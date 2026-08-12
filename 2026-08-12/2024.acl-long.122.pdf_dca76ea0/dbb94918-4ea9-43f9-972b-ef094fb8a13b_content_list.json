@@ -1,0 +1,1949 @@
+[
+    {
+        "type": "text",
+        "text": "LRQuant: Learnable and Robust Post-Training Quantization for Large Language Models",
+        "text_level": 1,
+        "bbox": [
+            129,
+            89,
+            868,
+            130
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Jiaqi Zhao, Miao Zhang\\*, Chao Zeng, Ming Wang, Xuebo Liu, Liqiang Nie School of Computer Science and Technology, Harbin Institute of Technology (Shenzhen) {24B351012,23S151104,190110509}@stu.hit.edu.cn {zhangmiao,liuxuebo,nieliqiang}@hit.edu.cn",
+        "bbox": [
+            136,
+            152,
+            862,
+            219
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            260,
+            260,
+            342,
+            277
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Post-training quantization (PTQ) for large language models (LLMs) significantly accelerates model inference and relieves memory constraints, without incurring model training. A “smoothing paradigm” is commonly used in LLM quantization, which transfers the quantization difficulty of activation to weight quantization using mathematically equivalent transformations. However, existing methods face two issues: 1) Most smoothing parameters are hand-crafted defined which leads to suboptimal results; 2) There are significant performance degradations when tested on unseen datasets. To address these challenges, this paper introduces a robust learnable smooth-based PTQ framework, called LRQuant. Firstly, we consider a learnable paradigm to find optimal smoothing parameters which are initialized by logarithmic activation equivalent. In addition, we empirically found that only relying on MSE loss could hardly lead to opti mal quantization results, and we then propose a novel loss function based on the negative logarithm of cosine similarity (NLC loss) be tween outputs of full-precision and quantized block. At last, we pioneeringly introduce Testtime adaptation (TTA) into LLM quantization, which allows for rapid model adaptation dur ing testing to improve generalization performance. More surprisingly, we find that by using our TTA method, we can achieve better results on test sets than directly using test sets for calibration in some cases while avoiding catastrophic forgetting. Codes are available at https://github.com/zjq0455/RLQ.",
+        "bbox": [
+            141,
+            286,
+            462,
+            787
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            114,
+            795,
+            260,
+            812
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Quantization (Esser et al., 2019; Chee et al., 2023; Dettmers et al., 2023a,b) is a well-known model compression technique converting the weights of large language models (LLMs) and activations from full precision to lower-bit representations.",
+        "bbox": [
+            112,
+            820,
+            490,
+            902
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Among various methods, Post-Training Quantization (PTQ) (Nagel et al., 2020; Hubara et al., 2021; Yao et al., 2022) is the most popular for LLMs, as it doesn’t require retraining the model and offers fast quantization, saving computational resources. For instance, GPTQ (Frantar et al., 2022) uses only an A100-80G GPU to quantize BLOOM-175B (Workshop et al., 2022) within 4 hours.",
+        "bbox": [
+            507,
+            261,
+            887,
+            391
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Previous PTQ methods exhibit uncommendable performance when confronted with more challenging configurations, such as W4A4, due to larger activation distribution variances. A new strategy, known as “smooth quantization” (Xiao et al., 2023), has been recently introduced to address this by shifting the quantization difficulty from activations to weights. However, current smoothing strategies, such as hand-crafted scaling factors (Xiao et al., 2023; Frantar et al., 2022) and uniform zero points (Wei et al., 2023) are all predefined, which usually lead to suboptimal. The intuitive proposition of learning the smoothing parameters, coupled with the adoption of MSE loss which aims to optimize quantization output by evaluating the similarity in magnitude, is an easily conceived solution. We conducted an example experiment and summarized the cosine similarity between the outputs of each quantized block (MSE-guided learning(Shao et al., 2024) and predefined method (Xiao et al., 2023)) and full-precision block. As shown in Figure 1, there are large differences, both for the predefined and the MSE-guided learning method, demonstrating that except for MSE, another learning strategy for better optimizing is essential.",
+        "bbox": [
+            507,
+            391,
+            887,
+            794
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "In addition, a prevalent issue across prior PTQ methods is that quantization on the calibration dataset leads to suboptimal performance when subsequently applied to unseen datasets. For instance, quantize a LLaMA based on WikiText2 (Merity et al., 2016) and evaluate on PTB (Marcus et al., 1994). Meanwhile, Test-time adaptation (TTA) is an increasingly promising technique to improve model generalization capacity (Wang et al., 2020; Niu et al., 2022, 2023), which enhances the model’s robustness during testing without requiring retraining. However, according to our investigation, there is currently no method that utilizes TTA to address the aforementioned issue in PTQ methods.",
+        "bbox": [
+            507,
+            794,
+            887,
+            923
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "\\*Corresponding author",
+        "bbox": [
+            136,
+            907,
+            280,
+            922
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "2240",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 2240–2255 August 11-16, 2024 ©2024 Association for Computational Linguistics",
+        "bbox": [
+            89,
+            945,
+            909,
+            973
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "chart",
+        "img_path": "images/e2e6ab749c72ccd80ec86307078c748e7ea921c312ca718085316a478aef9b54.jpg",
+        "content": "",
+        "chart_caption": [
+            "(a) LLaMA-7B"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            122,
+            93,
+            374,
+            235
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "chart",
+        "img_path": "images/2cb8bf04748f13a245c516beafa6230f5f5c3a829954557fe80fe1b15b1ee770.jpg",
+        "content": "",
+        "chart_caption": [
+            "(b) LLaMA-13B"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            373,
+            91,
+            628,
+            235
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "chart",
+        "img_path": "images/8ed44c9a8c51d5500fd63b9d61bf3fd032e4b2d3ba1ee0766ce6db8495118a29.jpg",
+        "content": "",
+        "chart_caption": [
+            "(c) LLaMA-2-13B"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            628,
+            91,
+            873,
+            234
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "chart",
+        "img_path": "images/1538ad7ccdf20ed2e071a3341b029410e0938add35216afebc33d448bebcf845.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 1: Cosine similarity between outputs of full-precision and quantized block (by predefined method (Xiao et al., 2023), MSE-guided learning method (Shao et al., 2024), and our LRQuant).",
+            "Figure 2: LRQuant not only outperforms previous methods under general setting with the help of NLC loss but also has a strong generalization capability."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            146,
+            312,
+            453,
+            479
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            564,
+            490,
+            662
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Considering all the aforementioned aspects, this paper introduces a novel PTQ framework named LRQuant. Firstly, we define learnable parameters and devise a novel block-wise loss function, named negative logarithm of cosine similarity loss (NLC loss) considering directional differences of outputs, to guide the learning of all learnable parameters. As depicted in Figure 1, this modification significantly improves our quantization performance. Additionally, LRQuant is the first to incorporate TTA strategy into LLMs quantization aiming to fortify models’ robustness on unseen test sets. Rather than adapting the learnable parameters of the whole model based on the unseen data where we observe catastrophic forgetting, LRQuant only updates the learnable parameters of the last block to effectively balance performance and forgetting. Figure 2 illustrates an approximate performance comparison between our LRQuant and previous PTQ methods. More excitedly, we observe that with our TTA method, the adapted model even outperforms the quantized model directly calibrated by the test set in some cases. This discovery implies that if a quantized model needs to be applied to different scenarios, there will be no need to re-calibrate and re-quantize the full-precision model from scratch.",
+        "bbox": [
+            112,
+            664,
+            490,
+            923
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            315,
+            885,
+            476
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Our key contributions can be summarized as:",
+        "bbox": [
+            527,
+            476,
+            867,
+            493
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• We present a learnable PTQ framework for LLMs (called LRQuant), by setting smoothing parameters into learnable with logarithmic activation equalization initialization.",
+        "bbox": [
+            531,
+            504,
+            885,
+            568
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• We propose a novel block-wise loss function called NLC loss, which is based on the negative logarithm of cosine similarity between outputs of full-precision and quantized blocks, to assist in correcting the output directions rather than only the magnitude by MSE loss.",
+        "bbox": [
+            531,
+            579,
+            887,
+            676
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• LRQuant is the first to introduce TTA into PTQ by updating the learnable parameters of the last block based on test data, which enhances the performance on unseen test data in some cases, while avoiding catastrophic forgetting on source data. Remarkably, our adapted quantized model exhibits superior performance compared to calibration using test sets from scratch.",
+        "bbox": [
+            531,
+            687,
+            887,
+            832
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Related Work",
+        "text_level": 2,
+        "bbox": [
+            509,
+            843,
+            667,
+            859
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2.1 Smooth-Based Post-Training Quantization",
+        "text_level": 2,
+        "bbox": [
+            509,
+            869,
+            884,
+            885
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "“Smooth” is a solution proposed to address the challenge of activation quantization difficulty (Xiao et al., 2023). It is based on mathematical equivalent transformations, where the activations with large variances across different channels are divided by scaling factors. Correspondingly, the weights which are generally easier to quantize are multiplied by scaling factors. Outlier Suppression (Wei et al., 2022) finds that the scaling parameter γ in LayerNorm (LN) layer of LLM is a key factor influencing the distribution of activation value outliers. Therefore, Gamma Migration is proposed, which involves removing γ from LN and moving it to the weights in the next layer and the short branch. Outlier Suppression+ (Wei et al., 2023) introduces channel-wise shifting, which eliminates the asymmetry in activation distribution and reduces the range of the tensor. SmoothQuant (Xiao et al., 2023) is the first method to introduce channelwise scaling factors designed based on the maximum value. FPTQ (Li et al., 2023) improves the calculation method of scaling factors by utilizing non-linear offline logarithmic activation equalization (LAE) to adjust the distribution of activations, making the activation distribution moderate. OmniQuant (Shao et al., 2024) stands out as the latest smooth-based PTQ method which defines learnable smoothing parameters. However, OmniQuant uses the basic channel-wise maximum values as the initial scaling factors and only use MSE loss to update, means that its performance can not reach the optimal level. This paper also defines learnable parameters where smoothing parameters are initialized with LAE. Furthermore, we design a novel loss function namely NLC loss based on cosine similarity considering the directional differences of outputs to update the learnable parameters.",
+        "bbox": [
+            507,
+            890,
+            885,
+            922
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "2241",
+        "bbox": [
+            480,
+            929,
+            519,
+            942
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            85,
+            492,
+            650
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2.2 Test-Time Adaptation",
+        "text_level": 2,
+        "bbox": [
+            114,
+            659,
+            334,
+            675
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Test-time adaptation is a technique to adapt models to unseen datasets to improve robustness during testing. Unlike fine-tuning (Wang et al., 2017; Howard and Ruder, 2018; Hu et al., 2021), it is source-free and doesn’t require additional labels from test data. Tent (Wang et al., 2020) minimizes the prediction entropy generated by the model during testing to reduce generalization error. EATA (Niu et al., 2022) believes that excessive adaptation can lead to catastrophic forgetting of the source data and proposes a sample selection method to choose samples with high contribution to adaptation from the test sets for entropy minimization. On this basis, SAR (Niu et al., 2023) proposes removing noisy samples with large gradients during testing and enhancing robustness to noise through sharpness-aware learning on the remaining samples. TS (Park et al., 2023) changes the traditional approach of updating model parameters and instead performs style shifting on test samples to make them resemble the nearest source domain.",
+        "bbox": [
+            112,
+            681,
+            490,
+            923
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/f066fe14ea3d656c73283cd2daeb0c10c870db94ec09b7df7671929f7ba30a61.jpg",
+        "image_caption": [
+            "Figure 3: An overview of our LRQuant. LRQuant uses our NLC loss and MSE loss to update learnable smoothing and quantization parameters. During testing, LRQuant utilizes test data to adapt the last block to improve performance on unseen data."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            514,
+            84,
+            885,
+            332
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            444,
+            885,
+            541
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "In this paper, we are the first to introduce TTA into LLMs quantization, aiming to improve the model’s generalization capability on unseen test sets while avoiding catastrophic forgetting and outperforming re-calibration from scratch.",
+        "bbox": [
+            507,
+            542,
+            885,
+            623
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3 LRQuant",
+        "text_level": 2,
+        "bbox": [
+            509,
+            634,
+            628,
+            652
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "In this section, we provide a detailed introduction to our LRQuant as shown in Figure 3. We first describe the learnable parameters and NLC loss and then introduce our TTA approach for quantized models on unseen datasets.",
+        "bbox": [
+            507,
+            662,
+            885,
+            743
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3.1 Learnable Parameters",
+        "text_level": 2,
+        "bbox": [
+            509,
+            749,
+            734,
+            765
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Learnable Weight Quantization. For weight quantization, the general function is as follows:",
+        "bbox": [
+            507,
+            770,
+            884,
+            803
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "img_path": "images/d49aa98a5b9a70ad305dea1917a52e3d947c9188803b515b07a314fd042ec265.jpg",
+        "text": "$$\n\\mathbf { W _ { q } } = \\mathbf { c l a m p } ( \\lfloor \\frac { \\mathbf { W } } { S } \\rceil + z , 0 , 2 ^ { b } - 1 ) ,\\tag{1}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            563,
+            814,
+            828,
+            846
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "where . means round-to-nearest operation. b denotes the target bit-width. $\\mathrm { w _ { q } }$ is the quantized weight and W is the full-precision weight. S is the step size and z is called zero-point, and we follow",
+        "bbox": [
+            507,
+            858,
+            885,
+            922
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "2242",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Lin et al. (2023) to learn these two parameters to improve performance, which can be elaborated as:",
+        "bbox": [
+            112,
+            85,
+            489,
+            117
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/b8a4a5d0157322ca4c3ff6322b6669dd34fa01f29c9729a3a718f7a3a35ba048.jpg",
+        "text": "$$\n\\begin{array} { r } { S = \\frac { \\alpha \\mathrm { m a x } ( \\mathbf { W } ) - \\beta \\mathrm { m i n } ( \\mathbf { W } ) } { 2 ^ { b } - 1 } , z = - \\lfloor \\frac { \\beta \\mathrm { m i n } ( \\mathbf { W } ) } { S } \\rceil , } \\end{array}\\tag{2}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            131,
+            129,
+            448,
+            153
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where α and $\\beta$ are learnable quantization parameters (Shao et al., 2024) to control the upper and lower bound of clipping range respectively and they are constrained within the range of [0, 1].",
+        "bbox": [
+            112,
+            166,
+            489,
+            231
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Learnable Activation Smoothing Quantization. Smooth-based PTQ methods are supposed to smooth the distribution of activations to mitigate the impact of outliers under the condition of outputting exactly equal results in mathematical form. For linear layers, this can be expressed as:",
+        "bbox": [
+            112,
+            237,
+            490,
+            335
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/225b3afe250aa5d5f81a905ceb490fa8fb24e275d5bcd3124bd89ce508d65eb0.jpg",
+        "text": "$$\n\\mathbf { \\boldsymbol { X } } ^ { \\prime } \\mathbf { \\boldsymbol { W } } ^ { \\prime } + \\mathbf { \\boldsymbol { B } } ^ { \\prime } = \\mathbf { \\boldsymbol { X } } \\mathbf { \\boldsymbol { W } } + \\mathbf { \\boldsymbol { B } } ,\\tag{3}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            208,
+            349,
+            393,
+            366
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where X, W, B and X’, W’, $\\mathbf { B } ^ { \\prime }$ are activation, weight, bias before and after equivalent transformation respectively. In more detail:",
+        "bbox": [
+            112,
+            381,
+            489,
+            430
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/6744749dceee62d130f24665e590ebaa3c4dc8a5ec0c48caf4a7b13c6ea778c8.jpg",
+        "text": "$$\n\\mathbf { \\boldsymbol { X } } ^ { \\prime } = ( \\mathbf { \\boldsymbol { X } } - z _ { s } ) \\mathrm { d i a g } ( s ) ^ { - 1 } ,\\tag{4}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            201,
+            443,
+            398,
+            462
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/d0b94b2e5a83ec2989586a49ee5d587d52299d3ef7df8d7dab2b0d998a12c7c9.jpg",
+        "text": "$$\n\\mathbf { W } ^ { \\ast } = \\mathrm { d i a g } ( s ) \\mathbf { W } ,\\tag{5}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            235,
+            480,
+            366,
+            497
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/145d31f1432327cf90e597f26f7f531f6df278de77306ad80f549c749643c556.jpg",
+        "text": "$$\n\\mathbf { B } ^ { \\prime } = \\mathbf { B } + z _ { s } \\mathbf { W } ,\\tag{6}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            238,
+            508,
+            361,
+            525
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where s and $z _ { s }$ are scaling factors and shifting factors (Wei et al., 2023) to narrow down the activation distribution range. We should notice that in order to calculate easily and implement smooth quantization in codes, for activation quantization, s and $z _ { s }$ are fused into the weights of previous LN or linear layers, and for weights, s can be absorbed into themselves.",
+        "bbox": [
+            112,
+            536,
+            489,
+            664
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "As is well-known, the initial values of hyperparameters have a significant impact on the final results (Glorot and Bengio, 2010). Inspired by (Lin et al., 2023) and (Li et al., 2023), the impact of the smoothing process on weight quantization is consistently smaller compared to the benefits obtained by smoothing activation and the use of logarithmic equivalence proves to be more effective in suppressing activation outliers. In this way, we define the initial scaling factor s as:",
+        "bbox": [
+            112,
+            665,
+            490,
+            827
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/a38b5bdcb7608d88fdda0a3c9fcd6735e34226044032351e87ac81176f69a64e.jpg",
+        "text": "$$\ns _ { i } ^ { 0 } = \\operatorname* { m a x } ( | \\mathbf { x } _ { i } | ) / \\log _ { a } ( a + \\operatorname* { m a x } ( | \\mathbf { x } _ { i } | ) ) ,\\tag{7}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            159,
+            841,
+            440,
+            859
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where i is the index of the input channel. We set a as 2 followed by (Li et al., 2023), while $s _ { i } ^ { 0 }$ is just an initial value as our scaling factor is learnable.",
+        "bbox": [
+            112,
+            875,
+            487,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.2 NLC Loss",
+        "text_level": 2,
+        "bbox": [
+            509,
+            84,
+            636,
+            99
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Block-wise quantization is commonly used in PTQ for LLMs, which quantizes the whole model block by block, to avoid excessive GPU memory usage. The MSE is usually adopted to guide the quantization process:",
+        "bbox": [
+            507,
+            104,
+            885,
+            186
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/d0b3ce3b5d06b698083eb52aba855bf33702643ae6d731ff5edf6aa19c663e1f.jpg",
+        "text": "$$\n\\mathcal { L } _ { M S E } = \\| F ( \\mathbf { W } , \\mathbf { X } ) - F ( Q _ { w } ( \\mathbf { W } ) , Q _ { a } ( \\mathbf { X } ) ) \\| _ { 2 } ^ { 2 } ,\\tag{8}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            526,
+            198,
+            843,
+            216
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where $F ( \\cdot )$ is the embedding function of a block. $Q _ { w } ( \\cdot )$ represents the weight quantizer with both learnable quantization parameters $\\Theta _ { q }$ (short for α and $\\beta )$ and smoothing parameters $\\Theta _ { s }$ (short for s and $z _ { s } )$ while $Q _ { a } ( \\cdot )$ denotes the activation quantizer with only smoothing parameters $\\Theta _ { s }$",
+        "bbox": [
+            507,
+            227,
+            885,
+            324
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "However, MSE loss only measures the magnitude similarity of vectors without considering the direction similarity. Hence, this paper is motivated by maximizing the cosine similarity between the output of each full-precision and quantized block, to improve directional similarity. We leverage the negative logarithm of cosine similarity for the outputs as the loss function called NLC loss $\\mathcal { L } _ { N L C } \\mathrm { : \\Omega }$",
+        "bbox": [
+            507,
+            325,
+            887,
+            455
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/42dbfa5e0962910f253d5a38e0a50bbb463ca3a4ce11d173030ef27425e5966f.jpg",
+        "text": "$$\n\\mathcal { L } _ { N L C } = - \\log ( \\mathcal { C } ( F ( \\mathbf { W } , \\mathbf { X } ) , F ( Q _ { w } ( \\mathbf { W } ) , Q _ { a } ( \\mathbf { X } ) ) ) ) ,\\tag{9}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            527,
+            467,
+            843,
+            483
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where $\\mathcal { C } ( \\cdot )$ is the cosine similarity operator:",
+        "bbox": [
+            509,
+            495,
+            835,
+            512
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/2d0343d3d2273c383a56590c4a601e59f0b5774090071710cbaa3f88ad7b3c39.jpg",
+        "text": "$$\n\\mathcal { C } ( A , B ) = \\frac { A \\cdot B } { \\| A \\| \\| B \\| } .\\tag{10}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            611,
+            521,
+            779,
+            557
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "In the end, we combined MSE loss and NLC loss, and our final optimization objective is:",
+        "bbox": [
+            509,
+            565,
+            884,
+            598
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/3b75ffb52a1a96a9cd9e55410b36df2f918baf93001eed05bfce38e098632931.jpg",
+        "text": "$$\n\\Theta _ { q } ^ { * } , \\Theta _ { s } ^ { * } = \\operatorname * { a r g m i n } _ { \\Theta _ { q } , \\Theta _ { s } } ( \\mathcal { L } _ { M S E } + \\mathcal { L } _ { N L C } ) ,\\tag{11}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            542,
+            611,
+            820,
+            638
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where $\\Theta _ { q } ^ { * }$ and $\\Theta _ { s } ^ { * }$ are the optimal learnable parameters. Our NLC loss approaches 0 when the quantized and the full-precision outputs are close to be the same, so as guiding the quantization process. As illustrated in Figure 1, with NLC loss, LRQuant has significantly outperformed MSE-only method.",
+        "bbox": [
+            507,
+            649,
+            887,
+            746
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.3 TTA for Quantized Models",
+        "text_level": 2,
+        "bbox": [
+            509,
+            756,
+            769,
+            772
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "In most existing PTQ methods for LLMs, the pretrained large model is first quantized based on the calibration dataset, which is then directly evaluated on unseen test datasets. However, when applying the quantized model to an unseen dataset with domain shift, it may cause performance degradation. A naive solution is to re-calibrate the whole quantized model based on the test dataset, while which is time-consuming. In addition, we empirically found that, adapting the entire model using test data will inevitably lead to catastrophic forgetting of source calibration knowledge, leading to performance degradation. Therefore, balancing model adaptation performance and catastrophic forgetting is crucial. To address this issue, we innovatively introduce the idea of TTA into LLM quantization.",
+        "bbox": [
+            507,
+            777,
+            887,
+            923
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "footer",
+        "text": "2243",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            197
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Considering that the most task-relevant block in the model is the last one, we choose to only adapt the last block of the quantized model based on the unseen test data. As illustrated in Figure 3, in the TTA phase of our LRQuant, we only extract the last block from the full-precision model for quantization based on the test data, and we still utilize a combination of MSE loss and NLC loss to update the parameters with only a few epochs. The adaptation goal is as follows:",
+        "bbox": [
+            112,
+            198,
+            489,
+            359
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/98bdc0bf934386c58e6492a5056e062e8a1b8686cbc669df7f2306702ebd315e.jpg",
+        "text": "$$\n\\Theta _ { q } ^ { l * } , \\Theta _ { s } ^ { l * } = \\underset { \\Theta _ { q } ^ { l } , \\Theta _ { s } ^ { l } } { \\mathrm { a r g m i n } } ( \\mathcal { L } _ { M S E } + \\mathcal { L } _ { N L C } ) ,\\tag{12}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            142,
+            363,
+            428,
+            395
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where $\\Theta _ { q } ^ { l * }$ and $\\Theta _ { s } ^ { l * }$ are the learnable parameters of the last block after adaptation, where we set 5 as the number of TTA epochs. This entire process is source-free, and the time required for each adaptation process on test sets is within one minute.",
+        "bbox": [
+            112,
+            403,
+            489,
+            483
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "An intuitive question is why only update the learnable parameters of the last block rather than the entire model. Here we describe the two advantages of our TTA scheme over re-calibration for PTQ. First, it is much more time-consuming and challenging to update the whole model than only the last block. Second, re-calibrating the whole model based on the test set can lead to catastrophic forgetting which significantly alters the suitable quantization parameters for source calibration data. Differently, our TTA scheme only re-calibrates the last block, which can somehow retain source knowledge. Moreover, our experimental results in Table 6 show that, compared to calibrating the whole fullprecision model using test sets from scratch, our TTA scheme can achieve much better performance on unstable target sets such as PTB, which maintains its performance on the source calibration set even after adapting to the new test dataset. In the end, we present the entire LRQuant pseudocode as Algorithm 1 at Appendix A.",
+        "bbox": [
+            110,
+            485,
+            490,
+            824
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "4 Experiments",
+        "text_level": 2,
+        "bbox": [
+            114,
+            833,
+            262,
+            850
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "In this section, we conduct extensive experiments to validate our LRQuant achieves the following objectives: (1) Demonstrates outstanding performance in challenging quantization tasks (W4A4 and W6A6) through the presented learnable parameters and NLC loss. (2) Enhances model performance on unseen test sets using our TTA scheme.",
+        "bbox": [
+            112,
+            858,
+            490,
+            922
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            887,
+            134
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "4.1 Experimental Setup",
+        "text_level": 2,
+        "bbox": [
+            509,
+            143,
+            715,
+            160
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Baseline. Because LRQuant is a smooth-based PTQ method, we select the same type but predefined methods SmoothQuant (Xiao et al., 2023), LAE (Li et al., 2023) and learnable approach OmniQuant (Shao et al., 2024) as baselines. It is important to note that, due to the lack of data from original papers and to ensure consistency with our LRQuant experimental environment, all results of other methods are reproduced as their settings.",
+        "bbox": [
+            507,
+            165,
+            887,
+            310
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Models. We mainly choose LLaMA (7B,13B and 30B) (Touvron et al., 2023a) and LLaMA-2 (7B,13B) (Touvron et al., 2023b) to evaluate our LRQuant, since LLaMA and LLaMA-2 families are currently the most popular and widely applied LLMs. Additionally, we also conduct experiments on OPT (1.3B, 2.7B, 6.7B) (Zhang et al., 2022), which can be found in Appendix D.",
+        "bbox": [
+            507,
+            310,
+            885,
+            438
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Training. For learnable smoothing parameters, we initialize the channel-wise shifting factors as Wei et al. (2023) and the scaling factors with Eq.(7), where we set the base a as 2. We utilize the AdamW optimizer (Loshchilov and Hutter, 2017) with zero weight decay to optimize the learnable smoothing parameters and quantization parameters with learning rate 1e-3 and 1e-2 respectively. Our calibration data consists of 128 random 2048 token-segments from WikiText2 (Merity et al., 2016). Using a batch size of 1, all processes are performed on one NVIDIA A100-40G GPU. The calibration training process consists of 20 epochs, while the TTA process involves 5 epochs.",
+        "bbox": [
+            507,
+            439,
+            887,
+            665
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Datasets. Following most smooth-based methods (Shao et al., 2024; Xiao et al., 2023), test data comes from WikiText2, Penn Treebank (PTB) (Marcus et al., 1994), and C4 (Raffel et al., 2020) for language generation tasks. For evaluating the performance on zero-shot tasks, we select several popular tasks including PIQA (Bisk et al., 2020), ARC (Clark et al., 2018), BoolQ (Clark et al., 2019), HellaSwag (Zellers et al., 2019) and Winogrande (Sakaguchi et al., 2021) using lmevaluation-harness (Gao et al., 2023).",
+        "bbox": [
+            507,
+            665,
+            887,
+            843
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "4.2 Experiments on Language Generation Tasks",
+        "text_level": 2,
+        "bbox": [
+            509,
+            853,
+            857,
+            884
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "The core competency requisite for LLMs is to comprehend and generate language. Hence, to validate the first objective—achieving superior performance in challenging quantization tasks—we initially compare a crucial metric for language generation tasks, perplexity, with the baselines.",
+        "bbox": [
+            507,
+            890,
+            887,
+            923
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "footer",
+        "text": "2244",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "table",
+        "img_path": "images/91d0ae7db7e7761faba63564c4f8c65dab50c863719b6cb62768749d28c90219.jpg",
+        "table_caption": [
+            "Table 1: W4A4 perplexities (lower is better) comparison of quantized LLaMA and LLaMA-2 models. W6A6 results are in Table 11 at Appendix D. All models are quantized based on WikiText2 and evaluated on all datasets."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Bits</td><td>Models</td><td>Methods</td><td>WikiText2</td><td>PTB</td><td>C4</td><td>PTB-new</td><td>C4-new</td></tr><tr><td rowspan=\"10\">W4A4</td><td rowspan=\"4\">LLaMA-7B</td><td>FP16</td><td>5.67</td><td>27.34</td><td>7.07</td><td>41.15</td><td>7.34</td></tr><tr><td>LAE</td><td>135.72</td><td>500.23</td><td>140.69</td><td>648.07</td><td>166.53</td></tr><tr><td>SmoothQuant</td><td>38.09</td><td>203.76</td><td>58.50</td><td>320.09</td><td>74.12</td></tr><tr><td>OmniQuant LRQuant</td><td>12.46 11.25</td><td>107.31</td><td>15.83</td><td>201.06</td><td>17.78</td></tr><tr><td rowspan=\"5\">LLaMA-13B</td><td>FP16</td><td></td><td>52.05</td><td>14.14</td><td>99.28</td><td>15.41</td></tr><tr><td>LAE</td><td>5.09 151.02</td><td>19.22 283.48</td><td>6.61 132.17</td><td>28.09 397.80</td><td>6.79 148.29</td></tr><tr><td>SmoothQuant</td><td>79.01</td><td>267.09</td><td>99.58</td><td></td><td></td></tr><tr><td>OmniQuant</td><td>12.39</td><td>72.26</td><td>15.47</td><td>297.53</td><td>121.95</td></tr><tr><td>LRQuant</td><td>11.26</td><td>42.76</td><td>13.19</td><td>105.07 63.78</td><td>17.38 14.53</td></tr><tr><td rowspan=\"5\">LLaMA-30B</td><td>FP16</td><td>4.10</td><td>16.29</td><td>5.98</td><td>23.51</td><td>6.13</td></tr><tr><td>LAE</td><td>388.53</td><td>855.89</td><td>210.49</td><td>1194.53</td><td>233.55</td></tr><tr><td>SmoothQuant</td><td>449.28</td><td>1320.15</td><td>193.36</td><td>2291.59</td><td>233.35</td></tr><tr><td>OmniQuant</td><td>15.09</td><td>68.11</td><td>18.05</td><td>90.31</td><td>19.68</td></tr><tr><td>LRQuant</td><td>12.00</td><td>36.55</td><td>12.83</td><td>53.64</td><td>14.12</td></tr><tr><td rowspan=\"5\">LLaMA-2-7B</td><td>FP16</td><td>5.47</td><td></td><td>22.51</td><td>6.97</td><td>37.91</td><td>7.26</td></tr><tr><td>LAE</td><td>180.94</td><td>2114.33</td><td>155.20</td><td></td><td>6149.77</td><td>174.06</td></tr><tr><td>SmoothQuant</td><td>106.18</td><td>1477.48</td><td>98.42</td><td>2961.55</td><td></td><td>113.35</td></tr><tr><td>OmniQuant</td><td>16.66</td><td>717.61</td><td>21.16</td><td>1572.5</td><td></td><td>24.05</td></tr><tr><td>LRQuant</td><td>12.75</td><td>87.63</td><td>15.82</td><td>281.41</td><td></td><td>17.57</td></tr><tr><td rowspan=\"5\">LLaMA-2-13B</td><td>FP16</td><td>4.88</td><td></td><td>28.87</td><td>6.47</td><td>50.93</td><td>6.73</td></tr><tr><td>LAE</td><td></td><td>338.27</td><td>1231.87</td><td>516.26</td><td>2102.05</td><td>541.60</td></tr><tr><td>SmoothQuant</td><td>184.11</td><td>1500.14</td><td>165.09</td><td></td><td>2681.07</td><td>158.29</td></tr><tr><td>OmniQuant</td><td>12.93</td><td>147.25</td><td>15.47</td><td></td><td>253.71</td><td>17.25</td></tr><tr><td>LRQuant</td><td>12.23</td><td>132.83</td><td>14.02</td><td></td><td>262.99</td><td>15.57</td></tr></table>",
+        "bbox": [
+            179,
+            83,
+            818,
+            431
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            498,
+            490,
+            562
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "The outcomes presented in Table 1 highlight a significant superiority of our learnable method over predefined methods in all W4A4 experiments. When compared to another learnable method, OmniQuant, across WikiText2, C4, and C4-new tasks, LRQuant exhibits a noteworthy reduction in perplexities by an average of 2.00, 3.20, and 3.79, respectively. Notably, on PTB and PTB-new tasks where OmniQuant faces substantial challenges, LRQuant demonstrates heightened stability. A more visually intuitive representation of the cosine similarity comparison with OmniQuant is depicted in Figure 1. W6A6 results can be found in Table 11 at Appendix D and OPT results can be found in Table 13 at Appendix E. These findings underscore the efficacy of learnable parameters and NLC loss.",
+        "bbox": [
+            112,
+            563,
+            490,
+            822
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.3 Experiments on Zero-Shot Tasks",
+        "text_level": 2,
+        "bbox": [
+            112,
+            834,
+            420,
+            851
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "In addition to language generation, zero-shot tasks reflect the model’s ability to handle unseen problems, also serving as a crucial metric for characterizing model performance. To further validation, we compare zero-shot accuracies with baselines.",
+        "bbox": [
+            112,
+            858,
+            490,
+            923
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            509,
+            498,
+            847,
+            513
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "As indicated in Table 2, similar to the results observed in language generation tasks, our LRQuant consistently outperforms all predefined methods. Moreover, our LRQuant also exhibits superior performance compared to OmniQuant in most cases, showcasing an average performance increase range of 3.22% 8.95%. Results and analysis for W6A6 can be found in Table 12. Combining the experimental results from the two subsections, we deduce that our LRQuant attains the state-of-the-art level in challenging quantization tasks. Additionally, in order to further demonstrate the superiority of our method on weight-only tasks, we conduct corresponding experiments in Appendix G.",
+        "bbox": [
+            507,
+            514,
+            887,
+            741
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.4 Ablation Experiments",
+        "text_level": 2,
+        "bbox": [
+            509,
+            755,
+            731,
+            770
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Having showcased the superior performance of LRQuant in challenging quantization tasks, our objective extends to providing additional evidence for the effectiveness of our two innovations: learnable parameters and NLC loss. To substantiate this, we conduct ablation studies on the LLaMA-7B at W4A4, and the results are presented in Table 3, where LAE and NLC represent the initialization methods for learnable smoothing parameters and",
+        "bbox": [
+            507,
+            777,
+            887,
+            923
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "2245",
+        "bbox": [
+            478,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "table",
+        "img_path": "images/b2dbbd35458a09923fd77d0063e8af92443a11ff3d2e95bd0a7c3113b0f3a9bd.jpg",
+        "table_caption": [
+            "Table 2: Zero-shot accuracies (higher is better) comparison of quantized LLaMA and LLaMA-2 models at W4A4. W6A6 results can be found in Table 12 at Appendix D."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Models</td><td>Methods</td><td>PIQA</td><td>ARC-e</td><td>ARC-c</td><td>BoolQ</td><td>HellaS</td><td>WinoG</td><td>Avg.</td></tr><tr><td rowspan=\"5\">LLaMA-7B</td><td>FP16</td><td>78.40</td><td>67.34</td><td>38.13</td><td>73.11</td><td>56.42</td><td>66.85</td><td>63.38</td></tr><tr><td>LAE</td><td>56.58</td><td>28.74</td><td>21.84</td><td>56.39</td><td>27.32</td><td>52.72</td><td>40.60</td></tr><tr><td>SmoothQuant</td><td>61.86</td><td>42.42</td><td>22.86</td><td>58.37</td><td>33.30</td><td>50.51</td><td>44.89</td></tr><tr><td>OmniQuant</td><td>63.49</td><td>46.17</td><td>24.74</td><td>62.53</td><td>39.58</td><td>53.51</td><td>48.34</td></tr><tr><td>LRQuant</td><td>66.64</td><td>52.98</td><td>28.92</td><td>63.30</td><td>43.99</td><td>53.51</td><td>51.56</td></tr><tr><td rowspan=\"5\">LLaMA-13B</td><td>FP16</td><td>78.78</td><td>74.53</td><td>43.94</td><td>68.53</td><td>59.09</td><td>70.08</td><td>65.82</td></tr><tr><td>LAE</td><td>58.10</td><td>35.31</td><td>22.09</td><td>61.31</td><td>30.60</td><td>50.98</td><td>43.07</td></tr><tr><td>SmoothQuant</td><td>62.45</td><td>44.31</td><td>24.48</td><td>61.07</td><td>35.63</td><td>50.11</td><td>46.34</td></tr><tr><td>OmniQuant</td><td>63.87</td><td>47.72</td><td>26.27</td><td>62.17</td><td>40.78</td><td>52.64</td><td>48.91</td></tr><tr><td>LRQuant</td><td>72.41</td><td>57.91</td><td>31.65</td><td>64.92</td><td>47.43</td><td>56.43</td><td>55.13</td></tr><tr><td rowspan=\"5\">LLaMA-30B</td><td>FP16</td><td>80.08</td><td>58.92</td><td>45.47</td><td>68.44</td><td>79.21</td><td>72.53</td><td>67.44</td></tr><tr><td>LAE</td><td>56.03</td><td>28.45</td><td>19.45</td><td>50.48</td><td>26.69</td><td>48.85</td><td>38.33</td></tr><tr><td>SmoothQuant</td><td>54.57</td><td>28.82</td><td>19.45</td><td>55.90</td><td>26.93</td><td>49.88</td><td>39.26</td></tr><tr><td>OmniQuant</td><td>65.29</td><td>50.25</td><td>24.06</td><td>62.17</td><td>41.87</td><td>52.41</td><td>49.34</td></tr><tr><td>LRQuant</td><td>73.12</td><td>61.53</td><td>33.28</td><td>70.64</td><td>50.71</td><td>60.46</td><td>58.29</td></tr><tr><td rowspan=\"5\">LLaMA-2-7B</td><td>FP16</td><td>78.45</td><td>69.32</td><td>40.02</td><td>71.07</td><td>56.69</td><td>67.25</td><td>63.80</td></tr><tr><td>LAE</td><td>56.20</td><td>28.87</td><td>21.75</td><td>56.26</td><td>28.13</td><td>52.32</td><td>40.59</td></tr><tr><td>SmoothQuant</td><td>58.59</td><td>32.65</td><td>21.67</td><td>59.90</td><td>29.23</td><td>50.19</td><td>42.04</td></tr><tr><td>OmniQuant</td><td>60.39</td><td>43.47</td><td>22.26</td><td>61.43</td><td>37.25</td><td>49.64</td><td>45.74</td></tr><tr><td>LRQuant</td><td>63.71</td><td>46.96</td><td>26.27</td><td>63.39</td><td>44.42</td><td>53.19</td><td>49.66</td></tr><tr><td rowspan=\"5\">LLaMA-2-13B</td><td>FP16</td><td>78.73</td><td>73.27</td><td>45.56</td><td>69.02</td><td>59.72</td><td>69.61</td><td>65.99</td></tr><tr><td>LAE</td><td>54.62</td><td>29.50</td><td>20.90</td><td>58.25</td><td>28.56</td><td>50.35</td><td>40.36</td></tr><tr><td>SmoothQuant</td><td>54.18</td><td>28.78</td><td>19.28</td><td>60.55</td><td>27.82</td><td>50.19</td><td>40.13</td></tr><tr><td>OmniQuant</td><td>67.36</td><td>53.96</td><td>29.61</td><td>63.33</td><td>44.93</td><td>51.54</td><td>51.79</td></tr><tr><td>LRQuant</td><td>61.70</td><td>43.06</td><td>27.56</td><td>64.19</td><td>46.32</td><td>54.85</td><td>49.61</td></tr></table>",
+        "bbox": [
+            178,
+            82,
+            818,
+            431
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/20009b2ce268c854368d3952d6ba5823c2f8b392f730e840516f9586ad7a7a5c.jpg",
+        "table_caption": [
+            "our NLC loss, respectively.",
+            "Table 3: Ablation results of LLaMA-7B quantized by LRQuant at W4A4 quantization."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>LAE</td><td>MSE</td><td>NLC</td><td>Wiki-2</td><td>PTB</td><td>C4</td></tr><tr><td></td><td>√</td><td></td><td>12.46</td><td>107.31</td><td>15.83</td></tr><tr><td>√</td><td>√</td><td></td><td>12.34</td><td>91.58</td><td>15.69</td></tr><tr><td>√</td><td></td><td>√</td><td>12.22</td><td>50.57</td><td>14.98</td></tr><tr><td>√</td><td>√</td><td>√</td><td>11.25</td><td>52.05</td><td>14.14</td></tr></table>",
+        "bbox": [
+            157,
+            532,
+            443,
+            596
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "The first row in the table is same as Omni-Quant which only uses the MSE loss. It is evident from the second and third row that each innovation in our LRQuant is effective. Although $L A E + N L C$ group achieves optimal performance on PTB, which shows mediocre results on Wiki-Text2 and C4. Conversely, $L A E + M S E + N L C$ demonstrates the overall best performance, which is selected as our default setting.",
+        "bbox": [
+            112,
+            661,
+            490,
+            806
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We also conduct experiments to demonstrate the effectiveness of smoothing strategy. As illustrated in Figure 4, it can be observed that after smoothing the magnitude of the activation values has significantly decreased and shows much better performance, especially for those channels with more prominent outliers.",
+        "bbox": [
+            112,
+            809,
+            490,
+            923
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "image",
+        "img_path": "images/a74d5a1c5c9badbc4342cb25717b4e83a6acfcedfd707411ff22624302ca7ad8.jpg",
+        "image_caption": [
+            "Figure 4: The magnitude comparison of activations before and after smoothing by LRQuant in a layer of LLaMA-7B."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            542,
+            494,
+            850,
+            612
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/a3c301b9ad2708d4c962a6a73ccf037f747e593be59d3ef8e10de680fb2e4d87.jpg",
+        "table_caption": [
+            "Table 4: Perplexity comparison of LRQuant with and w/o smooth at W4A4."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Model</td><td>Methods</td><td>Wiki-2</td><td>PTB</td><td>C4</td><td>PTB-n</td><td>C4-n</td></tr><tr><td>LLaMA-7B</td><td>w/o smooth</td><td>2.9e3</td><td>2.4e3</td><td>3.1e3</td><td>2.8e3</td><td>3.5e3</td></tr><tr><td></td><td>smooth</td><td>11.25</td><td>52.05</td><td>14.14</td><td>99.28</td><td>15.41</td></tr><tr><td>LLaMA-2-7B</td><td>w/o smooth</td><td>462.03</td><td>661.47</td><td>472.60</td><td>1044.91</td><td>514.84</td></tr><tr><td></td><td>smooth</td><td>12.75</td><td>87.63</td><td>15.82</td><td>281.41</td><td>17.57</td></tr></table>",
+        "bbox": [
+            515,
+            682,
+            878,
+            745
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4.5 Experiments on Test-Time Adaptation Performance",
+        "text_level": 2,
+        "bbox": [
+            509,
+            815,
+            857,
+            847
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "After achieving the first validation objective, the subsequent goal is to verify whether our TTA method can enhance the performance on unseen datasets. We compare the perplexities of LRQuant before and after adaptation, where the model is quantized based on WikiText2 while adapted and evaluated on remaining datasets. As illustrated in Table 5, although a little worse on C4, perplexities of almost all adapted models with our TTA scheme have shown a certain degree of reduction on PTB, which intuitively proves the effectiveness of our method.",
+        "bbox": [
+            507,
+            858,
+            885,
+            923
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "2246",
+        "bbox": [
+            480,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/7cad012bfc6976a002fe55dc2da3fd49f69b2de7671a164d853ec553bd182c46.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Bits</td><td>Models</td><td>Methods</td><td>WikiText2</td><td>PTB</td><td>C4</td><td>PTB-new</td><td>C4-new</td></tr><tr><td rowspan=\"6\">W4A4</td><td>LLaMA-7B</td><td>pre-TTA</td><td>11.25</td><td>52.05</td><td>14.14</td><td>99.28</td><td>15.41</td></tr><tr><td></td><td>post-TTA pre-TTA</td><td>11.25</td><td>54.22</td><td>14.83</td><td>98.10</td><td>16.32</td></tr><tr><td>LLaMA-13B</td><td>post-TTA</td><td>11.26 11.26</td><td>42.76 40.58</td><td>13.19 13.44</td><td>63.78 60.34</td><td>14.53 15.08</td></tr><tr><td>LLaMA-2-7B</td><td>pre-TTA post-TTA</td><td>12.75 12.75</td><td>87.63 80.69</td><td>15.82 17.17</td><td>281.41 227.27</td><td>17.57 19.69</td></tr><tr><td>LLaMA-2-13B</td><td>pre-TTA</td><td>12.23</td><td>132.83</td><td>14.02</td><td>262.99</td><td>15.57</td></tr><tr><td></td><td>post-TTA</td><td>12.23</td><td>97.42</td><td>14.46</td><td>196.16</td><td>19.50</td></tr><tr><td rowspan=\"3\">W6A6</td><td>LLaMA-7B</td><td>pre-TTA post-TTA</td><td>5.88 5.88</td><td>32.56 32.64</td><td>7.35 7.63</td><td>49.14 49.09</td><td>7.67 7.97</td></tr><tr><td>LLaMA-13B</td><td>pre-TTA</td><td>5.27</td><td>20.13</td><td>6.84</td><td>28.39</td><td>7.07</td></tr><tr><td></td><td>post-TTA</td><td>5.27</td><td>19.98</td><td>7.15</td><td>28.48</td><td>7.41</td></tr></table>",
+        "bbox": [
+            198,
+            82,
+            798,
+            285
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/b490b78053ef79e98aeb83a47713fd78f030576ae8e8f7ca2f0c7f682ee32215.jpg",
+        "table_caption": [
+            "Table 5: Perplexities (lower is better) comparison of quantized models by LRQuant before and after TTA at W4A4 and W6A6. In this experiment, models are quantized on WikiText2 and then directly evaluated (pre-TTA) or adapted (post-TTA) on the remaining datasets.",
+            "Table 6: Perplexities on target dataset after direct calibration and our TTA scheme. In this experiment, “Calibration\" directly calibrates and quantizes models on the target dataset (PTB), while “TTA\" quantizes models based on WikiText2, and adapts to the target datasets. This table reports their evaluation performance on the target datasets."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Bits</td><td>Testsets</td><td>Methods</td><td>LLaMA-13B</td><td>LLaMA-2-13B</td></tr><tr><td rowspan=\"2\">W4A4</td><td rowspan=\"2\">PTB</td><td>Calibration</td><td>40.86</td><td>59.35</td></tr><tr><td>TTA</td><td>40.58</td><td>97.42</td></tr><tr><td rowspan=\"2\">W6A6</td><td rowspan=\"2\">PTB</td><td>Calibration</td><td>20.07</td><td>30.61</td></tr><tr><td>TTA</td><td>19.98</td><td>29.99</td></tr></table>",
+        "bbox": [
+            282,
+            353,
+            715,
+            434
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            514,
+            489,
+            644
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/6f6bf44cd0e5a334dfff50689b59c68d49c46545e49c966a1f6bad41384ba067.jpg",
+        "table_caption": [
+            "Table 7: Time (miniute) comparison of directly calibrating and TTA on PTB."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Bits</td><td>Methods</td><td>LLaMA-7B</td><td>LLaMA-13B</td><td>LLaMA-2-7B</td></tr><tr><td>W4A4</td><td>Calibrate TTA</td><td>137.2 0.4</td><td>240.9 0.6</td><td>137.8 0.4</td></tr><tr><td>W6A6</td><td>Calibrate TTA</td><td>138.6 0.5</td><td>243.9 0.6</td><td>137.7 0.4</td></tr></table>",
+        "bbox": [
+            117,
+            650,
+            482,
+            720
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "In addition, we compare our TTA scheme with directly calibrating the whole model using PTB. In Table 6, Calibrate means the model is directly calibrated and quantized using PTB and then immediately evaluated on it, while TTA means our TTA scheme where WikiText2 is the calibration set and adapt on PTB. The calibration of the whole model requires 300  more time than TTA adaptation. More surprisingly, our TTA scheme can outperform directly calibrating the whole model with the test sets in some cases. For other cases with slight decreases, our method remains comparable performance but shows hundreds of times faster than recalibration (see Table 7). In summary, we consider that our TTA scheme can significantly promote the deployment efficiency of quantized models in new scenarios while ensuring effectiveness.",
+        "bbox": [
+            112,
+            777,
+            490,
+            923
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/b2cfd42a30765c9a5aba597f9b43f0c9a1be3222caac19b53650bb0799eb59ea.jpg",
+        "table_caption": [
+            "Table 8: Perplexities on original WikiText2 at W4A4 after re-calibrating and TTA on test datasets (C4 and PTB). In this experiment, “reCalib\" first quantizes models based on WikiText2 and then re-quantizes the model based on test datasets. This table reports their evaluation performance on the original WikiText2 dataset."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">Models</td><td rowspan=\"2\">Methods</td><td colspan=\"2\">W4A4</td></tr><tr><td>C4</td><td>PTB</td></tr><tr><td rowspan=\"2\">LLaMA-7B</td><td>reCalib</td><td>11.77</td><td>14.09</td></tr><tr><td>TTA</td><td>11.25</td><td>11.25</td></tr><tr><td rowspan=\"2\">LLaMA-13B</td><td>reCalib</td><td>11.80</td><td>13.22</td></tr><tr><td>TTA</td><td>11.26</td><td>11.26</td></tr><tr><td rowspan=\"2\">LLaMA-2-7B</td><td>reCalib</td><td>13.64</td><td>15.12</td></tr><tr><td>TTA</td><td>12.75</td><td>12.75</td></tr><tr><td rowspan=\"2\">LLaMA-2-13B</td><td>reCalib</td><td>12.10</td><td>14.94</td></tr><tr><td>TTA</td><td>12.23</td><td>12.23</td></tr></table>",
+        "bbox": [
+            571,
+            512,
+            821,
+            649
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            777,
+            887,
+            921
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "2247",
+        "bbox": [
+            478,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Last, we conduct experiments to evaluate our TTA scheme in relieving catastrophic forgetting. As indicated in Table 8, we evaluate the W4A4 performance on WikiText2 to compare re-calibrating the model from scratch (reCalib) with our TTA method (TTA) after adapting on new datasets. As shown, the performance on the original WikiText2 deteriorates after re-calibrating on new test sets (C4 and PTB). Differently, our TTA can retain its performance on the original dataset, verifying its effectiveness in mitigating catastrophic forgetting. W6A6 results are in Table 14 at Appendix F.",
+        "bbox": [
+            110,
+            85,
+            490,
+            278
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "5 Conclusion",
+        "text_level": 2,
+        "bbox": [
+            114,
+            291,
+            247,
+            307
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "In this paper, we propose a robust smoothbased PTQ framework namely LRQuant. Firstly, LRQuant defines learnable smoothing parameters and initializes them using LAE. Subsequently, we introduce a novel block-wise loss function namely NLC loss which further considers the directional similarity of outputs. The experiments substantiate that our LRQuant attains state-of-the-art levels on challenging weight-activation quantization tasks. Moreover, we pioneeringly proposed a TTA scheme for LLM quantization to improve generalization performance on unseen datasets by adapting the learnable parameters of the last block based on the test data. The experiments indicate that our method not only relieves catastrophic forgetting but also surpasses re-calibration using the target set, thereby significantly promoting the deployment efficiency of quantized models in some cases.",
+        "bbox": [
+            110,
+            318,
+            490,
+            609
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Limitations",
+        "text_level": 2,
+        "bbox": [
+            114,
+            621,
+            221,
+            637
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Our LRQuant defines learnable smoothing parameters and introduces a novel loss function based on cosine similarity so it has become state-of-theart weight-activation PTQ method. However, due to hardware limitation we have not applied our method to quantize larger LLMs with over 100 billion parameters. This will be added to our list of future work.",
+        "bbox": [
+            112,
+            648,
+            490,
+            776
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Additionally, our LRQuant is the first to introduce TTA into LLMs quantization which has successfully improved the quantized models’ performance on unseen datasets. However, we do not draw inspirations from state-of-the-art TTA methods which makes our performance may not achieve optimal, such as on C4 dataset our TTA scheme still stands behind original results. In future work, we aim to explore ideas from other methods and propose a more effective TTA scheme for LLMs quantization.",
+        "bbox": [
+            112,
+            777,
+            490,
+            922
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            884,
+            117
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Ethics Statement",
+        "text_level": 2,
+        "bbox": [
+            509,
+            130,
+            662,
+            147
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "This paper introduces solutions to the challenges associated with Large Language Models (LLMs) quantization, with the overarching goal of facilitating the widespread adoption and application of LLMs. In the current landscape, ethical concerns tied to LLMs, including the presence of hidden biases encoded in the models, are garnering heightened attention. Following our investigation, we assert that our proposed method does not further amplify the biases and contravene any ethical standards.",
+        "bbox": [
+            507,
+            158,
+            887,
+            335
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Acknowledgement",
+        "text_level": 2,
+        "bbox": [
+            509,
+            349,
+            675,
+            366
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Miao Zhang was partially sponsored by the National Natural Science Foundation of China under Grant 62306084 and Shenzhen College Stability Support Plan under Grant GXWD20231128102243003. Xuebo Liu was sponsored by CCF-Tencent Rhino-Bird Open Research Fund.",
+        "bbox": [
+            507,
+            376,
+            885,
+            488
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            510,
+            517,
+            610,
+            533
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Yonatan Bisk, Rowan Zellers, Jianfeng Gao, Yejin Choi, et al. 2020. Piqa: Reasoning about physical commonsense in natural language. In Proceedings ofthe AAAI conference on artificial intelligence, volume 34, pages 7432–7439.",
+            "Jerry Chee, Yaohui Cai, Volodymyr Kuleshov, and Christopher De Sa. 2023. Quip: 2-bit quantization of large language models with guarantees. arXiv preprint arXiv:2307.13304.",
+            "Christopher Clark, Kenton Lee, Ming-Wei Chang, Tom Kwiatkowski, Michael Collins, and Kristina Toutanova. 2019. Boolq: Exploring the surprising difficulty of natural yes/no questions. arXiv preprint arXiv:1905.10044.",
+            "Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick, and Oyvind Tafjord. 2018. Think you have solved question answering? try arc, the ai2 reasoning challenge. arXiv preprint arXiv:1803.05457.",
+            "Tim Dettmers, Artidoro Pagnoni, Ari Holtzman, and Luke Zettlemoyer. 2023a. Qlora: Efficient finetuning of quantized llms. arXiv preprint arXiv:2305.14314.",
+            "Tim Dettmers, Ruslan Svirschevski, Vage Egiazarian, Denis Kuznedelev, Elias Frantar, Saleh Ashkboos,"
+        ],
+        "bbox": [
+            512,
+            542,
+            885,
+            607
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "2248",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Alexander Borzunov, Torsten Hoefler, and Dan Alistarh. 2023b. Spqr: A sparse-quantized representation for near-lossless llm weight compression. arXiv preprint arXiv:2306.03078.",
+            "Steven K Esser, Jeffrey L McKinstry, Deepika Bablani, Rathinakumar Appuswamy, and Dharmendra S Modha. 2019. Learned step size quantization. arXiv preprint arXiv:1902.08153.",
+            "Elias Frantar, Saleh Ashkboos, Torsten Hoefler, and Dan Alistarh. 2022. Gptq: Accurate post-training quantization for generative pre-trained transformers. arXiv preprint arXiv:2210.17323.",
+            "Leo Gao, Jonathan Tow, Baber Abbasi, Stella Biderman, Sid Black, Anthony DiPofi, Charles Foster, Laurence Golding, Jeffrey Hsu, Alain Le Noac’h, Haonan Li, Kyle McDonell, Niklas Muennighoff, Chris Ociepa, Jason Phang, Laria Reynolds, Hailey Schoelkopf, Aviya Skowron, Lintang Sutawika, Eric Tang, Anish Thite, Ben Wang, Kevin Wang, and Andy Zou. 2023. A framework for few-shot language model evaluation.",
+            "Xavier Glorot and Yoshua Bengio. 2010. Understanding the difficulty of training deep feedforward neural networks. In Proceedings ofthe thirteenth international conference on artificial intelligence and statistics, pages 249–256. JMLR Workshop and Conference Proceedings.",
+            "Jeremy Howard and Sebastian Ruder. 2018. Universal language model fine-tuning for text classification. arXiv preprint arXiv:1801.06146.",
+            "Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. 2021. Lora: Low-rank adaptation of large language models. arXiv preprint arXiv:2106.09685.",
+            "Itay Hubara, Yury Nahshan, Yair Hanani, Ron Banner, and Daniel Soudry. 2021. Accurate post training quantization with small calibration sets. In International Conference on Machine Learning, pages 4466–4475. PMLR.",
+            "Qingyuan Li, Yifan Zhang, Liang Li, Peng Yao, Bo Zhang, Xiangxiang Chu, Yerui Sun, Li Du, and Yuchen Xie. 2023. Fptq: Fine-grained post-training quantization for large language models. arXiv preprint arXiv:2308.15987.",
+            "Ji Lin, Jiaming Tang, Haotian Tang, Shang Yang, Xingyu Dang, and Song Han. 2023. Awq: Activationaware weight quantization for llm compression and acceleration. arXiv preprint arXiv:2306.00978.",
+            "Ilya Loshchilov and Frank Hutter. 2017. Decoupled weight decay regularization. arXiv preprint arXiv:1711.05101.",
+            "Mitch Marcus, Grace Kim, Mary Ann Marcinkiewicz, Robert MacIntyre, Ann Bies, Mark Ferguson, Karen",
+            "Katz, and Britta Schasberger. 1994. The penn treebank: Annotating predicate argument structure. In Human Language Technology: Proceedings of a Workshop held at Plainsboro, New Jersey, March 8-11, 1994.",
+            "Stephen Merity, Caiming Xiong, James Bradbury, and Richard Socher. 2016. Pointer sentinel mixture models. arXiv preprint arXiv:1609.07843.",
+            "Markus Nagel, Rana Ali Amjad, Mart Van Baalen, Christos Louizos, and Tijmen Blankevoort. 2020. Up or down? adaptive rounding for post-training quantization. In International Conference on Machine Learning, pages 7197–7206. PMLR.",
+            "Shuaicheng Niu, Jiaxiang Wu, Yifan Zhang, Yaofo Chen, Shijian Zheng, Peilin Zhao, and Mingkui Tan. 2022. Efficient test-time model adaptation without forgetting. In International conference on machine learning, pages 16888–16905. PMLR.",
+            "Shuaicheng Niu, Jiaxiang Wu, Yifan Zhang, Zhiquan Wen, Yaofo Chen, Peilin Zhao, and Mingkui Tan. 2023. Towards stable test-time adaptation in dynamic wild world. arXiv preprint arXiv:2302.12400.",
+            "Jungwuk Park, Dong-Jun Han, Soyeong Kim, and Jaekyun Moon. 2023. Test-time style shifting: Handling arbitrary styles in domain generalization. arXiv preprint arXiv:2306.04911.",
+            "Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, and Peter J Liu. 2020. Exploring the limits of transfer learning with a unified text-to-text transformer. The Journal ofMachine Learning Research, 21(1):5485–5551.",
+            "Keisuke Sakaguchi, Ronan Le Bras, Chandra Bhagavatula, and Yejin Choi. 2021. Winogrande: An adversarial winograd schema challenge at scale. Communications ofthe ACM, 64(9):99–106.",
+            "Wenqi Shao, Mengzhao Chen, Zhaoyang Zhang, Peng Xu, Lirui Zhao, Zhiqian Li, Kaipeng Zhang, Peng Gao, Yu Qiao, and Ping Luo. 2024. Omniquant: Omnidirectionally calibrated quantization for large language models. In International Conference on Learning Representations.",
+            "Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al. 2023a. Llama: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971.",
+            "Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. 2023b. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288."
+        ],
+        "bbox": [
+            131,
+            85,
+            489,
+            140
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "2249",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Dequan Wang, Evan Shelhamer, Shaoteng Liu, Bruno Olshausen, and Trevor Darrell. 2020. Tent: Fully test-time adaptation by entropy minimization. arXiv preprint arXiv:2006.10726.",
+            "Yu-Xiong Wang, Deva Ramanan, and Martial Hebert. 2017. Growing a brain: Fine-tuning by increasing model capacity. In Proceedings ofthe IEEE Conference on Computer Vision and Pattern Recognition, pages 2471–2480.",
+            "Xiuying Wei, Yunchen Zhang, Yuhang Li, Xiangguo Zhang, Ruihao Gong, Jinyang Guo, and Xianglong Liu. 2023. Outlier suppression+: Accurate quantization of large language models by equivalent and optimal shifting and scaling. arXiv preprint arXiv:2304.09145.",
+            "Xiuying Wei, Yunchen Zhang, Xiangguo Zhang, Ruihao Gong, Shanghang Zhang, Qi Zhang, Fengwei Yu, and Xianglong Liu. 2022. Outlier suppression: Pushing the limit of low-bit transformer language models. Advances in Neural Information Processing Systems, 35:17402–17414.",
+            "BigScience Workshop, Teven Le Scao, Angela Fan, Christopher Akiki, Ellie Pavlick, Suzana Ilic, Daniel´ Hesslow, Roman Castagné, Alexandra Sasha Luccioni, François Yvon, et al. 2022. Bloom: A 176bparameter open-access multilingual language model. arXiv preprint arXiv:2211.05100.",
+            "Guangxuan Xiao, Ji Lin, Mickael Seznec, Hao Wu, Julien Demouth, and Song Han. 2023. Smoothquant: Accurate and efficient post-training quantization for large language models. In International Conference on Machine Learning, pages 38087–38099. PMLR.",
+            "Zhewei Yao, Reza Yazdani Aminabadi, Minjia Zhang, Xiaoxia Wu, Conglong Li, and Yuxiong He. 2022. Zeroquant: Efficient and affordable post-training quantization for large-scale transformers. Advances in Neural Information Processing Systems, 35:27168– 27183.",
+            "Rowan Zellers, Ari Holtzman, Yonatan Bisk, Ali Farhadi, and Yejin Choi. 2019. Hellaswag: Can a machine really finish your sentence? arXiv preprint arXiv:1905.07830.",
+            "Susan Zhang, Stephen Roller, Naman Goyal, Mikel Artetxe, Moya Chen, Shuohui Chen, Christopher Dewan, Mona Diab, Xian Li, Xi Victoria Lin, et al. 2022. Opt: Open pre-trained transformer language models. arXiv preprint arXiv:2205.01068."
+        ],
+        "bbox": [
+            115,
+            85,
+            487,
+            140
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "2250",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "code",
+        "sub_type": "algorithm",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "Algorithm 1 Overall algorithm of LRQuant   \nInput: full-precision LLM model ; calibration set X; test set $\\mathrm { X } ^ { t }$   \nOutput: quantized LLM model after TTA   \n1: $\\mathbf { \\bar { X } } _ { f p } \\doteq \\mathbf { X } _ { q } = \\mathbf { X }$   \n2: for in do ▷ Block-wise quantization   \n3: $\\dot { \\mathrm { X } _ { f p } } =  { B _ { i } } (  { \\mathrm { X } _ { f p } } )$   \n4: Init learnable parameters $\\Theta _ { q }$ and $\\Theta _ { s }$ ▷ $\\Theta _ { s }$ with Eq. (7)   \n5: for k in epochs do   \n6: for $( \\dot { \\mathbf { x } _ { q } } , \\mathbf { x } _ { f p } ) \\mathrm { i n } \\left( \\mathbf { X } _ { q } , \\mathbf { X } _ { f p } \\right)$ do   \n7: $B _ { . } ^ { ' } = 0$ uantize (Smooth $( \\boldsymbol { B } _ { i } , \\boldsymbol { \\Theta } _ { s } ) , \\boldsymbol { \\Theta } _ { q } )$   \n8: $\\mathbf { x } _ { q } ^ { ' } = { B } _ { i } ^ { ' } ( \\mathbf { x } _ { q } )$   \n9: $\\mathrm { l o s s } = \\mathrm { M S E } ( \\mathbf { x } _ { q } ^ { \\prime } , \\mathbf { x } _ { f p } ) + \\mathrm { N L C } ( \\mathbf { x } _ { q } ^ { \\prime } , \\mathbf { x } _ { f p } )$ ▷ NLC( ) with Eq. (9)   \n10: loss.backward() ▷ Update $\\Theta _ { q }$ and Θ<sub>s</sub>   \n11: end for   \n12: end for   \n13: $\\begin{array} { r } { B _ { i } ^ { q } = \\mathsf { C } } \\end{array}$ uantize (Smooth $( \\boldsymbol { B } _ { i } , \\boldsymbol { \\Theta } _ { s } ) , \\boldsymbol { \\Theta } _ { q } )$   \n14: $\\dot { \\bf X } _ { q } = { \\cal B } _ { i } ^ { q } ( { \\bf X } _ { q } )$   \n15: end for   \n16: $\\overline { { { \\bf X } _ { f p } ^ { t } } } = { \\bf X } _ { q } ^ { t } = { \\bf X } ^ { t }$ ▷ TTA phase   \n17: for $( B _ { i } , B _ { i } ^ { q } )$ ) in $( \\mathcal { M } , \\mathcal { M } _ { q } )$ do   \n18: if i == len( ) then ▷ The last quantized block   \n19: $\\mathrm { X } _ { f p } ^ { t } = B _ { i } ( \\mathrm { X } _ { f p } ^ { t } )$   \n20: Init $\\boldsymbol { \\Theta } _ { q } ^ { l }$ and $\\Theta _ { s } ^ { l }$   \n21: for k in 5 do   \n22: for $( \\mathbf { x } _ { q } ^ { t } , \\mathbf { x } _ { f p } ^ { t } ) \\operatorname { i n } { ( \\mathbf { X } _ { q } ^ { t } , \\mathbf { X } _ { f p } ^ { t } ) }$ do   \n23: $B _ { i } ^ { ' } = \\mathrm { Q }$ uantize (Smooth $B _ { i } , \\Theta _ { s } ^ { l } ) , \\Theta _ { q } ^ { l } )$   \n24: $\\mathbf { x } _ { q } ^ { t ^ { \\prime } } = B _ { i } ^ { ' } ( \\mathbf { x } _ { q } ^ { t } )$   \n25: loss = loss( $\\mathrm { ~ x } _ { q } ^ { t ^ { \\prime } } , \\mathrm { x } _ { f p } ^ { t } )$ .backward()   \n26: loss.backward()   \n27: end for   \n28: end for   \n29: $B _ { i } ^ { q } = \\mathbf { Q }$ uantize (Smooth $( \\boldsymbol { B } _ { i } , \\boldsymbol { \\Theta } _ { s } ^ { l } ) , \\boldsymbol { \\Theta } _ { q } ^ { l } )$   \n30: else   \n31: continue   \n32: end if   \n33: end for   \n34: return quantized model $\\mathcal { M } _ { q }$",
+        "bbox": [
+            112,
+            146,
+            489,
+            564
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "B Hyperparameter Analysis on the Base of LAE",
+        "text_level": 2,
+        "bbox": [
+            114,
+            590,
+            480,
+            623
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "In this paper, we set 2 as the base of our learnable scaling factors initialization function, which is the same with (Li et al., 2023). In addition, we also compare several other bases (e, 5, and 10) to quantize LLaMA-7B at W4A4, and the experimental results (perplexity) are shown in the Table 9.",
+        "bbox": [
+            112,
+            632,
+            489,
+            730
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "table",
+        "img_path": "images/e8654f5e60b05e8ce35b49bdaa4537ef7b488644bfc58d9b4dcb8e7707d5d449.jpg",
+        "table_caption": [
+            "Table 9: Perplexity comparison of LAE using different bases to calculate initial learnable scaling factors to quantize LLaMA-7B at W4A4."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Base</td><td>Wiki-2</td><td>PTB</td><td>C4</td><td>PTB-n</td><td>C4-n</td></tr><tr><td>2</td><td>11.25</td><td>52.05</td><td>14.14</td><td>99.28</td><td>15.41</td></tr><tr><td>e</td><td>11.28</td><td>50.13</td><td>14.15</td><td>82.95</td><td>15.53</td></tr><tr><td>5</td><td>11.58</td><td>96.46</td><td>14.53</td><td>157.09</td><td>15.87</td></tr><tr><td>10</td><td>11.37</td><td>47.38</td><td>14.40</td><td>85.09</td><td>15.72</td></tr></table>",
+        "bbox": [
+            117,
+            740,
+            482,
+            834
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "From the table, it can be observed that using different bases yields similar results. Even setting the base as a learnable parameter does not lead to a significant improvement in performance. Therefore, to save computational resources, we choose 2 as the base which shows relatively better performance.",
+        "bbox": [
+            131,
+            906,
+            489,
+            922
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            84,
+            885,
+            166
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "C Weighted Combination of MSE and NLC Loss",
+        "text_level": 2,
+        "bbox": [
+            509,
+            175,
+            858,
+            209
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "To validate whether the weighted combination of MSE and NLC loss in LRQuant achieves better performance, we further select different combination ratio for comparison as indicated in Table 10.",
+        "bbox": [
+            507,
+            218,
+            885,
+            284
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "table",
+        "img_path": "images/0ce51b72bce2a7ea2858f924b38290e22bdbb5865e7a707ef8c88232c98d18de.jpg",
+        "table_caption": [
+            "Table 10: Perplexity comparison of weighted combination on LLaMA-7B at W4A4."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Methods</td><td>Wiki-2</td><td>PTB</td><td>C4</td></tr><tr><td>0.9MSE+0.1NLC</td><td>11.35</td><td>73.06</td><td>14.23</td></tr><tr><td>0.8MSE+0.2NLC</td><td>11.42</td><td>64.24</td><td>14.11</td></tr><tr><td>0.6MSE+0.4NLC</td><td>11.69</td><td>57.17</td><td>15.42</td></tr><tr><td>MSE+NLC</td><td>11.26</td><td>42.76</td><td>13.19</td></tr></table>",
+        "bbox": [
+            522,
+            292,
+            872,
+            390
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "From the results, it can be observed that even with the weighted combination method, the performance does not improve and is even inferior to evenly combination. Therefore, we select an evenly combination of two loss functions for our LRQuant.",
+        "bbox": [
+            507,
+            445,
+            885,
+            543
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "D LLaMA and LLaMA-2 Experiments at W6A6",
+        "text_level": 2,
+        "bbox": [
+            509,
+            554,
+            884,
+            586
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Table 11 and Table 12 shows W6A6 experimental results corresponding to Section 4.2 and Section 4.3 respectively. As illustrated in Table 11, LRQuant achieves the best performance in most experiments. Additionally, as demonstrated in Table 12, LRQuant achieves optimal results in some experiments, while in the remaining ones, it obtains near-optimal performance, also demonstrating an advanced level. Combining the experiments for W4A4 in the content, we can conclude that LRQuant has become the current state-of-the-art method for weight-activation quantization.",
+        "bbox": [
+            507,
+            595,
+            887,
+            790
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "E Perplexities on OPT Families",
+        "text_level": 2,
+        "bbox": [
+            509,
+            800,
+            800,
+            816
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "We also evaluate perplexities of our LRQuant on OPT families (1.3B, 2.7B, 6.7B). The results are shown in Table 13. From the table, we know that our method outperforms all the predefined methods and for another learnable method OmniQuant there can be clearly seen a moderate decrease on each comparison so it proves that our LRQuant is able to applied for accurately and effectively quantizing OPT models.",
+        "bbox": [
+            507,
+            825,
+            885,
+            922
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "page_number",
+        "text": "2251",
+        "bbox": [
+            478,
+            928,
+            519,
+            942
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "table",
+        "img_path": "images/0637614e844013a9f3fa4efb514b015cd473f689e9724a108c3ea6a2df151236.jpg",
+        "table_caption": [
+            "Table 11: W6A6 perplexities (lower is better) comparison of quantized LLaMA and LLaMA-2 models."
+        ],
+        "table_footnote": [
+            "our method still outperforms them in most results."
+        ],
+        "table_body": "<table><tr><td>Bits</td><td>Models</td><td>Methods</td><td>WikiText2</td><td>PTB</td><td>C4</td><td>PTB-new</td><td>C4-new</td></tr><tr><td rowspan=\"18\">W6A6</td><td rowspan=\"4\">LLaMA-7B</td><td>LAE</td><td>6.04</td><td>30.61</td><td>7.47</td><td>44.44</td><td>7.80</td></tr><tr><td>SmoothQuant</td><td>6.15</td><td>30.73</td><td>7.63</td><td>46.17</td><td>7.99</td></tr><tr><td>OmniQuant</td><td>6.05</td><td>30.89</td><td>7.54</td><td>46.45</td><td>7.89</td></tr><tr><td>LRQuant</td><td>5.88</td><td>32.56</td><td>7.35</td><td>49.14</td><td>7.67</td></tr><tr><td rowspan=\"4\">LLaMA-13B</td><td>LAE</td><td>5.43</td><td>22.31</td><td>6.98</td><td>31.57</td><td>7.22</td></tr><tr><td>SmoothQuant</td><td>5.49</td><td>25.22</td><td>7.03</td><td>33.99</td><td>7.28</td></tr><tr><td>OmniQuant</td><td>5.48</td><td>21.39</td><td>7.03</td><td>29.42</td><td>7.28</td></tr><tr><td>LRQuant</td><td>5.27</td><td>20.13</td><td>6.84</td><td>28.39</td><td>7.07</td></tr><tr><td rowspan=\"4\">LLaMA-30B</td><td>LAE</td><td>4.57</td><td>17.36</td><td>6.34</td><td>25.00</td><td>6.54</td></tr><tr><td>SmoothQuant</td><td>4.77</td><td>18.03</td><td>6.48</td><td>25.34</td><td>6.70</td></tr><tr><td>OmniQuant</td><td>4.38</td><td>17.56</td><td>6.23</td><td>25.54</td><td>6.41</td></tr><tr><td>LRQuant</td><td>4.31</td><td>16.94</td><td>6.19</td><td>24.53</td><td>6.36</td></tr><tr><td rowspan=\"4\">LLaMA-2-7B</td><td>LAE</td><td>5.78</td><td>26.04</td><td>7.35</td><td>55.95</td><td>7.72</td></tr><tr><td>SmoothQuant</td><td>6.21</td><td>35.50</td><td>7.77</td><td>142.53</td><td>8.07</td></tr><tr><td>OmniQuant</td><td>6.20</td><td>37.01</td><td>7.76</td><td>155.70</td><td>8.06</td></tr><tr><td>LRQuant</td><td>5.67</td><td>25.77</td><td>7.24</td><td>67.09</td><td>7.61</td></tr><tr><td rowspan=\"4\">LLaMA-2-13B</td><td>LAE</td><td>5.13</td><td>31.90</td><td>6.71</td><td>59.36</td><td>7.03</td></tr><tr><td>SmoothQuant</td><td>5.18</td><td>31.78</td><td>6.76</td><td>59.28</td><td>7.09</td></tr><tr><td>OmniQuant</td><td>5.41</td><td>31.32</td><td>7.01</td><td>57.12</td><td>7.41</td></tr><tr><td>LRQuant</td><td>5.07</td><td>29.79</td><td>6.68</td><td>54.71</td><td>6.98</td></tr></table>",
+        "bbox": [
+            194,
+            83,
+            803,
+            373
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            424,
+            489,
+            473
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "F W6A6 Catastrophic Forgetting Experiments for Test-Time Adaptation",
+        "text_level": 2,
+        "bbox": [
+            114,
+            485,
+            485,
+            519
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Be similar with W4A4 results in Table 8 at Section 4.5, the performance on WikiText2 of models recalibrated by C4 or PTB is all surpassed by our method on W6A6, where we use C4 or PTB to adapt the last block. The comparison results can be found in Table 14. Thereby, we can assert further that our method relieves catastrophic forgetting through the implementation of our TTA scheme.",
+        "bbox": [
+            112,
+            529,
+            489,
+            658
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "G Weight-Only Experiments",
+        "text_level": 2,
+        "bbox": [
+            114,
+            670,
+            383,
+            687
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Our LRQuant is mainly focusing on the more challenging weight-activation quantization while quantization methods such as AWQ and GPTQ belong to weight-only quantization. To demonstrate the superiority of our proposed method on hardwarefriendly quantization tasks, we also add additional weight-only experiments as shown in Table 15 and Table 16. From results, it can be seen that compared to the two well-known weight-only PTQ methods AWQ and GPTQ, our method still demonstrates significant advantages. Especially under more extreme weight quantization settings like W2A16, where GPTQ and AWQ collapse, RLQuant still maintains a good performance. For zero-shot tasks,",
+        "bbox": [
+            112,
+            696,
+            492,
+            923
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "page_number",
+        "text": "2252",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "table",
+        "img_path": "images/092f234588bc12e4da40edfa4dfb60734ab54cdbdda2794c99151451758ea70e.jpg",
+        "table_caption": [
+            "Table 12: Zero-shot accuracies (higher is better) comparison of quantized LLaMA and LLaMA-2 models at W6A6."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Models</td><td>Methods</td><td>PIQA</td><td>ARC-e</td><td>ARC-c</td><td>BoolQ</td><td>HellaS</td><td>WinoG</td><td>Avg.</td></tr><tr><td rowspan=\"4\">LLaMA-7B</td><td>LAE</td><td>77.74</td><td>64.73</td><td>37.79</td><td>71.62</td><td>55.59</td><td>66.29</td><td>62.29</td></tr><tr><td>SmoothQuant</td><td>77.96</td><td>66.62</td><td>39.07</td><td>70.70</td><td>55.93</td><td>64.16</td><td>62.41</td></tr><tr><td>OmniQuant</td><td>77.04</td><td>67.67</td><td>38.31</td><td>72.66</td><td>55.43</td><td>63.14</td><td>62.38</td></tr><tr><td>LRQuant</td><td>77.36</td><td>64.81</td><td>38.13</td><td>72.50</td><td>55.81</td><td>65.82</td><td>62.41</td></tr><tr><td rowspan=\"4\">LLaMA-13B</td><td>LAE</td><td>78.29</td><td>71.67</td><td>43.34</td><td>65.74</td><td>58.00</td><td>69.13</td><td>64.36</td></tr><tr><td>SmoothQuant</td><td>78.72</td><td>70.74</td><td>42.66</td><td>65.25</td><td>58.27</td><td>68.27</td><td>63.99</td></tr><tr><td>OmniQuant</td><td>78.30</td><td>71.60</td><td>42.80</td><td>65.40</td><td>58.10</td><td>67.70</td><td>63.98</td></tr><tr><td>LRQuant</td><td>78.29</td><td>71.96</td><td>42.90</td><td>66.88</td><td>58.64</td><td>68.98</td><td>64.61</td></tr><tr><td rowspan=\"4\">LLaMA-30B</td><td>LAE</td><td>77.04</td><td>70.41</td><td>43.25</td><td>71.55</td><td>61.08</td><td>71.34</td><td>65.78</td></tr><tr><td>SmoothQuant</td><td>76.98</td><td>69.61</td><td>45.73</td><td>71.43</td><td>60.28</td><td>71.03</td><td>65.84</td></tr><tr><td>OmniQuant</td><td>79.98</td><td>73.74</td><td>46.67</td><td>67.80</td><td>61.88</td><td>71.90</td><td>67.00</td></tr><tr><td>LRQuant</td><td>80.74</td><td>74.54</td><td>45.31</td><td>68.44</td><td>61.85</td><td>72.22</td><td>67.18</td></tr><tr><td rowspan=\"4\">LLaMA-2-7B</td><td>LAE</td><td>77.63</td><td>66.83</td><td>38.82</td><td>70.55</td><td>55.84</td><td>65.35</td><td>62.50</td></tr><tr><td>SmoothQuant</td><td>77.20</td><td>68.39</td><td>38.73</td><td>70.51</td><td>55.85</td><td>64.95</td><td>62.61</td></tr><tr><td>OmniQuant</td><td>77.14</td><td>68.77</td><td>39.93</td><td>70.15</td><td>55.72</td><td>65.74</td><td>62.91</td></tr><tr><td>LRQuant</td><td>77.36</td><td>68.30</td><td>40.27</td><td>69.14</td><td>56.15</td><td>65.43</td><td>62.78</td></tr><tr><td rowspan=\"4\">LLaMA-2-13B</td><td>LAE</td><td>78.40</td><td>71.75</td><td>43.08</td><td>68.59</td><td>58.61</td><td>71.19</td><td>65.27</td></tr><tr><td>SmoothQuant</td><td>78.45</td><td>73.14</td><td>43.77</td><td>69.96</td><td>58.15</td><td>65.19</td><td>64.78</td></tr><tr><td>OmniQuant</td><td>76.44</td><td>70.75</td><td>41.72</td><td>67.71</td><td>57.12</td><td>64.88</td><td>63.10</td></tr><tr><td>LRQuant</td><td>78.40</td><td>72.18</td><td>43.94</td><td>67.92</td><td>59.16</td><td>68.59</td><td>65.03</td></tr></table>",
+        "bbox": [
+            178,
+            96,
+            818,
+            386
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/e940093e47f90df16b51a203d8db95c51f330d632c716f1d48d369b2586f7c16.jpg",
+        "table_caption": [
+            "Table 13: Perplexities (lower is better) comparison of quantized OPT models at W4A4 and W6A6."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Bits</td><td>Models</td><td>Methods</td><td>WikiText2</td><td>PTB</td><td>C4</td><td>PTB-new</td><td>C4-new</td></tr><tr><td rowspan=\"7\">W4A4</td><td>OPT-1.3B</td><td>FP16 SmoothQuant LAE OmniQuant</td><td>14.62 126.05 102.12 19.19</td><td>16.96 120.43 106.38 23.62</td><td>14.72 107.16 76.40 19.45</td><td>20.29 128.68 112.53 28.92</td><td>16.07 119.11 86.95 21.49</td></tr><tr><td>OPT-2.7B</td><td>LRQuant FP16 SmoothQuant LAE OmniQuant</td><td>19.11 12.47 252.04 423.20 15.19</td><td>23.29 15.11 207.65 304.95 19.34</td><td>19.39 13.16 151.90 263.87</td><td>28.75 17.97 220.49 246.71</td><td>21.45 14.34 169.49 309.16</td></tr><tr><td rowspan=\"3\">OPT-6.7B</td><td>LRQuant FP16 SmoothQuant</td><td>14.94 10.86</td><td>19.24 13.09</td><td>16.51 16.15 11.74</td><td>23.24 23.33 15.77</td><td>18.14 17.83</td></tr><tr><td>LAE</td><td>491.34 305.84</td><td>317.70 235.22</td><td>238.19</td><td>293.54</td><td>12.71 277.48</td></tr><tr><td>OmniQuant</td><td>12.34</td><td>15.44</td><td>180.49 13.56</td><td>202.07 18.50</td><td>214.96 14.88</td></tr><tr><td></td><td>LRQuant</td><td>12.33</td><td>15.31</td><td>13.50</td><td>18.31</td><td>14.76</td></tr><tr><td rowspan=\"6\">W6A6</td><td rowspan=\"3\">OPT-1.3B</td><td>FP16 SmoothQuant LAE</td><td>14.62</td><td>16.96</td><td>14.72</td><td>20.29</td><td>16.07</td></tr><tr><td></td><td>15.42</td><td>17.65</td><td>15.32</td><td>21.30</td><td>16.70</td></tr><tr><td>OmniQuant</td><td>15.34</td><td>17.67</td><td>15.20</td><td>21.30</td><td>16.57</td></tr><tr><td rowspan=\"5\"></td><td rowspan=\"2\">LRQuant</td><td>14.99</td><td>17.42</td><td>15.06</td><td>20.94</td><td>16.42</td></tr><tr><td>14.94</td><td>17.38</td><td>15.04</td><td>20.80</td><td>16.41</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>FP16 SmoothQuant</td><td>12.47 12.68</td><td>15.11</td><td>13.16</td><td>17.97</td><td>14.34</td></tr><tr><td rowspan=\"5\">OPT-2.7B</td><td>LAE</td><td>12.96</td><td>15.35</td><td>13.32</td><td>18.28</td><td>14.51</td></tr><tr><td>OmniQuant</td><td></td><td>15.65</td><td>13.53</td><td>18.67</td><td>14.68</td></tr><tr><td></td><td>12.56</td><td>15.30</td><td>13.27</td><td>18.23</td><td>14.47</td></tr><tr><td>LRQuant</td><td>12.55</td><td>15.23</td><td>13.27</td><td>18.14</td><td>14.47</td></tr><tr><td>FP16</td><td>10.86</td><td>13.09</td><td>11.74</td><td></td><td></td></tr><tr><td rowspan=\"5\">OPT-6.7B</td><td></td><td></td><td></td><td></td><td></td><td>15.77</td><td>12.71</td></tr><tr><td>LAE</td><td>SmoothQuant</td><td>10.98</td><td>13.23</td><td>11.85</td><td>15.89</td><td>12.82</td></tr><tr><td></td><td>11.39</td><td>13.69</td><td>12.15</td><td></td><td>16.33</td><td>13.08</td></tr><tr><td>OmniQuant</td><td>10.94</td><td>13.17</td><td>11.81</td><td></td><td>15.81</td><td>12.79</td></tr><tr><td>LRQuant</td><td></td><td>10.93</td><td>13.16</td><td>11.81</td><td>15.79</td><td>12.78</td></tr></table>",
+        "bbox": [
+            198,
+            462,
+            800,
+            878
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_number",
+        "text": "2253",
+        "bbox": [
+            478,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/8dfa604fb80c66cb07542306fb1caea2ef15005a745a6650fcfb74338cce3a65.jpg",
+        "table_caption": [
+            "Table 14: Perplexities on original WikiText2 at W6A6 after re-calibrating and TTA on test datasets (C4 and PTB). In this experiment, “reCalib\" first quantizes models based on WikiText2 and then re-quantizes the model based on test datasets. This table reports their evaluation performance on the original WikiText2 dataset."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">Models</td><td rowspan=\"2\">Methods</td><td colspan=\"2\">W6A6</td></tr><tr><td>C4</td><td>PTB</td></tr><tr><td>LLaMA-7B</td><td>reCalib TTA</td><td>5.91 5.88</td><td>5.95 5.88</td></tr><tr><td>LLaMA-13B</td><td>reCalib TTA</td><td>5.28 5.27</td><td>5.34 5.27</td></tr><tr><td>LLaMA-2-7B</td><td>reCalib TTA</td><td>5.71 5.67</td><td>5.76 5.67</td></tr><tr><td>LLaMA-2-13B</td><td>reCalib TTA</td><td>5.09 5.07</td><td>5.09 5.07</td></tr></table>",
+        "bbox": [
+            356,
+            139,
+            642,
+            300
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "table",
+        "img_path": "images/6f0c419a30e08a8795c02648fc54ed0cdc354087fe6036f2e7374b5c7fa0aa3e.jpg",
+        "table_caption": [
+            "Table 15: Perplexities comparison of PTQ methods on weight-only quantization tasks."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Bits</td><td>Models</td><td>Methods</td><td>WikiText2</td><td>PTB</td><td>C4</td><td>PTB-new</td><td>C4-new</td></tr><tr><td rowspan=\"8\">W4A16</td><td rowspan=\"3\">LLaMA-7B</td><td>AWQ</td><td>5.98</td><td>30.74</td><td>7.44</td><td>47.20</td><td>7.75</td></tr><tr><td>GPTQ</td><td>5.93</td><td>29.62</td><td>7.47</td><td>46.17</td><td>7.84</td></tr><tr><td>LRQuant</td><td>5.84</td><td>30.93</td><td>7.32</td><td>45.72</td><td>7.64</td></tr><tr><td rowspan=\"2\">LLaMA-13B</td><td>AWQ</td><td>5.25</td><td>22.73</td><td>6.80</td><td>31.01</td><td>7.02</td></tr><tr><td>GPTQ</td><td>5.28</td><td>20.36</td><td>6.86</td><td>29.75</td><td>7.12</td></tr><tr><td rowspan=\"2\"></td><td>LRQuant</td><td>5.21</td><td>19.39</td><td>6.76</td><td>28.32</td><td>6.98</td></tr><tr><td>AWQ</td><td>15.22</td><td>18.40</td><td>15.68</td><td>22.06</td><td>17.12</td></tr><tr><td rowspan=\"2\">OPT-1.3B</td><td>GPTQ LRQuant</td><td>15.44 15.05</td><td>18.47 17.65</td><td>15.79 15.27</td><td>22.04 21.23</td><td>17.21 16.70</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td rowspan=\"3\">OPT-2.7B</td><td>AWQ GPTQ</td><td>13.17 13.09</td><td>16.17 16.09</td><td>13.92 13.96</td><td>19.45</td><td>15.13</td></tr><tr><td>LRQuant</td><td>12.87</td><td>15.85</td><td>13.71</td><td>19.32 18.97</td><td>15.21 14.95</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td rowspan=\"8\">W2A16</td><td rowspan=\"2\">LLaMA-7B</td><td>AWQ GPTQ</td><td>9.1e4</td><td>7.1e4</td><td>9.1e4</td><td>7.4e4</td><td>8.9e4</td></tr><tr><td>LRQuant</td><td>491.62 16.20</td><td>9.7e3 121.41</td><td>5.1e3 24.65</td><td>1.2e4 389.78</td><td>4.7e3 26.18</td></tr><tr><td rowspan=\"2\">LLaMA-13B</td><td>AWQ</td><td>2.1e5</td><td>1.6e5</td><td>1.5e5</td><td>1.7e5</td><td>1.7e5</td></tr><tr><td>GPTQ</td><td>364.21</td><td>1.4e4</td><td>1.3e4</td><td>1.7e4</td><td>1.3e4</td></tr><tr><td rowspan=\"2\">OPT-1.3B</td><td>LRQuant</td><td>12.24</td><td>77.42</td><td>17.44</td><td>120.78</td><td>18.35</td></tr><tr><td>AWQ</td><td>9.5e3</td><td>5.9e3</td><td>6.4e3</td><td>8.2e3</td><td>6.7e3</td></tr><tr><td rowspan=\"2\"></td><td>GPTQ</td><td>5.5e3</td><td>6.6e3</td><td>5.5e3</td><td>7.8e3</td><td>5.9e3</td></tr><tr><td>LRQuant</td><td>48.43</td><td>91.86</td><td>69.34</td><td>100.78</td><td>76.07</td></tr><tr><td rowspan=\"3\">OPT-2.7B</td><td>AWQ</td><td>2.3e4</td><td>9.0e3</td><td>1.2e4</td><td>1.5e4</td><td>1.2e4</td></tr><tr><td>GPTQ</td><td>6.4e3</td><td>7.1e3</td><td>6.4e3</td><td>7.9e3</td><td>6.7e3</td></tr><tr><td>LRQuant</td><td>30.59</td><td>47.57</td><td>42.49</td><td>62.19</td><td>45.05</td></tr></table>",
+        "bbox": [
+            201,
+            476,
+            796,
+            834
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_number",
+        "text": "2254",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "table",
+        "img_path": "images/e6ec066b49609dd7ff8a7baaac814337ad87c2b84b37b693db8591924628ef7b.jpg",
+        "table_caption": [
+            "Table 16: Zero-shot accuracies comparison of PTQ methods on weight-only quantization tasks."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Bits</td><td>Models</td><td>Methods</td><td>PIQA</td><td>ARC-e</td><td>ARC-c</td><td>BoolQ</td><td>HellaS</td><td>WinoG</td></tr><tr><td rowspan=\"8\">W4A16</td><td rowspan=\"3\">LLaMA-7B</td><td>AWQ</td><td>78.12</td><td>66.58</td><td>37.71</td><td>73.08</td><td>55.20</td><td>66.53</td></tr><tr><td>GPTQ</td><td>77.69</td><td>67.88</td><td>37.54</td><td>69.93</td><td>55.38</td><td>66.85</td></tr><tr><td>LRQuant</td><td>78.18</td><td>65.02</td><td>37.79</td><td>72.96</td><td>55.42</td><td>65.35</td></tr><tr><td rowspan=\"2\">LLaMA-13B</td><td>AWQ</td><td>78.61</td><td>73.82</td><td>43.00</td><td>68.47</td><td>58.41</td><td>69.13</td></tr><tr><td>GPTQ</td><td>78.61</td><td>73.19</td><td>43.43</td><td>66.88</td><td>57.83</td><td>69.13</td></tr><tr><td rowspan=\"2\">OPT-1.3B</td><td>LRQuant</td><td>78.99</td><td>73.73</td><td>42.66</td><td>68.28</td><td>58.42</td><td>69.29</td></tr><tr><td>AWQ</td><td>71.10</td><td>56.81</td><td>25.68</td><td>56.69</td><td>40.81</td><td>57.93</td></tr><tr><td rowspan=\"2\"></td><td>GPTQ LRQuant</td><td>71.44 70.95</td><td>55.64 56.90</td><td>24.15 23.46</td><td>57.98 61.07</td><td>40.56</td><td>57.22</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td>40.65</td><td>58.41</td></tr><tr><td rowspan=\"3\">OPT-2.7B</td><td>AWQ GPTQ</td><td>73.01</td><td>60.04</td><td>26.96</td><td>59.81</td><td>44.88</td><td>61.56</td></tr><tr><td>LRQuant</td><td>73.39 73.23</td><td>59.43 60.82</td><td>26.88 26.02</td><td>53.30 65.75</td><td>44.38 45.04</td><td>60.85</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td><td>60.22</td></tr><tr><td rowspan=\"8\">W2A16</td><td rowspan=\"2\">LLaMA-7B</td><td>AWQ</td><td>53.69</td><td>26.30</td><td>21.16</td><td>46.02</td><td>25.38</td><td>49.01</td></tr><tr><td>GPTQ</td><td>53.64</td><td>26.09</td><td>21.92</td><td>46.42</td><td>25.87</td><td>49.80</td></tr><tr><td rowspan=\"2\">LLaMA-13B</td><td>LRQuant</td><td>62.89</td><td>46.75</td><td>25.76</td><td>62.01</td><td>36.19</td><td>54.61</td></tr><tr><td>AWQ</td><td>53.21</td><td>26.51</td><td>23.37</td><td>57.15</td><td>25.54</td><td>49.72</td></tr><tr><td rowspan=\"3\"></td><td>GPTQ</td><td>51.90</td><td>25.84</td><td>22.52</td><td>39.54</td><td>26.08</td><td>49.17</td></tr><tr><td>LRQuant</td><td>68.22</td><td>57.49</td><td>27.81</td><td>64.34</td><td>43.08</td><td>58.56</td></tr><tr><td>AWQ</td><td>51.63</td><td>24.83</td><td>20.05</td><td>37.82</td><td>25.71</td><td>48.93</td></tr><tr><td rowspan=\"2\">OPT-1.3B</td><td>GPTQ</td><td>52.77</td><td>25.59</td><td>19.28</td><td>40.06</td><td>25.74</td><td>49.80</td></tr><tr><td>LRQuant</td><td>60.23</td><td>43.22</td><td>19.80</td><td>57.98</td><td>30.71</td><td>51.78</td></tr><tr><td rowspan=\"3\">OPT-2.7B</td><td>AWQ</td><td>53.15</td><td>25.04</td><td>21.67</td><td>40.09</td><td>25.89</td><td>51.06</td></tr><tr><td>GPTQ</td><td>51.85</td><td>25.38</td><td>21.16</td><td>42.29</td><td>26.05</td><td>51.22</td></tr><tr><td>LRQuant</td><td>64.04</td><td>47.81</td><td>20.65</td><td>54.10</td><td>33.59</td><td>53.51</td></tr></table>",
+        "bbox": [
+            189,
+            307,
+            806,
+            665
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_number",
+        "text": "2255",
+        "bbox": [
+            478,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 15
+    }
+]

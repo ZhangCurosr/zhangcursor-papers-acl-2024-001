@@ -1,0 +1,2895 @@
+[
+    {
+        "type": "text",
+        "text": "How Abilities in Large Language Models are Affected by Supervised Fine-tuning Data Composition",
+        "text_level": 1,
+        "bbox": [
+            144,
+            89,
+            855,
+            130
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Guanting Dong\\*, Hongyi Yuan<sup>\\*</sup>, Keming Lu, Chengpeng Li<sup>\\*</sup>, Mingfeng Xue Dayiheng Liu, Wei Wang, Zheng Yuan, Chang Zhou, Jingren Zhou Alibaba Group",
+        "bbox": [
+            173,
+            152,
+            828,
+            203
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "{dongguanting.dgt,yuanzheng.yuanzhen,ericzhou.zc}@alibaba-inc.com",
+        "bbox": [
+            171,
+            203,
+            833,
+            219
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            262,
+            260,
+            342,
+            275
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Large language models (LLMs) with enormous pre-training tokens and parameters emerge di verse abilities, including math reasoning, code generation, and instruction following. These abilities are further enhanced by supervised fine-tuning (SFT). While the open-source com munity has explored ad-hoc SFT for enhancing individual capabilities, proprietary LLMs ex hibit versatility across various skills. Therefore, understanding the facilitation of multiple abil ities via SFT is paramount. In this study, we specificially focuses on the interplay of data composition between mathematical reasoning, code generation, and general human-aligning abilities during SFT. We propose four intrigu ing research questions to explore the associa tion between model performance and various factors including data amount, composition ra tio, model size and SFT strategies. Our experiments reveal that distinct capabilities scale differently and larger models generally show superior performance with same amount of data. Mathematical reasoning and code gen eration consistently improve with increasing data amount, whereas general abilities plateau after roughly a thousand samples. Moreover, we observe data composition appears to enhance various abilities under limited data con ditions, yet can lead to performance conflicts when data is plentiful. Our findings also sug gest the amount of composition data influences performance more than the composition ratio. In analysis of SFT strategies, we find that sequentially learning multiple skills risks catastrophic forgetting. Our proposed Dual-stage Mixed Fine-tuning (DMT) strategy offers a promising solution to learn multiple abilities with different scaling patterns.",
+        "bbox": [
+            141,
+            282,
+            462,
+            825
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            114,
+            831,
+            260,
+            846
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Recent research has demonstrated the remarkable and versatile proficiency of large language models (LLMs) in dealing with a variety of real-world tasks expressed in natural languages (Ouyang et al., 2022a; Anil et al., 2023; OpenAI, 2023; Luo et al., 2023a), especially Information Extraction (IE) (Lu et al., 2022; Xu et al., 2023b; Zhao et al., 2023; Cheng et al., 2023d; Wang et al., 2023b; Zhang et al., 2024b; Li et al., 2024), Information Retrieval (IR) (Zhu et al., 2024; Liu et al., 2024c) and Spoken Language Understanding (SLU) (Hoscilowicz et al., 2024; Yin et al., 2024; Cheng et al., 2023a, 2024; Dong et al., 2023a). Among the tasks, LLMs especially emerge with three outstanding abilities in reasoning (Cobbe et al., 2021; Wei et al., 2022), coding (Chen et al., 2021), and aligning general human intentions (Ouyang et al., 2022a), which have drawn much attention from the LLM research community. In order to further incentivize such abilities, it necessitates supervised fine-tuning (SFT) stages on annotated task data.",
+        "bbox": [
+            112,
+            854,
+            489,
+            903
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            261,
+            887,
+            551
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "However, existing research has mostly conducted separate SFT investigations on each of the three tasks, where reasoning and coding abilities require SFT on in-domain human-annotated or augmented data (Yuan et al., 2023b; Luo et al., 2023b; Yu et al., 2024) while diverse and complex human instructions are applauded for aligning human intentions (Wang et al., 2023d; Taori et al., 2023; Cheng et al., 2023c; Xu et al., 2023a; Zhou et al., 2023a; Wang et al., 2023a; Lu et al., 2023). As shown by the strong performance of proprietary LLMs such as GPT-4 (OpenAI, 2023) and Claude, LLMs have the potential to master all the tasks in one model. Therefore, it is of paramount importance to investigate the versatile performance of SFT with composite task data, and understanding and addressing the challenges posed by the data composition problem in the SFT stage is crucial for further enhancing the capabilities of LLMs in a comprehensive manner.",
+        "bbox": [
+            507,
+            552,
+            887,
+            873
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "In essence, the tasks of reasoning, coding, and aligning human intentions are of different characteristics. Reasoning and coding tasks require adhoc abilities of complex and detailed logic in decomposing task instructions and dealing with nonlinguistic and symbolic features (Chen et al., 2021; Huang and Chang, 2023), whereas aligning human intentions requires versatility and understanding obscure intentions expressed in human instructions (Lu et al., 2023). Given the fundamental difference among the tasks, multi-task learning with composite data fine-tuning for small-scaled pre-trained language models is prone to catastrophic forgetting (De Lange et al., 2022), hindering the fine-tuned performance of one model on separate tasks. Many efforts have been made to compensate for the phenomenon (Liang et al., 2021; Xu et al., 2021; Yuan et al., 2023a). There has also been research discovering that scaling up the pre-trained language model scale and the fine-tuning data scale are beneficial for zero-shot out-of-domain generalization on various linguistic tasks while leaving out the assessment of in-domain performance (Sanh et al., 2022; Chung et al., 2022a; Longpre et al., 2023). Given the increased capacity of LLMs, the multi-task performance by SFT on composite data of essentially different downstream tasks is less studied. Understanding the SFT performance with composite data and corresponding scaling patterns is of great utility in practice.",
+        "bbox": [
+            507,
+            875,
+            887,
+            922
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "Work done during internships at Alibaba Group.",
+        "bbox": [
+            139,
+            907,
+            453,
+            921
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "177",
+        "bbox": [
+            485,
+            928,
+            517,
+            941
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 177–198 August 11-16, 2024 ©2024 Association for Computational Linguistics",
+        "bbox": [
+            95,
+            946,
+            900,
+            973
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            85,
+            492,
+            520
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "In this study, we focus on the data composition problem among mathematical reasoning, code generation, and general human-aligning abilities in SFT. We aim to comprehensively investigate the relationship between model performance and different factors including data amount, data composition ratio, model scales, and SFT training strategies. We also investigate how the relationship varies under different scales. Specifically, we focus on the following four research questions:",
+        "bbox": [
+            112,
+            520,
+            490,
+            681
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. How do math reasoning, coding, and general abilities scale with SFT data amounts?",
+        "bbox": [
+            112,
+            681,
+            489,
+            713
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Are there performance conflicts when combining these three abilities in SFT?",
+        "bbox": [
+            114,
+            713,
+            489,
+            745
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. What are the key factors that induce the performance conflicts?",
+        "bbox": [
+            110,
+            746,
+            487,
+            777
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "4. What are the impacts of different SFT strategies for composite data?",
+        "bbox": [
+            112,
+            777,
+            489,
+            809
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "To answer these questions, we conduct experiments on three benchmarks, which are GSM8K (Cobbe et al., 2021) for mathematical reasoning, HumanEval (Chen et al., 2021) for coding, and MT-Bench (Zheng et al., 2023) for general human alignment. We fine-tune LLMs on the related training data to activate these abilities. Furthermore, we conduct extensive analysis regarding model parameter scales ranging from LLaMA 7B to 33B (Touvron et al., 2023) and explore four different SFT strategies shown in Figure 1: multi-task learning, sequential training, mixed sequential training, and dual-stage mixing fine-tuning (DMT), providing empirical guidance for learning a versatile LLM with composite SFT. The key findings of this paper can be summarized as follows:",
+        "bbox": [
+            112,
+            810,
+            490,
+            922
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            887,
+            230
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• Different SFT abilities exhibit distinct scaling patterns, while larger models show better performances with the same data amount generally.",
+        "bbox": [
+            529,
+            244,
+            887,
+            310
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• Compared to single ability learning, multitask learning multiple abilities exhibits improvement in low-resource and decline in high-resource. Additionally, as the model size increases, there is a greater performance gain in low-resource settings for math and general abilities.",
+        "bbox": [
+            531,
+            322,
+            885,
+            435
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• Data amounts directly influence each ability, while the data ratio is insignificant.",
+        "bbox": [
+            531,
+            448,
+            885,
+            481
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• Multi-task learning lead to conflicts, while sequential training results in catastrophic forgetting. Our proposed DMT effectively alleviates both performance conflicts and catastrophic forgetting in the SFT phrase, achieving a balance between general and specialized abilities.",
+        "bbox": [
+            531,
+            494,
+            887,
+            607
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Related Works",
+        "text_level": 2,
+        "bbox": [
+            509,
+            621,
+            675,
+            637
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Supervised Fine-Tuning of Large Language Models Large Language Models (LLMs) have shown notable zero-shot performance in various domains (Brown et al., 2020; Wu et al., 2021; Hou et al., 2024; Dong et al., 2023b; Zhou et al., 2024; Wu et al., 2023; Song et al., 2023), prompting further development to push the boundaries of these models. To delve deeper to their potential, LLMs are subjected to a Supervised Fine-Tuning (SFT) phase, enhancing their ability to solve tasks and align better with human instructions. Here, we extend the conventional definition of SFT to include various forms of sequence-to-sequence fine-tuning, such as fine-tuning for human alignment, instruction following, and domain-specific task optimization (Zhou et al., 2023b; Yuan et al., 2023c; Cheng et al., 2023b; Zhang et al., 2024a).",
+        "bbox": [
+            507,
+            648,
+            887,
+            923
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "178",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/ed8a0439a8bf2c6a9a13754145a76642e62f77e821f34c903258fca92acdbf56.jpg",
+        "image_caption": [
+            "Figure 1: The illustration of four different training strategies in this paper."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            136,
+            91,
+            863,
+            353
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Recent research has delved into multi-task instruction fine-tuning of pre-trained LLMs to bolster their zero-shot performance across numerous downstream NLP tasks (Sanh et al., 2022). In an effort to encompass existing NLP tasks comprehensively, Chung et al.; Longpre et al. curated the expansive FLAN dataset specifically for instruction-based fine-tuning. LLMs, both open-source (Chung et al., 2022b) and proprietary (Singhal et al., 2022), finetuned with FLAN, have demonstrated enhanced zero-shot performance on a variety of unseen tasks.",
+        "bbox": [
+            112,
+            404,
+            492,
+            582
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "While research has probed into the generalization capabilities of LLMs within out-of-distribution domains (Liu et al., 2024a; Yuan et al., 2024; Wang et al., 2024a), the effects of multi-task training on in-domain performance remain under-explored. With the ascent of proprietary models like Chat-GPT, the focus on SFT for aligning LLMs with human intent has intensified (Ouyang et al., 2022b). Moving away from crowd-sourced SFT data, recent initiatives have generated SFT datasets from user logs within proprietary LLM platforms (Chiang et al., 2023; Wang et al., 2023a), employing the models themselves to assist in the data generation process (Wang et al., 2023d; Taori et al., 2023; Cheng et al., 2023d; Lei et al., 2023; Xu et al., 2023a; Xue et al., 2023). Additionally, methods to improve SFT data quality have been proposed, targeting more accurate alignment with human interactions (Zhou et al., 2023a; Wang et al., 2023c; Lu et al., 2023; Liu et al., 2024b).",
+        "bbox": [
+            112,
+            583,
+            492,
+            904
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Furthermore, SFT has proven beneficial for",
+        "bbox": [
+            131,
+            906,
+            489,
+            922
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "LLMs in specialized areas such as mathematical reasoning (Cobbe et al., 2021; Hendrycks et al., 2021; Yuan et al., 2023b; Chen et al., 2024; Yue et al., 2023; Gou et al., 2024; Li et al., 2023; Yue et al., 2024) and code generation tasks (Chaudhary, 2023; Luo et al., 2023b; Wang et al., 2024b; Wei et al., 2023). Taking advantage of their advanced interactive capabilities, some researchers have leveraged supervised fine-tuned LLMs to compose commands that interface with external tools, thus enhancing the handling of assorted downstream applications (Shen et al., 2023; Yao et al., 2023b,a; Song et al., 2024; Fu et al., 2024). This paper examines the SFT performance using composite datasets, considering different model sizes and data amounts.",
+        "bbox": [
+            507,
+            404,
+            887,
+            663
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Scaling Laws in Large Language Models The exceptional performance of LLMs comes from scaling up model sizes, data amounts, and computational costs to massive scales. Therefore, it is crucial to explore the model performance across an exponential range of scales. Many endeavors have been made to discuss the scaling laws for pretraining (Anil et al., 2023; Hoffmann et al., 2022), transfer learning (Chronopoulou et al., 2019), preference modeling (Gao et al., 2022) and mathematical reasoning (Yuan et al., 2023b). In this paper, we also explore the SFT performance with composite data from the perspective of different scales of model sizes and data amounts.",
+        "bbox": [
+            507,
+            696,
+            887,
+            922
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "179",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3 Experiments",
+        "text_level": 2,
+        "bbox": [
+            114,
+            84,
+            260,
+            99
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We have SFT datasets $\\{ D _ { 1 } , D _ { 2 } , . . . , D _ { k } \\}$ where each $D _ { i } = \\{ q _ { i , j } , r _ { i , j } \\} _ { j }$ contains queries and responses from one source. We consider each SFT dataset to correspond to one ability and we also have k in-domain metrics to measure them. We investigate the performances of in-domain metrics with different dataset compositions $( D \\subset$ $\\cup _ { 1 \\leq i \\leq k } D _ { i } )$ and training strategies on different sizes of LLMs.",
+        "bbox": [
+            112,
+            110,
+            489,
+            255
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.1 Experiment Setup",
+        "text_level": 2,
+        "bbox": [
+            114,
+            268,
+            305,
+            285
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We collect three SFT datasets $\\{ D _ { 1 } , D _ { 2 } , D _ { 3 } \\}$ including GSM8K RFT (Yuan et al., 2023b), Code Alpaca (Chaudhary, 2023), and ShareGPT (Chiang et al., 2023) to represent math reasoning, coding, and general human-aligning ability SFT dataset respectively. We will integrate a new SFT dataset D by these three datasets to investigate how data composition affects the model performances. We use GSM8K test set (Cobbe et al., 2021), HumanEval (Chen et al., 2021), and MT-Bench (Zheng et al., 2023) to measure abilities including math reasoning, coding, and general human-aligning. We use LLaMA (Touvron et al., 2023) series as our pretrained language models and use FastChat framework (Zheng et al., 2023) for fine-tuning. We finetune models with 3 epochs and a peak of 2e-5 learning rate. The batch size during SFT is 16. More details about SFT datasets, evaluation metrics, implementations and Training FLOPs can be found in Appendix A, B, C and D.",
+        "bbox": [
+            110,
+            290,
+            490,
+            613
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.2 RQ1. Individual Ability Performance vs. Data Amount",
+        "text_level": 2,
+        "bbox": [
+            112,
+            625,
+            478,
+            657
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "The instruction following ability can be activated via SFT on datasets like ShareGPT which contain around 100 thousand samples. However, (Zhou et al., 2023a) demonstrates that strong base models can achieve human alignment with just 1000 samples. Specialized abilities such as math reasoning require a large amount of data (Cobbe et al., 2021; Yuan et al., 2023b), unlike general abilities. Therefore, it is crucial to investigate how each ability improves as the data amount increases.",
+        "bbox": [
+            110,
+            664,
+            489,
+            825
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Experimental Design: We conduct SFT on LLaMA of various sizes using {1, 1/4, 1/16, 1/64, 1/256} proportions of the training set obtained from GSM8K RFT, Code Alpaca, and ShareGPT seperately. This allowed us to evaluate each ability with various data sizes and model sizes.",
+        "bbox": [
+            112,
+            826,
+            489,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "chart",
+        "img_path": "images/55a4791e7132cc12a79039656ad2973968b8171d1aac79f6835136cf6b9bc746.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 2: The scaling curve of different sizes of LLaMA in three individual domains."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            514,
+            83,
+            880,
+            147
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Results and Analysis. Figure 2 shows the individual data scaling curves for different abilities after SFT. We find that: Different abilities exhibit different scaling curves. To be more specific, mathematical reasoning capability shows a positive correlation with the data amount across various model sizes which is consistent with (Yuan et al., 2023b). Similarly, general human-aligning ability demonstrates an almost monotonically increasing scaling curve. However, it is noteworthy that general ability emerges with only around 1k data samples (ranging from 1/256 to 1/64), and after reaching a certain threshold (1/64), their performances improve slowly. This further supports (Zhou et al., 2023a), indicating that a small amount of high-quality SFT data is possible for the emergence of general human-aligning ability in LLMs. On the other hand, code ability exhibits an irregular scaling curve when the model’s parameter count is small (7B & 13B). However, when the parameter count increases to 33B, its coding performance shows an approximately log-linear trend with the data amount. One possible explanation is that Code Alpaca and the samples in HumanEval have different distributions. Larger models can capture shared knowledge across code data distributions in the in-domain samples, which enables them to exhibit some level of generalization to out-of-distribution (OOD) samples. Another observation is larger models show better performances with the same data amount generally. The outlier is with very little data (1/256), smaller models may outperform larger models. If there is enough data, larger models have stable better performances.",
+        "bbox": [
+            507,
+            214,
+            887,
+            762
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.3 RQ2. Performance Difference vs. Mixed Data Amount",
+        "text_level": 2,
+        "bbox": [
+            509,
+            771,
+            873,
+            803
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We should deliver a versatile model that requires us to mix various SFT datasets and apply SFT. We want to ask how each ability varies due to SFT dataset mixtures. We investigate it with different amounts of mixed data and compare them with individual ability performance.",
+        "bbox": [
+            507,
+            809,
+            885,
+            906
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Experimental Design: For the individual source setting, consistent with the setup in RQ1, we performed fine-tuning on LLaMA models of different sizes using {1, 1/4, 1/16, 1/64, 1/256} amounts of training data from GSM8K, Code Alpaca, and ShareGPT separately. For the mixed source setting, we sampled {1, 1/4, 1/16, 1/64, 1/256} amounts of training data from GSM8K, Code Alpaca, and ShareGPT, and directly mixed them according to the corresponding proportions. In this way, we constructed datasets with fixed proportions of different ability domains, while varying the total data amount. These datasets are then used for finetuning the LLaMA models <sup>1</sup>.",
+        "bbox": [
+            527,
+            906,
+            884,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_number",
+        "text": "180",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "chart",
+        "img_path": "images/58c5cb9c32415dc4a1b9f1b17e6f5c80e61358f6a404ac94cecce75a6748b557.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 3: Comparative experiments between mix domains and individual domains for LLaMA."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            117,
+            82,
+            485,
+            278
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            348,
+            490,
+            557
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Results and Analysis. Figure 3 presents results of LLaMA of different sizes on three benchmarks under the individual source and mixed source settings. The following observations are made: Abilities are improved with low-resource and are decreased with high-resource compared to individual source abilities. In the case of LLaMA-7B, compared to the data scaling curve of the individual source setting, the models fine-tuned with mixed source data consistently demonstrated performance conflicts among the three ability domains at high resources (100%). However, as the data volume decreased, a turning point in performance is observed between the two settings in the data range of 1/64 to 1/16. Notably, the models fine-tuned with mixed source data exhibited performance gains at low resources (1/256), indicating that SFT data from different sources benefit each other in a low-resource setting. However, when there is enough data, data from other sources could be viewed as noise for in-domain generalization. As the model size increases, the performance gain in low-resource settings also increases for math and general abilities. In the case of the 13B and 33B models, it is obvious that the scaling curve for the mix source setting follows a similar trend observed in previous analyses, with the presence of performance intersection points as the data volume scales. However, a crucial distinction arises, whereby larger models exhibit more pronounced performance gains under low resources as the size of model parameters increases. The outlier is the LLaMA-7B (code only, 1/256). A possible reason is the introduction of a small amount of unseen code data easily disrupts the original code ability of the pretrained model, as supported by its low HumanEval score (less than 6). In conclusion, our finding implies that larger language models excel in acquiring general and specialized abilities from diverse data sources under low-resource conditions <sup>2</sup>.",
+        "bbox": [
+            110,
+            560,
+            492,
+            883
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "chart",
+        "img_path": "images/39d045509e08d137271e70011cbc94d52ffbec5182718327889e68f1af98c9c7.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 4: Different data ratio (k) between specific abilities and general abilities on three benchmarks."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            512,
+            82,
+            880,
+            212
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            279,
+            887,
+            601
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "3.4 RQ3. Performance Difference vs. Data Composition Ratio",
+        "text_level": 2,
+        "bbox": [
+            509,
+            612,
+            862,
+            644
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "We observe ability conflicts in high-resource settings, and we want to investigate the reasons why the conflicts occur. Two possible factors are the data amount of other abilities is too high or the data ratio of other abilities is too high. Here we conduct experiments to investigate the data ratio factor.",
+        "bbox": [
+            507,
+            649,
+            887,
+            762
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Experimental Design: We consider coding and mathematics as a combined specialized data source, and the ShareGPT as the general data source. We designed three setups as follows which control the amount of one source of data and vary the ratio between general and specialized data.",
+        "bbox": [
+            507,
+            762,
+            885,
+            859
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "1. Fixed general data, scaling specialized data:",
+        "bbox": [
+            527,
+            859,
+            887,
+            876
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>1</sup>We also conduct \"Equal Data Amount VS. Equal Data Proportion\" experiments in Appendix H",
+        "bbox": [
+            112,
+            895,
+            489,
+            922
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>2</sup>To validate the generalizability of our conclusions, we further conduct the more experiments on World Knowledge, Language Understanding and Translation in Appendix E.",
+        "bbox": [
+            509,
+            884,
+            885,
+            922
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_number",
+        "text": "181",
+        "bbox": [
+            485,
+            928,
+            515,
+            942
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "We use a full training set of ShareGPT and sampled different proportions {1, 1/4, 1/16, 1/64, 1/256} of GSM8K RFT and Code Alpaca as a mixture.",
+        "bbox": [
+            112,
+            84,
+            489,
+            133
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "2. Fixed specialized data, scaling general data: We use a full training set of GSM8K RFT and Code Alpaca and sample different proportions of ShareGPT as a mixture.",
+        "bbox": [
+            112,
+            134,
+            489,
+            197
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "3. Fixed 1/64 general data, scaling specialized data: Motivated by LIMA’s setup (Zhou et al., 2023a), we used a 1/64 ShareGPT set (about 1500 examples) and sampled different proportions of GSM8K RFT and Code Alpaca as a mixture.",
+        "bbox": [
+            112,
+            198,
+            489,
+            279
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Results and Analysis. Q1: Does the perfor  \nmance of the model vary with different ra  \ntios of general and specialized data? As illus  \ntrated in the top three graphs of Figure 4, we   \nconduct ablation studies of the data ratio (k) be  \ntween specialized and general abilities. To be no  \nticed ratio is normalized by data amount, for ex  \nample, k = 1 means specialized use data amount = general use data amount unt",
+        "bbox": [
+            112,
+            288,
+            490,
+            425
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "<sup>specialized</sup> <sup>all</sup> <sup>data</sup> <sup>amount</sup><sub>general all data amount</sub> . We utilize a fixed specialized data setting (directly mixing 100% code & math data for training) and a fixed general data setting (100% general data for training) as the baseline and observe:",
+        "bbox": [
+            112,
+            423,
+            489,
+            502
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "(1) With the increase in the ratio of general data from 1/256 to 1/1, Fixed specialized data, scaling general data setup exhibits similar performance to the setup that Fixed specialized abilities in terms of math reasoning. This suggests that variations in the data ratio k have minimal impact on math ability. We consider the reason that math and general abilities are non-conflict since they are too different in the semantic space. However, when considering HumanEval, the Fixed specialized data, scaling general data setup displays noticeable fluctuations compared to the baseline. We attribute this to the inclusion of a certain proportion of code data in ShareGPT. Due to the differences in data format and distribution, the presence of similar data features exacerbates the performance conflicts between abilities when the data ratio k increases. Further analysis of the distribution of different abilities is discussed in Section 4.1.",
+        "bbox": [
+            112,
+            502,
+            490,
+            809
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "(2) With the increase in the ratio of specialized data from 1/256 to 1/1, the setup that Fixed general data, scaling specialized data displayed no significant performance changes compared to the baseline. This echoes our hypothesis that when there are significant differences in task formats and data distributions between different SFT abilities, the impact of data ratio is minimal. However, when there is some degree of similarities, the data ratio can lead to noticeable performance fluctuations.",
+        "bbox": [
+            112,
+            809,
+            490,
+            922
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            84,
+            887,
+            148
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Q2: Under extremely limited general data resources, does the ratio of specialized data have an impact on the model’s performance? We further explore the impact of different ratios of specialized data when the model has just acquired a certain level of general human-aligning ability $( k = 1 / 6 4 )$ . The bottom 3 graphs of Figure 4 present comparative experiments between two settings. We observe that regardless of whether the data amount for general capabilities is abundant (k = 1) or scarce $( k = 1 / 6 4 )$ , the performance on MT-Bench shows no significant fluctuations with varying proportions of specialized data. Furthermore, in mathematical reasoning, 1/64 general data setup exhibited a scaling trend that is almost identical to the full general data setup. However, for coding ability, with the same amount of code data and different ratios, code abilities are different in the two settings. We still consider the reason is code data are partly related to ShareGPT data and cause the performance difference and provide an analysis in Discussion 4.2.",
+        "bbox": [
+            507,
+            149,
+            887,
+            505
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "3.5 RQ4. Performance Difference vs. Training Strategies",
+        "text_level": 2,
+        "bbox": [
+            509,
+            513,
+            816,
+            546
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "We could feed these SFT datasets into models with different training strategies. In this section, We experiment with these settings and investigate how they influence each ability’s performance.",
+        "bbox": [
+            507,
+            550,
+            885,
+            617
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Experimental Design: Firstly, we introduce three kinds of naive training strategies as follows:",
+        "bbox": [
+            507,
+            624,
+            884,
+            656
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "1. Multi-task learning: We directly mix different SFT data sources $D = \\cup _ { 1 \\leq i \\leq k } D _ { i }$ and applying SFT. If we view each data source as a different task, this can be viewed as multi-task learning.",
+        "bbox": [
+            507,
+            656,
+            885,
+            720
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "2. Sequential Training: We sequentially apply SFT on each dataset. Specifically, we sequentially trained on coding, math reasoning, and the general ability dataset. Since the general ability is the most important one for human alignment, we put ShareGPT as our last dataset.",
+        "bbox": [
+            507,
+            720,
+            885,
+            816
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "3. Mixed Sequential Training: We apply multitask learning on specialized datasets(code, math) first and apply SFT on the general ability dataset. These three approaches are presented in Figure 1.",
+        "bbox": [
+            507,
+            816,
+            887,
+            883
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Results and Analysis: Table 1 presents performances under different training strategies in terms of mathematical reasoning, code generation, and general human-aligning ability. Multi-task learning preserves specialized abilities among these strategies while hurting the general ability most among them. Sequential training and mixed sequential training preserve general ability while losing too many specialized abilities. The observed outcome is in accordance with expectations, as during the final fine-tuning phase, the mixed sequential training strategy remains unaffected by specialized data, thereby effectively preserving its generalization capability. However, an inherent drawback of multistage training is the occurrence of catastrophic forgetting of prior knowledge, which motivates us to further explore methods that can alleviate catastrophic forgetting of specialized abilities while maximizing the preservation of general capability.",
+        "bbox": [
+            507,
+            890,
+            887,
+            922
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "182",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            359
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4. Dual-stage Mixed Fine-tuning (DMT): Based on our observation from RQ1 to RQ4, we propose a new training strategy that can reduce the ability conflict during multi-task learning and relieve the issue of catastrophic forgetting during sequential training. From RQ1, the model needs large data amounts to activate specialized abilities. From RQ2, multi-task learning with all amounts of specialized data and general data will hurt each ability. From RQ3, a small amount of specialized data will not affect the general ability performance. From RQ4, (mixed) sequential training forgets specialized abilities. So the model needs to learn large amounts of specialized data and should not forget them during learning general ability. A natural choice is to learn full amounts of specialized data first and add a small amount of specialized data to general data during the last stage of sequential training to prevent forgetting. As shown in Figure 1, we first apply SFT on the specialized dataset which is same as the first stage of the mixed sequential training strategy. For the second stage, we perform SFT with a mixed data source comprising a combination of the general data and varying proportions k (1, 1/2, 1/4, 1/8, 1/16, 1/32) of code and math data. Adding code and math data in the second stage helps models to recall the specialized ability. The results of DMT $( k = 1 / 2 5 6 )$ are presented in Table 1 and the detailed scaling analysis of proportion k can be found in the discussion.",
+        "bbox": [
+            112,
+            359,
+            490,
+            843
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Model Accuracy vs. DMT Strategies. In Table 1, LLaMA-7B with DMT (k = 1/256) strategy perform significant improvement in mathematical reasoning (32.6 to 41.92) and code generation (15.24 to 17.68) compared to the mixed sequential training strategy, which indicates a significant alleviating effect of mixing specialized capability data in the last fine-tuning stage on catastrophic forgetting. Surprisingly, DMT $( k = 1 / 2 5 6 )$ even exhibits a slight improvement on MT-Bench, further highlighting its ability to alleviate catastrophic forgetting while effectively preserving general capability.",
+        "bbox": [
+            112,
+            843,
+            490,
+            923
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            885,
+            198
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Regarding the 13B and 33B models, DMT (k = 1/256) demonstrates noticeable alleviation of catastrophic forgetting in mathematical reasoning (13B: 40.48 to 46.47 / 33B: 44.24 to 56.36) and code generation (13B: 18.3 to 19.5 / 33B: 24.4 to 25.5) compared to the mixed sequential training strategy. Additionally, it significantly retains its general capability (13B: 5.93 to 6.03 / 33B 6.43 to 6.69). Therefore, these results serve as additional validation of the efficacy of DMT in mitigating catastrophic forgetting while maintaining general capability <sup>3</sup>.",
+        "bbox": [
+            507,
+            203,
+            887,
+            397
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4 Discussion",
+        "text_level": 2,
+        "bbox": [
+            509,
+            423,
+            636,
+            438
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4.1 Visualization of Different SFT Abilities",
+        "text_level": 2,
+        "bbox": [
+            509,
+            460,
+            863,
+            476
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "In the aforementioned analysis of data composition, we observed a significant performance degradation when different data sources are directly mixed. In this section, our aim is to explore the potential mutual influence of semantic representation distributions among different data sources. Specifically, we randomly sampled 100 queries from CodeAlpaca, GSM8k RFT, and ShareGPT datasets and extracted the hidden layer representations located in the Middle layer (15th) of the model. Subsequently, we employed the t-SNE toolkit (Van der Maaten and Hinton, 2008) to visualize the representations of the three types of capabilities. The results in Figure 5 illustrate a notable collapse phenomenon in the semantic representations of both the original LLaMA-13b and LLaMA-13b with DMT (k=1/256). While both models exhibit a certain level of separation in the mathematical data representations, there remains a certain degree of overlap between the representations of code and general samples. In Appendix G, we further discuss the visualization of semantic spaces at different layers of LLaMA 7B & 13B.",
+        "bbox": [
+            507,
+            489,
+            887,
+            862
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>3</sup>To verify the effectiveness of DMT strategy on relatively OOD benchmarks, we further evaluate it on MBPP and MATH in Appendix F.",
+        "bbox": [
+            509,
+            883,
+            884,
+            921
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "183",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/aa83c504f82898255653bc3d749e5b0698be94ec7531cbcf1fdd09db56f963c0.jpg",
+        "table_caption": [
+            "Table 1: The results of LLaMA-7B, 13B, 33B under different training strategies on three benchmarks. The top two results across different strategies are marked with bold and underlined."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">Methods</td><td colspan=\"3\">LLaMA -7B</td><td colspan=\"3\">LLaMA-13B</td><td colspan=\"3\">LLaMA-33B</td></tr><tr><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td></tr><tr><td>Individual domain</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>General only</td><td>11.10</td><td>10.42</td><td>5.88</td><td>14.02</td><td>16.40</td><td>6.13</td><td>26.06</td><td>24.30</td><td>6.63</td></tr><tr><td>Math only</td><td>49.10</td><td>6.71</td><td>2.53</td><td>51.40</td><td>12.8</td><td>2.54</td><td>57.91</td><td>15.5</td><td>3.18</td></tr><tr><td>Code only</td><td>4.51</td><td>18.40</td><td>4.30</td><td>5.15</td><td>17.1</td><td>3.53</td><td>6.06</td><td>26.82</td><td>4.18</td></tr><tr><td>Different Training Strategies</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>Multi-task learning</td><td>47.53</td><td>14.63</td><td>5.76</td><td>50.94</td><td>19.50</td><td>5.73</td><td>56.69</td><td>18.9</td><td>6.07</td></tr><tr><td>Sequential Training</td><td>31.39</td><td>15.85</td><td>5.72</td><td>39.12</td><td>20.12</td><td>5.93</td><td>47.27</td><td>24.80</td><td>6.73</td></tr><tr><td>Mixed Sequential Training</td><td>32.60</td><td>15.24</td><td>6.02</td><td>40.48</td><td>18.30</td><td>5.93</td><td>44.24</td><td>24.4</td><td>6.43</td></tr><tr><td>DMT(k=1/256)</td><td>41.92</td><td>17.68</td><td>6.08</td><td>46.47</td><td>19.50</td><td>6.03</td><td>56.36</td><td>25.00</td><td>6.73</td></tr></table>",
+        "bbox": [
+            121,
+            82,
+            882,
+            236
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "chart",
+        "img_path": "images/7fb94554896c112de25dcfabcb5e4ecfc82748423b1ecea89af57e0e169a64cc.jpg",
+        "content": "",
+        "chart_caption": [
+            "(a) LLaMA-13B"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            159,
+            294,
+            326,
+            384
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "chart",
+        "img_path": "images/373546fcbae18c364fdb4b1cc97aa9ee920607b1d0b8d8d8773caec23cdbf295.jpg",
+        "content": "",
+        "chart_caption": [
+            "(b) LLaMA-13B with DMT"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            332,
+            294,
+            500,
+            385
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "chart",
+        "img_path": "images/635473488207e8965e6d3c18036debcc9c519e7b94f8d98c92466385c67bbfaf.jpg",
+        "content": "",
+        "chart_caption": [
+            "(c) DMT scaling (7B)"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            500,
+            294,
+            672,
+            385
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "chart",
+        "img_path": "images/f1ea25df60b2764a1b617bb372c579e66a11fca1473e0e62644e18754505d4d0.jpg",
+        "content": "",
+        "chart_caption": [
+            "(d) DMT scaling (13B)",
+            "Figure 5: The left two figures show the t-SNE plots of LLaMA-13B and LLaMA-13B with the DMT strategy. The two right figures show the performance scaling of LLaMA-7B & 13B with DMT under different k values."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            675,
+            294,
+            848,
+            385
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "4.2 Ablation of the Specialized Domains in ShareGPT",
+        "text_level": 2,
+        "bbox": [
+            114,
+            472,
+            465,
+            502
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "In RQ2, we observe using mixed data sources resulted in improved abilities under low-resource conditions but diminished abilities under high-resource conditions when compared to single data sources. However, the presence of coding and mathematical samples within the ShareGPT introduces uncertainty regarding whether the performance gain under low resources is solely attributed to these specific coding & mathematical data or other orthogonal samples in the general dataset (e.g., translation or extraction). Hence, the objective of this section is to investigate whether the conclusions drawn in Section 3.3 remain valid after removing the code and math samples within ShareGPT.",
+        "bbox": [
+            112,
+            516,
+            490,
+            741
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Experimental Design: We employed an openset tagger InsTag (Lu et al., 2023) to annotate samples in ShareGPT. To filter out data related to coding and mathematical abilities, we conduct regular expression matching to eliminate instances where the tags contain keywords “code” or “math”. Finally, we obtain a ShareGPT dataset devoid of any code or math-related information (reducing from 86K to 63K). In alignment with the settings in Section 3.3, we sampled different proportions of training data (1, 1/4, 1/16, 1/64, 1/256) from GSM8K,",
+        "bbox": [
+            110,
+            745,
+            492,
+            923
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Code Alpaca, and the modified ShareGPT dataset (without code math). These samples were directly mixed according to the corresponding proportions. Subsequently, the LLaMA models were fine-tuned by using this mixed dataset.",
+        "bbox": [
+            507,
+            472,
+            885,
+            554
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Results and Analysis. Figure 6 shows the results of our experiment. Removing the code and math from ShareGPT not only mitigates the performance conflicts among different abilities to some extent under high-resource conditions but also maintains stable gains in low-resource settings. We propose that the potential reason behind these findings lies in the differences in the distribution of code and math data between ShareGPT, CodeAlpaca, and GSM8K RFT datasets. This distribution gap introduces an extra noise during the SFT phrase, while its removal enables the model to better generalize coding and mathematical abilities. Furthermore, in low-resource scenarios, this phenomenon indicates that the code and math samples in ShareGPT are not the key factor contributing to performance improvements, but rather the diversity and variability of the data (Longpre et al., 2023). In summary, the presence of code math data within ShareGPT does not emerge as a key factor impacting the performance gains identified in Section 3.3, highlighting the generalization of our conclusions.",
+        "bbox": [
+            507,
+            568,
+            887,
+            923
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "184",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "chart",
+        "img_path": "images/330c41071cf6e0540db23d3e9326bb1e971c4d8e764fb3e299d90fdc830b75bd.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 6: The scaling curve after ablating code and math-related samples from ShareGPT."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            119,
+            82,
+            484,
+            147
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "4.3 Specialized Data Amount in DMT",
+        "text_level": 2,
+        "bbox": [
+            114,
+            209,
+            428,
+            225
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We investigate how different values of k influence model performance and results shown in Figure 5. When we adjust k from 0 to 1/256 (k = 0 is equal to mixed sequential training), the SFT models show significant improvements in both specialized ability and general human-aligning ability. On the contrary, as k increased from 1/4 to 1, the model exhibited a decline in general ability. We believe this is in line with the findings in RQ2, which concluded that high-resource settings lead to conflicts while low-resource settings lead to gains in mixed sources. Furthermore, as k increased from 1/256 to 1/4, we observe a linear inverse trend between general ability and specialized ability, especially an increase in general ability coincided with a decrease in specialized ability. This suggests k needs to be tuned based on specific requirements in order to achieve a balance between multiple abilities.",
+        "bbox": [
+            110,
+            233,
+            490,
+            524
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "5 Conclusion",
+        "text_level": 2,
+        "bbox": [
+            114,
+            539,
+            247,
+            555
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We explore the data composition in the SFT phase, focusing on mathematical reasoning, code generation, and general human-aligning abilities. We formulate four research questions to guide our investigation and analyze the scaling trends between different abilities and factors (e.g. data amount, data ratio, model parameters, and training strategies). Our findings reveal distinct scaling patterns among different abilities, with larger models demonstrating superior performance when trained with the same amount of data. Moreover, mixing data sources in the SFT phase improves performance in low-resource scenarios but diminishes in highresource scenarios. Interestingly, the phenomenon of low-resource gain becomes more prominent as the model parameter size increases. Furthermore, our observations indicate that data amount directly influences performance conflicts, whereas the impact of data ratio is insignificant within our experimental setup. Finally, regarding the SFT strategies, we demonstrate our proposed DMT strategy effectively alleviates performance conflicts, offering a promising solution to activate multiple abilities.",
+        "bbox": [
+            110,
+            568,
+            492,
+            923
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            509,
+            85,
+            865,
+            101
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Limitations",
+        "text_level": 2,
+        "bbox": [
+            509,
+            112,
+            616,
+            128
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Due to our use of the large language model LLaMA-33B, the extensive computational resources and time required for both training and inference may limit its applicability. The datasets used in this article are all open source, so there are no ethical or moral issues; However, inappropriate prompts and noisy training corpora can potentially lead to privacy and bias issues with LLMs. Furthermore, the evaluation benchmark MT-Bench relies on GPT-4 for scoring, which may result in some variability in the results, and these may not always align perfectly with human judgment standards. In this paper, we primarily focus on three SFT capabilities that are of great interest in the LLMs community, including mathematical reasoning, code generation, and general human-aligned ability. To verify the generality of our conclusions, we further explore three additional SFT capabilities in the appendix. Nevertheless, there are still many other SFT capabilities (such as creative generation) within the LLMs community that have data composition issues waiting to be explored by researchers, which will also be the focus of our future research efforts.",
+        "bbox": [
+            507,
+            139,
+            887,
+            525
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            510,
+            551,
+            610,
+            568
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Rohan Anil, Andrew M Dai, Orhan Firat, Melvin Johnson, Dmitry Lepikhin, Alexandre Passos, Siamak Shakeri, Emanuel Taropa, Paige Bailey, Zhifeng Chen, et al. 2023. Palm 2 technical report. arXiv preprint arXiv:2305.10403.",
+            "Jacob Austin, Augustus Odena, Maxwell Nye, Maarten Bosma, Henryk Michalewski, David Dohan, Ellen Jiang, Carrie Cai, Michael Terry, Quoc Le, et al. 2021. Program synthesis with large language models. arXiv preprint arXiv:2108.07732.",
+            "Loubna Ben Allal, Niklas Muennighoff, Logesh Kumar Umapathi, Ben Lipkin, and Leandro von Werra. 2022. A framework for the evaluation of code generation models. https://github.com/bigcode-project/ bigcode-evaluation-harness.",
+            "Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel M. Ziegler, Jeffrey Wu, Clemens Winter, Christopher Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess,"
+        ],
+        "bbox": [
+            510,
+            575,
+            884,
+            640
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "185",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. 2020. Language models are few-shot learners.",
+            "Mauro Cettolo, Jan Niehues, Sebastian Stüker, Luisa Bentivogli, and Marcello Federico. 2014. Report on the 11th IWSLT evaluation campaign. In Proceedings ofthe 11th International Workshop on Spoken Language Translation: Evaluation Campaign, pages 2–17, Lake Tahoe, California.",
+            "Sahil Chaudhary. 2023. Code alpaca: An instructionfollowing llama model for code generation. https: //github.com/sahil280114/codealpaca.",
+            "Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde de Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, Alex Ray, Raul Puri, Gretchen Krueger, Michael Petrov, Heidy Khlaaf, Girish Sastry, Pamela Mishkin, Brooke Chan, Scott Gray, Nick Ryder, Mikhail Pavlov, Alethea Power, Lukasz Kaiser, Mohammad Bavarian, Clemens Winter, Philippe Tillet, Felipe Petroski Such, Dave Cummings, Matthias Plappert, Fotios Chantzis, Elizabeth Barnes, Ariel Herbert-Voss, William Hebgen Guss, Alex Nichol, Alex Paino, Nikolas Tezak, Jie Tang, Igor Babuschkin, Suchir Balaji, Shantanu Jain, William Saunders, Christopher Hesse, Andrew N. Carr, Jan Leike, Josh Achiam, Vedant Misra, Evan Morikawa, Alec Radford, Matthew Knight, Miles Brundage, Mira Murati, Katie Mayer, Peter Welinder, Bob McGrew, Dario Amodei, Sam McCandlish, Ilya Sutskever, and Wojciech Zaremba. 2021. Evaluating large language models trained on code.",
+            "Zhaorun Chen, Zhuokai Zhao, Zhihong Zhu, Ruiqi Zhang, Xiang Li, Bhiksha Raj, and Huaxiu Yao. 2024. Autoprm: Automating procedural supervision for multi-step reasoning via controllable question decomposition. In Proceedings ofthe 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies.",
+            "Xuxin Cheng, Bowen Cao, Qichen Ye, Zhihong Zhu, Hongxiang Li, and Yuexian Zou. 2023a. Ml-lmcl: Mutual learning and large-margin contrastive learning for improving asr robustness in spoken language understanding. In Findings of the Association for Computational Linguistics: ACL 2023, pages 6492– 6505.",
+            "Xuxin Cheng, Qianqian Dong, Fengpeng Yue, Tom Ko, Mingxuan Wang, and Yuexian Zou. 2023b. M 3 st: Mix at three levels for speech translation. In ICASSP 2023-2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), pages 1–5. IEEE.",
+            "Xuxin Cheng, Zhihong Zhu, Bowen Cao, Qichen Ye, and Yuexian Zou. 2023c. Mrrl: Modifying the reference via reinforcement learning for nonautoregressive joint multiple intent detection and slot",
+            "filling. In The 2023 Conference on Empirical Methods in Natural Language Processing, pages 10495– 10505.",
+            "Xuxin Cheng, Zhihong Zhu, Hongxiang Li, Yaowei Li, Xianwei Zhuang, and Yuexian Zou. 2024. Towards multi-intent spoken language understanding via hierarchical attention and optimal transport. In Proceedings of the AAAI Conference on Artificial Intelligence, volume 38, pages 17844–17852.",
+            "Xuxin Cheng, Zhihong Zhu, Wanshi Xu, Yaowei Li, Hongxiang Li, and Yuexian Zou. 2023d. Accelerating multiple intent detection and slot filling via targeted knowledge distillation. In The 2023 Conference on Empirical Methods in Natural Language Processing.",
+            "Wei-Lin Chiang, Zhuohan Li, Zi Lin, Ying Sheng, Zhanghao Wu, Hao Zhang, Lianmin Zheng, Siyuan Zhuang, Yonghao Zhuang, Joseph E. Gonzalez, Ion Stoica, and Eric P. Xing. 2023. Vicuna: An opensource chatbot impressing gpt-4 with 90%\\* chatgpt quality.",
+            "Alexandra Chronopoulou, Christos Baziotis, and Alexandros Potamianos. 2019. An embarrassingly simple approach for transfer learning from pretrained language models. arXiv preprint arXiv:1902.10547.",
+            "Hyung Won Chung, Le Hou, Shayne Longpre, Barret Zoph, Yi Tay, William Fedus, Yunxuan Li, Xuezhi Wang, Mostafa Dehghani, Siddhartha Brahma, Albert Webson, Shixiang Shane Gu, Zhuyun Dai, Mirac Suzgun, Xinyun Chen, Aakanksha Chowdhery, Alex Castro-Ros, Marie Pellat, Kevin Robinson, Dasha Valter, Sharan Narang, Gaurav Mishra, Adams Yu, Vincent Zhao, Yanping Huang, Andrew Dai, Hongkun Yu, Slav Petrov, Ed H. Chi, Jeff Dean, Jacob Devlin, Adam Roberts, Denny Zhou, Quoc V. Le, and Jason Wei. 2022a. Scaling instruction-finetuned language models.",
+            "Hyung Won Chung, Le Hou, Shayne Longpre, Barret Zoph, Yi Tay, William Fedus, Yunxuan Li, Xuezhi Wang, Mostafa Dehghani, Siddhartha Brahma, Albert Webson, Shixiang Shane Gu, Zhuyun Dai, Mirac Suzgun, Xinyun Chen, Aakanksha Chowdhery, Alex Castro-Ros, Marie Pellat, Kevin Robinson, Dasha Valter, Sharan Narang, Gaurav Mishra, Adams Yu, Vincent Zhao, Yanping Huang, Andrew Dai, Hongkun Yu, Slav Petrov, Ed H. Chi, Jeff Dean, Jacob Devlin, Adam Roberts, Denny Zhou, Quoc V. Le, and Jason Wei. 2022b. Scaling instruction-finetuned language models.",
+            "Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, et al. 2021. Training verifiers to solve math word problems. arXiv preprint arXiv:2110.14168.",
+            "Matthias De Lange, Rahaf Aljundi, Marc Masana, Sarah Parisot, Xu Jia, Aleš Leonardis, Gregory Slabaugh, and Tinne Tuytelaars. 2022. A continual learning survey: Defying forgetting in classification tasks. IEEE"
+        ],
+        "bbox": [
+            131,
+            85,
+            489,
+            127
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "186",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Transactions on Pattern Analysis and Machine Intelligence, 44(7):3366–3385.",
+            "Guanting Dong, Tingfeng Hui, Zhuoma GongQue, Jinxu Zhao, Daichi Guo, Gang Zhao, Keqing He, and Weiran Xu. 2023a. Demonsf: A multi-task demonstration-based generative framework for noisy slot filling task.",
+            "Guanting Dong, Jinxu Zhao, Tingfeng Hui, Daichi Guo, Wenlong Wan, Boqi Feng, Yueyan Qiu, Zhuoma Gongque, Keqing He, Zechen Wang, et al. 2023b. Revisit input perturbation problems for llms: A unified robustness evaluation framework for noisy slot filling task. arXiv preprint arXiv:2310.06504.",
+            "Dayuan Fu, Jianzhao Huang, Siyuan Lu, Guanting Dong, Yejie Wang, Keqing He, and Weiran Xu. 2024. Preact: Predicting future in react enhances agent’s planning ability.",
+            "Leo Gao, John Schulman, and Jacob Hilton. 2022. Scaling laws for reward model overoptimization.",
+            "Zhibin Gou, Zhihong Shao, Yeyun Gong, Yelong Shen, Yujiu Yang, Minlie Huang, Nan Duan, and Weizhu Chen. 2024. Tora: A tool-integrated reasoning agent for mathematical problem solving.",
+            "Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. 2021. Measuring mathematical problem solving with the math dataset. arXiv preprint arXiv:2103.03874.",
+            "Jordan Hoffmann, Sebastian Borgeaud, Arthur Mensch, Elena Buchatskaya, Trevor Cai, Eliza Rutherford, Diego de Las Casas, Lisa Anne Hendricks, Johannes Welbl, Aidan Clark, Tom Hennigan, Eric Noland, Katie Millican, George van den Driessche, Bogdan Damoc, Aurelia Guy, Simon Osindero, Karen Simonyan, Erich Elsen, Jack W. Rae, Oriol Vinyals, and Laurent Sifre. 2022. Training compute-optimal large language models.",
+            "Jakub Hoscilowicz, Pawel Pawlowski, Marcin Skorupa, Marcin Sowanski, and Artur Janicki. 2024.´ Large language models for expansion of spoken language understanding systems to new languages.",
+            "Yupeng Hou, Junjie Zhang, Zihan Lin, Hongyu Lu, Ruobing Xie, Julian McAuley, and Wayne Xin Zhao. 2024. Large language models are zero-shot rankers for recommender systems. In European Conference on Information Retrieval, pages 364–381. Springer.",
+            "Jie Huang and Kevin Chen-Chuan Chang. 2023. Towards reasoning in large language models: A survey. In Findings of the Association for Computational Linguistics: ACL 2023, pages 1049–1065, Toronto, Canada. Association for Computational Linguistics.",
+            "Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B Brown, Benjamin Chess, Rewon Child, Scott Gray, Alec Radford, Jeffrey Wu, and Dario Amodei. 2020. Scaling laws for neural language models. arXiv preprint arXiv:2001.08361.",
+            "Shanglin Lei, Guanting Dong, Xiaoping Wang, Keheng Wang, and Sirui Wang. 2023. Instructerc: Reforming emotion recognition in conversation with a retrieval multi-task llms framework.",
+            "Chengpeng Li, Zheng Yuan, Hongyi Yuan, Guanting Dong, Keming Lu, Jiancan Wu, Chuanqi Tan, Xiang Wang, and Chang Zhou. 2023. Query and response augmentation cannot help out-of-domain math reasoning generalization.",
+            "Xiaoxi Li, Jiajie Jin, Yujia Zhou, Yuyao Zhang, Peitian Zhang, Yutao Zhu, and Zhicheng Dou. 2024. From matching to generation: A survey on generative information retrieval.",
+            "Xiaobo Liang, Lijun Wu, Juntao Li, Yue Wang, Qi Meng, Tao Qin, Wei Chen, Min Zhang, and Tie-Yan Liu. 2021. R-drop: Regularized dropout for neural networks.",
+            "Hunter Lightman, Vineet Kosaraju, Yura Burda, Harri Edwards, Bowen Baker, Teddy Lee, Jan Leike, John Schulman, Ilya Sutskever, and Karl Cobbe. 2023. Let’s verify step by step. arXiv preprint arXiv:2305.20050.",
+            "Bo Liu, Liming Zhan, Zexin Lu, Yujie Feng, Lei Xue, and Xiao-Ming Wu. 2024a. How good are llms at out-of-distribution detection?",
+            "Wei Liu, Weihao Zeng, Keqing He, Yong Jiang, and Junxian He. 2024b. What makes good data for alignment? a comprehensive study of automatic data selection in instruction tuning.",
+            "Zheng Liu, Yujia Zhou, Yutao Zhu, Jianxun Lian, Chaozhuo Li, Zhicheng Dou, Defu Lian, and Jian-Yun Nie. 2024c. Information retrieval meets large language models. In Companion Proceedings ofthe ACM on Web Conference 2024, WWW ’24, page 1586–1589, New York, NY, USA. Association for Computing Machinery.",
+            "Shayne Longpre, Le Hou, Tu Vu, Albert Webson, Hyung Won Chung, Yi Tay, Denny Zhou, Quoc V Le, Barret Zoph, Jason Wei, et al. 2023. The flan collection: Designing data and methods for effective instruction tuning. arXiv preprint arXiv:2301.13688.",
+            "Keming Lu, Hongyi Yuan, Zheng Yuan, Runji Lin, Junyang Lin, Chuanqi Tan, and Chang Zhou. 2023. # instag: Instruction tagging for diversity and complexity analysis. arXiv preprint arXiv:2308.07074.",
+            "Yaojie Lu, Qing Liu, Dai Dai, Xinyan Xiao, Hongyu Lin, Xianpei Han, Le Sun, and Hua Wu. 2022. Unified structure generation for universal information extraction. arXiv preprint arXiv:2203.12277.",
+            "Haoran Luo, Haihong E, Zichen Tang, Shiyao Peng, Yikai Guo, Wentai Zhang, Chenghao Ma, Guanting Dong, Meina Song, and Wei Lin. 2023a. Chatkbqa: A generate-then-retrieve framework for knowledge base question answering with fine-tuned large language models."
+        ],
+        "bbox": [
+            131,
+            85,
+            489,
+            114
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "187",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Ziyang Luo, Can Xu, Pu Zhao, Qingfeng Sun, Xiubo Geng, Wenxiang Hu, Chongyang Tao, Jing Ma, Qingwei Lin, and Daxin Jiang. 2023b. Wizardcoder: Empowering code large language models with evolinstruct. arXiv preprint arXiv:2306.08568.",
+            "OpenAI. 2023. Gpt-4 technical report.",
+            "Long Ouyang, Jeff Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul Christiano, Jan Leike, and Ryan Lowe. 2022a. Training language models to follow instructions with human feedback.",
+            "Long Ouyang, Jeff Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul Christiano, Jan Leike, and Ryan Lowe. 2022b. Training language models to follow instructions with human feedback.",
+            "Jeff Rasley, Samyam Rajbhandari, Olatunji Ruwase, and Yuxiong He. 2020. Deepspeed: System optimizations enable training deep learning models with over 100 billion parameters. In Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining, KDD ’20, page 3505–3506, New York, NY, USA. Association for Computing Machinery.",
+            "Victor Sanh, Albert Webson, Colin Raffel, Stephen H. Bach, Lintang Sutawika, Zaid Alyafeai, Antoine Chaffin, Arnaud Stiegler, Teven Le Scao, Arun Raja, Manan Dey, M Saiful Bari, Canwen Xu, Urmish Thakker, Shanya Sharma Sharma, Eliza Szczechla, Taewoon Kim, Gunjan Chhablani, Nihal Nayak, Debajyoti Datta, Jonathan Chang, Mike Tian-Jian Jiang, Han Wang, Matteo Manica, Sheng Shen, Zheng Xin Yong, Harshit Pandey, Rachel Bawden, Thomas Wang, Trishala Neeraj, Jos Rozen, Abheesht Sharma, Andrea Santilli, Thibault Fevry, Jason Alan Fries, Ryan Teehan, Tali Bers, Stella Biderman, Leo Gao, Thomas Wolf, and Alexander M. Rush. 2022. Multitask prompted training enables zero-shot task generalization.",
+            "Yongliang Shen, Kaitao Song, Xu Tan, Dongsheng Li, Weiming Lu, and Yueting Zhuang. 2023. Hugginggpt: Solving ai tasks with chatgpt and its friends in hugging face.",
+            "Karan Singhal, Shekoofeh Azizi, Tao Tu, S. Sara Mahdavi, Jason Wei, Hyung Won Chung, Nathan Scales, Ajay Tanwani, Heather Cole-Lewis, Stephen Pfohl, Perry Payne, Martin Seneviratne, Paul Gamble, Chris Kelly, Nathaneal Scharli, Aakanksha Chowdhery, Philip Mansfield, Blaise Aguera y Arcas, Dale Webster, Greg S. Corrado, Yossi Matias, Katherine Chou, Juraj Gottweis, Nenad Tomasev, Yun Liu, Alvin Rajkomar, Joelle Barral, Christopher Semturs, Alan",
+            "Karthikesalingam, and Vivek Natarajan. 2022. Large language models encode clinical knowledge.",
+            "Xiaoshuai Song, Keqing He, Pei Wang, Guanting Dong, Yutao Mou, Jingang Wang, Yunsen Xian, Xunliang Cai, and Weiran Xu. 2023. Large language models meet open-world intent discovery and recognition: An evaluation of chatgpt.",
+            "Xiaoshuai Song, Zhengyang Wang, Keqing He, Guanting Dong, Yutao Mou, Jinxu Zhao, and Weiran Xu. 2024. Knowledge editing on black-box large language models.",
+            "Rohan Taori, Ishaan Gulrajani, Tianyi Zhang, Yann Dubois, Xuechen Li, Carlos Guestrin, Percy Liang, and Tatsunori B. Hashimoto. 2023. Stanford alpaca: An instruction-following llama model. https:// github.com/tatsu-lab/stanford\\_alpaca.",
+            "Erik F. Tjong Kim Sang and Fien De Meulder. 2003. Introduction to the CoNLL-2003 shared task: Language-independent named entity recognition. In Proceedings of the Seventh Conference on Natural Language Learning at HLT-NAACL 2003, pages 142– 147.",
+            "Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. 2023. Llama: Open and efficient foundation language models.",
+            "Laurens Van der Maaten and Geoffrey Hinton. 2008. Visualizing data using t-sne. Journal of machine learning research, 9(11).",
+            "Guan Wang, Sijie Cheng, Xianyuan Zhan, Xiangang Li, Sen Song, and Yang Liu. 2023a. Openchat: Advancing open-source language models with mixed-quality data.",
+            "Pei Wang, Yejie Wang, Muxi Diao, Keqing He, Guanting Dong, and Weiran Xu. 2024a. Multi-perspective consistency enhances confidence estimation in large language models.",
+            "Shuhe Wang, Xiaofei Sun, Xiaoya Li, Rongbin Ouyang, Fei Wu, Tianwei Zhang, Jiwei Li, and Guoyin Wang. 2023b. Gpt-ner: Named entity recognition via large language models.",
+            "Yejie Wang, Keqing He, Guanting Dong, Pei Wang, Weihao Zeng, Muxi Diao, Yutao Mou, Mengdi Zhang, Jingang Wang, Xunliang Cai, and Weiran Xu. 2024b. Dolphcoder: Echo-locating code large language models with diverse and multi-objective instruction tuning.",
+            "Yizhong Wang, Hamish Ivison, Pradeep Dasigi, Jack Hessel, Tushar Khot, Khyathi Raghavi Chandu, David Wadden, Kelsey MacMillan, Noah A Smith, Iz Beltagy, et al. 2023c. How far can camels go? exploring the state of instruction tuning on open resources. arXiv preprint arXiv:2306.04751."
+        ],
+        "bbox": [
+            114,
+            85,
+            489,
+            152
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "page_number",
+        "text": "188",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Yizhong Wang, Yeganeh Kordi, Swaroop Mishra, Alisa Liu, Noah A. Smith, Daniel Khashabi, and Hannaneh Hajishirzi. 2023d. Self-instruct: Aligning language models with self-generated instructions.",
+            "Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou, et al. 2022. Chain-of-thought prompting elicits reasoning in large language models. Advances in Neural Information Processing Systems, 35:24824–24837.",
+            "Yuxiang Wei, Zhe Wang, Jiawei Liu, Yifeng Ding, and Lingming Zhang. 2023. Magicoder: Source code is all you need.",
+            "Shaohua Wu, Xudong Zhao, Tong Yu, Rongguo Zhang, Chong Shen, Hongli Liu, Feng Li, Hong Zhu, Jiangang Luo, Liang Xu, et al. 2021. Yuan 1.0: Largescale pre-trained language model in zero-shot and few-shot learning. arXiv preprint arXiv:2110.04725.",
+            "Yuxiang Wu, Guanting Dong, and Weiran Xu. 2023. Semantic parsing by large language models for intricate updating strategies of zero-shot dialogue state tracking.",
+            "Can Xu, Qingfeng Sun, Kai Zheng, Xiubo Geng, Pu Zhao, Jiazhan Feng, Chongyang Tao, and Daxin Jiang. 2023a. Wizardlm: Empowering large language models to follow complex instructions.",
+            "Derong Xu, Wei Chen, Wenjun Peng, Chao Zhang, Tong Xu, Xiangyu Zhao, Xian Wu, Yefeng Zheng, and Enhong Chen. 2023b. Large language models for generative information extraction: A survey.",
+            "Runxin Xu, Fuli Luo, Zhiyuan Zhang, Chuanqi Tan, Baobao Chang, Songfang Huang, and Fei Huang. 2021. Raise a child in large language model: Towards effective and generalizable fine-tuning. In Proceedings ofthe 2021 Conference on Empirical Methods in Natural Language Processing, pages 9514– 9528, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics.",
+            "Mingfeng Xue, Dayiheng Liu, Kexin Yang, Guanting Dong, Wenqiang Lei, Zheng Yuan, Chang Zhou, and Jingren Zhou. 2023. Occuquest: Mitigating occupational bias for inclusive large language models.",
+            "Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Thomas L. Griffiths, Yuan Cao, and Karthik Narasimhan. 2023a. Tree of thoughts: Deliberate problem solving with large language models.",
+            "Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, and Yuan Cao. 2023b. React: Synergizing reasoning and acting in language models.",
+            "Wen-tau Yih, Matthew Richardson, Chris Meek, Ming-Wei Chang, and Jina Suh. 2016. The value of semantic parse labeling for knowledge base question answering. In Proceedings ofthe 54th Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers), pages 201–206, Berlin,",
+            "Germany. Association for Computational Linguistics.",
+            "Shangjian Yin, Peijie Huang, Yuhong Xu, Haojing Huang, and Jiatian Chen. 2024. Do large language model understand multi-intent spoken language ?",
+            "Longhui Yu, Weisen Jiang, Han Shi, Jincheng Yu, Zhengying Liu, Yu Zhang, James T. Kwok, Zhenguo Li, Adrian Weller, and Weiyang Liu. 2024. Metamath: Bootstrap your own mathematical questions for large language models.",
+            "Hongyi Yuan, Zheng Yuan, Chuanqi Tan, Fei Huang, and Songfang Huang. 2023a. HyPe: Better pretrained language model fine-tuning with hidden representation perturbation. In Proceedings ofthe 61st Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 3246– 3264, Toronto, Canada. Association for Computational Linguistics.",
+            "Lifan Yuan, Yangyi Chen, Ganqu Cui, Hongcheng Gao, Fangyuan Zou, Xingyi Cheng, Heng Ji, Zhiyuan Liu, and Maosong Sun. 2024. Revisiting out-ofdistribution robustness in nlp: Benchmarks, analysis, and llms evaluations. Advances in Neural Information Processing Systems, 36.",
+            "Zheng Yuan, Hongyi Yuan, Chengpeng Li, Guanting Dong, Chuanqi Tan, and Chang Zhou. 2023b. Scaling relationship on learning mathematical reasoning with large language models.",
+            "Zheng Yuan, Hongyi Yuan, Chuanqi Tan, Wei Wang, Songfang Huang, and Fei Huang. 2023c. Rrhf: Rank responses to align language models with human feedback without tears.",
+            "Xiang Yue, Xingwei Qu, Ge Zhang, Yao Fu, Wenhao Huang, Huan Sun, Yu Su, and Wenhu Chen. 2023. Mammoth: Building math generalist models through hybrid instruction tuning. arXiv preprint arXiv:2309.05653.",
+            "Xiang Yue, Tuney Zheng, Ge Zhang, and Wenhu Chen. 2024. Mammoth2: Scaling instructions from the web.",
+            "Shengyu Zhang, Linfeng Dong, Xiaoya Li, Sen Zhang, Xiaofei Sun, Shuhe Wang, Jiwei Li, Runyi Hu, Tianwei Zhang, Fei Wu, and Guoyin Wang. 2024a. Instruction tuning for large language models: A survey.",
+            "Zhen Zhang, Yuhua Zhao, Hang Gao, and Mengting Hu. 2024b. Linkner: Linking local named entity recognition models to large language models using uncertainty.",
+            "Gang Zhao, Xiaocheng Gong, Xinjie Yang, Guanting Dong, Shudong Lu, and Si Li. 2023. Demosg: Demonstration-enhanced schema-guided generation for low-resource event extraction."
+        ],
+        "bbox": [
+            115,
+            85,
+            487,
+            140
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "page_number",
+        "text": "189",
+        "bbox": [
+            485,
+            928,
+            517,
+            941
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric. P Xing, Hao Zhang, Joseph E. Gonzalez, and Ion Stoica. 2023. Judging llm-as-a-judge with mt-bench and chatbot arena.",
+            "Chunting Zhou, Pengfei Liu, Puxin Xu, Srini Iyer, Jiao Sun, Yuning Mao, Xuezhe Ma, Avia Efrat, Ping Yu, Lili Yu, et al. 2023a. Lima: Less is more for alignment. arXiv preprint arXiv:2305.11206.",
+            "Jeffrey Zhou, Tianjian Lu, Swaroop Mishra, Siddhartha Brahma, Sujoy Basu, Yi Luan, Denny Zhou, and Le Hou. 2023b. Instruction-following evaluation for large language models."
+        ],
+        "bbox": [
+            114,
+            85,
+            489,
+            153
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Sizhe Zhou, Yu Meng, Bowen Jin, and Jiawei Han. 2024. Grasping the essentials: Tailoring large language models for zero-shot relation extraction. arXiv preprint arXiv:2402.11142.",
+        "bbox": [
+            115,
+            286,
+            490,
+            342
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Yutao Zhu, Huaying Yuan, Shuting Wang, Jiongnan Liu, Wenhan Liu, Chenlong Deng, Haonan Chen, Zhicheng Dou, and Ji-Rong Wen. 2024. Large language models for information retrieval: A survey."
+        ],
+        "bbox": [
+            115,
+            349,
+            490,
+            404
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "A SFT Datasets",
+        "text_level": 2,
+        "bbox": [
+            509,
+            83,
+            667,
+            99
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "We investigate the data composition issues of mathematical reasoning, coding, and general capabilities in the SFT stage from the following SFT datasets.",
+        "bbox": [
+            507,
+            110,
+            887,
+            175
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "• Code Alpaca (Chaudhary, 2023) aims to build and share an instruction-following LLaMA model for code generation. which is fully based on Stanford Alpaca and contains 20K data used for fine-tuning the model. The Code Alpaca dataset has been open-sourced<sup>4</sup>.",
+        "bbox": [
+            529,
+            192,
+            885,
+            290
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "• GSM8K RFT (Yuan et al., 2023b) is a mathematical dataset enhanced by integrating multiple reasoning paths based on the original GSM8K dataset (Cobbe et al., 2021) through the rejection sampling. It contains 7.5K questions and 110K responses in the training set. The GSM8k RFT dataset has been opensourced <sup>5</sup>.",
+        "bbox": [
+            531,
+            302,
+            887,
+            431
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "• ShareGPT refers to the multi-turn chatting histories used by Vicuna (Chiang et al., 2023). ShareGPT includes 86K human queries and responses from ChatGPT and other chatbots. The GSM8k RFT dataset has been opensourced <sup>6</sup>.",
+        "bbox": [
+            531,
+            445,
+            887,
+            543
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "The following table 2 presents the statistics of three datasets at different subset proportion (k).",
+        "bbox": [
+            509,
+            557,
+            885,
+            592
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/2823de6e952647024a4733bd155d1f01bcbc79e15d321939ce8564a66cc4f609.jpg",
+        "table_caption": [
+            "Table 2: Data statistics of three datasets at different subset proportion (k)."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Data Ratio</td><td>GSM8K RFT</td><td>CodeAlpaca</td><td>ShareGPT</td></tr><tr><td>K=1/1</td><td>110142</td><td>20022</td><td>86060</td></tr><tr><td>K=1/4</td><td>27535</td><td>5005</td><td>21515</td></tr><tr><td>K=1/16</td><td>6883</td><td>1251</td><td>5378</td></tr><tr><td>K=1/64</td><td>1720</td><td>312</td><td>1344</td></tr><tr><td>K=1/256</td><td>430</td><td>78</td><td>336</td></tr></table>",
+        "bbox": [
+            515,
+            604,
+            880,
+            692
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "B Evaluation metrics",
+        "text_level": 2,
+        "bbox": [
+            510,
+            763,
+            712,
+            778
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "We use the following metrics to measure the aligned large language models.",
+        "bbox": [
+            509,
+            791,
+            884,
+            824
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>4</sup>https://github.com/sahil280114/codealpaca",
+        "bbox": [
+            536,
+            834,
+            858,
+            848
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>5</sup>https://github.com/OFA-Sys/gsm8k-ScRel",
+        "bbox": [
+            536,
+            847,
+            838,
+            862
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>6</sup>Exact dataset of ShareGPT (https://sharegpt.com/) has not been released. We instead use a reproduced version from https://huggingface.co/datasets/ anon8231489123/ShareGPT\\_Vicuna\\_unfiltered cleaned raw dataset, and follow Vicuna preprocess.",
+        "bbox": [
+            509,
+            860,
+            885,
+            922
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_number",
+        "text": "190",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "• HumanEval (Chen et al., 2021) consists of 164 original programming problems, with an average of 9.6 test cases allocated to each problem. To ensure a thorough assessment of the functional correctness of LLMsynthesized code, HumanEval+ extends the number of test cases significantly, averaging at 774.8 test cases per problem. We use the same method as (Chen et al., 2021)to obtain unbiased estimates of Pass@k under greedy decoding. To facilitate the reproducibility of our results, we use the open-source github repository BigCode (Ben Allal et al., 2022) to evaluate all the HumanEval scores in this paper <sup>7</sup>.",
+        "bbox": [
+            136,
+            84,
+            490,
+            328
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "• GSM8K (Cobbe et al., 2021) is a math word problem dataset used to measure large language model math reasoning ability. We use the default test set to measure the model. We calculate the score based on greedy decoding accuracy (maj@1). In this paper, we use the open-source github repository gsm8k-ScRel <sup>8</sup> to evaluate all the GSM8k scores.",
+        "bbox": [
+            136,
+            338,
+            489,
+            468
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "• MT-Bench (Zheng et al., 2023) is a significant benchmark that contribute to the evaluation and advancement of chatbot models and LLMs in different contexts. MT-Bench<sup>9</sup> evaluates LLMs on multi-turn dialogues using comprehensive questions tailored to handling conversations. It provides a comprehensive set of questions specifically designed for assessing the capabilities of models in handling multi-turn dialogues.",
+        "bbox": [
+            136,
+            480,
+            490,
+            643
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "We also supplement more benchmark evaluation results in the appendix F to verify the generalization of our conclusions:",
+        "bbox": [
+            112,
+            655,
+            489,
+            703
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "• MATH (Hendrycks et al., 2021) is a dataset with challenging high-school math problems. Problems are classified into the following topics: Prealgebra, Algebra, Number Theory, Counting and Probability, Geometry, Intermediate Algebra, and Precalculus. Problems in MATH are harder and more diverse than in GSM8K. In this paper, we use the open-source github repository gsm8k-ScRel to evaluate all the MATH scores. We use 500 test problems from (Lightman et al., 2023) as out-of-domain math benchmark.",
+        "bbox": [
+            134,
+            715,
+            490,
+            862
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            544,
+            84,
+            884,
+            134
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "• MBPP (Austin et al., 2021) consists of around 1,000 crowd-sourced Python programming problems, designed to be solvable by entrylevel programmers, covering programming fundamentals, standard library functionality, and so on. Each problem consists of a task description, code solution and 3 automated test cases. To facilitate the reproducibility of our results, we use the open-source github repository BigCode (Ben Allal et al., 2022) to evaluate all the MBPP scores in this paper.",
+        "bbox": [
+            531,
+            141,
+            885,
+            321
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "C Implementation Details",
+        "text_level": 2,
+        "bbox": [
+            509,
+            335,
+            752,
+            353
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "We fine-tune all the SFT datasets with 3 epochs and a batch size of 128 on NVIDIA A100 GPUs. We use 8 GPUs for 7B and 13B models, 16 GPUs for 33B models during fine-tuning. We use a peak learning rate of 2e-5 with a 3% learning rate warmup. We evaluate the results on the final epoch. We use greedy decode to calculate Pass@1 and maj@1. Since the scores of MT-bench will fluctuate, we conducted three experiments and took the average.",
+        "bbox": [
+            507,
+            360,
+            887,
+            520
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "All experiments are conducted using the default template of the FastChat framework (Zheng et al., 2023), as shown in the figure below:",
+        "bbox": [
+            507,
+            521,
+            885,
+            570
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Prompt Template",
+        "text_level": 2,
+        "bbox": [
+            534,
+            580,
+            670,
+            596
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user’s questions. USER: {Query} ASSISTANT:",
+        "bbox": [
+            532,
+            606,
+            860,
+            688
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "To facilitate the replication of our results, all datasets and evaluation benchmarks used in our experiments have been open-sourced and their detailed sources are indicated. We will also opensource our code after the blind review process.",
+        "bbox": [
+            507,
+            702,
+            887,
+            784
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Training FLOPs. We mainly follow the notations of (Kaplan et al., 2020) here.",
+        "bbox": [
+            507,
+            818,
+            885,
+            850
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D Estimating FLOPs of SFT",
+        "text_level": 2,
+        "bbox": [
+            509,
+            794,
+            776,
+            810
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "For each input sample of length $n _ { c t x }$ in SFT dataset (GSM8K, CodeAlpaca, ShareGPT), we can split it into two parts:",
+        "bbox": [
+            507,
+            851,
+            885,
+            900
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "img_path": "images/5205cbef2f6e477af6528a3ac9df847b7a8df82c3f5b555e17a4957ee3668b7c.jpg",
+        "text": "$$\nn _ { c t x } = n _ { Q } + n _ { R }\\tag{1}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            630,
+            908,
+            761,
+            923
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>8</sup>https://github.com/OFA-Sys/gsm8k-ScRel",
+        "bbox": [
+            139,
+            895,
+            443,
+            909
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>9</sup>https://huggingface.co/spaces/lmsys/mt-bench",
+        "bbox": [
+            139,
+            908,
+            487,
+            922
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>7</sup>https://github.com/bigcode-project/ bigcode-evaluation-harness",
+        "bbox": [
+            114,
+            870,
+            420,
+            896
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_number",
+        "text": "191",
+        "bbox": [
+            485,
+            928,
+            515,
+            942
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "chart",
+        "img_path": "images/1736b4ddf27b2722057fbef37756b92300a06afd05269962b52c5d31adaa07cd.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            121,
+            84,
+            307,
+            181
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "chart",
+        "img_path": "images/4c39d08d77c70c491f64b374f5ecd1cdb0a3cfa698f9df8c965fa54231b9ba9c.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            310,
+            83,
+            497,
+            181
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "chart",
+        "img_path": "images/f48868c3cad4fd8700eb393f11f7bcea15aace72ea3e50c46499e95d1ffc72f9.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            495,
+            84,
+            687,
+            181
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "chart",
+        "img_path": "images/00c18a453d5876db30f68d5bb3a5a286800d48e13cb81e16197db8a594485956.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 7: The scaling curve of LLaMA-7B in WebQSP, CoNLL 2003, IWSLT14(de-en), IWSLT14(de-en)."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            687,
+            84,
+            877,
+            181
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/d7f548bcc0d724a32b22528045abfee0208249edd039f652e6af5e74e48835d8.jpg",
+        "table_caption": [
+            "Table 3: The statistics of FLOPs and GPU hours required for SFT. For 33B, we use DeepSpeed ZeRO3 (Rasley et al., 2020) for distributed training. All the GPU hours are based on NVIDIA A100 80GB GPU. Note we use non-embedding parameters to compute FLOPs in our experiments."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Model size</td><td>7B</td><td>13B</td><td>33B</td></tr><tr><td colspan=\"4\">GSM8k RFT</td></tr><tr><td>SFT FLOPs</td><td> $2 . 4 \\times 1 0 ^ { 1 8 }$ </td><td> $4 . 3 \\times 1 0 ^ { 1 8 }$ </td><td> $1 . 1 \\times 1 0 ^ { 1 9 }$ </td></tr><tr><td>SFT GPI hrs</td><td>6.1</td><td>12.1</td><td>37.4</td></tr><tr><td colspan=\"4\">Code Alpaca</td></tr><tr><td>SFT FLOPs</td><td> $^ { 4 . 7 \\times 1 0 ^ { 1 7 } } _ { 1 . 2 }$ </td><td> $^ { 7 . 8 \\times 1 0 ^ { 1 7 } } _ { 2 . 5 }$ </td><td> $^ { 2 . 0 \\times 1 0 ^ { 1 8 } } _ { 8 . 2 }$ </td></tr><tr><td>SFT GPI hrs</td><td></td><td></td><td></td></tr><tr><td colspan=\"4\">ShareGPT</td></tr><tr><td>SFT FLOPs</td><td> $2 . 2 \\times 1 0 ^ { 1 8 }$ </td><td> $\\begin{array} { c } { { 3 . 9 \\times 1 0 ^ { 1 8 } } } \\\\ { { 1 0 . 9 } } \\end{array}$ </td><td> $9 . 7 \\times 1 0 ^ { 1 9 }$ </td></tr><tr><td>SFT GPI hrs</td><td>5.4</td><td></td><td>34.0</td></tr></table>",
+        "bbox": [
+            117,
+            231,
+            484,
+            417
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "img_path": "images/84a52cad1a215ec5f1f4e8abebd6231ac626bc7c87b31aa2354b02f118c91888.jpg",
+        "text": "$$\nC _ { \\mathrm { t r a i n } } \\approx 6 N n _ { c t x } N _ { s }\\tag{2}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            226,
+            560,
+            374,
+            577
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "where $n _ { Q } , n _ { R }$ denotes the length of question and generated answers respectively. $N , N _ { s }$ denotes the non-embedding parameters and the numbers of samples.",
+        "bbox": [
+            112,
+            590,
+            489,
+            653
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Therefore, We estimate the SFT FLOPs following (Kaplan et al., 2020) and GPU times in Table 3.",
+        "bbox": [
+            112,
+            655,
+            490,
+            689
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "E Validation Experiments in More SFT Abilities",
+        "text_level": 2,
+        "bbox": [
+            114,
+            702,
+            473,
+            736
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "To validate the generalization of our conclusions, we selected representative datasets to evaluate the capabilities of large models across different dimensions. These dimensions include World Knowledge : WebQuestionsSP (Yih et al., 2016), Language Understanding: CoNLL 2003 (Tjong Kim Sang and De Meulder, 2003), and Translation: IWSLT14 (Cettolo et al., 2014)",
+        "bbox": [
+            112,
+            747,
+            490,
+            878
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Experimental Design: Align the settings of RQ1 and RQ2, we introduce two settings as follows:",
+        "bbox": [
+            112,
+            890,
+            489,
+            922
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "1. Individual Domain: We conduct SFT on LLaMA of various sizes using {1, 1/2, 1/4, 1/8} proportions <sup>10</sup> of the training set obtained from WebQSP, CoNLL 2003, and IWSLT14 seperately. This allowed us to evaluate each ability with various data sizes and model sizes.",
+        "bbox": [
+            507,
+            235,
+            887,
+            332
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "2. Mixed Domain: We sampled {1, 1/2, 1/4, 1/8} amounts of training data from WebQSP, CoNLL 2003, and IWSLT14, and directly mixed them according to the corresponding proportions. In this way, we constructed datasets with fixed proportions of different ability domains, while varying the total data amount. These datasets are then used for fine-tuning the LLaMA models.",
+        "bbox": [
+            507,
+            336,
+            887,
+            466
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Analysis. As shown in Figure 7 and Table 4, we have following observations.",
+        "bbox": [
+            507,
+            469,
+            884,
+            501
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "For the individual domain, the performance (P, R, F1) of the model in the language understanding (NER) task shows a positive correlation with the scaling curve of data volume. These two abilities exhibit similar scaling curve trends as the mathematical ability performance in RQ1. In the case of world knowledge (WebQSP), a similar positive correlation trend is observed in terms of F1 and Hits@1. However, when the data ratio is reduced from 1/4 to 1/8, there is a significant performance fluctuation, particularly in the performance of translation ability, which shows a relatively irregular trend. These conclusions further support the core conclusion of RQ1 that different data exhibit different scaling curves.",
+        "bbox": [
+            507,
+            505,
+            887,
+            747
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "For the mixed domains, the findings align with the conclusions in RQ2, where abilities are improved with low-resource and decreased with highresource compared to individual source abilities. This consistent conclusion holds for world knowledge, language understanding, and translation abilities.",
+        "bbox": [
+            507,
+            750,
+            887,
+            863
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>10</sup>Because these three datasets have relatively small amounts of data (a few thousand), the scaling range is from 1/1 of the data volume to 1/8 of the data volume.",
+        "bbox": [
+            509,
+            883,
+            884,
+            921
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_number",
+        "text": "192",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/ae36be2841bd1435b7e27d0b66141a93e4c280f3131c1d8519674130f4b4bf39.jpg",
+        "table_caption": [
+            "Table 4: Results in other domains for single and mixed source settings based on LLaMA-7B."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">Datasets</td><td colspan=\"3\">CONIL03</td><td colspan=\"2\">WebQSP</td><td colspan=\"2\">IWSLT14</td></tr><tr><td>P</td><td>R</td><td>F1</td><td>F1</td><td>Hits@1</td><td>de-en</td><td>en-de</td></tr><tr><td>Single Domain(1/1)</td><td>91.89</td><td>89.33</td><td>90.59</td><td>33.51</td><td>64.12</td><td>50</td><td>52</td></tr><tr><td>Single Domain(1/2)</td><td>90.59</td><td>87.15</td><td>88.83</td><td>27.10</td><td>61.87</td><td>46</td><td>43</td></tr><tr><td>Single Domain(1/4)</td><td>85.24</td><td>79.46</td><td>82.25</td><td>22.56</td><td>61.38</td><td>42</td><td>40</td></tr><tr><td>Single Domain(1/8)</td><td>83.22</td><td>80.42</td><td>81.79</td><td>13.63</td><td>49.05</td><td>41</td><td>40</td></tr><tr><td>Mixed Domains(1/1)</td><td>91.74</td><td>87.79</td><td>89.72</td><td>32.10</td><td>63.70</td><td>46</td><td>49</td></tr><tr><td>Mixed Domains(1/2)</td><td>90.69</td><td>86.93</td><td>88.77</td><td>29.98</td><td>62.29</td><td>45</td><td>45</td></tr><tr><td>Mixed Domains(1/4)</td><td>88.81</td><td>85.62</td><td>87.18</td><td>25.42</td><td>58.02</td><td>43</td><td>43</td></tr><tr><td>Mixed Domains(1/8)</td><td>86.47</td><td>81.18</td><td>83.74</td><td>21.36</td><td>56.86</td><td>45</td><td>45</td></tr></table>",
+        "bbox": [
+            226,
+            82,
+            771,
+            222
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "chart",
+        "img_path": "images/181ede9a60bf390d6b20a6c902831608314eba1df989c6f2fdc9a1b3307896a8.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 8: The scaling curve of LLaMA-7B on MATH and MBPP benchmarks."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            121,
+            273,
+            482,
+            367
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "F Results on OOD Benchmarks in Math and Code",
+        "text_level": 2,
+        "bbox": [
+            114,
+            435,
+            480,
+            468
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "To validate the generalization of our findings on other benchmarks, we utilized GSM8K and Code Alpaca as the training sets. We further evaluated the results on the individual domain, mixed domain, and different training strategies on other specialized ability benchmark, including MATH and MBPP, which is illustrated in Table 5 and Figure 8. We have the following findings:",
+        "bbox": [
+            112,
+            479,
+            489,
+            607
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "(1) In the individual domain, LLaMA shows a positive correlation between performance in MATH and MBPP and the data volume (consistent with RQ1).",
+        "bbox": [
+            112,
+            607,
+            489,
+            671
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "(2) Comparing the individual and mixed domains, LLaMA-7B exhibits a trade-off between high-resource performance conflict and lowresource performance gain in both MATH and MBPP (consistent with RQ2).",
+        "bbox": [
+            112,
+            673,
+            489,
+            752
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "(3) Considering the general ability results shown in Table 1, we can observe that DMT maintains competitive results in MATH and MBPP while prioritizing general abilities. This further validates the effectiveness of DMT (consistent with RQ4).",
+        "bbox": [
+            112,
+            755,
+            489,
+            835
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "G Visualization of Different Layers",
+        "text_level": 2,
+        "bbox": [
+            114,
+            847,
+            438,
+            864
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "In this section, we compared the visualization results of the baseline model of LLaMA-13B and DMT (k=1/256) in the starting layer (Layer1), middle layer (Layer15), and ending layer (Layer31) in Figure 9 and 10.",
+        "bbox": [
+            112,
+            875,
+            490,
+            922
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            509,
+            274,
+            884,
+            305
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "The visualization result of the starting layer are relatively chaotic, while the visualization results of the middle layer and the ending layer are clearer. And the results of the middle layer and the last layer are consistent in pointing out that both base model and model with DMT strategy exhibit a certain level of separation in the mathematical data representations, there remains a certain degree of overlap between the representations of code and general samples.",
+        "bbox": [
+            507,
+            307,
+            887,
+            470
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "H Equal Data Amount VS. Equal Data Proportion",
+        "text_level": 2,
+        "bbox": [
+            509,
+            485,
+            863,
+            519
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "In a realistic SFT phrase for training general LLM, the data amount for different abilities is likely to differ. Therefore, instead of controlling the same amount of data, we select to mix datasets with the same proportion of subsets to better simulate realworld scenarios in above experiments. In addition, We further supplement the experimental results using different abilities mixed with the equal data amount and compare them with the results using the equal subset proportion in Table 6.",
+        "bbox": [
+            507,
+            531,
+            887,
+            693
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Equal Data amount Setting: we utilize the data amount of GSM8k RFT as the baseline. We sampled data with proportions of 1/16, 1/64, 1/256, and mixed samples of the same data amount from Code alpaca and ShareGPT.",
+        "bbox": [
+            507,
+            694,
+            885,
+            774
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Equal Proportion Setting: we sampled data with proportions of 1/16, 1/64, 1/256 according to the subset proportions of each dataset and mixed them, which is aligned with the setup in RQ2.",
+        "bbox": [
+            507,
+            776,
+            885,
+            840
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "It can be observed that there is not a significant difference in the results of the three benchmark tests between the two settings. Therefore, these findings do not significantly impact the main experimental conclusions presented in the paper.",
+        "bbox": [
+            507,
+            843,
+            887,
+            923
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "page_number",
+        "text": "193",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "table",
+        "img_path": "images/8eab06badae86850c60d467a55030f41450af6126cd60eaff16eb1693e14b90f.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Methods</td><td colspan=\"2\">Math Benchmarks</td><td colspan=\"2\">Code Benchmarks</td></tr><tr><td></td><td>GSM8K</td><td>MATH</td><td>HumanEval</td><td>MBPP</td></tr><tr><td colspan=\"5\">Individual domain (Scaling)</td></tr><tr><td>Single Domain(k=1/1)</td><td>49.10</td><td>4.4</td><td>18.4</td><td>21.6</td></tr><tr><td>Single Domain(k=1/4)</td><td>43.37</td><td>3.9</td><td>11.58</td><td>18.8</td></tr><tr><td>Single Domain(k=1/16)</td><td>35.90</td><td>3.2</td><td>12.19</td><td>16.6</td></tr><tr><td>Single Domain(k=1/64)</td><td>22.71</td><td>3.2</td><td>9.14</td><td>15.8</td></tr><tr><td>Single Domain(k=1/256)</td><td>12.7</td><td>2.0</td><td>5.48</td><td>15.8</td></tr><tr><td colspan=\"5\">Mixed domain (Scaling)</td></tr><tr><td>Mixed Domain(k=1/1)</td><td>47.53</td><td>3.6</td><td>14.63</td><td>19.4</td></tr><tr><td>Mixed Domain(k=1/4)</td><td>41.98</td><td>3.2</td><td>9.14</td><td>18.8</td></tr><tr><td>Mixed Domain(k=1/16)</td><td>32.97</td><td>2.4</td><td>9.16</td><td>18.4</td></tr><tr><td>Mixed Domain(k=1/64)</td><td>25.77</td><td>2.4</td><td>14.63</td><td>17.2</td></tr><tr><td>Mixed Domain(k=1/256)</td><td>14.78</td><td>3.0</td><td>11.37</td><td>16.6</td></tr><tr><td colspan=\"5\">Individual domain</td></tr><tr><td>General only</td><td>11.1</td><td>2.9</td><td>10.4</td><td>1.0</td></tr><tr><td>Math only</td><td>49.10</td><td>4.4</td><td>6.71</td><td>9.0</td></tr><tr><td>Code only</td><td>4.51</td><td>1.0</td><td>18.40</td><td>21.6</td></tr><tr><td colspan=\"5\">Different Training Strategies</td></tr><tr><td>Multi-task learning</td><td>47.53</td><td>3.6</td><td>14.63</td><td>19.4</td></tr><tr><td>Sequential Training</td><td>31.39</td><td>2.0</td><td>15.85</td><td>15.8</td></tr><tr><td>Mixed Sequential Training</td><td>32.6</td><td>2.5</td><td>15.24</td><td>16.6</td></tr><tr><td>DMT (k=1/256)</td><td>41.92</td><td>3.6</td><td>17.68</td><td>19.8</td></tr></table>",
+        "bbox": [
+            257,
+            82,
+            741,
+            449
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "table",
+        "img_path": "images/1d046106850e365f0399111936001d871a1e336cf05e3c7fd62a08b7e61a43db.jpg",
+        "table_caption": [
+            "Table 5: The detailed results of LLaMA-7B, 13B with different training strategies on OOD benchmarks.",
+            "Table 6: Comparative experiment between equal data amounts and equal subset proportions of different SFT abilities on LLaMA-7B"
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Methods</td><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td></tr><tr><td>Mixed Domain(k=1/16, Equal Amount)</td><td>34.49</td><td>9.14</td><td>5.49</td></tr><tr><td>Mixed Domain(k=1/64, Equal Amount)</td><td>25.02</td><td>13.54</td><td>5.21</td></tr><tr><td>Mixed Domain(k=1/256, Equal Amount)</td><td>16.7</td><td>11.54</td><td>4.63</td></tr><tr><td>Mixed Domain(k=1/16, Equal Proportion)</td><td>32.97</td><td>9.16</td><td>5.52</td></tr><tr><td>Mixed Domain(k=1/64, Equal Proportion)</td><td>25.77</td><td>14.63</td><td>5.24</td></tr><tr><td>Mixed Domain(k=1/256, Equal Proportion)</td><td>14.78</td><td>11.37</td><td>4.41</td></tr></table>",
+        "bbox": [
+            231,
+            487,
+            766,
+            601
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "I Comparison Experiment of Different Training Sequences",
+        "text_level": 2,
+        "bbox": [
+            114,
+            665,
+            465,
+            700
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "To investigate the impact of training order on different SFT abilities, we have conducted additional experiments with six different training orders. The results and analysis of these experiments are provided in Table 7. Based on our findings, we conclude the following:",
+        "bbox": [
+            112,
+            711,
+            489,
+            808
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "1. The SFT ability trained in the final stage tend to retain relatively good performance.",
+        "bbox": [
+            112,
+            808,
+            487,
+            841
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "2. If general and code abilities are trained in the first two stages, there is a noticeable performance decrease in code capability, while math capability does not show significant impact. One possible reason is that the task format of code generation and general ability exhibits similar data distributions (as discussed in RQ3 and Discussion1). This can result in a more severe catastrophic forgetting phenomenon during continuous fine-tuning.",
+        "bbox": [
+            112,
+            843,
+            489,
+            922
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            667,
+            885,
+            733
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "J Detailed Results of experiments",
+        "text_level": 2,
+        "bbox": [
+            509,
+            744,
+            818,
+            762
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "J.1 Results of Different Random Seeds",
+        "text_level": 2,
+        "bbox": [
+            509,
+            771,
+            830,
+            788
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "For each dataset, we employed random selection by utilizing a random function with three distinct seeds for sampling. Subsequently, we conducted a comparative analysis of the results obtained from different subsets on the three benchmark tests. The specific details are presented in Table 8. It can be observed that DMT maintains its superiority under three different random seed settings. The influence of different subsets on experimental results is not a key factor and does not affect the overall trend.",
+        "bbox": [
+            507,
+            794,
+            885,
+            922
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_number",
+        "text": "194",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "chart",
+        "img_path": "images/e2f1372e70ce9238ce223dd8ffd45d7832853e5152d4a8841be55b7e5f0abcb7.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            141,
+            96,
+            349,
+            205
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "chart",
+        "img_path": "images/95accf38da1b4f667733119802ea316a1d619c97f1a8f8deff20896cd5e4a298.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            388,
+            95,
+            601,
+            205
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "chart",
+        "img_path": "images/7e7c4369650d32e2389944dd91fcfae665c60c27f2949b4a78e2c17ba780e804.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 9: From left to right are the visualization results of starting layer (Layer1), middle layer (Layer15), and ending layer (Layer31) on LLaMA-7B."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            640,
+            95,
+            852,
+            205
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "chart",
+        "img_path": "images/93f16df6a65a882d8317a726685046449db5583b43d3c45206284b386bd2f476.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            137,
+            278,
+            351,
+            388
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "chart",
+        "img_path": "images/e3dfd700d7538de3eb895ba8ff2b6150b12eee3f0ac1f4ac4f8d3e30301b3654.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            389,
+            278,
+            601,
+            388
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "chart",
+        "img_path": "images/23f834e80142c0f076d323d221ba17a4f1e991e78c4fbb506a6385e13fa93824.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 10: From left to right are the visualization results of starting layer (Layer1), middle layer (Layer15), and ending layer (Layer31) on LLaMA-7B with DMT(k=1/256) strategy."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            640,
+            278,
+            852,
+            388
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            461,
+            489,
+            493
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "J.2 Results of Single Source and Mixed Source",
+        "text_level": 2,
+        "bbox": [
+            112,
+            501,
+            438,
+            533
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "In Table 9 and Table 10, we report the detailed comparative results between mix domains and individual domains for LLaMA-7B, 3B and 33B, as the supplemental results in RQ2.",
+        "bbox": [
+            112,
+            539,
+            489,
+            605
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "J.3 Results of Data Ratio (k)",
+        "text_level": 2,
+        "bbox": [
+            114,
+            614,
+            356,
+            630
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "In Table 11, we report The detailed results of the data ratio (k) between specific abilities and general abilities on three benchmarks, as the supplemental results in RQ3.",
+        "bbox": [
+            112,
+            634,
+            489,
+            700
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "J.4 Results of Specialized Data Amount of DMT",
+        "text_level": 2,
+        "bbox": [
+            112,
+            709,
+            463,
+            740
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "In Table 12, we report The detailed results of LLaMA-7B, 13B, 33B with different training strategies on three benchmarks, as the supplemental results in RQ4.",
+        "bbox": [
+            112,
+            746,
+            490,
+            810
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "J.5 Results of MT-Bench",
+        "text_level": 2,
+        "bbox": [
+            112,
+            821,
+            326,
+            837
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "In Figure 11, we report detailed results of LLaMA-7B, 13B, 33B with different training strategies on MT-Bench, which include coding, extraction, humanities, math, reasoning, roleplay, stem and writing abilities.",
+        "bbox": [
+            112,
+            841,
+            492,
+            922
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "J.6 Supplemental Results for Discussion",
+        "text_level": 2,
+        "bbox": [
+            509,
+            460,
+            842,
+            476
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "In Figure 12, we report the t-SNE visualizations of LLaMA-7B and LLaMA-7B with DMT(k=1/256) strategy. What’s more, the bottom figure represents the scaling relationship of LLaMA-7B with DMT(k=1/256) under different values of K.",
+        "bbox": [
+            507,
+            480,
+            887,
+            561
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "Moreover, in Table 13, we report The detailed results of LLaMA-7B, 13B, 33B with different training strategies on three benchmarks, as the supplemental results in RQ4.",
+        "bbox": [
+            507,
+            562,
+            887,
+            626
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_number",
+        "text": "195",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "table",
+        "img_path": "images/26cec70fae2c21a008ecc680b73a1028377cbc49fd71ff4565e9c43bbfb15078.jpg",
+        "table_caption": [
+            "Table 7: Results of different sequential training for LLaMA-7B"
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Methods</td><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td></tr><tr><td> $\\mathrm { C o d e }  \\mathrm { M a t h }  \\mathrm { G e n e r a l }$ </td><td>31.39</td><td>15.85</td><td>5.72</td></tr><tr><td> $\\mathbf { M a t h }  \\mathbf { C o d e }  \\mathbf { G e n e r a l }$ </td><td>29.71</td><td>15.85</td><td>5.65</td></tr><tr><td> $\\mathrm { C o d e }  \\mathrm { G e n e r a l }  \\mathrm { M a t h }$ </td><td>48.21</td><td>9.75</td><td>4.7</td></tr><tr><td> $\\mathrm { G e n e r a l } \\to \\mathrm { C o d e } \\to \\mathrm { M a t h }$ </td><td>48.21</td><td>7.9</td><td>4.59</td></tr><tr><td> $\\mathrm { G e n e r a l } \\to \\mathrm { M a t h } \\to \\mathrm { C o d e }$ </td><td>37.60</td><td>15.85</td><td>3.79</td></tr><tr><td> $\\mathbf { M a t h }  \\mathbf { G e n e r a l }  \\mathbf { C o d e }$ </td><td>26.45</td><td>16.46</td><td>3.68</td></tr></table>",
+        "bbox": [
+            285,
+            96,
+            712,
+            202
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "table",
+        "img_path": "images/137b93416516fcf4e2498b39e7f88b54885aacd3bd7116dad4f7bc8ca58de29e.jpg",
+        "table_caption": [
+            "Table 8: The results of LLaMA-7B, 13B, 33B under different training strategies on three benchmarks. We tested the results of DMT on randomly sampling k proportion of specified data under three random seeds."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Methods</td><td colspan=\"3\">LLaMA-7B</td><td colspan=\"3\">LLaMA-13B</td><td colspan=\"3\">LLaMA -33B</td></tr><tr><td></td><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td></tr><tr><td>Different Training Strategies</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>Multi-task learning</td><td>47.53</td><td>14.63</td><td>5.76</td><td>50.94</td><td>19.50</td><td>5.73</td><td>56.69</td><td>18.9</td><td>6.07</td></tr><tr><td>Sequential Training</td><td>31.39</td><td>15.85</td><td>5.72</td><td>39.12</td><td>20.12</td><td>5.93</td><td>47.27</td><td>24.80</td><td>6.73</td></tr><tr><td>Mixed Sequential Training</td><td>32.60</td><td>15.24</td><td>6.02</td><td>40.48</td><td>18.30</td><td>5.93</td><td>44.24</td><td>24.4</td><td>6.43</td></tr><tr><td>DMT(k=1/256,random seed=1)</td><td>41.92</td><td>17.68</td><td>6.08</td><td>46.47</td><td>19.50</td><td>6.03</td><td>56.36</td><td>25.00</td><td>6.73</td></tr><tr><td>DMT(k=1/256,random seed=2)</td><td>41.31</td><td>17.68</td><td>6.02</td><td>45.85</td><td>18.90</td><td>6.08</td><td>55.64</td><td>24.80</td><td>6.71</td></tr><tr><td>DMT(k=1/256,random seed=3)</td><td>42.03</td><td>18.21</td><td>6.13</td><td>46.22</td><td>20.52</td><td>6.10</td><td>56.12</td><td>25.30</td><td>6.73</td></tr></table>",
+        "bbox": [
+            119,
+            262,
+            880,
+            410
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "table",
+        "img_path": "images/29e8cff4456c5f04ec94ca49a47d1b3552127ef429bc22a615ffc50aeb3aa20e.jpg",
+        "table_caption": [
+            "Table 9: Comparative experiments between mix domains and individual domains for LLaMA-7B, 13B."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">Methods</td><td colspan=\"3\">LLaMA-7B</td><td colspan=\"3\">LLaMA-13B</td></tr><tr><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td></tr><tr><td> $\\mathrm { S i n g l e } ( \\mathrm { k } { = } 1 )$ </td><td>49.10</td><td>18.4</td><td>5.88</td><td>51.4</td><td>18.4</td><td>6.13</td></tr><tr><td> $\\mathrm { S i n g l e } ( \\mathrm { k } { = } 1 / 4 )$ </td><td>43.37</td><td>11.58</td><td>5.85</td><td>48.59</td><td>13.41</td><td>6.03</td></tr><tr><td> ${ \\mathrm { S i n g l e } } ( \\mathbf { k { = } } 1 / 1 6 )$ </td><td>35.90</td><td>12.19</td><td>5.61</td><td>43.00</td><td>12.80</td><td>5.66</td></tr><tr><td> ${ \\mathrm { S i n g l e } } ( \\mathbf { k { = } } 1 / 6 4 )$ </td><td>22.71</td><td>9.14</td><td>5.11</td><td>27.40</td><td>12.20</td><td>5.24</td></tr><tr><td> $\\mathrm { S i n g l e } ( \\mathrm { k } { = } 1 / 2 5 6 )$ </td><td>12.70</td><td>5.48</td><td>4.00</td><td>18.40</td><td>10.36</td><td>2.95</td></tr><tr><td> $\\overline { { \\mathrm { M i x } ( \\mathrm { k } { = } 1 ) } }$ </td><td>47.53</td><td>14.63</td><td>5.76</td><td>50.49</td><td>17.10</td><td>5.73</td></tr><tr><td> $\\operatorname { M i x } ( \\mathrm { k } { = } 1 / 4 )$ </td><td>41.98</td><td>9.14</td><td>5.48</td><td>48.52</td><td>14.00</td><td>5.61</td></tr><tr><td> $\\mathbf { M i x } ( \\mathbf { k } { = } 1 / 1 6 )$ </td><td>32.97</td><td>9.16</td><td>5.22</td><td>40.63</td><td>14.60</td><td>5.52</td></tr><tr><td> $\\mathbf { M i x } ( \\mathbf { k } { = } 1 / 6 4 )$ </td><td>25.77</td><td>14.63</td><td>5.27</td><td>33.2</td><td>17.68</td><td>5.24</td></tr><tr><td> $\\mathbf { M i x } ( \\mathbf { k } { = } 1 / 2 5 6 )$ </td><td>14.78</td><td>11.37</td><td>4.11</td><td>24.94</td><td>12.19</td><td>4.4</td></tr></table>",
+        "bbox": [
+            181,
+            479,
+            818,
+            658
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "table",
+        "img_path": "images/16023010a57f0be8ff072cb56527550b9562e1f59314021d6da4002595ce3758.jpg",
+        "table_caption": [
+            "Table 10: Comparative experiments between mix domains and individual domains for LLaMA-33B."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td rowspan=1 colspan=1>Methods</td><td rowspan=1 colspan=1>GSM8K HumanEval  MT-Bench</td></tr><tr><td></td><td rowspan=5 colspan=1>Single(k=1) $\\mathrm { S i n g l e } ( \\mathrm { k } { = } 1 / 4 )$  ${ \\mathrm { S i n g l e } } ( \\mathbf { k { = } } 1 / 1 6 )$  ${ \\mathrm { S i n g l e } } ( \\mathbf { k { = } } 1 / 6 4 )$  $\\mathrm { S i n g l e } ( \\mathrm { k } { = } 1 / 2 5 6 )$ </td><td rowspan=1 colspan=1>57.91      26.82        6.63</td></tr><tr><td></td><td rowspan=1 colspan=1>56.10      25.61        6.66</td></tr><tr><td></td><td rowspan=1 colspan=1>54.60      21.95        6.17</td></tr><tr><td></td><td rowspan=1 colspan=1>44.60      18.59        5.99</td></tr><tr><td></td><td rowspan=1 colspan=1>29.21      14.02        2.3</td></tr><tr><td rowspan=5 colspan=2> $\\mathbf { M i x } ( \\mathbf { k } { = } 1 / 1 6 )$  $\\mathbf { M i x } ( \\mathbf { k } { = } 1 / 6 4 )$  $\\mathbf { M i x } ( \\mathbf { k } { = } 1 / 2 5 6 )$ </td><td rowspan=2 colspan=1>Mix(k=1/4)</td></tr><tr><td rowspan=1 colspan=1>54.54      22.56        5.92</td></tr><tr><td rowspan=1 colspan=1>53.33      26.82        6.26</td></tr><tr><td rowspan=1 colspan=1>46.66       18.6        5.73</td></tr><tr><td rowspan=1 colspan=1>36.54      17.68        4.58</td></tr></table>",
+        "bbox": [
+            314,
+            719,
+            685,
+            878
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "page_number",
+        "text": "196",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "table",
+        "img_path": "images/f961d2586cd37a0ab34b784367cfe779e1d2bb49f09b480f082ae37e923764a5.jpg",
+        "table_caption": [
+            "Table 11: The detailed results of the data ratio (k) between specific abilities and general abilities on three benchmarks."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Model size</td><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td></tr><tr><td>Mix[(code,math),1 general] Mix[(code,math),1/4 general]</td><td>47.53 48.44</td><td>14.63 15.85</td><td>5.76 5.73</td></tr><tr><td>Mix[(code,math),1/16 general] Mix[(code,math),1/64 general] Mix[(code,math),1/256 general]</td><td>47.99 47.23 48.52</td><td>15.24 14.63 16.46</td><td>5.27 5.16 4.69</td></tr><tr><td>Mix[1(code,math),general] Mix[1/4(code,math),general] Mix[1/16(code,math),general]</td><td>47.53 41.31 33.20</td><td>14.63 10.97 11.58</td><td>5.76 5.81 5.76</td></tr><tr><td>Mix[1/64(code,math),general] Mix[1/256(code,math),general] Mix[1(code,math),1/64general]</td><td>25.17 16.52 47.68</td><td>12.19 9.14</td><td>5.84 5.82</td></tr><tr><td>Mix[1/4(code,math),1/64general]</td><td>43.29</td><td>14.63 12.19</td><td>5.09 5.07</td></tr><tr><td>Mix[1/16(code,math),1/64general]</td><td>33.81</td><td>12.19</td><td>5.17</td></tr><tr><td>Mix[1/64(code,math),1/64general]</td><td>26.23 18.27</td><td>12.19</td><td>5.12</td></tr></table>",
+        "bbox": [
+            257,
+            105,
+            744,
+            392
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "table",
+        "img_path": "images/41ddb00abcf0368b9040bed2406dd8925d1eeda4d8b14241f1f637bd03c58171.jpg",
+        "table_caption": [
+            "Table 12: The detailed results of LLaMA-7B, 13B with different training strategies on three benchmarks."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">Methods</td><td colspan=\"3\">LLaMA-7B</td><td colspan=\"3\">LLaMA-13B</td></tr><tr><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td></tr><tr><td>Individual domain</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>General only</td><td>11.10</td><td>10.42</td><td>5.88</td><td>14.02</td><td>16.40</td><td>6.13</td></tr><tr><td>Math only</td><td>49.10</td><td>6.71</td><td>2.53</td><td>51.40</td><td>12.8</td><td>2.54</td></tr><tr><td>Code only</td><td>4.51</td><td>18.40</td><td>4.30</td><td>5.15</td><td>17.1</td><td>3.53</td></tr><tr><td>Different Training Strategies</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>Multi-task learning</td><td>47.53</td><td>14.63</td><td>5.76</td><td>50.94</td><td>19.5</td><td>5.73</td></tr><tr><td>Sequential Training</td><td>31.39</td><td>15.85</td><td>5.72</td><td>39.12</td><td>20.12</td><td>5.93</td></tr><tr><td>Mixed Sequential Training</td><td>32.6</td><td>15.24</td><td>6.02</td><td>40.48</td><td>18.30</td><td>5.93</td></tr><tr><td>DMT (k=1)</td><td>45.79</td><td>14.02</td><td>5.63</td><td>50.49</td><td>16.46</td><td>5.76</td></tr><tr><td>DMT (k=1/4)</td><td>48.37</td><td>13.41</td><td>5.69</td><td>50.18</td><td>18.9</td><td>5.83</td></tr><tr><td>DMT (k=1/16)</td><td>43.3</td><td>15.24</td><td>5.78</td><td>48.59</td><td>18.9</td><td>5.96</td></tr><tr><td>DMT (k=1/64)</td><td>42.53</td><td>15.85</td><td>6.01</td><td>47.61</td><td>15.24</td><td>6.03</td></tr><tr><td>DMT (k=1/256)</td><td>41.92</td><td>17.68</td><td>6.08</td><td>46.47</td><td>19.5</td><td>6.03</td></tr></table>",
+        "bbox": [
+            159,
+            469,
+            843,
+            681
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "table",
+        "img_path": "images/96f2cf7558f3e1d86b3beec66328f2f6592347f8214a70917a1391963b7977dd.jpg",
+        "table_caption": [
+            "Table 13: The scaling curve after ablating code and math-related samples from ShareGPT"
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Model size</td><td>GSM8K</td><td>HumanEval</td><td>MT-Bench</td></tr><tr><td>1/1 Mix(code,math,general(w/o code math))</td><td>49.05</td><td>17.68</td><td>5.80</td></tr><tr><td>1/4 Mix(code,math,general(w/o code math))</td><td>43.13</td><td>15.85</td><td>5.71</td></tr><tr><td>1/16 Mix(code,math,general(w/o code math))</td><td>36.23</td><td>10.36</td><td>5.38</td></tr><tr><td>1/64 Mix(code,math,general(w/o code math))</td><td>25.62</td><td>10.97</td><td>5.21</td></tr><tr><td>1/256 Mix(code,math,general(w/o code math))</td><td>15.31</td><td>11.37</td><td>4.38</td></tr></table>",
+        "bbox": [
+            221,
+            759,
+            776,
+            870
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "page_number",
+        "text": "197",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "chart",
+        "img_path": "images/7c82f4f35ed42bb9bdc7421d8355fc875d2b1a721bdc50a3dd4fd557bdfb8d6f.jpg",
+        "content": "",
+        "chart_caption": [
+            "(a) LLaMA-7B"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            136,
+            199,
+            378,
+            365
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "chart",
+        "img_path": "images/8c686d2b0b118f0fc0d08700a7cbae1528d5a8f701c80e855f4e198eebe5a399.jpg",
+        "content": "",
+        "chart_caption": [
+            "(b) LLaMA-13B"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            386,
+            199,
+            630,
+            365
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "chart",
+        "img_path": "images/c99d1542d20be9463c248743b55a3e02151d95e4b2a791d9ae01d1c91bccf72c.jpg",
+        "content": "",
+        "chart_caption": [
+            "(c) LLaMA-33B",
+            "Figure 11: The detailed results of LLaMA-7B, 13B, 33B with different training strategies on MT-Bench."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            638,
+            199,
+            880,
+            365
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "chart",
+        "img_path": "images/cc140ff9e3bdaf9457913a90c2b5396fe8b24d1ff68d2ea2e92d09ddf7dbe6fc.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            198,
+            664,
+            411,
+            775
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "chart",
+        "img_path": "images/0b0993ba8af6913f08ad01293a84dff6e8a711ed3406ad2b43481c81535834e4.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 12: Figures show the t-SNE visualizations of LLaMA-7B and LLaMA-7B with DMT(k=1/256) stategy."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            579,
+            664,
+            791,
+            775
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "page_number",
+        "text": "198",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 21
+    }
+]

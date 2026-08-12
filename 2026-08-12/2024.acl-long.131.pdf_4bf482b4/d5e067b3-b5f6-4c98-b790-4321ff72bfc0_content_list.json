@@ -1,0 +1,2220 @@
+[
+    {
+        "type": "text",
+        "text": "Reasoning in Flux: Enhancing Large Language Models Reasoning through Uncertainty-aware Adaptive Guidance",
+        "text_level": 1,
+        "bbox": [
+            114,
+            77,
+            882,
+            118
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Zhangyue Yin<sup>♢</sup> Qiushi Sun<sup>♡</sup> Qipeng Guo<sup>♣</sup> Zhiyuan Zeng<sup>♢</sup> Xiaonan Li<sup>♢</sup> Junqi Dai<sup>♢</sup> Qinyuan Cheng<sup>♢</sup> Xuanjing Huang<sup>♢†</sup> Xipeng Qiu<sup>♢†</sup>",
+        "bbox": [
+            154,
+            124,
+            852,
+            166
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "<sup>♢</sup>School of Computer Science, Fudan University",
+        "bbox": [
+            302,
+            166,
+            702,
+            184
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "<sup>♡</sup>The University of Hong Kong <sup>♣</sup>Shanghai AI Laboratory {yinzy21,cengzy23,jqdai22,chengqy21}@m.fudan.edu.cn qiushisun@u.nus.edu guoqipeng@pjlab.org.cn {lixn20, xjhuang, xpqiu}@fudan.edu.cn",
+        "bbox": [
+            243,
+            185,
+            761,
+            253
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            262,
+            260,
+            342,
+            275
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Machine reasoning, which involves solving complex problems through step-by-step deduction and analysis, is a crucial indicator of the capabilities of Large Language Models (LLMs). However, as the complexity of tasks escalates, LLMs often encounter increasing errors in their multi-step reasoning process. This study delves into the underlying factors contributing to these reasoning errors and seeks to leverage uncertainty to refine them. Specifically, we introduce Uncertainty-aware Adaptive Guidance (UAG), a novel approach for guiding LLM reasoning onto an accurate and reliable trajectory. UAG first identifies and evaluates uncertainty signals within each step of the reasoning chain. Upon detecting a significant increase in uncertainty, UAG intervenes by retracting to a previously reliable state and then introduces certified reasoning clues for refinement. By dynamically adjusting the reasoning process, UAG offers a plug-and-play solution for improving LLMs’ performance in complex reasoning. Extensive experiments across various reasoning tasks demonstrate that UAG not only enhances the reasoning abilities of LLMs but also consistently outperforms several strong baselines with minimal computational overhead. Further analysis reveals that UAG is notably effective in identifying and diminishing reasoning errors.",
+        "bbox": [
+            141,
+            288,
+            462,
+            705
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            114,
+            727,
+            260,
+            744
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "The impressive advancements of Large Language Models (LLMs) have recently brought about a new era in machine reasoning (Brown et al., 2020; Chowdhery et al., 2022; OpenAI, 2023; Jiang et al., 2024; Sun et al., 2024c, inter alia). For challenging scenarios, decomposing a problem into a series of intermediate steps has been shown to significantly improve the performance of LLMs (Cobbe et al., 2021; Yu et al., 2023; Sun et al., 2024a).",
+        "bbox": [
+            112,
+            752,
+            489,
+            898
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "chart",
+        "img_path": "images/9ffc2fc3a036bdb9a07d66319264c78d36136a5be1b34569b9e92d1cd864a1e2.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 1: An example from the GSM8K dataset, where the model displays higher uncertainty in the tokens where the reasoning is incorrect (highlighted in red boxes). Each step is delineated by periods."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            510,
+            259,
+            882,
+            505
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "However, as the difficulty of tasks escalates, the reasoning chains inevitably become more complex and lengthy (Zhang et al., 2023b). This poses a challenge for LLMs in managing the accumulation of errors across multiple intermediate steps (Chen et al., 2022; Chu et al., 2023).",
+        "bbox": [
+            507,
+            583,
+            885,
+            680
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "To mitigate the aforementioned issues, existing studies have focused on addressing the challenges from the perspective of alleviating uncertainty. For example, self-consistency decoding (Wang et al., 2023) samples multiple reasoning chains and employs a majority voting mechanism to mitigate the inherent randomness. Tree-of-thought (Yao et al., 2023) enables the exploration and evaluation of coherent thought units that serve as intermediate steps in problem-solving. Furthermore, Xie et al. (2023) conceptualize reasoning as a beam search, incorporating step-wise evaluation in the decoding process. While these methods have shown promise in enhancing reasoning performance, their manipulation of the reasoning process is conducted after the generation of individual intermediate steps, lacking the ability to make fine-grained, flexible adjustments with each step to steer the model effectively. This oversight has long been neglected in the study of reasoning chains, yet it unveils a new pathway to improve the reasoning capabilities of LLMs.",
+        "bbox": [
+            507,
+            680,
+            887,
+            922
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "Corresponding Authors",
+        "bbox": [
+            141,
+            907,
+            299,
+            921
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "2401",
+        "bbox": [
+            480,
+            928,
+            519,
+            942
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 2401–2416 August 11-16, 2024 ©2024 Association for Computational Linguistics",
+        "bbox": [
+            89,
+            945,
+            909,
+            973
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            181
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Delving into individual reasoning steps, our observation reveals that the model can exhibit signs of uncertainty when faced with potential errors spontaneously. Figure 1 illustrates two distinct reasoning chains generated by LLaMA-2 (Touvron et al., 2023b), where a gradual shift towards red hues indicates an increase in the model’s uncertainty. This increase in uncertainty is particularly notable when the model is in the midst of an incorrect reasoning step. For instance, the model erroneously interprets that 13 eggs were “baked” instead of “left” in one flaw, which leads to a cascade of subsequent errors.",
+        "bbox": [
+            112,
+            184,
+            490,
+            376
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Inspired by this, we propose a novel approach: UAG, which integrates clues throughout the reasoning process based on the model’s fine-grained uncertainty. UAG first guides the model in an autoregressive manner to conduct reasoning. Upon detecting a significant rise in uncertainty within a step, the erroneous step will be removed, and targeted reasoning clues will be incorporated. Prior research (Cao, 2023; Diao et al., 2023) indicate that reasoning exemplars imbued with rich clues can substantially assist models in completing complex reasoning tasks. From a Bayesian perspective, we infer the necessity of selecting examples based on their relevance and originality. Furthermore, we cluster these example samples to minimize the search space and reduce computational costs. Our empirical studies on various datasets, including mathematical, commonsense, and symbolic reasoning, demonstrate that UAG significantly enhances model performance on complex reasoning tasks. Moreover, our method is plug-and-play, applicable to various open-source LLMs such as LLaMA (Touvron et al., 2023a) and Mistral (Jiang et al., 2023).",
+        "bbox": [
+            112,
+            379,
+            490,
+            750
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Our primary contributions are as follows:",
+        "bbox": [
+            132,
+            751,
+            443,
+            766
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• We conduct a pioneering study that explores the underlying causes of errors in LLM reasoning, focusing on the role of uncertainty.",
+        "bbox": [
+            136,
+            774,
+            489,
+            821
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• We introduce the Uncertainty-aware Adaptive Guidance (UAG), a novel technique that leverages model uncertainty to evaluate and enhance the reliability of each reasoning step.",
+        "bbox": [
+            136,
+            824,
+            490,
+            888
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• Our experimental evaluations, conducted across a diverse range of reasoning tasks, show that UAG significantly outperforms a series of strong baselines.",
+        "bbox": [
+            136,
+            891,
+            489,
+            922
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            544,
+            85,
+            884,
+            117
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Related Work",
+        "text_level": 2,
+        "bbox": [
+            509,
+            130,
+            667,
+            146
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2.1 Demonstration Guidance.",
+        "text_level": 2,
+        "bbox": [
+            509,
+            156,
+            759,
+            172
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Recent advancements have emphasized the significance of effective exemplar selection to guide model reasoning (Zhang et al., 2022; Shum et al., 2023; Paranjape et al., 2023; Su et al., 2023). Pioneering this field, Zhang et al. (2023c) introduce AutoCoT, a method that automates the creation of exemplars by sampling a diverse array of problems and autonomously generating corresponding reasoning chains (Wei et al., 2022; Kojima et al., 2022). This approach eliminates the need for manually crafting task-specific examples. Additionally, some strategies leverage the intrinsic knowledge of LLMs to enhance the accuracy and factuality of reasoning processes through exemplar extraction (Wang et al., 2024).",
+        "bbox": [
+            507,
+            179,
+            887,
+            420
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "In parallel, Diao et al. (2023) investigate the application of active learning for selecting informative exemplars, which utilizes the model’s inherent uncertainties. Ye and Durrett (2023) focus on assessing the validity of reasoning chains within exemplars by evaluating their log-likelihood and performance accuracy on novel instances. Further extending the utility of LLMs in reasoning, Li and Qiu (2023) introduce memory-of-thought, a novel approach that retrieves pre-established, highconfidence thought processes to aid in current reasoning tasks. The potential for LLMs to utilize their self-generated reasoning chains for continuous self-improvement has been demonstrated in recent studies (Huang et al., 2023; Zheng et al., 2023; Lu et al., 2024; Madaan et al., 2023).",
+        "bbox": [
+            507,
+            420,
+            887,
+            680
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2.2 Decomposition and Validation.",
+        "text_level": 2,
+        "bbox": [
+            509,
+            690,
+            798,
+            707
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Zhou et al. (2023) address the challenges that LLMs encounter in complex reasoning tasks by advocating for the decomposition of these tasks into simpler sub-questions. This concept aligns with the modular decomposition strategy introduced by Khot et al. (2023), which aims to optimize the handling of individual subtasks effectively. Building upon these foundations, Yao et al. (2023) innovate further by integrating a verification process within the decomposition framework. They conceptualize reasoning as a tree search, allowing LLMs to traverse various decision branches and perform both forward and backward exploration at each node.",
+        "bbox": [
+            507,
+            713,
+            887,
+            922
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "2402",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Similarly, Besta et al. (2024) propose modeling the reasoning process as a graph structure, which offers a more dynamic framework for synthesizing LLM thoughts. Further advancing evaluation techniques, Yin et al. (2024) introduce a two-stage evaluation framework that incorporates local scoring and global evaluation to enhance LLM decisionmaking. Recent developments also include collaborative efforts, where problems are distributed among multiple LLMs for resolution (Yin et al., 2023a). Despite the innovative nature of these methods, they inherently increase computational demands, a consequence of the extensive decomposition (Hao et al., 2023; Zhang et al., 2023a; Han et al., 2023; Zhang et al., 2024), exploration (Liu et al., 2023), and verification (Sel et al., 2023).",
+        "bbox": [
+            110,
+            84,
+            490,
+            343
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2.3 Decoding Enhancement.",
+        "text_level": 2,
+        "bbox": [
+            114,
+            356,
+            352,
+            372
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "In the realm of decoding strategies, Wang et al. (2023) introduce self-consistency decoding, a significant shift from traditional greedy decoding. This method enhances reasoning capabilities by generating multiple reasoning paths and selecting the most consistent answer, effectively reducing the randomness associated with single-sample decoding. Complementing this, Fu et al. (2023b) advocate for guiding LLMs through more complex reasoning processes by using exemplars that feature increased reasoning complexity.",
+        "bbox": [
+            110,
+            378,
+            490,
+            557
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Furthering this line, Xie et al. (2023) propose a model akin to beam search that incorporates a selfevaluation mechanism to refine the decoding process. Building on this, Li et al. (2023a) introduce contrastive decoding, which helps LLMs avoid basic errors common in smaller models by utilizing model comparisons. This significantly enhances the reasoning capabilities of LLMs, as echoed in the work of O’Brien and Lewis (2023). Additionally, Chuang et al. (2023) explore intra-model dynamics by contrasting outputs from later versus earlier layers, aiming to cultivate more factually accurate reasoning within LLMs. Despite these advancements, these methodologies primarily rely on the internal representations within models (Sun et al., 2023; Stechly et al., 2023), often neglecting the integration of external reasoning cues.",
+        "bbox": [
+            110,
+            557,
+            490,
+            833
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3 Preliminary",
+        "text_level": 2,
+        "bbox": [
+            114,
+            846,
+            255,
+            863
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "This section outlines the foundational concepts that underpin our UAG method. Given a problem , a LLM generates an answer , constructing it to-",
+        "bbox": [
+            112,
+            873,
+            490,
+            922
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "ken by token through a probabilistic approach as described below:",
+        "bbox": [
+            507,
+            85,
+            884,
+            117
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "img_path": "images/4618fe9bc553a29572cb336307b01c7990c7d5f7a29fb966079afb1ee6098404.jpg",
+        "text": "$$\nP ( A | \\mathcal { Q } ) = \\prod _ { i = 1 } ^ { | \\mathcal { A } | } P _ { \\mathcal { M } } ( a _ { i } | \\mathcal { Q } , a _ { < i } ) ,\\tag{1}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            574,
+            140,
+            818,
+            184
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "where $P _ { \\mathcal { M } } ( a _ { i } | \\mathcal { Q } , a _ { < i } )$ represents the probability of generating the i-th token of the answer, given the problem  and the sequence of previously generated tokens $a _ { < i }$",
+        "bbox": [
+            507,
+            193,
+            885,
+            258
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "CoT (Wei et al., 2022) involves supplementing the problem $\\mathcal { Q }$ with several demonstrations that include detailed reasoning processes. This methodology guides the model to first generate the rationale , followed by the answer ${ \\mathcal { A } } .$",
+        "bbox": [
+            507,
+            258,
+            887,
+            340
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "img_path": "images/515b8525258f2b69159870e3b92254611633f4a398650531d283084158e13e23.jpg",
+        "text": "$$\nP ( \\mathcal { R } , \\mathcal { A } | \\mathcal { D } , \\mathcal { Q } ) = P ( \\mathcal { A } | \\mathcal { D } , \\mathcal { Q } , \\mathcal { R } ) P ( \\mathcal { R } | \\mathcal { D } , \\mathcal { Q } ) ,\\tag{2}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            521,
+            366,
+            870,
+            384
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Applying Bayesian theorem (Bayes and Price, 1763) allows us to further refine our understanding:",
+        "bbox": [
+            509,
+            410,
+            885,
+            442
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "img_path": "images/47c163cb438f6d5c98a57a593e0bb68a57a40ea8fdc97b8c9d19e7b8b2822d2a.jpg",
+        "text": "$$\n\\begin{array} { r l } & { P ( \\mathcal { R } , \\mathcal { A } | \\mathcal { D } , \\mathcal { Q } ) = \\frac { P ( \\mathcal { D } | \\mathcal { Q } , \\mathcal { R } , \\mathcal { A } ) P ( \\mathcal { R } , \\mathcal { A } | \\mathcal { Q } ) P ( \\mathcal { Q } ) } { P ( \\mathcal { D } , \\mathcal { Q } ) } } \\\\ & { \\qquad = \\frac { P ( \\mathcal { D } | \\mathcal { Q } , \\mathcal { R } , \\mathcal { A } ) P ( \\mathcal { R } , \\mathcal { A } | \\mathcal { Q } ) } { P ( \\mathcal { D } | \\mathcal { Q } ) } , } \\end{array}\\tag{3}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            509,
+            462,
+            902,
+            533
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "where a low $P ( \\mathcal { R } , \\mathcal { A } | \\mathcal { Q } )$ indicates the model’s difficulty in generating the desired rationale and answer without additional context. Our goal is to enhance the probability of accurately generating both the rationale and the answer by improving $P ( \\mathcal { R } , \\mathcal { A } | \\mathcal { D } , \\mathcal { Q } )$ . According to Bayes’ Theorem, this requires increasing $P ( \\mathcal { D } | \\mathcal { Q } , \\mathcal { R } , \\mathcal { A } )$ while decreasing $P ( \\mathcal { D } | \\mathcal { Q } )$",
+        "bbox": [
+            507,
+            560,
+            887,
+            690
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "( ∣ )Given that the answer  typically comprises fewer tokens than the rationale $\\mathcal { R }$ , our primary focus is on optimizing the impact of the reasoning process . To this end, we define the following criteria:",
+        "bbox": [
+            507,
+            689,
+            885,
+            770
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Relevance: $P ( \\mathcal { D } | \\mathcal { Q } , \\mathcal { R } , \\mathcal { A } )$ indicates that the reasoning within  aligns closely with our expected reasoning process, emphasizing the relevance of the exemplified reasoning.",
+        "bbox": [
+            531,
+            774,
+            885,
+            839
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Originality: $P ( \\mathcal { D } | \\mathcal { Q } )$ suggests that the reasoning within introduces novel concepts or steps unknown to the model (Yin et al., 2023b), highlighting the originality of the exemplar’s reasoning process.",
+        "bbox": [
+            531,
+            841,
+            887,
+            923
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "2403",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/f4aeb59443f41bece2fc03e55e490fdebcc0a45dabd290396ec67eaeebba6ee4.jpg",
+        "image_caption": [
+            "Figure 2: An overview of the Uncertainty-aware Adaptive Guidance (UAG) method. The process begins with the model incrementally generating reasoning based solely on the question while monitoring the uncertainty of each token. A significant increase in uncertainty signals potential errors, prompting a reversion to the last complete sentence. Exemplars are then selected from a curated set of examples based on their relevance and originality to assist in refining and completing the reasoning process."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            119,
+            82,
+            880,
+            337
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "4 Uncertainty-aware Adaptive Guidance",
+        "text_level": 2,
+        "bbox": [
+            114,
+            434,
+            484,
+            450
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Uncertainty-aware Adaptive Guidance (UAG) aims to enhance the reasoning capabilities of LLMs by incorporating uncertainty awareness and adaptability. As depicted in Figure 2, our method progresses through three interconnected phases: Uncertainty Identification, Adaptive Reasoning Adjustment, and Demonstration Clustering. Each phase plays a crucial role in refining the LLM’s reasoning process, which we detail in the subsequent sections.",
+        "bbox": [
+            112,
+            460,
+            489,
+            606
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "4.1 Uncertainty Identification",
+        "text_level": 2,
+        "bbox": [
+            114,
+            618,
+            366,
+            633
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "In complex reasoning tasks, LLMs generate reasoning chains  sequentially, one token at a time. This generative process can be formally described as follows:",
+        "bbox": [
+            112,
+            640,
+            490,
+            703
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/cbef02365ee4766de9cd9af4e16a3a03cf6ba40dc819ccf557ed85c6462e9d77.jpg",
+        "text": "$$\nP ( \\mathcal { R } | \\mathcal { Q } ) = \\prod _ { t } P _ { \\mathcal { M } } ( r _ { t } | \\mathcal { Q } , r _ { < t } ) ,\\tag{4}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            179,
+            714,
+            423,
+            746
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where $P ( \\mathcal { R } | \\mathcal { Q } )$ represents the probability of generating the reasoning chain  given a question , and $P _ { \\mathcal { M } } ( r _ { t } | \\mathcal { Q } , r _ { < t } )$ denotes the probability assigned by the model to the t-th token, given the question and the preceding tokens $r _ { < t }$",
+        "bbox": [
+            112,
+            760,
+            489,
+            841
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "A significant challenge in LLM reasoning is the unreliability and inaccuracy of generated reasoning chains, often resulting from cumulative errors in specific reasoning steps (Xie et al., 2023; Zhang et al., 2023b; Wang et al., 2024; Hao et al., 2023).",
+        "bbox": [
+            112,
+            843,
+            489,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "The uncertainty during the decoding process typically reflects the model’s confidence level or lack thereof (Manakul et al., 2023; Iter et al., 2023).",
+        "bbox": [
+            507,
+            434,
+            885,
+            482
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We define the uncertainty of generating the t-th token as:",
+        "bbox": [
+            509,
+            482,
+            884,
+            514
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/8e54903d2be5aa3e96ce629faed91afa5aaf5676a135016dbeb5ca5cfd913a9c.jpg",
+        "text": "$$\n\\mathcal { H } ( r _ { t } ) = - \\log P ( r _ { t } | \\boldsymbol { r } _ { < t } ) ,\\tag{5}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            598,
+            523,
+            794,
+            541
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where $p ( r _ { t } | r _ { < t } )$ is the probability that the LLM assigns to the t-th token, given the previous tokens. To assess changes in uncertainty, we utilize the following difference function:",
+        "bbox": [
+            507,
+            548,
+            885,
+            613
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/baa337037bdeee9898f073fb31d480459d36e2eab7f93fd599135b5537ea5f16.jpg",
+        "text": "$$\n\\Delta \\mathcal { H } ( r _ { t } ) = \\mathcal { H } ( r _ { t } ) - \\mathcal { H } ( r _ { t - 1 } ) ,\\tag{6}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            584,
+            621,
+            808,
+            638
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where $\\Delta \\mathcal { H } ( r _ { t } )$ quantifies the uncertainty gap for the t-th token relative to the t−1-th token. This metric is crucial for highlighting fluctuations in model confidence between decoding steps. Specifically, a positive $\\Delta \\mathcal { H } ( r _ { t } )$ indicates rising uncertainty, signaling challenging reasoning steps or potential mistakes. Conversely, a negative value indicates increasing reliability in the sequence.",
+        "bbox": [
+            507,
+            646,
+            885,
+            776
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "If the increase in $\\Delta \\mathcal { H } ( r _ { t } )$ exceeds a predefined ( )threshold θ, formally expressed as:",
+        "bbox": [
+            509,
+            776,
+            884,
+            808
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/e121cb64d9a1cbf02bbddb622c396cb7e1db9898ae5980a9b5b30ba82f8ad6d3.jpg",
+        "text": "$$\n\\mathrm { i f } \\Delta \\mathcal { H } ( r _ { t } ) > \\theta ,\\tag{7}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            635,
+            815,
+            756,
+            833
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "this condition suggests a significant rise in uncertainty, indicating a potential need for intervention, such as introducing additional context or implementing a corrective mechanism to steer the reasoning chain toward a more reliable trajectory.",
+        "bbox": [
+            507,
+            841,
+            887,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_number",
+        "text": "2404",
+        "bbox": [
+            480,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "4.2 Adaptive Reasoning Adjustment",
+        "text_level": 2,
+        "bbox": [
+            114,
+            85,
+            416,
+            101
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "When faced with increased uncertainty, UAG aims to rectify errors by eliminating erroneous reasoning steps and introducing supplementary reasoning clues, as aligned with the relevance and originality criteria defined in Section 3.",
+        "bbox": [
+            112,
+            107,
+            489,
+            186
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "For refinement, we first backtrack within the reasoning chain to the last coherent step, denoted as $r _ { m } ,$ , where $r _ { \\leq m }$ represents the most recently completed reasoning step (as illustrated in Figure 2). To mitigate the uncertainty in the reasoning process, guided by Eq 3, our objective is to carefully select a demonstration to serve as external insights. We aim to increase $P ( \\mathcal { D } | \\mathcal { Q } , \\mathcal { R } , \\mathcal { A } )$ and decrease $P ( \\mathcal { D } | \\mathcal { Q } )$ ( ∣, where  comprises $\\{ \\mathcal { Q } _ { d } , \\mathcal { R } _ { d } , \\mathcal { A } _ { d } \\}$",
+        "bbox": [
+            112,
+            187,
+            489,
+            332
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Given that the model has not yet completed its reasoning, we utilize the existing reasoning process $r _ { \\leq m }$ to calculate the relevance score $\\scriptstyle { S _ { R } }$ as follows:",
+        "bbox": [
+            112,
+            334,
+            489,
+            381
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/78048f75428d4c6ba6e1659f43d23f5f266a264d4645c26d4fc72e8fb1eccf7a.jpg",
+        "text": "$$\n\\begin{array} { r l } & { \\mathcal { S } _ { R } = \\log P ( \\mathcal { D } | \\mathcal { Q } , r _ { \\le m } ) } \\\\ & { \\qquad = \\log P ( \\mathcal { Q } _ { d } , \\mathcal { R } _ { d } , \\mathcal { A } _ { d } | \\mathcal { Q } , r _ { \\le m } ) } \\end{array}\\tag{8}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            173,
+            394,
+            428,
+            431
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "A lower probability suggests higher originality; hence, we calculate the originality score through the negative log-likelihood of the probability:",
+        "bbox": [
+            112,
+            445,
+            489,
+            494
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/b7ec886ea5e03a67051b2043a1dcf60ddf01d8959f29caec7099d66a4a0eb1fd.jpg",
+        "text": "$$\n\\begin{array} { r l } & { \\mathcal { S } _ { O } = - \\log P ( \\mathcal { D } | \\mathcal { Q } ) } \\\\ & { \\quad \\quad = - \\log P ( \\mathcal { Q } _ { d } , \\mathcal { R } _ { d } , \\mathcal { A } _ { d } | \\mathcal { Q } ) } \\end{array}\\tag{9}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            183,
+            507,
+            416,
+            544
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "The selection score $s$ is then computed as the weighted average of the two scores:",
+        "bbox": [
+            112,
+            558,
+            487,
+            592
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/28b61648c36d84b72bde7ac00fa7e5ee9154ae3c56d82035536cf63441615b30.jpg",
+        "text": "$$\n\\begin{array} { r } { S = \\lambda _ { 1 } S _ { R } + \\lambda _ { 2 } S _ { O } , } \\end{array}\\tag{10}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            225,
+            605,
+            376,
+            621
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where $\\lambda _ { 1 }$ and $\\lambda _ { 2 }$ are the weights assigned to the relevance and originality scores, respectively.",
+        "bbox": [
+            112,
+            636,
+            487,
+            668
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Following this, we rank the demonstrations according to the selection score , ordered from highest to lowest as $\\{ S _ { 1 } , S _ { 2 } , S _ { 3 } , \\ldots \\}$ , corresponding to $\\left\\{ \\mathcal { D } _ { 1 } , \\mathcal { D } _ { 2 } , \\mathcal { D } _ { 3 } , \\ldots \\right\\}$ }. We retain the initial reasoning process $r _ { \\leq m }$ and sequentially append each $\\mathcal { D } _ { i }$ in front of the problem . Our objective is to identify a $\\mathcal { D } _ { i }$ such that, upon generating up to the next step, the uncertainty remains consistently below a predefined threshold θ:",
+        "bbox": [
+            112,
+            669,
+            489,
+            814
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/5aad731fc200d2c8d0bc3e8e4eb9a7f370c9b71e7e7576fb24e63ac5a8a1d13d.jpg",
+        "text": "$$\n\\exists \\mathcal { D } _ { i } : \\forall k , \\Delta \\mathcal { H } ( r _ { m + k } ) \\leq \\theta ,\\tag{11}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            196,
+            826,
+            406,
+            845
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where k is the index of the tokens generated after appending $\\mathcal { D } _ { i }$ . This ensures that the enhanced reasoning process effectively mitigates uncertainty and increases the reliability of the reasoning chain.",
+        "bbox": [
+            112,
+            858,
+            490,
+            922
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "4.3 Optimizing Demonstration Selection Through Clustering",
+        "text_level": 2,
+        "bbox": [
+            509,
+            84,
+            843,
+            117
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Given the reasoning process for each question , it becomes necessary to retrieve demonstrations when the uncertainty exceeds the predefined threshold θ. This could lead to a high computational overhead due to the extensive retrieval of demonstrations. To address this, we propose a clustering approach for organizing the demonstration set , aimed at selecting representative exemplars efficiently.",
+        "bbox": [
+            507,
+            122,
+            885,
+            266
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Initially, we compute a vector representation for each demonstration $\\mathcal { D } _ { i }$ using a sophisticated text embedding model, text-embedding-3-large. Subsequently, these vectorized demonstrations are grouped into k distinct clusters using the k-means clustering algorithm. This method efficiently groups similar reasoning processes, enhancing the efficiency of demonstration selection.",
+        "bbox": [
+            507,
+            267,
+            885,
+            395
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "We structure each cluster $\\mathcal { C } _ { j }$ by sorting its demonstrations according to their proximity to the cluster’s centroid, prioritizing those closest as they are most representative of the cluster’s reasoning pattern:",
+        "bbox": [
+            507,
+            397,
+            885,
+            478
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/e7e593ea20d154c21d75d067f3b08f20918e968df7d6d64065b29132fbad8767.jpg",
+        "text": "$$\n\\begin{array} { r } { \\mathcal { C } _ { j } = [ \\mathcal { D } _ { 1 } ^ { j } , \\mathcal { D } _ { 2 } ^ { j } , \\dotsc ] , \\quad \\mathcal { C } _ { j } \\in K \\dotsc M e a n s ( \\{ \\mathcal { D } \\} ) , } \\end{array}\\tag{12}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            522,
+            488,
+            863,
+            510
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where each cluster $\\mathcal { C } _ { j }$ comprises demonstrations $[ \\mathcal { D } _ { 1 } ^ { j } , \\mathcal { D } _ { 2 } ^ { j } , \\ldots ]$ that exhibit similar reasoning traits, determined by the K-means clustering of the demonstration set .",
+        "bbox": [
+            509,
+            537,
+            884,
+            604
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "This clustering-based approach not only streamlines the demonstration selection process but also ensures that the model has access to a diverse yet concise set of reasoning examples. It effectively balances the need for a broad variety of reasoning examples with computational efficiency, ensuring that the reasoning process is both accurate and practical.",
+        "bbox": [
+            507,
+            605,
+            887,
+            733
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "5 Experiments",
+        "text_level": 2,
+        "bbox": [
+            509,
+            745,
+            657,
+            762
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "5.1 Experimental Setup",
+        "text_level": 2,
+        "bbox": [
+            509,
+            770,
+            714,
+            787
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "In this section, we delineate and scrutinize the performance of our proposed UAG, utilizing a variety of LLM backbones across a series of reasoning benchmarks. To evaluate the efficacy of UAG, we primarily employ accuracy as the performance metric. Furthermore, we undertake an analysis of the computational costs among different methods, quantified by the number of tokens generated during the reasoning process. Implementation details and configurations of the various approaches can be found in Appendix B.",
+        "bbox": [
+            507,
+            791,
+            887,
+            889
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_footnote",
+        "text": "https://openai.com/index/new-embedding-models-andapi-updates",
+        "bbox": [
+            509,
+            895,
+            880,
+            921
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_number",
+        "text": "2405",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "table",
+        "img_path": "images/6299c9db8855554e00f9d4601eb453c98124938d19505012d32dc6f7144054ee.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>GSM8K</td><td>MultiArith</td><td>SingleEQ</td><td>AddSub</td><td>SVAMP</td><td>AQuA</td><td>Average</td><td>Avg. #Tokens</td></tr><tr><td colspan=\"9\">Single Reasoning Chain</td></tr><tr><td>ZS-CoT</td><td>41.93</td><td>64.50</td><td>71.65</td><td>75.19</td><td>59.40</td><td>31.89</td><td>57.43</td><td>178.25</td></tr><tr><td>CoT</td><td>38.89</td><td>75.50</td><td>77.36</td><td>75.19</td><td>59.20</td><td>30.71</td><td>59.48</td><td>87.88</td></tr><tr><td>ComplexCoT</td><td>43.67</td><td>76.50</td><td>77.56</td><td>76.20</td><td>56.90</td><td>31.50</td><td>60.38</td><td>124.96</td></tr><tr><td>UAG</td><td>46.70</td><td>77.66</td><td>79.92</td><td>77.97</td><td>60.70</td><td>33.85</td><td>62.80</td><td>151.76</td></tr><tr><td colspan=\"9\">Multiple Reasoning Chains</td></tr><tr><td>ZS-CoT-SC</td><td>52.16</td><td>75.33</td><td>77.17</td><td>80.25</td><td>67.40</td><td>37.01</td><td>64.89</td><td>884.79</td></tr><tr><td>CoT-SC</td><td>47.08</td><td>85.00</td><td>85.43</td><td>79.24</td><td>67.40</td><td>36.22</td><td>66.73</td><td>442.23</td></tr><tr><td>ComplexCoT-SC</td><td>56.63</td><td>85.83</td><td>83.86</td><td>79.49</td><td>67.90</td><td>35.83</td><td>68.26</td><td>629.18</td></tr><tr><td>UAG-SC</td><td>58.07</td><td>87.66</td><td>86.41</td><td>81.26</td><td>67.60</td><td>39.76</td><td>70.12</td><td>772.53</td></tr></table>",
+        "bbox": [
+            121,
+            82,
+            877,
+            269
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "chart",
+        "img_path": "images/3d3ce33ae5791df61a47e6b8bb8180c884b2801ff6d0c95844ec1d406318d0c1.jpg",
+        "content": "",
+        "chart_caption": [
+            "Table 1: Results on Arithmetic Reasoning Tasks (Accuracy in %). The best result is highlighted in bold, while the method with the lowest computational cost is denoted in green. We utilize the Mistral-7B (Jiang et al., 2023) backbone for all methods to ensure a fair comparison. For brevity, Zero-Shot-CoT is abbreviated as ZS-CoT. In multiple reasoning chains scenario, the self-consistency is applied to determine the final outcome. Additionally, we report the average number of generated tokens ( #Tokens ) to compare the computational efficiency of each method.",
+            "(a) Commonsense Reasoning"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            124,
+            359,
+            475,
+            497
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "chart",
+        "img_path": "images/02034716eae73c6aa3fe7280adc6f830698959b13c07b8f3f9132af1d401ab91.jpg",
+        "content": "",
+        "chart_caption": [
+            "(b) Symbolic Reasoning",
+            "Figure 3: Performance comparison and cost curves on (a) commonsense reasoning and (b) symbolic reasoning. The cost and performance of different methods correspond to each other. Histograms show the accuracy, while line charts illustrate the cost."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            519,
+            359,
+            872,
+            497
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            586,
+            489,
+            667
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Benchmarks. Our evaluation encompasses three distinct categories of reasoning tasks, ensuring a comprehensive analysis of UAG’s versatility and effectiveness:",
+        "bbox": [
+            112,
+            674,
+            489,
+            739
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "• Arithmetic Reasoning: This category includes GSM8K (Cobbe et al., 2021), MultiArith (Roy and Roth, 2015), SingleEq (Koncel-Kedziorski et al., 2016), AddSub (Hosseini et al., 2014), SVAMP (Patel et al., 2021), and AQUA (Ling et al., 2017), which encompass a range of arithmetic problem-solving tasks.",
+        "bbox": [
+            112,
+            743,
+            489,
+            856
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "• Commonsense Reasoning: We employ StrategyQA (Geva et al., 2021), CommonsenseQA (CSQA; Talmor et al., 2019), BoolQ (Clark et al., 2019), and AI2 Reasoning Challenge (ARC-c;",
+        "bbox": [
+            112,
+            858,
+            490,
+            923
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Clark et al., 2018) to gauge the model’s ability to understand and apply commonsense knowledge.",
+        "bbox": [
+            522,
+            586,
+            885,
+            618
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "• Symbolic Reasoning: This involves datasets derived from BigBench (bench authors, 2023; Suzgun et al., 2023), specifically Date Understanding, Penguins in a Table, Colored Objects, and Object Counting, which test the model’s skill in abstract and symbolic thought processes.",
+        "bbox": [
+            510,
+            620,
+            887,
+            718
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Following Zhang et al. (2023c), our experiments are conducted in a “test question only” scenario, where we lack access to correct answers and must independently construct exemplars. Detailed descriptions and statistics of these benchmarks are provided in the appendix A.",
+        "bbox": [
+            507,
+            721,
+            887,
+            819
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Baselines. For an intuitive and comprehensive performance comparison, we incorporate three primary categories of baselines: (1) Zero-shot CoT (Kojima et al., 2022) for reasoning without exemplars; (2) CoT (Wei et al., 2022) for exemplarguided chain-of-thought prompting; and (3) ComplexCoT (Fu et al., 2023b) for complexity-based prompting. Furthermore, we also employ selfconsistency decoding (Wang et al., 2023) as a strong baseline with multiple reasoning chains for comparison. In our analysis, UAG’s performance is contrasted not only with these baselines but also with a variety of exemplar selection (Zhang et al., 2023c) and decoding enhancement techniques (O’Brien and Lewis, 2023; Chuang et al., 2023) in Appendix C.4. For generation, we adhere to the few-shot exemplars of baselines and use the number of generated tokens as a metric to assess the computational cost of each method.",
+        "bbox": [
+            507,
+            826,
+            887,
+            923
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "2406",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            490,
+            296
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Backbones. We derive embeddings for clustering through text-embedding-3-large. In our evaluation, we utilize open-source models LLaMA-2 (Touvron et al., 2023b) and Mistral (Jiang et al., 2023), applying various prompting techniques such as Zero-Shot CoT (ZS-CoT) (Kojima et al., 2022), CoT (Wei et al., 2022), and ComplexCoT (Fu et al., 2023b). Section 5.3 details our examination of the scalability of our approach across various model sizes, specifically using the 7B, 13B, and 70B parameter configurations of LLaMA-2. Additionally, we integrate a Mixture of Experts model, Mistral-8x7B (Jiang et al., 2024) to further diversify our evaluations.",
+        "bbox": [
+            112,
+            304,
+            492,
+            530
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "5.2 Main Results",
+        "text_level": 2,
+        "bbox": [
+            114,
+            536,
+            267,
+            551
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Arithmetic Reasoning. In Table 1, we present the results of arithmetic reasoning tasks. Our method manifests substantial performance enhancement across most benchmarks, in both single and multiple chain scenarios. Notably, we observe absolute increments in accuracy of 7.81%, 2.78%, and 3.14% on GSM8K, AddSub, and AQuA benchmarks, respectively, when compared to CoT approach (Wei et al., 2022). This disparity in performance gains can be attributed to UAG’s strategy of constraining the reasoning search space by strategically eliminating uncertainty, as reflected in its superior performance across tasks. This underscores the efficacy of introducing controllable randomness in the UAG decoding process to expand the search space. A more extensive comparison of UAG against a broader spectrum of methods is detailed in Appendix C, where we delve deeper into the underlying factors contributing to UAG’s enhanced performance.",
+        "bbox": [
+            112,
+            557,
+            490,
+            882
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Commonsense and Symbolic Reasoning. As illustrated in Figure 3a and Figure 3b, UAG consistently outperforms existing approaches across a variety of tasks. For instance, on the BoolQ dataset, our approach achieves an accuracy rate of 62.26%, significantly surpassing the 58.07% accuracy of the baseline method. Particularly noteworthy is our performance on the StrategyQA and BoolQ datasets, where we observe that the Zero-Shot CoT (Kojima et al., 2022) struggled in guiding the model to generate precise and accurate answers, leading to significant performance declines.",
+        "bbox": [
+            112,
+            890,
+            489,
+            922
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "chart",
+        "img_path": "images/ac28b4cf6fa4790d443ef855db798f8273f5e67c6ca96f1a08a5ed6e08d1ccd7.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 4: Performance comparison across models on the AQuA dataset. UAG achieves consistent performance improvement across various models."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            519,
+            89,
+            873,
+            175
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            247,
+            887,
+            409
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Computational Cost. Despite the significant improvements our approach yields across various benchmarks, a potential concern arises regarding the computational overhead. Upon examining Figures 3a and 3b, we note that UAG, when applied to commonsense and symbolic reasoning tasks, does not incur substantial performance costs in comparison to CoT. For instance, in the Date Understanding dataset, UAG demonstrates only a 20% increase in overhead relative to CoT, yet it achieves an enhancement of over 3% in performance. Furthermore, as illustrated in Table 1, in arithmetic reasoning, UAG’s computational demand is comparable to ComplexCoT and is even more efficient than the exemplar-free Zero-Shot CoT approach. Notably, UAG’s mechanism of refining reasoning based on finished reasoning steps ensures that the additional computational overhead is minimal.",
+        "bbox": [
+            507,
+            418,
+            887,
+            711
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "5.3 Further Analysis",
+        "text_level": 2,
+        "bbox": [
+            509,
+            722,
+            692,
+            739
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Performance on various models. In Figure 4, we compare the performance of UAG against other baselines across different LLMs. UAG consistently outperforms these baselines. Intriguingly, CoT does not always outperform Zero-Shot-CoT (Kojima et al., 2022), e.g., Zero-Shot-CoT outperforms CoT on Mistral-7B, and this advantage is more pronounced on Mistral-8x7B. Furthermore, an increased number of exemplars does not unconditionally enhance performance; in certain cases, such as with Mistral, better results are achieved even without exemplars (Li et al., 2023b). In this scenario, Mistral is even better without exemplar. This phenomenon underscores UAG’s strategic advantage in introducing the most appropriate exemplars ondemand, which substantially contributes to the observed performance improvements of our method.",
+        "bbox": [
+            507,
+            745,
+            887,
+            922
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "2407",
+        "bbox": [
+            478,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "chart",
+        "img_path": "images/e8fc6f7b3304f132de1a4b6b1ef7ce0f9aee9eb893da7479b4d85af0a1b6e923.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 5: Ablation Study on Relevance and Originality. Performance impact across datasets when omitting either relevance or originality."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            124,
+            86,
+            477,
+            175
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            256,
+            490,
+            354
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Importance of Relevance and Originality. In Section 3, we introduce the concepts of relevance and originality, with exemplar selection criteria detailed in Eq 10. An ablation study, as depicted in Figure 5, evaluates the impact of these factors. We modify the experiment by omitting the condition in Eq 11 and employing random selection for comparison. The results reveal that excluding originality leads to an average performance drop of 5.73%, as the model then relies solely on question relevance, often being misled by errors in analogous questions (Zhang et al., 2023c). Conversely, eliminating relevance also results in significant performance decline, rendering the exemplar selection process ineffective. A further analysis of the weights $\\lambda _ { 1 }$ and $\\lambda _ { 2 }$ is elaborated in Appendix C.1.",
+        "bbox": [
+            110,
+            361,
+            490,
+            621
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "chart",
+        "img_path": "images/12fca9c7cc57e83647e6e9a74369c6f7ebbbd16e4e2d9c67d60cd3c134e66f1e.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 6: Performance comparison of UAG and Auto-CoT methods on various reasoning datasets."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            124,
+            636,
+            478,
+            724
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Comparison to Existing Demonstration Selection Method. In Figure 6, we conduct an analysis of our UAG method against another representative demonstration selection strategy utilizing clustering, Auto-CoT (Zhang et al., 2023c), across various reasoning datasets. This comparison, under the same experimental setting, reveals a notable performance enhancement by UAG over Auto-CoT in each dataset. These findings indicate the superiority of UAG, which dynamically selects appropriate demonstrations based on uncertainty during the reasoning process, as opposed to Auto-CoT’s static pre-selection approach.",
+        "bbox": [
+            112,
+            777,
+            490,
+            923
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            885,
+            151
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "6 Conclusion",
+        "text_level": 2,
+        "bbox": [
+            509,
+            161,
+            643,
+            178
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "In this paper, we start by observing the causes behind LLM reasoning errors from the perspective of uncertainty, paving the way for nuanced and adaptive modifications in the reasoning process. Driven by this insight, we introduce the Uncertainty-aware Adaptive Guidance (UAG). UAG strategically mitigates reasoning errors by identifying and eliminating uncertainties with reasoning steps, concurrently leveraging exemplars chosen for their relevance and originality to dispel uncertainty and steer the subsequent reasoning trajectory. Comprehensive experimental evaluations across a spectrum of reasoning tasks demonstrate that UAG not only surpasses several strong baselines but also exhibits adaptability to a diverse array of models, underscoring its efficacy and wide applicability in enhancing LLM reasoning capabilities. Further analysis showcases the remarkable versatility of UAG, which can function as a plug-and-play module and efficiently identify and eliminate reasoning errors.",
+        "bbox": [
+            507,
+            189,
+            887,
+            512
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Ethics Statement",
+        "text_level": 2,
+        "bbox": [
+            509,
+            524,
+            663,
+            539
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "The development and deployment of Large Language Models (LLMs), such as those described in this paper, necessitate careful consideration of various ethical concerns. We outline several key areas of focus:",
+        "bbox": [
+            507,
+            550,
+            887,
+            630
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Data Privacy and Security. Our approach, involving the enhancement of LLMs for reasoning tasks, does not require the collection or processing of personal data. The prompts and methods used are devoid of personal information, aligning with privacy preservation principles.",
+        "bbox": [
+            507,
+            631,
+            885,
+            728
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Impact on Workforce. The automation capabilities of LLMs might affect employment in certain sectors. It is important to consider the broader societal implications and support the workforce in adapting to these technological changes.",
+        "bbox": [
+            507,
+            728,
+            887,
+            809
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Environmental Considerations. The computational resources required for training and running LLMs have environmental impacts. We advocate for the use of sustainable practices and the exploration of energy-efficient models.",
+        "bbox": [
+            507,
+            809,
+            887,
+            890
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "In conducting this research, we have adhered to ethical guidelines and ensured compliance with the licensing requirements of the datasets used, as detailed in Table 2. Our commitment to ethical research extends beyond legal compliance, encompassing a broader responsibility to the societal implications of our work.",
+        "bbox": [
+            507,
+            890,
+            885,
+            922
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "2408",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            85,
+            490,
+            166
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Limitations",
+        "text_level": 2,
+        "bbox": [
+            114,
+            183,
+            220,
+            199
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "While our Uncertainty-aware Adaptive Guidance (UAG) method demonstrates significant improvements in reasoning tasks, it is important to acknowledge certain limitations that point towards areas for future development:",
+        "bbox": [
+            112,
+            214,
+            490,
+            296
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Applicability to Closed-Source Models. A notable constraint of our method is its limited applicability to closed-source models. Models such as ChatGPT and Claude, which do not provide access to the probability distribution of tokens, pose a challenge to the implementation of UAG. This limitation restricts the versatility of our approach, as it cannot be directly applied to these commercially closed-source models.",
+        "bbox": [
+            112,
+            310,
+            490,
+            455
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Generalization to Broader Generative Tasks. While our research has focused predominantly on reasoning tasks, the potential of leveraging uncertainty in LLMs extends to a wider spectrum of generative applications (Manakul et al., 2023), such as code generation (Sun et al., 2024b). This includes using uncertainty as a metric for evaluating model hallucination (Ji et al., 2023), generation quality, and other aspects of generative performance. However, our current scope has not encompassed these areas, and we recognize this as an opportunity for future research to expand the applicability and utility of UAG in these domains.",
+        "bbox": [
+            112,
+            470,
+            490,
+            681
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Acknowledgement",
+        "text_level": 2,
+        "bbox": [
+            114,
+            697,
+            278,
+            715
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We extend our gratitude to the members of the FudanNLP group for their insightful suggestions and thought-provoking discussions that greatly enhanced this work. We also sincerely appreciate the anonymous reviewers and area chairs for their constructive feedback, which was instrumental in advancing the quality of our study. This work was supported by the National Natural Science Foundation of China (No. 62236004). The computations in this research were performed using the CFFF platform of Fudan University.",
+        "bbox": [
+            110,
+            728,
+            490,
+            909
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            510,
+            84,
+            610,
+            99
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Mr. Bayes and Mr. Price. 1763. An essay towards solving a problem in the doctrine of chances. by the late rev. mr. bayes, f. r. s. communicated by mr. price, in a letter to john canton, a. m. f. r. s. Philosophical Transactions (1683-1775), 53:370–418.",
+            "BIG bench authors. 2023. Beyond the imitation game: Quantifying and extrapolating the capabilities of language models. Transactions on Machine Learning Research.",
+            "Maciej Besta, Nils Blach, Ales Kubicek, Robert Gerstenberger, Michal Podstawski, Lukas Gianinazzi, Joanna Gajda, Tomasz Lehmann, Hubert Niewiadomski, Piotr Nyczyk, and Torsten Hoefler. 2024. Graph of thoughts: Solving elaborate problems with large language models.",
+            "Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. 2020. Language models are few-shot learners. In NeurIPS, volume 33, pages 1877–1901.",
+            "Lang Cao. 2023. Enhancing reasoning capabilities of large language models: A graph-based verification approach.",
+            "Wenhu Chen, Xueguang Ma, Xinyi Wang, and William W. Cohen. 2022. Program of thoughts prompting: Disentangling computation from reasoning for numerical reasoning tasks.",
+            "Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, et al. 2022. Palm: Scaling language modeling with pathways.",
+            "Zheng Chu, Jingchang Chen, Qianglong Chen, Weijiang Yu, Tao He, Haotian Wang, Weihua Peng, Ming Liu, Bing Qin, and Ting Liu. 2023. A survey of chain of thought reasoning: Advances, frontiers and future.",
+            "Yung-Sung Chuang, Yujia Xie, Hongyin Luo, Yoon Kim, James Glass, and Pengcheng He. 2023. Dola: Decoding by contrasting layers improves factuality in large language models.",
+            "Christopher Clark, Kenton Lee, Ming-Wei Chang, Tom Kwiatkowski, Michael Collins, and Kristina Toutanova. 2019. BoolQ: Exploring the surprising difficulty of natural yes/no questions. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers), pages 2924–2936, Minneapolis, Minnesota. Association for Computational Linguistics."
+        ],
+        "bbox": [
+            510,
+            107,
+            884,
+            172
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "2409",
+        "bbox": [
+            478,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick, and Oyvind Tafjord. 2018. Think you have solved question answering? try arc, the ai2 reasoning challenge. ArXiv, abs/1803.05457.",
+            "Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, Christopher Hesse, and John Schulman. 2021. Training verifiers to solve math word problems.",
+            "Shizhe Diao, Pengcheng Wang, Yong Lin, and Tong Zhang. 2023. Active prompting with chain-ofthought for large language models.",
+            "Jinlan Fu, See-Kiong Ng, Zhengbao Jiang, and Pengfei Liu. 2023a. Gptscore: Evaluate as you desire.",
+            "Yao Fu, Hao Peng, Ashish Sabharwal, Peter Clark, and Tushar Khot. 2023b. Complexity-based prompting for multi-step reasoning. In The Eleventh International Conference on Learning Representations.",
+            "Mor Geva, Daniel Khashabi, Elad Segal, Tushar Khot, Dan Roth, and Jonathan Berant. 2021. Did aristotle use a laptop? a question answering benchmark with implicit reasoning strategies. Transactions of the Association for Computational Linguistics, 9:346– 361.",
+            "Chengcheng Han, Xiaowei Du, Che Zhang, Yixin Lian, Xiang Li, Ming Gao, and Baoyuan Wang. 2023. DialCoT meets PPO: Decomposing and exploring reasoning paths in smaller language models. In Proceedings ofthe 2023 Conference on Empirical Methods in Natural Language Processing, pages 8055–8068, Singapore. Association for Computational Linguistics.",
+            "Shibo Hao, Yi Gu, Haodi Ma, Joshua Hong, Zhen Wang, Daisy Wang, and Zhiting Hu. 2023. Reasoning with language model is planning with world model. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 8154–8173, Singapore. Association for Computational Linguistics.",
+            "Mohammad Javad Hosseini, Hannaneh Hajishirzi, Oren Etzioni, and Nate Kushman. 2014. Learning to solve arithmetic word problems with verb categorization. In Proceedings ofthe 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 523–533. Association for Computational Linguistics.",
+            "Jiaxin Huang, Shixiang Gu, Le Hou, Yuexin Wu, Xuezhi Wang, Hongkun Yu, and Jiawei Han. 2023. Large language models can self-improve. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 1051–1068, Singapore. Association for Computational Linguistics.",
+            "Dan Iter, Reid Pryzant, Ruochen Xu, Shuohang Wang, Yang Liu, Yichong Xu, and Chenguang Zhu. 2023.",
+            "In-context demonstration selection with cross entropy difference. In Findings of the Association for Computational Linguistics: EMNLP 2023, pages 1150– 1162, Singapore. Association for Computational Linguistics.",
+            "Ziwei Ji, Nayeon Lee, Rita Frieske, Tiezheng Yu, Dan Su, Yan Xu, Etsuko Ishii, Ye Jin Bang, Andrea Madotto, and Pascale Fung. 2023. Survey of hallucination in natural language generation. ACM Computing Surveys, 55(12):1–38.",
+            "Albert Q. Jiang, Alexandre Sablayrolles, Arthur Mensch, Chris Bamford, Devendra Singh Chaplot, Diego de las Casas, Florian Bressand, Gianna Lengyel, Guillaume Lample, Lucile Saulnier, Lélio Renard Lavaud, Marie-Anne Lachaux, Pierre Stock, Teven Le Scao, Thibaut Lavril, Thomas Wang, Timothée Lacroix, and William El Sayed. 2023. Mistral 7b.",
+            "Albert Q. Jiang, Alexandre Sablayrolles, Antoine Roux, Arthur Mensch, Blanche Savary, Chris Bamford, Devendra Singh Chaplot, Diego de las Casas, Emma Bou Hanna, Florian Bressand, Gianna Lengyel, Guillaume Bour, Guillaume Lample, Lélio Renard Lavaud, Lucile Saulnier, Marie-Anne Lachaux, Pierre Stock, Sandeep Subramanian, Sophia Yang, Szymon Antoniak, Teven Le Scao, Théophile Gervet, Thibaut Lavril, Thomas Wang, Timothée Lacroix, and William El Sayed. 2024. Mixtral of experts.",
+            "Tushar Khot, Harsh Trivedi, Matthew Finlayson, Yao Fu, Kyle Richardson, Peter Clark, and Ashish Sabharwal. 2023. Decomposed prompting: A modular approach for solving complex tasks. In The Eleventh International Conference on Learning Representations.",
+            "Takeshi Kojima, Shixiang Shane Gu, Machel Reid, Yutaka Matsuo, and Yusuke Iwasawa. 2022. Large language models are zero-shot reasoners. In Advances in Neural Information Processing Systems.",
+            "Rik Koncel-Kedziorski, Subhro Roy, Aida Amini, Nate Kushman, and Hannaneh Hajishirzi. 2016. MAWPS: A math word problem repository. In Proceedings of the 2016 Conference of the North American Chapter ofthe Associationfor Computational Linguistics: Human Language Technologies, pages 1152–1157, San Diego, California. Association for Computational Linguistics.",
+            "Xiang Lisa Li, Ari Holtzman, Daniel Fried, Percy Liang, Jason Eisner, Tatsunori Hashimoto, Luke Zettlemoyer, and Mike Lewis. 2023a. Contrastive decoding: Open-ended text generation as optimization. In Proceedings of the 61st Annual Meeting of the Associationfor Computational Linguistics (Volume 1: Long Papers), pages 12286–12312, Toronto, Canada. Association for Computational Linguistics.",
+            "Xiaonan Li and Xipeng Qiu. 2023. MoT: Memory-ofthought enables ChatGPT to self-improve. In Proceedings ofthe 2023 Conference on Empirical Meth-"
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            151
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "2410",
+        "bbox": [
+            480,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "ods in Natural Language Processing, pages 6354– 6374, Singapore. Association for Computational Linguistics.",
+            "Yifei Li, Zeqi Lin, Shizhuo Zhang, Qiang Fu, Bei Chen, Jian-Guang Lou, and Weizhu Chen. 2023b. Making language models better reasoners with step-aware verifier. In Proceedings of the 61st Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 5315–5333, Toronto, Canada. Association for Computational Linguistics.",
+            "Wang Ling, Dani Yogatama, Chris Dyer, and Phil Blunsom. 2017. Program induction by rationale generation: Learning to solve and explain algebraic word problems. In Proceedings ofthe 55th Annual Meeting of the Association for Computational Linguistics, ACL 2017, Vancouver, Canada, July 30 - August 4, Volume 1: Long Papers, pages 158–167. Association for Computational Linguistics.",
+            "Tengxiao Liu, Qipeng Guo, Yuqing Yang, Xiangkun Hu, Yue Zhang, Xipeng Qiu, and Zheng Zhang. 2023. Plan, verify and switch: Integrated reasoning with diverse X-of-thoughts. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 2807–2822, Singapore. Association for Computational Linguistics.",
+            "Jianqiao Lu, Wanjun Zhong, Wenyong Huang, Yufei Wang, Qi Zhu, Fei Mi, Baojun Wang, Weichao Wang, Xingshan Zeng, Lifeng Shang, Xin Jiang, and Qun Liu. 2024. Self: Self-evolution with language feedback.",
+            "Aman Madaan, Niket Tandon, Prakhar Gupta, Skyler Hallinan, Luyu Gao, Sarah Wiegreffe, Uri Alon, Nouha Dziri, Shrimai Prabhumoye, Yiming Yang, Shashank Gupta, Bodhisattwa Prasad Majumder, Katherine Hermann, Sean Welleck, Amir Yazdanbakhsh, and Peter Clark. 2023. Self-refine: Iterative refinement with self-feedback. In Advances in Neural Information Processing Systems, volume 36, pages 46534–46594. Curran Associates, Inc.",
+            "Potsawee Manakul, Adian Liusie, and Mark Gales. 2023. SelfCheckGPT: Zero-resource black-box hallucination detection for generative large language models. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 9004–9017, Singapore. Association for Computational Linguistics.",
+            "Sean O’Brien and Mike Lewis. 2023. Contrastive decoding improves reasoning in large language models.",
+            "OpenAI. 2023. GPT-4 technical report.",
+            "Bhargavi Paranjape, Scott Lundberg, Sameer Singh, Hannaneh Hajishirzi, Luke Zettlemoyer, and Marco Tulio Ribeiro. 2023. Art: Automatic multistep reasoning and tool-use for large language models.",
+            "Arkil Patel, Satwik Bhattamishra, and Navin Goyal. 2021. Are NLP models really able to solve simple",
+            "math word problems? In Proceedings of the 2021 Conference of the North American Chapter of the Associationfor Computational Linguistics: Human Language Technologies, pages 2080–2094, Online. Association for Computational Linguistics.",
+            "Subhro Roy and Dan Roth. 2015. Solving general arithmetic word problems. In Proceedings of the 2015 Conference on Empirical Methods in Natural Language Processing, EMNLP 2015, Lisbon, Portugal, September 17-21, 2015, pages 1743–1752. The Association for Computational Linguistics.",
+            "Bilgehan Sel, Ahmad Al-Tawaha, Vanshaj Khattar, Ruoxi Jia, and Ming Jin. 2023. Algorithm of thoughts: Enhancing exploration of ideas in large language models.",
+            "KaShun Shum, Shizhe Diao, and Tong Zhang. 2023. Automatic prompt augmentation and selection with chain-of-thought from labeled data.",
+            "Kaya Stechly, Matthew Marquez, and Subbarao Kambhampati. 2023. Gpt-4 doesn’t know it’s wrong: An analysis of iterative prompting for reasoning problems.",
+            "Hongjin Su, Jungo Kasai, Chen Henry Wu, Weijia Shi, Tianlu Wang, Jiayi Xin, Rui Zhang, Mari Ostendorf, Luke Zettlemoyer, Noah A. Smith, and Tao Yu. 2023. Selective annotation makes language models better few-shot learners. In The Eleventh International Conference on Learning Representations.",
+            "Jiankai Sun, Chuanyang Zheng, Enze Xie, Zhengying Liu, Ruihang Chu, Jianing Qiu, Jiaqi Xu, Mingyu Ding, Hongyang Li, Mengzhe Geng, Yue Wu, Wenhai Wang, Junsong Chen, Zhangyue Yin, Xiaozhe Ren, Jie Fu, Junxian He, Wu Yuan, Qi Liu, Xihui Liu, Yu Li, Hao Dong, Yu Cheng, Ming Zhang, Pheng Ann Heng, Jifeng Dai, Ping Luo, Jingdong Wang, Ji-Rong Wen, Xipeng Qiu, Yike Guo, Hui Xiong, Qun Liu, and Zhenguo Li. 2024a. A survey of reasoning with foundation models.",
+            "Qiushi Sun, Zhirui Chen, Fangzhi Xu, Kanzhi Cheng, Chang Ma, Zhangyue Yin, Jianing Wang, Chengcheng Han, Renyu Zhu, Shuai Yuan, Qipeng Guo, Xipeng Qiu, Pengcheng Yin, Xiaoli Li, Fei Yuan, Lingpeng Kong, Xiang Li, and Zhiyong Wu. 2024b. A survey of neural code intelligence: Paradigms, advances and beyond.",
+            "Qiushi Sun, Zhangyue Yin, Xiang Li, Zhiyong Wu, Xipeng Qiu, and Lingpeng Kong. 2023. Corex: Pushing the boundaries of complex reasoning through multi-model collaboration.",
+            "Tianxiang Sun, Xiaotian Zhang, Zhengfu He, Peng Li, Qinyuan Cheng, Xiangyang Liu, Hang Yan, Yunfan Shao, Qiong Tang, Shiduo Zhang, et al. 2024c. Moss: An open conversational large language model. Machine Intelligence Research, pages 1–18.",
+            "Mirac Suzgun, Nathan Scales, Nathanael Schärli, Sebastian Gehrmann, Yi Tay, Hyung Won Chung,"
+        ],
+        "bbox": [
+            131,
+            85,
+            489,
+            126
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "2411",
+        "bbox": [
+            478,
+            929,
+            519,
+            942
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Aakanksha Chowdhery, Quoc Le, Ed Chi, Denny Zhou, and Jason Wei. 2023. Challenging BIG-bench tasks and whether chain-of-thought can solve them. In Findings of the Association for Computational Linguistics: ACL 2023, pages 13003–13051, Toronto, Canada. Association for Computational Linguistics.",
+            "Alon Talmor, Jonathan Herzig, Nicholas Lourie, and Jonathan Berant. 2019. CommonsenseQA: A question answering challenge targeting commonsense knowledge. In Proceedings ofthe 2019 Conference ofthe North American Chapter ofthe Associationfor Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers), pages 4149–4158, Minneapolis, Minnesota. Association for Computational Linguistics.",
+            "Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. 2023a. Llama: Open and efficient foundation language models.",
+            "Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, et al. 2023b. Llama 2: Open foundation and fine-tuned chat models.",
+            "Jianing Wang, Qiushi Sun, Xiang Li, and Ming Gao. 2024. Boosting language models reasoning with chain-of-knowledge prompting.",
+            "Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc V Le, Ed H. Chi, Sharan Narang, Aakanksha Chowdhery, and Denny Zhou. 2023. Self-consistency improves chain of thought reasoning in language models. In The Eleventh International Conference on Learning Representations.",
+            "Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, brian ichter, Fei Xia, Ed H. Chi, Quoc V Le, and Denny Zhou. 2022. Chain of thought prompting elicits reasoning in large language models. In Advances in Neural Information Processing Systems.",
+            "Yuxi Xie, Kenji Kawaguchi, Yiran Zhao, Xu Zhao, Min-Yen Kan, Junxian He, and Qizhe Xie. 2023. Self-evaluation guided beam search for reasoning. In Thirty-seventh Conference on Neural Information Processing Systems.",
+            "Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Thomas L. Griffiths, Yuan Cao, and Karthik Narasimhan. 2023. Tree of Thoughts: Deliberate problem solving with large language models.",
+            "Xi Ye and Greg Durrett. 2023. Explanation selection using unlabeled data for chain-of-thought prompting. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 619–637, Singapore. Association for Computational Linguistics.",
+            "Zhangyue Yin, Qiushi Sun, Cheng Chang, Qipeng Guo, Junqi Dai, Xuanjing Huang, and Xipeng Qiu. 2023a. Exchange-of-thought: Enhancing large language model capabilities through cross-model communication. In Proceedings ofthe 2023 Conference on Empirical Methods in Natural Language Processing, pages 15135–15153, Singapore. Association for Computational Linguistics.",
+            "Zhangyue Yin, Qiushi Sun, Qipeng Guo, Jiawen Wu, Xipeng Qiu, and Xuanjing Huang. 2023b. Do large language models know what they don’t know? In Findings ofthe Associationfor Computational Linguistics: ACL 2023, pages 8653–8665, Toronto, Canada. Association for Computational Linguistics.",
+            "Zhangyue Yin, Qiushi Sun, Qipeng Guo, Zhiyuan Zeng, Xiaonan Li, Tianxiang Sun, Cheng Chang, Qinyuan Cheng, Ding Wang, Xiaofeng Mou, Xipeng Qiu, and Xuanjing Huang. 2024. Aggregation of reasoning: A hierarchical framework for enhancing answer selection in large language models. In Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024), pages 609–625, Torino, Italia. ELRA and ICCL.",
+            "Fei Yu, Hongbo Zhang, Prayag Tiwari, and Benyou Wang. 2023. Natural language reasoning, a survey.",
+            "Weizhe Yuan, Graham Neubig, and Pengfei Liu. 2021. BARTScore: Evaluating generated text as text generation. In Advances in Neural Information Processing Systems.",
+            "Jiajie Zhang, Shulin Cao, Tingjian Zhang, Xin Lv, Juanzi Li, Lei Hou, Jiaxin Shi, and Qi Tian. 2023a. Reasoning over hierarchical question decomposition tree for explainable question answering. In Proceedings ofthe 61st Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 14556–14570, Toronto, Canada. Association for Computational Linguistics.",
+            "Kun Zhang, Jiali Zeng, Fandong Meng, Yuanzhuo Wang, Shiqi Sun, Long Bai, Huawei Shen, and Jie Zhou. 2024. Tree-of-reasoning question decomposition for complex question answering with large language models. In Proceedings ofthe AAAI Conference on Artificial Intelligence, volume 38, pages 19560–19568.",
+            "Yifan Zhang, Jingqin Yang, Yang Yuan, and Andrew Chi-Chih Yao. 2023b. Cumulative reasoning with large language models.",
+            "Yiming Zhang, Shi Feng, and Chenhao Tan. 2022. Active example selection for in-context learning. In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing, pages 9134– 9148, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics.",
+            "Zhuosheng Zhang, Aston Zhang, Mu Li, and Alex Smola. 2023c. Automatic chain of thought prompting in large language models. In The Eleventh International Conference on Learning Representations."
+        ],
+        "bbox": [
+            131,
+            85,
+            489,
+            166
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "page_number",
+        "text": "2412",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Chuanyang Zheng, Zhengying Liu, Enze Xie, Zhenguo Li, and Yu Li. 2023. Progressive-hint prompting improves reasoning in large language models. ArXiv preprint, abs/2304.09797.",
+        "bbox": [
+            114,
+            85,
+            489,
+            140
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Denny Zhou, Nathanael Schärli, Le Hou, Jason Wei, Nathan Scales, Xuezhi Wang, Dale Schuurmans, Claire Cui, Olivier Bousquet, Quoc V Le, and Ed H. Chi. 2023. Least-to-most prompting enables complex reasoning in large language models. In The Eleventh International Conference on Learning Representations.",
+        "bbox": [
+            114,
+            148,
+            490,
+            241
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "A Statistics and Details of Datasets",
+        "text_level": 2,
+        "bbox": [
+            114,
+            254,
+            433,
+            269
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "For our experimental analysis, we carefully selected a diverse set of 14 datasets, encompassing the domains of arithmetic reasoning, commonsense reasoning, and symbolic reasoning. In Table 2, we comprehensively detail each dataset, including its source, type of answers it contains, the count of Chain-of-Thought (CoT) (Wei et al., 2022) prompt exemplars used, the size of the test sample, and the applicable licenses.",
+        "bbox": [
+            110,
+            280,
+            490,
+            425
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "B Implementation Details",
+        "text_level": 2,
+        "bbox": [
+            114,
+            436,
+            357,
+            453
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Baseline Implementation. In our main experiments, we employ three baselines: Zero-Shot CoT (Kojima et al., 2022), CoT (Wei et al., 2022), and ComplexCoT (Fu et al., 2023b). For Zero-Shot CoT, we append “Let’s think step by step” after each question. For both CoT and Complex-CoT, we adhere to their original prompting exemplars. To maintain consistency, we standardize the prompt format in ComplexCoT to match CoT, replacing “Question:” and “Answer:” with $\\mathrm { \\ddot { Q } } \\mathrm { \\vec { . } { } }$ and $\\mathbf { \\ddot { \\ s } } 6 \\mathbf { \\cdot } \\mathbf { \\vec { \\mu } }$ , respectively. The details of prompts used are listed in Table 2. While CoT and ComplexCoT have the same number of prompts, each example in ComplexCoT encompasses more intermediate steps. The experimental outcomes for CD and DoLA were sourced from Chuang et al. (2023) and O’Brien and Lewis (2023). For comparison, we use the LLaMA-1 model (Touvron et al., 2023a) and sample 20 reasoning chains for selfconsistency (Wang et al., 2023), aligning with their settings.",
+        "bbox": [
+            110,
+            462,
+            492,
+            802
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Generation Settings In our experimental setup, we adapt the generation temperature $\\tau$ for different tasks and baseline models. For the LLaMA model, Zero-Shot-CoT shows optimal performance at lower temperatures, specifically within $\\tau \\in$ 0.1, 0.5 . This contrasts with CoT and Complex-CoT, which perform better at higher temperatures $( \\tau > 0 . 5 )$ , consistent with Xie et al. (2023). For the Mistral model, a temperature control within $\\tau \\in [ 0 . 3 , 0 . 7 ]$ yields more favorable results. This variance in optimal temperature settings can be attributed to differences in model architecture and the distribution of the training data.",
+        "bbox": [
+            112,
+            809,
+            490,
+            923
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "chart",
+        "img_path": "images/3b5d013e7a8c7803033c97a030dd723bee87387d29ed549cd29f7a16024ae71f.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 7: Weight analysis of Relevance and Originality on GSM8K and StrategyQA dataset."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            531,
+            97,
+            847,
+            230
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            285,
+            885,
+            381
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "In scenarios involving multiple reasoning paths, we set the sampling temperature to 0.7 and set the number of reasoning chains to 5 to explore the reasoning space thoroughly. A majority voting mechanism is employed post-answer generation for the final decision (Wang et al., 2023). We note that some special tokens, such as the “muffins” in Figure 1, exhibits high uncertainty, likely due to infrequent usage, but did not consider these as reasoning errors if their uncertainty exceeded the threshold θ.",
+        "bbox": [
+            507,
+            381,
+            887,
+            542
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "For different datasets, we follow the Auto-CoT setup (Zhang et al., 2023c) with varying cluster numbers; for mathematical reasoning, $k = 8 ,$ while for symbolic reasoning, k = 4 was uniform. In commonsense reasoning, the cluster count was set to 7 for CSQA and StrategyQA, and 5 for BoolQ and ARC-c. To ensure precise answer extraction and mitigate evaluation errors, as discussed in Section 5.3, an exemplar was incorporated in the initial stages for Mistral-7B, LLaMA models.",
+        "bbox": [
+            507,
+            543,
+            887,
+            703
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Hardware utilization included a single RTX4090 for running LLaMA-7B and Mistral-7B models, two RTX4090s for LLaMA-13B, and two A100s for LLaMA-70B and Mistral-8x7B. In the multiple reasoning chains scenario, employing multiplesampling effectively reduces the randomness associated with a single run. The UAG method is implemented using PyTorch and Transformers, with Copilot and ChatGPT assisting in code writing and debugging.",
+        "bbox": [
+            507,
+            703,
+            887,
+            868
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Hyper parameter. We set the respective weights of relevance and originality $\\lambda _ { 1 }$ and $\\lambda _ { 2 }$ to 0.5 and $0 . 5 ,$ respectively, and the ablation experiments for this setting are shown in 5.3, which we analyze in more detail in C.1. In the main experiment, we set the threshold θ to 16, and we analyzed the different threshold selections in C.2. In the clustering phase, we use text-embedding-3-large to obtain the corresponding embedding. We use NLL loss to react to the uncertainty of the model and use the model’s respective tokenizer to get the number of generated tokens. Benefiting from the uncertainty assessment, we are able to first complete inference on a batch of confident samples. These samples are used as examples to bootstrap questions that are interrupted due to high uncertainty, similar to active learning, allowing our approach to be applied in test question only scenarios.",
+        "bbox": [
+            507,
+            873,
+            885,
+            922
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "page_number",
+        "text": "2413",
+        "bbox": [
+            478,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "table",
+        "img_path": "images/9bc692146bafb8fbf7a498c3a2498fd105f090cf2f00f8d23aa09ae69a44ab90.jpg",
+        "table_caption": [
+            "Table 2: Comprehensive statistics of datasets utilized in our experiments. # EX. indicates the number of Chain-of-Thought (CoT) (Wei et al., 2022) prompting exemplars used for few-shot prompting. # EVAL. denotes the total count of evaluation samples in each dataset."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>DATASET</td><td>REASONING TASK</td><td>ANSWER FORMAT</td><td># EX.</td><td># EVAL.</td><td>LICENSE</td></tr><tr><td>GSM8K (Cobbe et al., 2021)</td><td>Arithmetic</td><td>Number</td><td>8</td><td>1,319</td><td>MIT License</td></tr><tr><td>MultiArith (Roy and Roth, 2015)</td><td>Arithmetic</td><td>Number</td><td>8</td><td>600</td><td>Unspecified</td></tr><tr><td>SingleEq (Koncel-Kedziorski et al., 2016)</td><td>Arithmetic</td><td>Number</td><td>8</td><td>508</td><td>Unspecified</td></tr><tr><td>AddSub (Hosseini et al., 2014)</td><td>Arithmetic</td><td>Number</td><td>8</td><td>395</td><td>Unspecified</td></tr><tr><td>SVAMP (Patel et al., 2021)</td><td>Arithmetic</td><td>Number</td><td>8</td><td>1,000</td><td>MIT License</td></tr><tr><td>AQUA (Ling et al., 2017)</td><td>Arithmetic</td><td>Multi-choice</td><td>4</td><td>254</td><td>Apache-2.0</td></tr><tr><td>StrategyQA (Geva et al., 2021)</td><td>Commonsense</td><td>T/F</td><td>6</td><td>2,290</td><td>MIT license</td></tr><tr><td>CommonsenseQA (Talmor et al., 2019)</td><td>Commonsense</td><td>Multi-choice</td><td>7</td><td>1,221</td><td>Unspecified</td></tr><tr><td>BoolQ (Clark et al., 2019)</td><td>Commonsense</td><td>T/F</td><td>4</td><td>3,270</td><td>CC BY-SA 3.0</td></tr><tr><td>ARC-c (Clark et al., 2018)</td><td>Commonsense</td><td>Multi-choice</td><td></td><td>299</td><td>CC BY-SA 4.0</td></tr><tr><td>Date Understanding (Suzgun et al., 2023)</td><td>Symbolic</td><td>Multi-choice</td><td>43333</td><td>250</td><td>MIT license</td></tr><tr><td>Penguins in a Table (Suzgun et al., 2023)</td><td>Symbolic</td><td>Multi-choice</td><td></td><td>146</td><td>MIT license</td></tr><tr><td>Colored Objects (Suzgun et al., 2023)</td><td>Symbolic</td><td>Multi-choice</td><td></td><td>250</td><td>MIT license</td></tr><tr><td>Object Counting (Suzgun et al., 2023)</td><td>Symbolic</td><td>Multi-choice</td><td></td><td>250</td><td>MIT license</td></tr></table>",
+        "bbox": [
+            115,
+            82,
+            915,
+            274
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "chart",
+        "img_path": "images/f958a175e54c2c4bfc96ac22899993780fb4fb67dcb4c57a351d4b89bcffdd9b.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 8: Threshold Analysis on GSM8K dataset."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            124,
+            347,
+            477,
+            483
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            541,
+            489,
+            783
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "C Extended Analysis",
+        "text_level": 2,
+        "bbox": [
+            114,
+            794,
+            315,
+            810
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "C.1 Further Analysis of Relevance and Originality",
+        "text_level": 2,
+        "bbox": [
+            114,
+            820,
+            438,
+            853
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "In Figure 7, we examine the influence of relevance and originality weights on performance, utilizing the Mistral-7B model. We maintain the constraint $\\lambda _ { 1 } + \\lambda _ { 2 } = 1$ , where $\\lambda _ { 1 }$ varies from 0 to 1, denoting an increasing emphasis on relevance. Our findings indicate that an increment in $\\lambda _ { 1 }$ corresponds with a gradual improvement in model performance, underscoring the positive role of relevance in enhancing model reasoning. However, beyond $\\lambda _ { 1 } > 0 . 6 .$ there is a notable decline in performance, suggesting an overreliance on correlation and the detrimental impact of reasoning errors from similar samples. The model exhibits optimal performance when $\\lambda _ { 1 } = \\lambda _ { 2 } = 0 . 5$ , striking a balance between relevance and originality. This balanced setting is adopted for our subsequent experiments, reflecting its effectiveness in optimizing model performance.",
+        "bbox": [
+            112,
+            858,
+            489,
+            923
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "chart",
+        "img_path": "images/c16681568e43ece6d490c43546518ad5f841f6ac7d239e3a7079897d69a5023b.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 9: Threshold Analysis on StrategyQA dataset."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            521,
+            346,
+            872,
+            483
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            543,
+            887,
+            755
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "C.2 Threshold θ",
+        "text_level": 2,
+        "bbox": [
+            509,
+            769,
+            657,
+            784
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "In Figure 8 and Figure 9, we delve into the influence of threshold θ on the performance in the GSM8K and StrategyQA datasets. The histograms display the distribution of samples requiring exemplar introduction at various thresholds. The accompanying curves illustrate the corresponding accuracy at each threshold level. It is observed that the model’s accuracy escalates with an increase in θ, peaking before a rapid decline post θ > 16. To understand this phenomenon, we examine the frequency of samples meeting the criteria of Eq 7 at varying thresholds, depicted through a histogram. This analysis reveals a decrease in the number of samples satisfying Eq 7 as θ ascends. A lower θ entails a larger subset of samples undergoing reasoning adjustment, which, given that many samples are correctly inferred initially, could inadvertently introduce errors. Conversely, a higher θ may fail to identify samples with reasoning errors, gradually like an exemplar-free Zero-Shot-CoT approach (Kojima et al., 2022) and resulting in a marked degradation in performance.",
+        "bbox": [
+            507,
+            793,
+            887,
+            922
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_number",
+        "text": "2414",
+        "bbox": [
+            478,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "chart",
+        "img_path": "images/767285c620796274ccc7b4d5e1f49b1169fbe85e1b26035739b4629c1fea0ceb.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 10: Error Identification and Correction on GSM8K dataset. UAG exhibits comparable error identification capabilities to ChatGPT."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            124,
+            87,
+            478,
+            224
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "chart",
+        "img_path": "images/2892e9dcdea2b67066fab986148fdf47b1e809709ffcba1e7cb5b1cf2a137263.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 11: Performance comparison of UAG and various Decoding Enhancement Methods on GSM8K dataset. Using LLaMA-1 backbone (Touvron et al., 2023a), UAG consistently enhances performance across models of different parameter sizes."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            124,
+            302,
+            477,
+            438
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            552,
+            490,
+            778
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "C.3 Correlation between Reasoning Errors and Model Uncertainty",
+        "text_level": 2,
+        "bbox": [
+            114,
+            788,
+            470,
+            820
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "In Figure 1, we observe a correlation between reasoning errors and model uncertainty, a phenomenon previously substantiated by various studies (Yuan et al., 2021; Fu et al., 2023a; Manakul et al., 2023). To delve deeper, we analyze 100 error-containing samples from the GSM8K and",
+        "bbox": [
+            112,
+            826,
+            490,
+            923
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "chart",
+        "img_path": "images/6d46f931d45e7dbc42de196cc48a6f4d2961fe26e3046d6c5d3ac72168185021.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 12: Error Identification and Correction on StrategyQA dataset. UAG exhibits comparable error identification capabilities to ChatGPT."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            519,
+            87,
+            873,
+            224
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "chart",
+        "img_path": "images/613a6efe28d3d0a1852d4996f74d900314618def7fd2dc09b43038108d973a1c.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 13: Performance comparison of UAG and various Decoding Enhancement Methods on StrategyQA dataset. Using LLaMA-1 backbone (Touvron et al., 2023a), UAG consistently enhances performance across models of different parameter sizes."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            519,
+            331,
+            873,
+            472
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "StrategyQA datasets, identified through labeled correct answers, as illustrate in Figure 10 and Figure ??. These samples are processed using both ChatGPT and our UAG method for error localization and correction. Employing the reasoning process generated by Mistral-7B, we utilized gpt-3.5-turbo-1106, following the method outlined in Xie et al. (2023). ChatGPT exhibits a substantial error identification rate, correctly pinpointing 71% and 83% of errors in the datasets and successfully amending 57% and 69%, respectively. UAG demonstrates a comparable proficiency, correctly identifying 60% and 81% of the errors and effecting corrections in 43% and 55% of the cases. Notably, UAG capitalizes on the model’s inherent uncertainty for judgment, obviating the need for reevaluation. This approach not only significantly reduces computational overhead but also remains versatile across models of varying parameter sizes.",
+        "bbox": [
+            507,
+            617,
+            887,
+            923
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_number",
+        "text": "2415",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "chart",
+        "img_path": "images/5eba9b766137fff891066a5ddcd77c220c97717c233a95dd62265a5f581dbd1a.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 14: Performance Comparison in Multiple Reasoning Chains Scenario. Adhering to the configuration outlined by O’Brien and Lewis (2023), we utilize the LLaMA-65B backbone (Touvron et al., 2023a)."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            124,
+            87,
+            477,
+            224
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "C.4 Comparison to Decoding Enhancement Method",
+        "text_level": 2,
+        "bbox": [
+            114,
+            312,
+            473,
+            343
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "In Section 2, we discuss a variety of reasoning enhancement methods. Due to experimental constraints, it was impractical to compare our approach with all notable methods. Consequently, we select two representative decoding enhancement methods for comparison: Contrastive Decoding (CD) (Li et al., 2023a) and Decoding by Contrasting Layers (DoLA) (Chuang et al., 2023). Utilizing the LLaMA-1 backbone (Touvron et al., 2023a), with baseline results sourced from Chuang et al. (2023), Figure 11 and Figure 13 illustrates that UAG consistently outperforms the DoLA method across all model sizes on both the GSM8K and StrategyQA datasets. O’Brien and Lewis (2023) highlight that meticulous hyperparameter selection can notably enhance the performance of CD methods in reasoning tasks. In Figure 14, our comparison with these carefully tuned CD results reveals that UAG not only demonstrates comparable performance but also exhibits a distinct edge in commonsense reasoning tasks. This comparison underscores UAG’s ability to achieve significant performance improvements across a broader array of tasks.",
+        "bbox": [
+            112,
+            350,
+            490,
+            722
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_number",
+        "text": "2416",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 15
+    }
+]
