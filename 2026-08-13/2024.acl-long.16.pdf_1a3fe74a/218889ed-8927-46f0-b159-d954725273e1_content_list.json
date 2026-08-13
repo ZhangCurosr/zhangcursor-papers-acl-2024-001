@@ -1,0 +1,1652 @@
+[
+    {
+        "type": "text",
+        "text": "MINPROMPT: Graph-based Minimal Prompt Data Augmentation for Few-shot Question Answering",
+        "text_level": 1,
+        "bbox": [
+            157,
+            89,
+            840,
+            129
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Xiusi Chen<sup>1</sup> Jyun-Yu Jiang<sup>2</sup> Wei-Cheng Chang<sup>2</sup> Cho-Jui Hsieh<sup>1</sup> Hsiang-Fu Yu<sup>2</sup> Wei Wang<sup>1</sup> University of California, Los Angeles<sup>1</sup> Amazon Search<sup>2</sup> {xchen,chohsieh,weiwang}@cs.ucla.edu {jyunyu.jiang,weicheng.cmu,rofu.yu}@gmail.com",
+        "bbox": [
+            260,
+            146,
+            742,
+            231
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            262,
+            260,
+            341,
+            277
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Recent advances in few-shot question answering (QA) mostly rely on the power of pretrained large language models (LLMs) and fine-tuning in specific settings. Although the pre-training stage has already equipped LLMs with powerful reasoning capabilities, LLMs still need to be fine-tuned to adapt to specific domains to achieve the best results. In this paper, we propose to select the most informative data for fine-tuning, thereby improving the efficiency of the fine-tuning process with comparative or even better accuracy on the open-domain QA task. We present MINPROMPT, a minimal data augmentation framework for opendomain QA based on an approximate graph algorithm and unsupervised question generation. We transform the raw text into a graph structure to build connections between different factual sentences, then apply graph algorithms to identify the minimal set of sentences needed to cover the most information in the raw text. We then generate QA pairs based on the identified sentence subset and train the model on the selected sentences to obtain the final model. Empirical results on several benchmark datasets and theoretical analysis show that MINPROMPT is able to achieve comparable or better results than baselines with a high degree of efficiency, bringing consistent improvements in F-1 scores.",
+        "bbox": [
+            141,
+            291,
+            462,
+            719
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            114,
+            733,
+            260,
+            750
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Question answering (QA) provides accurate responses to a series of questions based on given narrative contexts. Its diverse applications extend to areas such as chatbots (Yang et al., 2019), dialogue systems (Burtsev et al., 2018), and instant information retrieval (Esteva et al., 2021), making it a key pursuit in the field of natural language processing (NLP). Supervised learning has traditionally been the approach for developing efficient QA systems that deliver commendable results (Chen et al.,",
+        "bbox": [
+            112,
+            760,
+            490,
+            922
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2024; Tian et al., 2024a). However, this method is intrinsically restricted by its reliance on a large set of annotated QA training examples, which becomes problematic due to the substantial cost associated with acquiring expert-level annotations.",
+        "bbox": [
+            507,
+            261,
+            885,
+            342
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Our research focuses on the few-shot QA task, an effort to address the QA challenge with the presence of only a limited number of training examples. The prevalent approaches under the few-shot setting either introduce a new task and pre-train an extensive language model from scratch (Ram et al., 2021), or they fine-tune an already pre-trained model on the given training examples (Chada and Natarajan, 2021; Tian et al., 2024b). The finetuning stage is crucial in the sense that it stimulates the power of the LLMs obtained during the pre-training stage and makes the model align with the input/output distribution of a certain domain or dataset. However, with an increasing data size for fine-tuning, the training duration increases accordingly, which is undesirable, especially when the model size is also large (OpenAI, 2023). As such, the importance of minimal data augmentation cannot be understated. The fine-tuning data, often a limited resource in our consideration (up to 128 shots), is directly used to adjust the parameters of a pre-trained model to enhance performance on the downstream task. The data is usually labeled by domain experts and thus could be time-consuming to obtain in large quantities. On the other hand, augmented data represents a broader dataset, gen erated in an unsupervised manner by converting statements into question-answer pairs. In QA tasks, it is vital for a model to be exposed to a diverse range of questions, answers, and contexts to develop a robust understanding of the language and the task at hand. However, not all parts of the training data hold equal relevance or significance for the model’s learning process. Some parts may contain more valuable information or more complex language structures that the model needs to under stand to improve its performance. Consequently, identifying and augmenting these critical portions of the training data could substantially enhance the model’s capacity to answer questions accurately and comprehensively.",
+        "bbox": [
+            507,
+            342,
+            887,
+            923
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "254",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 254–266 August 11-16, 2024 ©2024 Association for Computational Linguistics",
+        "bbox": [
+            97,
+            946,
+            900,
+            973
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            166
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "To address the above challenges, we present MINPROMPT, which consists of the following three modules: (1) A sentence graph construction module that leverages sentence graph representation to structurize the raw text. Each node in the graph symbolizes a sentence, while edges illustrate the shared entities between sentences. This sentence graph effectively encapsulates the complex interconnections between various textual elements; (2) A data selection module that features an approximate minimal dominating set algorithm. The algorithm is applied to the sentence graph to identify the smallest set of sentences to cover all shared entities. This module ensures efficient use of computational resources, reduces the risk of overfitting, and enhances the model’s generalization ability, resulting in an overall improvement in QA performance; and (3) A question generation module that transforms the selected plain factual sentences into QA pairs. The synthesized QA pairs are further turned into prompts, providing a condensed, yet comprehensive representation of the text. The generated prompts serve as high-quality, information-rich training instances for the QA model. This model trained on the compact and meaningful prompts is then capable of generating accurate answers to the posed questions, all without requiring any additional explicit supervision.",
+        "bbox": [
+            112,
+            170,
+            490,
+            620
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "In summary, our contributions are as follows:",
+        "bbox": [
+            131,
+            623,
+            470,
+            639
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• We propose to study minimal data augmentation for effective and efficient few-shot QA",
+        "bbox": [
+            114,
+            664,
+            487,
+            696
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• We introduce MINPROMPT, a minimal data augmentation framework that uses a graph-based algorithm and unsupervised question generation to synthesize the most informative QA training samples out of the raw text.",
+        "bbox": [
+            114,
+            720,
+            489,
+            802
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• We conduct extensive experiments on publicly accessible benchmarks to validate the effectiveness of MINPROMPT, and observe a solid improvement over competitive compared methods. Beyond that, we also study the necessity of different parts of the model.",
+        "bbox": [
+            114,
+            826,
+            490,
+            922
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Related Work",
+        "text_level": 2,
+        "bbox": [
+            509,
+            83,
+            667,
+            99
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Question generation. Chen et al. (2019) presented an answer-aware question generation (QG) model that employs reinforcement learning for improved question quality. The model incorporates a coverage mechanism to alleviate the common issue of answer-related content being left out from the generated questions. Ma et al. (2020) developed a more sophisticated approach to answer-aware question generation. Their model uses sentence-level semantic matching and answer position inferring within a sequence-to-sequence framework, resulting in higher-quality questions. Do et al. (2023) proposed a two-stage framework for Conversational Question Generation (CQG). It selects sentences from a semantic graph to pick up coherent topics and then uses a classifier to determine the answer type of the question. Their approach produces more natural dialogues, as real-life interlocutors often discuss relevant content that is non-sequential. Mohammadshahi et al. (2022) introduces RQUGE, a novel metric for assessing the quality of automatically generated questions. Traditional methods may unfairly penalize valid questions that don’t mirror reference questions closely. RQUGE overcomes these issues by evaluating on the basis of the answerability of a question given the context. Utilizing pre-trained models for its QA scorer modules, RQUGE does not require additional training. The paper presents evidence of RQUGE’s high correlation with human judgment and robustness against adversarial corruption.",
+        "bbox": [
+            507,
+            115,
+            887,
+            615
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Few-shot QA. Previous research in QA has mainly focused on either reusing pre-trained language models (PLMs) (Lan et al., 2020; Joshi et al., 2020) or training a model from scratch using synthetic QA data (Puri et al., 2020; Lewis et al., 2019a; Alberti et al., 2019). However, both approaches require a large amount of annotated data from the downstream QA task to fine-tune the models, which can be impractical in real-world scenarios. To address this problem, several recent approaches have been developed that allow the model to adapt to the downstream task with only a small amount of annotated data (Ram et al., 2021; Chada and Natarajan, 2021). For example, Ram et al. (2021) proposed a pretraining scheme tailored for QA tasks by designing a recurring span selection objective that aligns with the common objective in extractive QA tasks. Chada and Natarajan (2021) proposed a framework called FewshotQA, which leverages the capacity of existing PLMs by constructing a QA-style prompt that casts the QA problem as a text generation problem, specifically by concatenating the question and a mask token representing the answer span. This approach aims to save pretraining the model on a large-scale corpus. In contrast to these previous studies, this paper proposes to focus on identifying and leveraging more relevant information from the context data in addition to the annotated QA pairs to fine-tune the model in a few-shot setting.",
+        "bbox": [
+            507,
+            617,
+            887,
+            923
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "255",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/bb46c6f09d2aa905ebc4b848f9a3648e5e4c8cb5c5a5fe5690006589bec4699f.jpg",
+        "image_caption": [
+            "Figure 1: Framework overview for MINPROMPT."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            115,
+            85,
+            877,
+            335
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            386,
+            489,
+            548
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3 MINPROMPT: Graph-based Prompt Data Augmentation for Few-shot QA",
+        "text_level": 2,
+        "bbox": [
+            114,
+            557,
+            467,
+            592
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "As shown in Figure 1, our overall framework, MIN-PROMPT, is designed to extract the most semantically rich and factually dense sentences to serve as candidates for conversion into a prompt tuning QA dataset. This process is guided by the principal intuition that the most informative sentences are those that encompass facts or declarations concerning a greater number of entities. Hence, these highimpact sentences should ideally cite more entities within their purview. To implement this, we start by extracting the co-reference of entities across sentences. Essentially, it allows us to map the discourse in a way that allows us to understand which sentences are speaking about the same entities. Next, we construct a graph to depict the higherorder coreference relationships. In this graph, the sentences serve as nodes, and sentences are connected if they mention the same entity. This representation allows us to establish and understand the intricate network of relationships between sentences and the entities they mention. Employing graph-based algorithms, we are then able to identify and extract the most informative sentences. These are typically sentences that have a high degree of connectivity in the graph, indicating that they mention or discuss a larger number of entities. We then transform these selected sentences into a fine-tuning dataset. The transformation process entails restructuring the sentences to meet the format requirements of a QA dataset, which generally involves turning declarative sentences into question-and-answer pairs. This method thus combines insights from computational linguistics and graph theory to achieve its goal of creating a highquality fine-tuning dataset for QA tasks. The approach ensures that the dataset is not only rich in informative sentences, but also maps intricate entity relationships, thus providing a comprehensive context for each question and answer pair. This context helps in the training of more robust and nuanced QA systems.",
+        "bbox": [
+            110,
+            600,
+            492,
+            923
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            386,
+            887,
+            725
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3.1 Named Entity Recognition & Entity Typing",
+        "text_level": 2,
+        "bbox": [
+            509,
+            738,
+            840,
+            771
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "We use the entities as the bridge to build connections between all the factual sentences. We first conduct named entity recognition (NER) on the raw text to extract all the entity mentions along with their types. For the purpose of unsupervised QA data generation in our setting, the key lies in generating the questions given the raw text and the extracted entities (as answers). The most straightforward way to generate questions is to convert factual sentences into cloze questions (Chen et al., 2023). Creating a conventional cloze question involves extracting the original sentence containing the answer from the context and replacing the answer with a chosen token. However, training a model on these data primarily imparts text-matching and fill-in-the-blank skills, while offering minimal generalizability. As a result, we opt for a retrievalbased method to procure a sentence akin to the one containing the answer and subsequently use this to formulate a question. This has been evidenced in the work by (Lewis et al., 2019b) and further affirmed by our preliminary experiments. Our initial step involves indexing all sentences from a Wikipedia dump using the ElasticSearch search engine. Named entities were extracted from each sentence within the Wikipedia corpus as well as from the sentences utilized as queries. We presupposed access to a named-entity recognition system and leveraged the $\\operatorname { s p a C y } ^ { 1 }$ NER pipeline for this work, which is proven effective in NER and entity typing. Subsequently, for a given context-answer pair, we queried the index. This query involved using the original context sentence to return a sentence that either (1) includes the answer, or (2) does not originate from the context, thus discarding sentences with high similarity. Aside from guaranteeing that the retrieved sentence and the query sentence share the answer entity, we require that at least one additional matching entity be present in both the query sentence and the entire context. Finally, these retrieved sentences were introduced into our sentence graph construction module.",
+        "bbox": [
+            507,
+            777,
+            887,
+            923
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "256",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            490,
+            618
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.2 Sentence Graph Construction",
+        "text_level": 2,
+        "bbox": [
+            114,
+            629,
+            396,
+            644
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "As aforementioned, we construct the sentence graph to capture the semantic overlap of the factual sentences in the raw text. A proportion of the sentence graph is visualized in Figure 2. Upon building the sentence graph, we aim at extracting the minimal sentence set that covers the most semantics in the whole graph. Now the question becomes how we can leverage the high-order co-reference relationship to reduce the size of the training data. To dive deep into this question, we start by making the following assumption:",
+        "bbox": [
+            112,
+            650,
+            489,
+            828
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Assumption 1. Suppose two sentences in a sentence set S, $\\{ s _ { e } , s _ { e } ^ { \\prime } \\} \\subset S ,$ , mention the same entity e. The quality of a QA model $M _ { S }$ trained by a sentence set S will be similar to the quality ofthe other model $M _ { S ^ { \\prime } }$ trained by the set $S ^ { \\prime } = S - \\{ s _ { e } \\}$ because $s _ { e } ^ { \\prime } \\in S ^ { \\prime }$ still cover the similar topics and knowledge in $s _ { e }$",
+        "bbox": [
+            112,
+            834,
+            489,
+            898
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "image",
+        "img_path": "images/b80ca4649e1f9d6b441203dc49da851f35f33870ec4160cd7c8152aa5e51989b.jpg",
+        "image_caption": [
+            "Figure 2: Illustration of the Sentence graph. In the sentence graph, nodes correspond to sentences and edges represent the coreference of entities across sentences. Sentences 1, 2 and 3 shares the entity Lakers while sentence 4 shares the entity Crypto.com Arena with sentence 3."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            512,
+            83,
+            882,
+            241
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            365,
+            884,
+            413
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Based on Assumption 1, an intuitive idea of leveraging the sentence graph to effectively reduce the size of the training data is to find a minimal set of sentence nodes that can cover the whole sentence graph without losing the quality of the model. In other words, the challenge can be reduced to finding the minimal dominating set (Allan and Laskar, 1978) of the sentence graph.",
+        "bbox": [
+            507,
+            419,
+            885,
+            549
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.3 Minimal Dominating Set Approximation",
+        "text_level": 2,
+        "bbox": [
+            509,
+            561,
+            877,
+            577
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Unfortunately, finding the minimal dominating set is an NP-Complete problem (Hedetniemi and Laskar, 1991), so it is extremely time-consuming to obtain the optimal minimal dominating set as training data. Hence, an efficient approximation approach to derive a decent dominating set with few enough sentences is essential. To address this challenge, we leverage a greedy algorithm as shown in Algorithm 1 by iteratively choosing the node that can cover the most uncovered nodes.",
+        "bbox": [
+            507,
+            583,
+            885,
+            744
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Complexity Analysis. Here we analyze the complexity of Algorithm 1. Suppose V and E are the numbers of nodes and edges. For time complexity, the algorithm first spends $O ( V \\log V )$ time to establish the max heap. For each iteration, taking the node with the highest degree costs $O ( 1 )$ with the priority queue. In total, we need to update the priority queue $O ( E )$ times, where each update costs O(log V ) time. Hence, the total time complexity is O(E log V ). For space complexity, the additional space complexity is only $O ( V )$ to record the current set of uncovered nodes and the max heap.",
+        "bbox": [
+            507,
+            745,
+            887,
+            923
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>1</sup>https://spacy.io",
+        "bbox": [
+            136,
+            907,
+            268,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_number",
+        "text": "257",
+        "bbox": [
+            485,
+            928,
+            515,
+            942
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "code",
+        "sub_type": "algorithm",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "Algorithm 1 ApproximateDominantingSet   \n$S \\gets \\emptyset$   \nLet H be a priority queue   \nAdd all nodes in H with their node degrees   \nwhile H is not empty do   \n$v  H . \\mathsf { p o p } .$ \\_max()   \n$S \\gets S \\bigcup \\{ v \\}$   \nRemove v and its neighbors in E from H   \nUpdate degrees of the remaining nodes in H   \nend while   \nreturn S",
+        "bbox": [
+            114,
+            82,
+            487,
+            267
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            288,
+            460,
+            304
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Theoretical Analysis. We also conduct some theoretical analysis on Algorithm 1. According to Theorem 1, the quality of dominating set derived by Algorithm 1 is guaranteed.",
+        "bbox": [
+            112,
+            304,
+            489,
+            369
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Theorem 1. Algorithm 1 computes an $( \\ln \\Delta + 2 )$ approximation of the optimal dominanting set. In other words, for the computed dominating set $S$ and an optimal dominating set $S ^ { * }$ , we have",
+        "bbox": [
+            112,
+            370,
+            489,
+            437
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/10e1bfcf586601582e87038ddaada3a4988f00505a5c945b1d5f0e74dea8e2c8.jpg",
+        "text": "$$\n\\frac { | S | } { | S ^ { * } | } \\leq \\ln \\Delta + 2 ,\n$$",
+        "text_format": "latex",
+        "bbox": [
+            233,
+            441,
+            369,
+            475
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where $\\Delta = \\operatorname* { m a x } _ { v } d ( v )$ is the maximal degree of G.",
+        "bbox": [
+            112,
+            481,
+            487,
+            498
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Proof. Here we prove the theorem in an amortized way. Suppose each iteration costs 1 (i.e., contributing to the cardinality of the final dominating set). Instead of letting the selected node takes all the cost, we amortize and distribute the cost among all newly covered nodes.",
+        "bbox": [
+            112,
+            505,
+            489,
+            601
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Assume $S ^ { \\prime }$ is an optimal dominating set. By the definition of dominating set, we can assign each node in V to exactly one neighboring node in $S ^ { \\prime }$ so that the graph can be decomposed into several stars, where the center is a dominating node and non-dominating nodes are leaves.",
+        "bbox": [
+            112,
+            601,
+            489,
+            699
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Consider a certain star with a center $\\boldsymbol { v ^ { \\prime } } \\in \\ S ^ { \\prime }$ while choosing a node u in Algorithm 1. By the greedy condition and the optimality of $v ^ { \\prime } ,$ , after cost distribution, the charged cost of u would be at most $d ( v ^ { \\prime } )$ . Also, after removing $u ,$ the degree of $v ^ { \\prime }$ will be reduced by 1. Following this process to iteratively select dominating nodes, the total amortized cost would be at most:",
+        "bbox": [
+            112,
+            697,
+            489,
+            827
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/014135ae760f75b9d53517deb20d1f9062b218b2c6028e33e682c631bca8410a.jpg",
+        "text": "$$\n\\begin{array} { c } { \\displaystyle { \\frac { 1 } { d ( v ^ { \\prime } ) + 1 } + \\frac { 1 } { d ( v ^ { \\prime } ) } + \\dots + \\frac { 1 } { 1 } = H ( d ( v ^ { * } ) + 1 ) } } \\\\ { \\displaystyle { \\le H ( \\Delta + 1 ) } } \\\\ { \\displaystyle { < \\ln \\Delta + 2 , } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            124,
+            845,
+            477,
+            917
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where $\\Delta$ is the maximal degree of the graph; $\\begin{array} { r } { H ( n ) = \\sum _ { i - 1 } ^ { n } 1 / i } \\end{array}$",
+        "bbox": [
+            509,
+            84,
+            885,
+            118
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "3.4 Question Generation",
+        "text_level": 2,
+        "bbox": [
+            509,
+            147,
+            722,
+            164
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Our approach considers two question styles, including (1) generic cloze-style questions, wherein the answer is substituted by the token “[MASK]\", and (2) a templated question format termed $\\mathrm { \" W h + B + A + ? \" }$ as well as its diverse ordering variations, as depicted in Figure 3. Given a retrieved sentence structured as [Fragment A] [Answer] [Fragment B], the template $\\mathrm { \" W h + B + A + ? } \\ $ replaces the Answer with a component Wh (for instance, what, who or where). This component is determined by the entity type of the Answer and is placed at the beginning of the question. It is then followed by Fragment B and Fragment A. The selection of the wh-component involves sampling a bi-gram based on the likelihood of that particular bigram being connected with the named entity type of the answer. This likelihood is calculated from the named entity and questions bigram starters found in the SQuAD dataset. This information, while not leveraging the complete context-question-answer framework, can be considered as prior knowledge that does not disrupt the wholeness of our unsupervised methodology. It is also important to note that the choice of wh-component does not have a substantial impact on the results. Although we experimented with clause-based templates for this template-driven approach, we did not observe any significant differences in performance.",
+        "bbox": [
+            507,
+            171,
+            887,
+            624
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "3.5 Prompt-style Data Augmentation",
+        "text_level": 2,
+        "bbox": [
+            509,
+            637,
+            818,
+            652
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "We extend the recent progress in prompt tuning to create augmented data for MINPROMPT. Specifically, we have formulated a template to enable QA input, designated as $x ^ { o r i }$ . The template is constructed as follows:",
+        "bbox": [
+            507,
+            659,
+            887,
+            740
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/8909a13f88ea56b76c8a912f9f2c189d6d29df20f28d8921dcc669dec4b267b2.jpg",
+        "text": "$$\n\\begin{array} { c } { x _ { q } = Q u e s t i o n : \\mathbf { q } } \\\\ { x _ { a } = A n s w e r : < m a s k > } \\\\ { x _ { c } = C o n t e x t : \\mathbf { c } } \\\\ { x ^ { o r i } = [ x _ { q } \\oplus x _ { a } \\oplus x _ { c } ] } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            603,
+            757,
+            788,
+            834
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Here, we formulate the labels y as:",
+        "bbox": [
+            509,
+            848,
+            773,
+            866
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/4d69848cfc970519a45146155f3e8f2e54f94586af6ef6a6ee68dd09b7e270fe.jpg",
+        "text": "$$\n\\begin{array} { c } { { y _ { a } = A n s w e r : \\mathbf { a } , } } \\\\ { { y = \\left[ x _ { q } \\oplus y _ { a } \\oplus x _ { c } \\right] , } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            616,
+            883,
+            774,
+            920
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_number",
+        "text": "258",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "image",
+        "img_path": "images/1514b60924d85a157743e7d1524d4aadd2ed0b9f2408f9b622cd163391102db9.jpg",
+        "image_caption": [
+            "Figure 3: Examples of generated questions. When MINPROMPT runs into an entity in the raw text during the question generation phase, it turns the factual sentence into a QA pair of (question, entity), with the question type depending on the entity type."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            131,
+            86,
+            468,
+            336
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "where ${ \\bf q } , { \\bf a } ,$ and c represent the query text, response text, and background context respectively, and symbolizes string concatenation.",
+        "bbox": [
+            112,
+            444,
+            487,
+            492
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "In the augmented QA data samples, we apply the masking to the chosen entity in $x _ { c }$ to construct the context text for the augmented data $x _ { c } ^ { a u g }$ , along with the mask token in $x _ { a }$ . The specifics of an augmented data sample $( x ^ { a u g } , y ^ { a u g } )$ are depicted in Figure 3. Let the set of all training samples from original QA datasets and augmented QA pairs be denoted by $( X ^ { o r i } , Y ^ { o r i } )$ and $( X ^ { a u g } , Y ^ { a u g } )$ respectively. Thus, our entire training set $( X ^ { t r a i n } , Y ^ { t r a i n } )$ comprises of both $( X ^ { o r i } , Y ^ { o r i } )$ and $( X ^ { a u g } , Y ^ { a u g } )$",
+        "bbox": [
+            112,
+            492,
+            489,
+            653
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "3.6 Training",
+        "text_level": 2,
+        "bbox": [
+            114,
+            664,
+            231,
+            680
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "One of the key benefits of harmonizing the augmented and original data lies in the ability of the model to effectively process both data types without any significant loss. Concisely, MINPROMPT derives a prediction utilizing an encoder-decoder model as",
+        "bbox": [
+            112,
+            686,
+            489,
+            782
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "img_path": "images/08a93545b5a70601cb1339355c5c11ca759122ea86b54dcb8673ceaa34fe0b15.jpg",
+        "text": "$$\ny ^ { p r e d } = d e c o d e r _ { \\theta _ { D } } ( e n c o d e r _ { \\theta _ { E } } ( x ) ) ,\\tag{1}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            171,
+            794,
+            428,
+            813
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "where $\\theta _ { E }$ and $\\theta _ { D }$ represent learnable parameters, and $x \\in X ^ { t r a i n }$ can be either an original or an augmented training sample.",
+        "bbox": [
+            112,
+            826,
+            489,
+            873
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "The training objective of our system aims to maximize the log-likelihood of the text in the reference answer, denoted by $y \\in Y ^ { t r a i n }$ . The loss functions",
+        "bbox": [
+            112,
+            875,
+            489,
+            922
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "concerning the original samples and the augmented samples are expressed in the following equations:",
+        "bbox": [
+            509,
+            84,
+            884,
+            117
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "img_path": "images/eec20e142c50c9711cd7dc12e311caeda8161a9b64c473cd4bdb04b79d9010eb.jpg",
+        "text": "$$\n\\begin{array} { c } { { { \\displaystyle L ^ { o r i } ( \\theta ) = \\sum _ { ( x , y ) \\in ( X ^ { o r i } , Y ^ { o r i } ) } \\log \\left( \\prod _ { i = 1 } ^ { n } P \\left( y _ { i } \\mid y _ { < i } , x ; \\theta \\right) \\right) } } } \\\\ { { { \\displaystyle L ^ { a u g } ( \\theta ) = \\sum _ { ( x , y ) \\in ( X ^ { a u g } , Y ^ { a u g } ) } \\log \\left( \\prod _ { i = 1 } ^ { n } P \\left( y _ { i } \\mid y _ { < i } , x ; \\theta \\right) \\right) } } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            510,
+            126,
+            895,
+            218
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "where $\\theta = \\{ \\theta _ { D } , \\theta _ { E } \\}$ . The overall loss function is the weighted average of two losses:",
+        "bbox": [
+            507,
+            229,
+            884,
+            262
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "img_path": "images/0c56ebbd893e858187553bbda22e7a1473f6a2df08ca9f4bd79f2d3bc1d9873a.jpg",
+        "text": "$$\nL ( \\theta ) = L ^ { o r i } ( \\theta ) + \\lambda L ^ { a u g } ( \\theta ) .\\tag{2}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            589,
+            273,
+            803,
+            291
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "We consider $\\lambda > 0$ to be a hyperparameter that establishes a balance between the few-shot QA training samples and the augmented QA samples.",
+        "bbox": [
+            507,
+            303,
+            884,
+            351
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4 Experiments",
+        "text_level": 2,
+        "bbox": [
+            509,
+            361,
+            657,
+            378
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.1 Experimental Setup",
+        "text_level": 2,
+        "bbox": [
+            509,
+            386,
+            714,
+            403
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Datasets. Following Splinter (Ram et al., 2021) and FewshotQA (Chada and Natarajan, 2021), we sample subsets from the MRQA 2019 shared task (Fisch et al., 2019) for our few-shot experiments. Taking a closer look, there are in total eight widely used benchmark QA datasets in MRQA: SQuAD (Rajpurkar et al., 2016), NewsQA (Trischler et al., 2017), TriviaQA (Joshi et al., 2017), SearchQA (Dunn et al., 2017), HotpotQA (Yang et al., 2018), Natural Questions (Kwiatkowski et al., 2019), BioASQ (Tsatsaronis et al., 2015), and TextbookQA (Kembhavi et al., 2017). Following Splinter (Ram et al., 2021), smaller training datasets are sampled in a logarithmic manner from the original full datasets, resulting in few-shot datasets with 16, 32, 64, and 128 training examples.",
+        "bbox": [
+            507,
+            407,
+            887,
+            682
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Comparative Baselines. We evaluate the performance of MINPROMPT against four competitive few-shot QA methods, including RoBERTa (Liu et al., 2019), SpanBERT (Joshi et al., 2020), Splinter (Ram et al., 2021), FewshotQA (Chada and Natarajan, 2021), and PMR (Xu et al., 2023). Details of these baselines, raw text data source, and evaluation metric are in Appendix A, B and C, correspondingly.",
+        "bbox": [
+            507,
+            682,
+            887,
+            827
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.2 Implementation Details",
+        "text_level": 2,
+        "bbox": [
+            509,
+            837,
+            742,
+            853
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "For all the models, we use the same hyperparameters during training for a fair comparison. Specifically, the models are optimized by Adam (Kingma and Ba, 2014) with bias corrections. The learning rate is $2 \\times 1 0 ^ { - 5 }$ without learning rate scheduling. The training batch size is set to 2. The maximum sequence length of sequence generation is 100 for FewshotQA and MINPROMPT. We train all the models compared for 25 epochs. The reported results are given by the best-performing checkpoint in the development sets. For MINPROMPT, we perform a grid search for the loss weight λ in the space 0.01, 0.05, 0.1, 0.5, 1.0, 10.0 . All experiments are run on NVIDIA Tesla A100-SXM4 Tensor Core GPUs with 40GB memory.",
+        "bbox": [
+            507,
+            858,
+            887,
+            922
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "259",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "table",
+        "img_path": "images/42d39b7428f3050b9d27efe66b549712295b9a7b77c5c1580654b877eec78a50.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td># examples</td><td>SQuAD</td><td>TriviaQA</td><td>NQ</td><td>NewsQA</td><td>SearchQA</td><td>HotpotQA</td><td>BioASQ</td><td>TextbookQA</td></tr><tr><td># nodes</td><td>104,160</td><td>123,183</td><td>418,049</td><td>356,408</td><td>25,413</td><td>417,895</td><td>60,080</td><td>30,723</td></tr><tr><td># edges</td><td>20,310,486</td><td>36,716,957</td><td>408,935,741</td><td>339,619,544</td><td>13,425,062</td><td>766,206,565</td><td>6,821,645</td><td>3,150,557</td></tr><tr><td># dominating set</td><td>8,260</td><td>11,099</td><td>30,452</td><td>24,015</td><td>1,518</td><td>34,830</td><td>4,480</td><td>1,116</td></tr><tr><td># training samples</td><td>17,409</td><td>24,091</td><td>48,213</td><td>32,391</td><td>4,509</td><td>116,385</td><td>6,884</td><td>1,505</td></tr></table>",
+        "bbox": [
+            119,
+            82,
+            880,
+            153
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/1ee20580210dc2feb76a53c8d99b9ae87c8d0fe113ee6a6442237811488c577d.jpg",
+        "table_caption": [
+            "Table 1: Number of augmented training examples per dataset. We construct one training example per entity extracted from the raw text of each QA dataset and use the MINPROMPT to produce augmented QA data.",
+            "Table 2: Overall performance in F1 scores across all datasets when the numbers of training examples are 16, 32, 64, and 128. NQ stands for Natural Questions. RoBERTa, SpanBERT, Splinter and Splinter w/ MINPROMPT have 110M parameters. PMR, FewshotQA and FewshotQA w/ MINPROMPT have parameters of size 406M. Comparisons with more baselines are in Section 4.6 and Appendix D."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Model</td><td>SQuAD</td><td>TriviaQA</td><td>NQ</td><td>NewsQA</td><td>SearchQA</td><td>HotpotQA</td><td>BioASQ</td><td>TextbookQA</td><td>Average</td></tr><tr><td colspan=\"10\">16 Examples</td></tr><tr><td>RoBERTa</td><td>7.7±4.3</td><td>7.5±4.4</td><td>17.3±3.3</td><td>1.4±0.8</td><td>6.9±2.7</td><td>10.5±2.5</td><td>16.7±7.1</td><td>3.3±2.1</td><td>9.0±3.4</td></tr><tr><td>SpanBERT</td><td>18.2±6.7</td><td>11.6±2.1</td><td>19.6±3.0 43.6±1.7</td><td>7.6±4.1 30.1±3.7</td><td>13.3±6.0 58.2±5.0</td><td>12.5±5.5 46.1±4.7</td><td>15.9±4.4 54.2±3.4</td><td>7.5±2.9 31.0±1.8</td><td>13.3±4.3 47.5±3.4</td></tr><tr><td>PMR</td><td>60.3±4.0</td><td>56.2±3.1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>Splinter Splinter w/ MINPROMPT</td><td>54.6±6.4 58.9±3.6</td><td>18.9±4.1 35.7±1.9</td><td>27.4±4.6 37.6±2.8</td><td>20.8±2.7 31.9±1.8</td><td>26.3±3.9 35.2±1.6</td><td>24.0±5.0 34.0±6.3</td><td>28.2±4.9 38.7±3.6</td><td>19.4±4.6 37.0±5.1</td><td>27.4±4.5 36.1±3.3</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>FewshotQA</td><td>72.5±3.7</td><td>47.1±7.6</td><td>57.3±3.2</td><td>44.9±4.5</td><td>54.3±5.9</td><td>59.7±2.2</td><td>62.7±4.4</td><td>33.1±3.2</td><td>53.9±4.3</td></tr><tr><td>FewshotQA w/ MINPROMPT</td><td>73.6±3.3</td><td>50.9±4.6</td><td>58.5±1.9</td><td>46.5±1.8</td><td>55.4±2.7</td><td>57.1±2.9</td><td>57.2±2.3</td><td>42.2±4.1</td><td>55.2±2.9</td></tr><tr><td colspan=\"10\">32 Examples</td></tr><tr><td>RoBERTa</td><td>18.2±5.1</td><td>10.5±1.8</td><td>22.9±0.7</td><td>3.2±1.7</td><td>13.5±1.8</td><td>10.4±1.9</td><td>23.3±6.6</td><td>4.3±0.9</td><td>13.3±2.6</td></tr><tr><td>SpanBERT</td><td>25.8±7.7</td><td>15.1±6.4</td><td>25.1±1.6</td><td>7.2±4.6</td><td>14.6±8.5</td><td>13.2±3.5</td><td>25.1±3.3</td><td>7.6±2.3</td><td>16.7±4.7</td></tr><tr><td>PMR</td><td>70.0±3.2</td><td>66.3±2.5</td><td>48.5±3.5</td><td>36.6±2.1</td><td>64.8±2.2</td><td>52.9±2.5</td><td>62.9±2.4</td><td>36.4±3.2</td><td>54.8±2.7</td></tr><tr><td>Splinter</td><td>59.2±2.1</td><td>28.9±3.1</td><td>33.6±2.4</td><td>27.5±3.2</td><td>34.8±1.8</td><td>34.7±3.9</td><td>36.5±3.2</td><td>27.6±4.3</td><td>35.3±3.0</td></tr><tr><td>Splinter w/ MINPROMPT</td><td>64.6±1.5</td><td>35.6±2.1</td><td>42.8±1.3</td><td>33.0±1.2</td><td>39.2±3.4</td><td>41.4±3.1</td><td>49.2±3.2</td><td>38.2±2.5</td><td>43.0±2.3</td></tr><tr><td>FewshotQA</td><td>73.8±2.2</td><td>56.7±5.9</td><td>60.6±2.4</td><td>50.0±2.8</td><td>61.4±3.6</td><td>61.6±1.5</td><td>66.9±4.7</td><td>41.7±4.2</td><td>59.1±3.4</td></tr><tr><td>FewshotQA w/ MINPROMPT</td><td>78.0±1.1</td><td>53.5±4.0</td><td>59.3±1.0</td><td>51.8±1.8</td><td>60.3±2.6</td><td>61.6±3.1</td><td>63.6±2.9</td><td>46.5±2.0</td><td>59.3±2.3</td></tr><tr><td colspan=\"10\">64 Examples</td></tr><tr><td>RoBERTa SpanBERT</td><td>28.4±1.7</td><td>12.5±1.4</td><td>24.2±1.0</td><td>4.6±2.8</td><td>19.8±2.4</td><td>15.0±3.9</td><td>34.0±1.8</td><td>5.4±1.1</td><td>18.0±2.0</td></tr><tr><td>PMR</td><td>45.8±3.3 71.2±2.8</td><td>15.9±6.4 67.1±1.8</td><td>29.7±1.5 51.2±3.1</td><td>12.5±4.3 43.2±1.8</td><td>18.0±4.6</td><td>23.3±1.1</td><td>35.3±3.1 68.2±1.6</td><td>13.0±6.9 41.8±2.3</td><td>24.2±3.9</td></tr><tr><td>Splinter</td><td>65.2±1.4</td><td>35.5±3.7</td><td>38.2±2.3</td><td></td><td>66.2±1.8</td><td>56.3±2.0</td><td></td><td></td><td>58.1±2.2</td></tr><tr><td>Splinter w/ MINPROMPT</td><td>68.6±1.8</td><td>35.4±2.9</td><td>45.9±1.3</td><td>37.4±1.2 36.1±1.7</td><td>39.8±3.6 44.3±3.1</td><td>45.4±2.3 48.6±2.3</td><td>49.5±3.6 59.4±2.4</td><td>35.9±3.1 42.6±1.6</td><td>43.4±2.7 47.6±2.1</td></tr><tr><td>FewshotQA</td><td>77.9±2.1</td><td>57.9±4.4</td><td>60.9±2.5</td><td>53.7±1.1</td><td>65.4±2.4</td><td>63.1±2.2</td><td>73.2±3.1</td><td>44.8±1.8</td><td>62.1±2.5</td></tr><tr><td>FewshotQA w/ MINPROMPT</td><td>79.2±1.0</td><td>55.3±3.2</td><td>59.7±1.3</td><td>54.2±1.0</td><td>67.1±1.0</td><td>61.1±3.0</td><td>72.4±2.5</td><td>48.7±2.4</td><td>62.5±1.9</td></tr><tr><td>128 Examples</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td colspan=\"10\"></td></tr><tr><td>RoBERTa</td><td>43.0±7.1</td><td>19.1±2.9</td><td>30.1±1.9</td><td>16.7±3.8</td><td>27.8±2.5</td><td>27.3±3.9</td><td>46.1±1.4</td><td>8.2±1.1</td><td></td></tr><tr><td>SpanBERT</td><td>55.8±3.7</td><td>26.3±2.1</td><td>36.0±1.9</td><td>29.5±7.3</td><td>26.3±4.3</td><td>36.6±3.4</td><td>52.2±3.2</td><td>20.9±5.1</td><td>27.3±3.1</td></tr><tr><td>PMR</td><td>79.8±1.8</td><td>68.6±1.4</td><td>57.4±2.6</td><td>52.3±1.4</td><td>68.5±1.8</td><td>65.9±1.0</td><td>76.8±2.1</td><td>45.1±1.2</td><td>35.4±3.9</td></tr><tr><td>Splinter</td><td>72.7±1.0</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>64.3±1.7</td></tr><tr><td>Splinter w/ MINPROMPT</td><td>70.2±2.8</td><td>44.7±3.9</td><td>46.3±0.8 51.2±1.3</td><td>43.5±1.3</td><td>47.2±3.5</td><td>54.7±1.4</td><td>63.2±4.1</td><td>42.6±2.5</td><td>51.9±2.3</td></tr><tr><td></td><td></td><td>45.4±1.3</td><td></td><td>40.2±1.6</td><td>48.5±2.1</td><td>54.5±2.2</td><td>67.8±1.6</td><td>44.2±2.1</td><td>52.8±1.9</td></tr><tr><td>FewshotQA</td><td>78.8±2.7</td><td>55.2±1.8</td><td>63.3±1.6</td><td>56.8±1.1</td><td>67.0±1.8</td><td>64.9±1.8</td><td>77.2±1.5</td><td>46.2±5.9</td><td>63.7±2.3</td></tr><tr><td>FewshotQA w/ MINPROMPT</td><td>80.5±1.4</td><td>52.9±3.9</td><td>64.2±1.4</td><td>56.9±1.0</td><td>68.1±1.9</td><td>61.7±1.4</td><td>77.8±1.2</td><td>52.5±3.7</td><td>64.3±2.0</td></tr></table>",
+        "bbox": [
+            117,
+            206,
+            882,
+            645
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            740,
+            490,
+            919
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4.3 Performance Comparison",
+        "text_level": 2,
+        "bbox": [
+            509,
+            740,
+            759,
+            756
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Table 2 presents the few-shot QA performance comparison of various models across all benchmarks when provided with 16, 32, 64, and 128 training examples. BART-large serves as the backbone pretrained language model (PLM) for FewshotQA.",
+        "bbox": [
+            507,
+            771,
+            887,
+            853
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "The experiment was repeated five times, each with a different random seed, and we report the average and standard deviation of the results for each method. As a general observation, PMR, Splinter and FewshotQA with MINPROMPT excel over other compared methods by a respectable margin in most cases. On average, models with MINPROMPT yield better results with consistently lower variances (the rightmost column). The only exception is the 128 examples, where MINPROMPT and PMR ended in a draw. Note that FewshotQA with MINPROMPT performs better in fewer-shot cases because BART is pretrained on general domain plain texts, so MINPROMPT can apply its broad knowledge and rapidly adapt to the specifics of the QA task with just a few examples. PMR gradually catches up with more few-shot examples because its specialized training allows it to learn more efficiently from and utilize the additional examples, scaling its performance in a way that is directly relevant to the task. There are several cases in which performance degrades when using MINPROMPT. This is probably because the augmented data samples outweigh the original fine-tuning data samples for these datasets, directing the pretrained model towards the distribution of the augmented data which is slightly shifted from the distributions of the finetuning and test data after all. More notably, MIN-PROMPT exhibits less variance in results compared to FewshotQA in most cases, particularly when there are fewer training examples available.",
+        "bbox": [
+            507,
+            858,
+            887,
+            922
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "260",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            490,
+            520
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/d294c30eda199f864c315e9f5d75f973153d3d8456437d2092c16d1a8ce30921.jpg",
+        "table_caption": [
+            "Table 3: Ablation study. Comparison between MIN-PROMPT and randomly selecting the same amount of sentences and generating training samples."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Model</td><td>SQuAD</td><td>TextbookQA</td></tr><tr><td>16 Examples</td><td></td><td></td></tr><tr><td>FewshotQA w/ MINPROMPT-random</td><td>72.0±3.5</td><td>39.2±4.8</td></tr><tr><td>FewshotQA w/ MINPROMPT</td><td>73.6±3.3</td><td>42.2±4.1</td></tr><tr><td>32 Examples</td><td></td><td></td></tr><tr><td>FewshotQA w/ MINPROMPT-random FewshotQA w/ MINPROMPT</td><td>75.9±1.8</td><td>43.3±2.2 46.5±2.0</td></tr><tr><td></td><td>78.0±1.1</td><td></td></tr><tr><td>64 Examples</td><td></td><td></td></tr><tr><td>FewshotQA w/ MINPROMPT-random</td><td>78.6±1.3</td><td>46.2±2.2</td></tr><tr><td>FewshotQA w/ MINPROMPT</td><td>79.2±1.0</td><td>48.7±2.4</td></tr><tr><td>128 Examples</td><td></td><td></td></tr><tr><td>FewshotQA w/ MINPROMPT-random</td><td>79.9±1.4</td><td>49.5±3.5</td></tr><tr><td>FewshotQA w/ MINPROMPT</td><td>80.5±1.4</td><td>52.5±3.7</td></tr></table>",
+        "bbox": [
+            127,
+            529,
+            475,
+            692
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "In digging deeper into specific models, both Splinter and FewshotQA enhanced by MIN-PROMPT consistently outperform their original model in terms of higher F1 scores with generally lower variances. On SQuAD, NQ, BioASQ, and TextbookQA, the performance improvements over the top baseline are relatively more substantial. Our hypothesis is that the factual statements are more concentrated in a small number of sentences, thus MINPROMPT can more effectively extract the most informative data for fine-tuning. Consequently, the influence from the is adequate to impact the primary QA task. We also observe that with the decrease in the number of few-shot QA training examples, MINPROMPT demonstrate more improvement. This is also expected since MINPROMPT essentially introduces external prior knowledge that is not present in the few-shot training examples. When the models see more actual training examples that are with the same distribution as the test set, the external knowledge helps less and even becomes noise in the extreme case. Finally, we also observe a greater improvement brought about by MINPROMPT to Splinter than to FewshotQA. This is because Splinter has a smaller model size; therefore, it naturally acquires less knowledge during the pre-train stage. Adding external knowledge to it in the form of QA benefits even more than bigger models, such as FewshotQA.",
+        "bbox": [
+            112,
+            760,
+            489,
+            922
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            887,
+            392
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "4.4 Effect of Deriving the Dominating Set",
+        "text_level": 2,
+        "bbox": [
+            509,
+            401,
+            853,
+            418
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "To validate the necessity of deriving the dominating set of the sentence graph to keep the most informative factual sentences in the raw text, we further conduct an ablation study. We construct a variant of MINPROMPT called MINPROMPT-random where we randomly sample the same number of sentences as shown in Table 1 for each dataset, and then generate training samples out of these randomly sampled factual sentences. We run MINPROMPT-random and report the results on SQuAD and TextbookQA in Table 3. When comparing the two models, we can observe that MINPROMPT consistently perform better than MINPROMPT-random. We also observe this pattern on all the other datasets. This observation empirically validates that the dominating set derivation process indeed provides factual sentences that preserve as much information as possible about the crucial entities in the raw text.",
+        "bbox": [
+            507,
+            423,
+            887,
+            714
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "4.5 Case Study",
+        "text_level": 2,
+        "bbox": [
+            509,
+            724,
+            647,
+            740
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Further exploration of two specific test cases from the TextbookQA test set provides insightful results, as depicted in Figure 4. In the left case, both FewshotQA and Splinter without MINPROMPT yield the incorrect response, 23. Despite its semantic relevance to the accurate answer, haploid number, the response goes overly detailed, since the value 23 is specific only to human beings. This case underlines the advantage of MINPROMPT’s full model, equipped with a sentence construction module anchored by entities, in deriving detailed answer text at the entity level, over FewshotQA and Splinter. In the right case, both FewshotQA and Splinter with MINPROMPT successfully identify the correct answer, whereas Splinter supplies an incorrect answer, HIV, not even present in the context. Meanwhile, FewshotQA and PMR produced another treatment instead of what the question asks (a disorder), indicating that the question generation module of MINPROMPT improved the models ability to deal with various kinds of questions. This comparison effectively highlights the utility of the sentence graph in forging higher-order entity interconnections within the same context. Although the baselines provide a contextually relevant response, they do not adequately address the question. The two cases substantiate the indispensable role of the sentence graph construction module and the question generation module in MINPROMPT, fortifying its capacity to delve into complex question and context semantics.",
+        "bbox": [
+            507,
+            745,
+            887,
+            923
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "261",
+        "bbox": [
+            485,
+            928,
+            515,
+            942
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/bf8b706f2df3809490dc44e74a1457edfe995e4629461af5842d5a644907387b.jpg",
+        "table_caption": [
+            "Figure 4: Case study. In both cases, MINPROMPT successfully generates the correct answer, whereas baselines without entity masking can not accurately recover the entity-level details."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=2>Context: “...In species with sexual reproduction, each cellof the body has two copies of each chromosome. Forexample, human beings have 23 different chromosomes.Each body cell contains two of each chromosome, for atotal of 46 chromosomes. The number of different types ofchromosomes is called thehaploid number. In humans, thehaploid number is 23.The number of chromosomes innormal body cells is called the diploid number. The diploidnumber is twice the haploid number. The two members ofa given pair of chromosomes are called homologouschromosomes ...&quot;Question: What is the number of chromosomes in agamete called?</td><td rowspan=1 colspan=2>Context: “...For example,cystic fibrosisgene therapy istargeted at the respiratory system, so a solution with thevector can be sprayed into the patients nose. Recently, invivo gene therapy was also used to partially restore thevision of three young adults with a rare type of eye disease.In ex vivo gene therapy, done outside the body, cells areremoved from the patient and the proper gene is insertedusing a virus as a vector. The modified cells are placedback into the patient. One of the first uses of this type ofgene therapy was in the treatment of a young girl with arare genetic disease,adenosine deaminase deficiency, orADA deficiency.Question: Which disorder has been treated by ex vivogene therapy?</td></tr><tr><td rowspan=1 colspan=1>Answers</td><td rowspan=1 colspan=1>FewshotQA, Splinter:.:23PMR:haploid numberSplinter w/ MinPrompt:haploid numberFewshotQA w/ MinPrompt: haploid numberGround truth: haploid number</td><td rowspan=1 colspan=1>Answers</td><td rowspan=1 colspan=1>Splinter:HIVFewshotQA, PMR:cystic fibrosisSplinter w/ MinPrompt:ADA deficiencyFewshotQA w/ MinPrompt:ADA deficiencyGround truth: ada deficiency / adenosinedeaminase deficiency</td></tr></table>",
+        "bbox": [
+            154,
+            83,
+            842,
+            307
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "table",
+        "img_path": "images/6cec8f19ffa2a86c96c5c18b8ff92521ba0f8112dc32e29dca6a7c24da874657.jpg",
+        "table_caption": [
+            "Table 4: Performance of MinPrompt with 128 examples against the unsupervised domain adation method."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Model</td><td>NQ</td><td>NewsQA</td><td>BioASQ</td><td>TextbookQA</td></tr><tr><td>Qasar</td><td>59.76</td><td>56.63</td><td>63.70</td><td>47.02</td></tr><tr><td>Splinter w/ MinPrompt</td><td>51.17</td><td>40.22</td><td>67.80</td><td>44.24</td></tr><tr><td>FewshotQA w/ MinPrompt</td><td>64.17</td><td>56.84</td><td>77.84</td><td>52.53</td></tr></table>",
+        "bbox": [
+            117,
+            369,
+            485,
+            413
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            481,
+            490,
+            803
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "4.6 Comparisons against Unsupervised Domain Adaption",
+        "text_level": 2,
+        "bbox": [
+            112,
+            818,
+            438,
+            851
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "In addition to the few-shot approach, some studies apply unsupervised domain adpation to tackle the limitation of training data (Assem et al., 2021). As an additional study, we compare with Qasar (Assem et al., 2021) Qasar, we focus on four overlapping datasets (i.e., NQ, NewsQA, BioASQ, and TextbookQA) between their paper and our studies as shown in Table 4. We can observe that FewshotQA w/ MinPrompt outperforms Qasar across four datasets from 0.4% to 22.2%. We also would like to emphasize that Qasar uses fine-tuning training samples ranging from 142 to 4,185 while Min-Prompt using only 16 to 128 fine-tuning examples surpasses Qasar with certain disadvantages in the limited amount of fine-tuning data.",
+        "bbox": [
+            112,
+            858,
+            489,
+            922
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            374,
+            887,
+            552
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "5 Conclusion",
+        "text_level": 2,
+        "bbox": [
+            509,
+            569,
+            643,
+            586
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "In this paper, we present MINPROMPT, a robust data augmentation framework that leverages a graph-based algorithm and unsupervised question generation to extract minimally meaningful QA training samples from raw text. Our contributions reside in the application of minimal data augmentation, enhancing computational efficiency and model performance while mitigating overfitting. Through extensive experiments, our model consistently outperformed competitive methods in public benchmarks, demonstrating its effectiveness.",
+        "bbox": [
+            507,
+            600,
+            887,
+            777
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Acknowledgements",
+        "text_level": 2,
+        "bbox": [
+            509,
+            795,
+            684,
+            812
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We thank anonymous reviewers for their valuable and insightful feedback. Research was supported in part by NIH U24DK097771, U54HG012517, NSF 1829071, 2106859, 2119643, 2200274, 2202693, and 2312501, DARPA HR00112490370, and Optum Lab.",
+        "bbox": [
+            507,
+            826,
+            887,
+            921
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "262",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Limitations",
+        "text_level": 2,
+        "bbox": [
+            114,
+            84,
+            220,
+            99
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "While MINPROMPT is capable of achieving comparative or better performance over existing studies, it still has some limitations as follows: First, MINPROMPT integrates the trained NER model as part of the pipeline, so the performance of the SpaCy NER model greatly affects the overall performance of MINPROMPT. Second, MINPROMPT uses all shared entities to construct the sentence graph. However, some entities might be more crucial than others for the downstream QA task. As a result, treating the entities differently might lead to a different result. Lastly, the template utilized for prompt-tuning in this study still relies on manual design. Our approach is influenced by previous research that has been shown to be effective. Nevertheless, it would be intriguing to explore the development of automated methods for constructing superior prompt-tuning templates.",
+        "bbox": [
+            112,
+            110,
+            490,
+            401
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "Ethics Statement",
+        "text_level": 2,
+        "bbox": [
+            114,
+            412,
+            267,
+            428
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "This paper presents work that aims to advance the field of Natural Language Processing, specifically Large Language Models. There are potential societal consequences of our work associated with LLMs, such as AI safety and reliability. Beyond LLMs, we feel no other consequences must be highlighted here.",
+        "bbox": [
+            112,
+            438,
+            489,
+            551
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            114,
+            577,
+            213,
+            594
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Chris Alberti, Daniel Andor, Emily Pitler, Jacob Devlin, and Michael Collins. 2019. Synthetic qa corpora generation with roundtrip consistency. In ACL’19, pages 6168–6173.",
+            "Robert B Allan and Renu Laskar. 1978. On domination and independent domination numbers of a graph. Discrete mathematics, 23(2):73–76.",
+            "Haytham Assem, Rajdeep Sarkar, and Sourav Dutta. 2021. Qasar: self-supervised learning framework for extractive question answering. In 2021 IEEE International Conference on Big Data (Big Data), pages 1797–1808. IEEE.",
+            "Mikhail Burtsev, Alexander Seliverstov, Rafael Airapetyan, Mikhail Arkhipov, Dilyara Baymurzina, Nickolay Bushkov, Olga Gureenkova, Taras Khakhulin, Yurii Kuratov, Denis Kuznetsov, et al. 2018. Deeppavlov: Open-source library for dialogue systems. In ACL’18, System Demonstrations, pages 122–127.",
+            "Rakesh Chada and Pradeep Natarajan. 2021. Fewshotqa: A simple framework for few-shot learning of question",
+            "answering tasks using pre-trained text-to-text models. In EMNLP’21, pages 6081–6090.",
+            "Xiusi Chen, Hongzhi Wen, Sreyashi Nag, Chen Luo, Qingyu Yin, Ruirui Li, Zheng Li, and Wei Wang. 2024. Iteralign: Iterative constitutional alignment of large language models. arXiv preprint arXiv:2403.18341.",
+            "Xiusi Chen, Yu Zhang, Jinliang Deng, Jyun-Yu Jiang, and Wei Wang. 2023. Gotta: generative few-shot question answering by prompt-based cloze data augmentation. In Proceedings ofthe 2023 SIAM International Conference on Data Mining (SDM), pages 909–917. SIAM.",
+            "Yu Chen, Lingfei Wu, and Mohammed J Zaki. 2019. Reinforcement learning based graph-to-sequence model for natural question generation. arXiv preprint arXiv:1908.04942.",
+            "Xuan Long Do, Bowei Zou, Shafiq Joty, Anh Tai Tran, Liangming Pan, Nancy F Chen, and Ai Ti Aw. 2023. Modeling what-to-ask and how-to-ask for answerunaware conversational question generation. arXiv preprint arXiv:2305.03088.",
+            "Matthew Dunn, Levent Sagun, Mike Higgins, V Ugur Guney, Volkan Cirik, and Kyunghyun Cho. 2017. Searchqa: A new q&a dataset augmented with context from a search engine. arXiv preprint arXiv:1704.05179.",
+            "Andre Esteva, Anuprit Kale, Romain Paulus, Kazuma Hashimoto, Wenpeng Yin, Dragomir Radev, and Richard Socher. 2021. Covid-19 information retrieval with deep-learning based semantic search, question answering, and abstractive summarization. NPJ digital medicine, 4(1):1–9.",
+            "Adam Fisch, Alon Talmor, Robin Jia, Minjoon Seo, Eunsol Choi, and Danqi Chen. 2019. Mrqa 2019 shared task: Evaluating generalization in reading comprehension. In Proceedings ofthe 2nd Workshop on Machine Readingfor Question Answering, pages 1–13.",
+            "Stephen T Hedetniemi and Renu C Laskar. 1991. Bibliography on domination in graphs and some basic definitions of domination parameters. In Annals of discrete mathematics, volume 48, pages 257–277. Elsevier.",
+            "Mandar Joshi, Danqi Chen, Yinhan Liu, Daniel S Weld, Luke Zettlemoyer, and Omer Levy. 2020. Spanbert: Improving pre-training by representing and predicting spans. TACL, 8:64–77.",
+            "Mandar Joshi, Eunsol Choi, Daniel S Weld, and Luke Zettlemoyer. 2017. Triviaqa: A large scale distantly supervised challenge dataset for reading comprehension. In ACL’17, pages 1601–1611.",
+            "Aniruddha Kembhavi, Minjoon Seo, Dustin Schwenk, Jonghyun Choi, Ali Farhadi, and Hannaneh Hajishirzi. 2017. Are you smarter than a sixth grader?"
+        ],
+        "bbox": [
+            115,
+            601,
+            487,
+            655
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "263",
+        "bbox": [
+            485,
+            929,
+            515,
+            942
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "textbook question answering for multimodal machine comprehension. In CVPR’17, pages 4999–5007.",
+            "Diederik P Kingma and Jimmy Ba. 2014. Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980.",
+            "Tom Kwiatkowski, Jennimaria Palomaki, Olivia Red field, Michael Collins, Ankur Parikh, Chris Alberti, Danielle Epstein, Illia Polosukhin, Jacob Devlin, Kenton Lee, et al. 2019. Natural questions: A benchmark for question answering research. TACL, 7:453–466.",
+            "Zhenzhong Lan, Mingda Chen, Sebastian Goodman, Kevin Gimpel, Piyush Sharma, and Radu Soricut. 2020. Albert: A lite bert for self-supervised learning of language representations. In ICLR’20.",
+            "Mike Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed, Omer Levy, Veselin Stoyanov, and Luke Zettlemoyer. 2020. Bart: Denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension. In ACL’20, pages 7871–7880.",
+            "Patrick Lewis, Ludovic Denoyer, and Sebastian Riedel. 2019a. Unsupervised question answering by cloze translation. In ACL’19, pages 4896–4910.",
+            "Patrick Lewis, Ludovic Denoyer, and Sebastian Riedel. 2019b. Unsupervised question answering by cloze translation. In Proceedings of the 57th Annual Meeting ofthe Associationfor Computational Linguistics, pages 4896–4910, Florence, Italy. Association for Computational Linguistics.",
+            "Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692.",
+            "Xiyao Ma, Qile Zhu, Yanlin Zhou, and Xiaolin Li. 2020. Improving question generation with sentence-level semantic matching and answer position inferring. In Proceedings ofthe AAAI conference on artificial intelligence, volume 34, pages 8464–8471.",
+            "Alireza Mohammadshahi, Thomas Scialom, Majid Yazdani, Pouya Yanki, Angela Fan, James Henderson, and Marzieh Saeidi. 2022. Rquge: Reference-free metric for evaluating question generation by answering the question. arXiv preprint arXiv:2211.01482.",
+            "R OpenAI. 2023. Gpt-4 technical report. arXiv, pages 2303–08774.",
+            "Liangming Pan, Wenhu Chen, Wenhan Xiong, Min-Yen Kan, and William Yang Wang. 2021. Unsupervised multi-hop question answering by question generation. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 5866–5880.",
+            "Raul Puri, Ryan Spring, Mohammad Shoeybi, Mostofa Patwary, and Bryan Catanzaro. 2020. Training question answering models from synthetic data. In EMNLP’20, pages 5811–5826.",
+            "Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, Peter J Liu, et al. 2020. Exploring the limits of transfer learning with a unified text-to-text transformer. JMLR, 21(140):1–67.",
+            "Pranav Rajpurkar, Jian Zhang, Konstantin Lopyrev, and Percy Liang. 2016. Squad: 100,000+ questions for machine comprehension of text. In EMNLP’16, pages 2383–2392.",
+            "Ori Ram, Yuval Kirstain, Jonathan Berant, Amir Globerson, and Omer Levy. 2021. Few-shot question answering by pretraining span selection. In ACL’21, pages 3066–3079.",
+            "Yijun Tian, Yikun Han, Xiusi Chen, Wei Wang, and Nitesh V Chawla. 2024a. Tinyllm: Learning a small student from multiple large language models. arXiv preprint arXiv:2402.04616.",
+            "Yijun Tian, Huan Song, Zichen Wang, Haozhu Wang, Ziqing Hu, Fang Wang, Nitesh V Chawla, and Panpan Xu. 2024b. Graph neural prompting with large language models. In Proceedings ofthe AAAI Conference on Artificial Intelligence, volume 38, pages 19080–19088.",
+            "Adam Trischler, Tong Wang, Xingdi Yuan, Justin Harris, Alessandro Sordoni, Philip Bachman, and Kaheer Suleman. 2017. Newsqa: A machine comprehension dataset. In Proceedings of the 2nd Workshop on Representation Learning for NLP, pages 191–200.",
+            "George Tsatsaronis, Georgios Balikas, Prodromos Malakasiotis, Ioannis Partalas, Matthias Zschunke, Michael R Alvers, Dirk Weissenborn, Anastasia Krithara, Sergios Petridis, Dimitris Polychronopoulos, et al. 2015. An overview of the bioasq large-scale biomedical semantic indexing and question answering competition. BMC bioinformatics, 16(1):1–28.",
+            "Weiwen Xu, Xin Li, Wenxuan Zhang, Meng Zhou, Wai Lam, Luo Si, and Lidong Bing. 2023. From cloze to comprehension: Retrofitting pre-trained masked language models to pre-trained machine reader. In Thirty-seventh Conference on Neural Information Processing Systems.",
+            "Wei Yang, Yuqing Xie, Aileen Lin, Xingyu Li, Luchen Tan, Kun Xiong, Ming Li, and Jimmy Lin. 2019. End-to-end open-domain question answering with bertserini. In ACL’19, System Demonstrations, pages 72–77.",
+            "Zhilin Yang, Peng Qi, Saizheng Zhang, Yoshua Bengio, William Cohen, Ruslan Salakhutdinov, and Christopher D Manning. 2018. Hotpotqa: A dataset for diverse, explainable multi-hop question answering. In EMNLP’18, pages 2369–2380."
+        ],
+        "bbox": [
+            131,
+            85,
+            487,
+            114
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "264",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "A Baseline Details",
+        "text_level": 2,
+        "bbox": [
+            114,
+            84,
+            292,
+            99
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "• RoBERTa (Liu et al., 2019) is a robustly optimized BERT-based PLM. It improves BERT by techniques such as training the model for a longer time, with larger batches and getting rid of the next sentence prediction task. It is known to demonstrate substantially better performance on a variety of natural language understanding tasks over BERT, including QA.",
+        "bbox": [
+            114,
+            110,
+            490,
+            241
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "• SpanBERT (Joshi et al., 2020) is another variant of BERT that emphasizes the encoding of spans instead of tokens. It is pretrained on two tasks: (1) masked language modeling, which is the same as BERT, and (2) span boundary prediction, which pulls the representations of the span boundary into a direction where the entire content of the masked span can be predicted correctly. SpanBERT achieves substantially better performance on span selection tasks in particular.",
+        "bbox": [
+            114,
+            250,
+            490,
+            413
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "• Splinter (Ram et al., 2021) is a pretraining framework dedicated to the extractive QA task based on SpanBERT. It is pretrained by the recurring span selection task, which masks all but one instance of each recurring span and asks the model to select the correct span for each masked position.",
+        "bbox": [
+            114,
+            424,
+            490,
+            538
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "• FewshotQA (Chada and Natarajan, 2021) is the first QA-dedicated fine-tuning framework that takes advantage of pre-trained encoderdecoder models such as BART (Lewis et al., 2020) and T5 (Raffel et al., 2020). In FewshotQA, the input is constructed as a concatenation of the question, a mask token as the placeholder for the answer span, and a context. Given this input, the model is fine-tuned using the same objective as its pretraining objective.",
+        "bbox": [
+            114,
+            549,
+            490,
+            712
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "• PMR (Xu et al., 2023) constructs generalpurpose machine reading comprehension training data by using Wikipedia hyperlinks and designed a Wiki Anchor Extraction task to guide the MRCstyle pretraining.",
+        "bbox": [
+            112,
+            721,
+            490,
+            804
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "B QA data acquisition",
+        "text_level": 2,
+        "bbox": [
+            114,
+            815,
+            327,
+            832
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "The first step in our framework is to retrieve the raw text corpus as the super set from which all our prompt dataset comes. For pretraining, text corpus from general domains such as Wikipedia is commonly used. On the contrary, since we focus on the fine-tuning stage, we use domain-specific text as a starting point. Following Splinter (Ram et al., 2021) and FewshotQA (Chada and Natarajan, 2021), we take MRQA (Fisch et al., 2019) as a benchmark to test the performance of all the comparative methods.",
+        "bbox": [
+            110,
+            841,
+            489,
+            923
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            885,
+            183
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "C Evaluation Metrics",
+        "text_level": 2,
+        "bbox": [
+            509,
+            192,
+            715,
+            209
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Following previous studies (Ram et al., 2021; Chada and Natarajan, 2021), we use the F1 score as our evaluation metric. Specifically, for each sample in the test set, the predicted span and the ground truth answer are treated as bags of words, and F1 scores are applied to compute the overlap between these two sets. If there are multiple ground-truth answers to a particular question, we take the maximum of the corresponding F1 scores.",
+        "bbox": [
+            507,
+            218,
+            885,
+            365
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "D Comparisons against MQA-QG",
+        "text_level": 2,
+        "bbox": [
+            507,
+            375,
+            823,
+            393
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Here we compare with the other few-shot data augmentation approach, MQA-QG (Pan et al., 2021). For a fair comparison, we first run the released implementation of MQA-QG, apply their approach on Splinter, and then compare it with our method. The results of 16-shot experiments are as shown in Table 5. We see consistent improvements derived by MinPrompt over MQA-QG, and a similar pattern is also observed in 32, 64, and 128-shot scenarios.",
+        "bbox": [
+            507,
+            401,
+            887,
+            548
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "E Additional Discussions",
+        "text_level": 2,
+        "bbox": [
+            509,
+            558,
+            746,
+            575
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Here we list some additional discussions on our approach.",
+        "bbox": [
+            507,
+            585,
+            885,
+            617
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "E.1 Generalization Ability to Different Answer Types",
+        "text_level": 2,
+        "bbox": [
+            507,
+            627,
+            831,
+            659
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "To different types of answers (e.g., why v.s. how and longanswers), we would like to mention that MinPrompt raises different types of questions based on the results of the entity typing. During this process, why / how questions would be raised once a conjunction (e.g., because) or an adverb (e.g., by) is recognized from the raw text. We agree that the why / how questions with longer answers might be less than some other types of questions like what / who / when ones in the augmented training samples, and it might cause generalization issues. An intuitive fix is to assign larger sample weights to the augmented samples with why / how questions or to repeat these samples multiple times to make different types of questions roughly be of the same number. However, the main focus of this paper is to demonstrate the idea that graph-based data selection can help the overall downstream performance, so we leave the detailed analysis for certain types of answers for future work.",
+        "bbox": [
+            507,
+            665,
+            887,
+            923
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "page_number",
+        "text": "265",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "table",
+        "img_path": "images/fd6b8507ff410c2a9a8b12bbd781be8532ec21f126d13f1bbefd2f5478a352b5.jpg",
+        "table_caption": [
+            "Table 5: Performance comparisons against MQA-QG."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Model</td><td>SQuAD</td><td>TriviaQA</td><td>NQ</td><td>NewsQA</td><td>SearchQA</td><td>HotpotQA</td><td>BioASQ</td><td>TextbookQA</td></tr><tr><td>MQA-QG</td><td>54.38</td><td>32.28</td><td>37.36</td><td>25.12</td><td>31.35</td><td>33.89</td><td>36.39</td><td>29.71</td></tr><tr><td>MinPrompt</td><td>58.91</td><td>35.67</td><td>37.64</td><td>31.88</td><td>35.17</td><td>34.03</td><td>38.68</td><td>36.98</td></tr></table>",
+        "bbox": [
+            132,
+            80,
+            863,
+            120
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            172,
+            490,
+            236
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "E.2 Potential Solution to Overfitting with Prompt-style Augmentation",
+        "text_level": 2,
+        "bbox": [
+            114,
+            246,
+            455,
+            279
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "It could introduce an ovefit with prompt-style agumentation to the distribution of different quesetion formats as we observed in the experiments, especially for the cases with only few shot training samples. The distribution of different types of questions in the augmented data might be skewed, for example, the what / who / when questions might be more than the why / how questions. In this way, the what / who / when questions in the test set might get more precise answers than the why / how questions. The intuitive fix is to put larger sample weights to the augmented samples with why / how questions or to repeat these samples multiple times to make different types of questions roughly be of the same number.",
+        "bbox": [
+            112,
+            284,
+            490,
+            525
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "page_number",
+        "text": "266",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 12
+    }
+]

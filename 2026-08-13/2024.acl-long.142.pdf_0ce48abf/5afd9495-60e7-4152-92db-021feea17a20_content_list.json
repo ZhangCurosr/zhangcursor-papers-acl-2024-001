@@ -1,0 +1,2465 @@
+[
+    {
+        "type": "text",
+        "text": "Long-Context Language Modeling with Parallel Context Encoding",
+        "text_level": 1,
+        "bbox": [
+            152,
+            89,
+            843,
+            111
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Howard Yen Tianyu Gao Danqi Chen Princeton Language and Intelligence (PLI), Princeton University {hyen,tianyug,danqic}@cs.princeton.edu",
+        "bbox": [
+            235,
+            145,
+            763,
+            196
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            260,
+            260,
+            342,
+            277
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Extending large language models (LLMs) to process longer inputs is crucial for a wide range of applications. However, the substantial computational cost of transformers and limited generalization of positional encoding restrict the size of their context window. We introduce Context Expansion with Parallel Encoding (CEPE ), a framework that can be applied to any existing decoder-only LLMs to extend their context window. CEPE employs a small encoder to process long inputs chunk by chunk, enabling the frozen decoder to utilize additional contexts via cross-attention. CEPE is efficient, generalizable, and versatile: trained with 8K-token documents, it extends the context window of LLAMA-2 to 128K tokens, offering 10× the throughput with only 1/6 of the memory. CEPE yields strong performance on language modeling and in-context learning. CEPE also excels in retrieval-augmented applications, while existing long-context models degenerate with retrieved contexts. We further introduce a CEPE variant that can extend the context window of instruction-tuned models using only unlabeled data, and showcase its effectiveness on LLAMA-2-CHAT, leading to a strong instruction-following model that can leverage very long contexts on downstream tasks.<sup>1</sup>",
+        "bbox": [
+            141,
+            290,
+            462,
+            690
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            115,
+            715,
+            260,
+            731
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Enabling long and extensible context is crucial for large language models (LLMs) to effectively perform complex tasks, such as summarizing a book or answering questions with hundreds of retrieved Web pages. However, several challenges limit the ability of LLMs to leverage long context: (1) LLMs and popular positional encodings (Raffel et al., 2020; Su et al., 2021) do not generalize to sequence lengths longer than the lengths seen during training (Press et al., 2022), even after additional fine-tuning (Chen et al., 2023, 2024; Peng et al., 2024, inter alia). (2) Transformers (Vaswani et al., 2017)— the predominant architecture of LLMs—incur a quadratic computational cost and a linear memory cost with respect to the input length, making it expensive to use for long sequences. (3) Highquality long-context data, such as long instructionfollowing data, are scarce and difficult to obtain (Wang et al., 2023; Xiong et al., 2023).",
+        "bbox": [
+            112,
+            741,
+            490,
+            888
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "chart",
+        "img_path": "images/1aafb169199fe00884d92491f43981783ac4716396b6740eb74f3c3b911e7a0e.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            515,
+            258,
+            699,
+            445
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "chart",
+        "img_path": "images/1b1e96d2af3a62b713ccd34442d750c79f59127f514287ad1f7152e786860f2a.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 1: A comparison between CEPE and other techniques of extending LLMs’ context window, including YARN (Peng et al., 2024), STREAMINGLLM (Xiao et al., 2024b), and REPLUG (Shi et al., 2024). CEPE trained on 8K tokens can generalize to 128K tokens with minimal computational and memory costs."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            697,
+            258,
+            878,
+            448
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            582,
+            887,
+            744
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Besides directly fine-tuning LLMs on longer inputs, a series of inference-time modification methods have been proposed recently to scale up the effective context window, either by modifying the attention mechanism (Bertsch et al., 2023; Xiao et al., 2024b; Ivgi et al., 2023) or encoding chunks of context in separate forward passes (Shi et al., 2024; Ratner et al., 2023; Lin et al., 2023). While these methods generalize to longer sequences, the model often fails to effectively leverage the extra tokens and can incur larger inference costs.",
+        "bbox": [
+            507,
+            745,
+            887,
+            922
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>1</sup>Code and models are available at https://github. com/princeton-nlp/CEPE.",
+        "bbox": [
+            114,
+            895,
+            489,
+            921
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "2588",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 2588–2610 August 11-16, 2024 ©2024 Association for Computational Linguistics",
+        "bbox": [
+            89,
+            945,
+            909,
+            973
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/bd64103e35fd88ed0546a85f033a4fde730a50a1d4f24d37d1435129ee633162.jpg",
+        "image_caption": [
+            "Figure 2: The CEPE architecture. The encoder model encodes the additional 3 chunks (k = 3) of context in parallel, and the final hidden representations from the encoder model are concatenated and used as inputs to the cross-attention layers in the decoder model. The cross-attention layers attend to the encoder representations between the self-attention and feed-forward layers in the decoder model."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            154,
+            82,
+            826,
+            249
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "In this work, we propose an efficient and lightweight solution to extending the context window of LLMs, called Context Expansion with Parallel Encoding (CEPE ). CEPE is applicable to any pre-trained decoder-only LM by adding two components: (1) a small encoder that encodes the long context in chunks, and (2) a cross-attention module that is inserted at each layer of the decoder to attend to the encoder representations (Figure 2). With a careful selection of unlabeled training data, CEPE can leverage not only long-context documents, but also retrieved documents effectively.",
+        "bbox": [
+            112,
+            341,
+            490,
+            533
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "CEPE offers several benefits: (1) length generalization: CEPE is not limited by positional encoding constraints as the long context is encoded in chunks, each with its own positional encoding; (2) efficiency: using a small encoder and processing contexts in parallel reduce computational cost. Since cross-attention attends only to the last layer’s representations from the encoder, CEPE requires much less memory compared to decoder-only LMs, which cache the key-value pairs of every token in every layer; (3) reduced training cost: unlike full fine-tuning approaches, we only tune the encoder and the cross-attention while keeping the large decoder LM frozen; augmenting a 7B decoder with a 400M encoder and cross-attention layers (1.4B parameters) can be done with one A100 80GB GPU.",
+        "bbox": [
+            112,
+            535,
+            490,
+            793
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "We apply CEPE to LLAMA-2 (Touvron et al., 2023b) and train it on a filtered version of Red-Pajama (Together, 2023b) for 20B tokens—only 1% of the pre-training budget of LLAMA-2. We first show that CEPE-LLAMA-2, trained with 8K input length, continues to improve perplexity on longer input up to 128K tokens. Then, we apply CEPE to a retrieval-augmented setting, as our larger context window allows incorporating more retrieved documents. Compared to existing methods, CEPE achieves better performance on both retrieval-augmented language modeling and open-domain question answering. Additionally, we demonstrate that CEPE can effectively leverage more demonstrations for in-context learning (Brown et al., 2020). All the above is achieved with a much lower memory and computational cost than most previous solutions.",
+        "bbox": [
+            112,
+            794,
+            490,
+            923
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            340,
+            887,
+            500
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Finally, we propose CEPE-Distilled (CEPED), which extends the context window of instructiontuned models, using only unlabeled data. CEPED distills the behavior of the original instructiontuned model to the new architecture through an auxiliary KL divergence loss, which eliminates the need to curate expensive long-context instructionfollowing data (Ivison et al., 2023). We apply CEPED to LLAMA-2-CHAT and show that while preserving their instruction understanding ability, CEPED-LLAMA-2-CHAT can incorporate more context and improve performance on long-text understanding tasks (Shaham et al., 2023).",
+        "bbox": [
+            507,
+            501,
+            887,
+            709
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "To conclude, CEPE is a lightweight framework that can extend context windows of any base or instruction-tuned LMs. We hope CEPE can empower future LLM research with cheap and effective long-context abilities.",
+        "bbox": [
+            507,
+            711,
+            887,
+            791
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Method: CEPE",
+        "text_level": 2,
+        "bbox": [
+            509,
+            800,
+            702,
+            816
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "We design CEPE to adapt pre-trained LLMs to perform long-context language modeling on sequences with many tokens (e.g., books). For retrieval augmentation, these long contexts may contain a set of retrieved passages instead. We first describe how CEPE modifies the architecture of LLMs to attend to representations encoded by a small encoder, and then describe how the CEPE modules are trained. Finally, we extend CEPE to CEPED, which expands the context window of instructiontuned models using only unlabeled data.",
+        "bbox": [
+            507,
+            826,
+            887,
+            922
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "2589",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            490,
+            166
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2.1 Architecture",
+        "text_level": 2,
+        "bbox": [
+            114,
+            174,
+            262,
+            190
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "CEPE augments off-the-shelf decoder-only LMs by (1) adding a small, bidirectional pre-trained encoder model and (2) inserting cross-attention layers between the self-attention and feed-forward layers in every transformer block of the decoder model.",
+        "bbox": [
+            112,
+            196,
+            489,
+            278
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Notation. Given an input context with $T$ tokens $x _ { 1 } , . . . , x _ { T }$ , we consider the first $m$ tokens $x _ { 1 } , . . . , x _ { m }$ as the additional context and the last $n = T - m$ tokens $x _ { m + 1 } , . . . , x _ { T }$ as the main input X. The additional context is split into chunks ${ \\mathcal { C } } = C _ { 1 } , . . . , C _ { k }$ , which can contain either segments within a long document or a set of retrieved passages. We use $\\mathcal { M } _ { \\mathrm { e n c } }$ to denote the encoder model with hidden dimension $d _ { \\mathrm { e n c } }$ and ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ to denote the decoder-only LLM with hidden dimension $d _ { \\mathrm { d e c } }$",
+        "bbox": [
+            110,
+            284,
+            489,
+            445
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Encoding chunks. We first encode $C _ { 1 } , . . . , C _ { k }$ chunk by chunk using the trainable encoder ${ \\mathcal { M } } _ { \\mathrm { e n c } } .$",
+        "bbox": [
+            112,
+            451,
+            487,
+            483
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "img_path": "images/ead21398ec452a5bd0543a5bd4e690ae97cca0247c6e5c512dcb0a5cf0f3af13.jpg",
+        "text": "$$\n\\begin{array} { r } { \\phi _ { i } = \\mathcal { M } _ { \\mathrm { e n c } } ( C _ { i } ) \\qquad \\Phi = \\mathrm { C O N C A T } \\big ( \\{ \\phi _ { i } \\} _ { i = 1 } ^ { k } \\big ) } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            132,
+            494,
+            467,
+            512
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "where $\\phi _ { i } \\in \\mathbb { R } ^ { | C _ { i } | \\times d _ { \\mathrm { d e c } } }$ is the token-wise last layer hidden state from ${ \\mathcal { M } } _ { \\mathrm { e n c } }$ and $\\Phi \\in \\mathbb { R } ^ { m \\times d _ { \\mathrm { d e c } } }$ . Note that $\\mathcal { M } _ { \\mathrm { e n c } }$ is bidirectional, which results in more information-rich representations compared to unidirectional ones. While we do not preserve global positions across different chunks, experiments show that CEPE achieves better or comparable performance to full-attention models that do.",
+        "bbox": [
+            112,
+            521,
+            489,
+            652
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Cross-attention modules. In every decoder layer of the transformer, we insert a cross-attention module between the self-attention and feed-forward layers. To construct the cross-attention module, we provide Φ as keys and values, and the hidden states of X as queries. Note that in order for ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ to attend to Φ, the key and value projection matrices in the cross-attention module also serve as an up-projection that transforms the $d _ { \\mathrm { e n c } }$ -dimensional Φ into a $d _ { \\mathrm { d e c } ^ { - } } \\mathrm { d i m e n s i o n a l }$ embedding. Figure 2 illustrates the architecture of CEPE.",
+        "bbox": [
+            112,
+            658,
+            489,
+            835
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Efficiency. ${ \\mathcal { M } } _ { \\mathrm { e n c } }$ is much smaller and encodes contexts in parallel to avoid the quadratic complexity of full attention. This enables CEPE to exhibit a substantially higher training and inference speed than if we were to use ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ to process all",
+        "bbox": [
+            112,
+            841,
+            489,
+            923
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "$T = m + n$ tokens. Moreover, CEPE drastically reduces memory consumption by avoiding caching $( m + n ) L$ key-value pairs (L is the number of layers of $M _ { \\mathrm { d e c } } )$ and instead caching only Φ and nL keyvalue pairs. In particular, using a standard decoderonly model requires $\\mathcal { O } ( ( m + n ) L d _ { \\mathrm { d e c } } )$ memory whereas CEPE requires $\\mathcal { O } ( m d _ { \\mathrm { e n c } } + n L d _ { \\mathrm { d e c } } )$ . In our setting, $m \\gg n$ and $d _ { \\mathrm { d e c } } \\gg d _ { \\mathrm { e n c } }$ , so in practice, we observe a substantial gap: for each additional token, CEPE requires only 1/256 of the memory compared to encoding them in ${ \\mathcal { M } } _ { \\mathrm { d e c } }$",
+        "bbox": [
+            507,
+            85,
+            885,
+            263
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Comparison with existing retrieval-augmented LMs. CEPE takes inspiration from retrievalaugmented models such as FiD (Izacard and Grave, 2021), Atlas (Izacard et al., 2022b), and RETRO (Borgeaud et al., 2022) for attending to parallel encodings. Our method differs in the following key aspects: FiD, Atlas, and RETRO are all fullparameter training methods for encoder-decoder models; Atlas and RETRO are pre-training methods that rely on expensive large-scale retrievalaugmented data; FiD is a fine-tuning method for open-domain QA tasks, which requires taskspecific data. In contrast, CEPE is a lightweight framework that can extend the context window of any existing decoder-only model; we only fine-tune an added small encoder and the cross-attention layers; instead of retrieval-augmented data, CEPE only requires a small amount of filtered unlabeled data, as described in the following section; because CEPE is built on top of powerful pre-trained models, it can be easily adapted to a wide range of tasks without explicit fine-tuning.",
+        "bbox": [
+            507,
+            269,
+            887,
+            626
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2.2 Data",
+        "text_level": 2,
+        "bbox": [
+            509,
+            639,
+            596,
+            655
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "We use RedPajama (RP; Together, 2023b) as our training corpus, which is an open-source reproduction of the LLAMA-1 (Touvron et al., 2023a) training data. It contains about 1 trillion tokens from seven domains: ArXiv, Books, C4-RP, CC, Github, StackExchange, and Wiki. We first partition the corpus into three sets of documents: training, test, and retrieval; we leverage the retrieval corpus for retrieval-augmented language modeling.",
+        "bbox": [
+            507,
+            663,
+            887,
+            808
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "We design a data mixture with strong long-range dependencies and a diversity of domains. The training data is preprocessed into two subsets, each of which is a collection of 8192-token sequences: (1) In $\\mathrm { R P } _ { \\mathrm { t r a i n - c a t } }$ , we concatenate documents together to form training sequences; (2) In ${ \\mathrm { R P } } _ { \\mathrm { t r a i n - f i l t e r } }$ , we keep documents from the Arxiv and Books domains that have at least 8, 192 tokens and sample sequences within document boundaries.",
+        "bbox": [
+            507,
+            809,
+            885,
+            922
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "2590",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            487,
+            116
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Our qualitative analysis found that data from the ArXiv and Books domains naturally contain long documents that are especially useful when training long-context models. It is also important to use a mixture of data from all domains to ensure better generalization. Thus, we use a mixture ratio of 2:1 between ${ \\mathrm { R P } } _ { \\mathrm { t r a i n - f i l t e r } }$ and $\\mathrm { R P } _ { \\mathrm { t r a i n - c a t } }$ for training. We alternatively consider using retrieval supervision when generating the training data to improve the model’s ability to leverage retrieved documents. However, our ablations found that our unlabeled data mixture transfers well to retrieval-augmented settings at a much cheaper cost (§7.1).",
+        "bbox": [
+            110,
+            117,
+            489,
+            328
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "2.3 Training",
+        "text_level": 2,
+        "bbox": [
+            114,
+            338,
+            231,
+            355
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We use LLAMA-2-7B (Touvron et al., 2023b) as $M _ { \\mathrm { d e c } }$ (originally trained on 4K length), and insert the new cross-attention layers described in Section 2.1 into it. We add a bidirectional encoder $\\mathcal { M } _ { \\mathrm { e n c } }$ with 435M parameters, yielding 1.8B added parameters in the CEPE model.",
+        "bbox": [
+            110,
+            361,
+            489,
+            458
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Encoder. We first pre-train a bidirectional maskedlanguage model on the RedPajama dataset. $\\mathcal { M } _ { \\mathrm { e n c } }$ follows the configuration of RoBERTa-large (Liu et al., 2019b) but shares the vocabulary with ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ LLAMA-2. <sup>2</sup> We train ${ \\mathcal { M } } _ { \\mathrm { e n c } }$ for 100K steps with a batch size of 2, 048 and sequence length of 512 tokens. For more details, refer to §A.1.",
+        "bbox": [
+            112,
+            466,
+            489,
+            580
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Cross-attention. We freeze the weights of ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ and train only the added cross-attention layers as well as fine-tuning ${ \\mathcal { M } } _ { \\mathrm { e n c } }$ using the cross-entropy loss. We first adopt a warmup training stage designed to teach ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ to copy from ${ \\mathcal { M } } _ { \\mathrm { e n c } }$ through cross-attention—for each position $\\textit { i } \\leq T$ , the objective is to generate $x _ { i + 1 }$ , conditioned on $\\mathcal { M } _ { \\mathrm { e n c } } ( x _ { 1 } , \\dots , x _ { T } )$ and $\\mathcal { M } _ { \\mathrm { d e c } } ( x _ { 1 } , \\dots , x _ { i } ) - \\mathcal { M } _ { \\mathrm { e n c } }$ and ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ share the same input. The warmup stage uses 131M tokens from the training set of RP.<sup>3</sup>",
+        "bbox": [
+            112,
+            586,
+            489,
+            746
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "After the warmup stage, we move to the standard training, where each sequence has T = 8, 192 tokens. We use the last 4, 096 tokens as the decoder input X, and chunk the first 4, 096 tokens into $k = 1 6$ contexts of $| C _ { i } | = 2 5 6$ tokens each as the encoder input , and train for 20B tokens. Freezing the decoder allows CEPE to be trained on a single A100 GPU, which is a significant reduction in computational cost compared to training ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ with sequence length T. For more training details and hyperparameters, please refer to §A.2.",
+        "bbox": [
+            112,
+            749,
+            490,
+            862
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            885,
+            149
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "2.4 CEPED for Instruction-Tuned Models",
+        "text_level": 2,
+        "bbox": [
+            509,
+            159,
+            858,
+            174
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We extend our method to CEPE-DISTILLED (CEPED) to augment instruction-tuned models with longer context. Instruction-tuned models (Ouyang et al., 2022; Taori et al., 2023; Touvron et al., 2023b) excel in many downstream applications, but their limited context window restricts their performance in tasks that require long documents (Shaham et al., 2023) or a large number of retrieved passages (Gao et al., 2023). It is challenging to extend these models to longer context windows directly through fine-tuning due to the scarcity of high-quality instruction data.",
+        "bbox": [
+            507,
+            179,
+            885,
+            373
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "To this end, we propose CEPED, which uses an auxiliary distillation loss to encourage $\\mathcal { M } _ { \\mathrm { e n c } }$ and the cross-attention layers to learn the capabilities of the already instruction-tuned ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ . This can be especially useful for settings where the fine-tuning data are not open-sourced, which is the case for LLAMA-2-CHAT (Touvron et al., 2023b).",
+        "bbox": [
+            507,
+            374,
+            885,
+            487
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Distillation loss. We design a distillation objective, where the original ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ acts as the “teacher” and the CEPED model acts as the “student”. We use the input context $\\mathbf { C O N C A T } ( { \\mathcal { C } } , X )$ with $m + n =$ 4, 096 tokens, which can fit in the context window of LLAMA-2-CHAT, our choice of ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ . First, we input CONCAT( , X) to ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ and save the logits of X as the teacher logits. During training, and X are used as inputs to $\\mathcal { M } _ { \\mathrm { e n c } }$ and ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ , respectively, and we minimize the KL divergence between the output logits of X and the corresponding teacher logits as well as the cross-entropy loss. We train the model for 10B tokens from our data mixture. For more details, see §A.3.",
+        "bbox": [
+            507,
+            492,
+            887,
+            719
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3 Long-context Language Modeling",
+        "text_level": 2,
+        "bbox": [
+            509,
+            730,
+            838,
+            746
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We start by evaluating CEPE on long-context language modeling benchmarks to assess basic LM abilities, and compare with existing approaches in terms of perplexity, memory, and throughput.",
+        "bbox": [
+            507,
+            755,
+            885,
+            820
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Datasets. We evaluate on ArXiv and Books from our RedPajama test split, as well as three longcontext datasets: PG19 (Rae et al., 2020), Proof-Pile (Azerbayev et al., 2023), and CodeParrot (Wolf et al., 2023). We filter all documents to have at least 32, 768 tokens, and sample 5, 000 sequences for each dataset. We calculate the perplexity on the last 256 tokens of each sequence. Following Peng et al. (2024), for the experiments with 128K tokens, we filter documents to have at least 131, 072 tokens and evaluate on only 10 sequences.<sup>4</sup>",
+        "bbox": [
+            507,
+            826,
+            887,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>2</sup>Future works applying CEPE to LLAMA-2 models can simply use our pre-trained encoder.",
+        "bbox": [
+            112,
+            870,
+            487,
+            896
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>3</sup>Preliminary experiments suggest this stage can stabilize training; ablations can be found in §7.1.",
+        "bbox": [
+            112,
+            896,
+            487,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_number",
+        "text": "2591",
+        "bbox": [
+            478,
+            928,
+            519,
+            942
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "table",
+        "img_path": "images/572fa5d294b29ea35084f39e758e0caaaceefbf1fb1537a65dff138de1a28b3e.jpg",
+        "table_caption": [
+            "Table 1: Long-context language modeling text perplexity on ArXiv and Book from RedPajama, PG19, ProofPile, and CodeParrot. Throughput compares the speed (number of tokens/second) of each model with that of LLAMA-2. All experiments are conducted on one A100 80GB GPU, except for LLAMA-2-32K and YARN with 128K tokens, which require model parallelism, and are conducted on four A100 GPUs."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>ArXiv</td><td>Book</td><td>PG19</td><td>ProofPile</td><td>CodeParrot</td><td>Throughput</td><td>Mem. (GB)</td></tr><tr><td colspan=\"8\">Total Tokens = 4, 096</td></tr><tr><td>LLAMA-2</td><td>2.597</td><td>6.282</td><td>7.614</td><td>2.409</td><td>1.735</td><td>1.00×</td><td>19.2</td></tr><tr><td>LLAMA-2-32K</td><td>2.601</td><td>6.621</td><td>7.945</td><td>2.414</td><td>1.785</td><td>1.00×</td><td>19.2</td></tr><tr><td>YARN-64K</td><td>2.651</td><td>6.337</td><td>7.326</td><td>2.457</td><td>1.764</td><td>1.04×</td><td>19.2</td></tr><tr><td>CEPE</td><td>2.579</td><td>6.292</td><td>7.536</td><td>2.396</td><td>1.763</td><td>1.31×</td><td>19.8</td></tr><tr><td colspan=\"8\">Total Tokens = 8, 192</td></tr><tr><td>LLAMA-2</td><td> $> 1 0 ^ { 3 }$ </td><td> $> { 1 0 } ^ { 3 }$ </td><td> $> 1 0 ^ { 3 }$ </td><td> $> { 1 0 } ^ { 3 }$ </td><td> $> 1 0 ^ { 3 }$ </td><td></td><td></td></tr><tr><td>LLAMA-2-32K</td><td>2.505</td><td>6.339</td><td>7.744</td><td>2.221</td><td>1.729</td><td>1.00×</td><td>24.9</td></tr><tr><td>YARN-64K</td><td>2.561</td><td>6.077</td><td>7.146</td><td>2.267</td><td>1.714</td><td>2.52×</td><td>24.8</td></tr><tr><td>REPLUG</td><td>2.589</td><td>6.149</td><td>7.554</td><td>2.307</td><td>1.728</td><td>0.17×</td><td>18.8</td></tr><tr><td>STREAMINGLLM</td><td>2.740</td><td>6.327</td><td>7.783</td><td>2.437</td><td>1.806</td><td>1.94×</td><td>20.0</td></tr><tr><td>CEPE</td><td>2.496</td><td>6.049</td><td>7.372</td><td>2.219</td><td>1.715</td><td>3.48×</td><td>22.6</td></tr><tr><td colspan=\"8\">Total Tokens = 32, 768</td></tr><tr><td>LLAMA-2-32K</td><td>2.322</td><td>6.178</td><td>7.420</td><td>2.158</td><td>1.664</td><td>1.00×</td><td>59.1</td></tr><tr><td>YARN-64K</td><td>2.359</td><td>5.884</td><td>6.809</td><td>2.193</td><td>1.640</td><td>1.03×</td><td>58.9</td></tr><tr><td>STREAMINGLLM</td><td>2.752</td><td>6.358</td><td>7.627</td><td>2.503</td><td>1.853</td><td>1.16×</td><td>20.0</td></tr><tr><td>CEPE</td><td>2.421</td><td>6.015</td><td>7.204</td><td>2.218</td><td>1.702</td><td>3.72×</td><td>25.6</td></tr><tr><td colspan=\"8\">Total Tokens = 131, 072</td></tr><tr><td>LLAMA-2-32K</td><td> $> 1 0 ^ { 3 }$ </td><td> $> { 1 0 } ^ { 3 }$ </td><td> $> 1 0 ^ { 3 }$ </td><td> $> { 1 0 } ^ { 3 }$ </td><td> $> 1 0 ^ { 3 }$ </td><td>一</td><td></td></tr><tr><td>YARN-64K</td><td> $> 1 0 ^ { 3 }$ </td><td> $> { 1 0 } ^ { 3 }$ </td><td> $> 1 0 ^ { 3 }$ </td><td> $> { 1 0 } ^ { 3 }$ </td><td> $> 1 0 ^ { 3 }$ </td><td></td><td></td></tr><tr><td>YARN-128K</td><td>2.359</td><td>5.270</td><td>6.306</td><td>2.242</td><td>1.264</td><td>1.00×</td><td>235.6</td></tr><tr><td>STREAMINGLLM</td><td>2.371</td><td>5.058</td><td>6.681</td><td>2.270</td><td>1.280</td><td>2.56×</td><td>20.0</td></tr><tr><td>CEPE</td><td>2.217</td><td>4.869</td><td>6.305</td><td>2.099</td><td>1.266</td><td>9.90×</td><td>38.6</td></tr></table>",
+        "bbox": [
+            156,
+            82,
+            842,
+            431
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            524,
+            489,
+            605
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Models. We focus on 7B parameters model. Our baseline includes LLAMA-2 and its long-sequence fine-tuned versions: LLAMA-2-32K (Together, 2023a), YARN-64K, and YARN-128K (Peng et al., 2024). LLAMA-2-32K was trained on RP with upsampled ArXiv and Books domains, and a mixture of other data , and YARN was trained on PG19. While YARN-64K and YARN-128K were fine-tuned for only 1.7B and 3.4B tokens, respectively, fine-tuning all parameters requires much more memory relative to CEPE. We also evaluate on training-free long-context methods: STREAMINGLLM (Xiao et al., 2024b) and REPLUG (Shi et al., 2023) with LLAMA-2-7B. Although REPLUG was originally evaluated in a retrieval-augmented setting, we found that it also works well in long-context modeling, when viewing the long context as retrieved context. See §B for more implementation details.",
+        "bbox": [
+            110,
+            611,
+            492,
+            888
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            524,
+            884,
+            556
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "For CEPE, we put 2K tokens in the decoder when T = 4, 096, and 4K tokens in the decoder in other settings. Additional tokens are split into chunks of 256 tokens and fed into the encoder.",
+        "bbox": [
+            507,
+            558,
+            885,
+            624
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Results. We show the results in Table 1. Compared to the two fully fine-tuned models, LLAMA-2-32K and YARN-64K, CEPE achieves either lower or comparable perplexity across all datasets with lower memory usage and higher throughput despite being trained only 8K sequences. Furthermore, CEPE continues to improve on perplexity while maintaining low memory use at 128K tokens, well beyond its training lengths (8K); on the other hand, LLAMA-2-32K and YARN-64K cannot generalize beyond its training length and the memory cost increases significantly. At 128K tokens, we outperform or achieve comparable perplexity with all applicable baselines on all domains. Although CEPE observes higher perplexity than YARN-64K on PG19 and Book at 32K, we note that YARN-64K was fine-tuned on PG19, and thus has a significant domain advantage.",
+        "bbox": [
+            505,
+            632,
+            889,
+            923
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>4</sup>This is due to computational cost and scarcity of long documents. All 10 sequences are from different documents.",
+        "bbox": [
+            112,
+            895,
+            489,
+            922
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_number",
+        "text": "2592",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "table",
+        "img_path": "images/658814bfab4a9f9ef082778ef1cdb21d07bc49c165844dcd6975f3d5380bae7b.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>ArXiv</td><td>Book</td><td>C4-RP</td><td>CC</td><td>Github</td><td>StackEx</td><td>Wiki</td><td>Avg.</td></tr><tr><td colspan=\"9\">k = 0 (T = 2, 048)</td></tr><tr><td>LLAMA-2</td><td>3.541</td><td>6.524</td><td>6.916</td><td>5.564</td><td>1.865</td><td>4.043</td><td>4.816</td><td>4.753</td></tr><tr><td>LLAMA-2-32K</td><td>3.561</td><td>6.892</td><td>7.798</td><td>5.931</td><td>1.932</td><td>4.262</td><td>4.958</td><td>5.048</td></tr><tr><td>YARN-64K</td><td>3.633</td><td>6.631</td><td>7.164</td><td>5.701</td><td>1.930</td><td>4.164</td><td>4.837</td><td>4.866</td></tr><tr><td colspan=\"9\">k = 8 (T = 4, 096)</td></tr><tr><td>LLAMA-2</td><td>3.602</td><td>6.581</td><td>6.963</td><td>5.348</td><td>1.829</td><td>4.044</td><td>4.815</td><td>4.740</td></tr><tr><td>LLAMA-2-32K</td><td>3.642</td><td>6.985</td><td>7.767</td><td>5.645</td><td>1.893</td><td>4.270</td><td>4.988</td><td>5.027</td></tr><tr><td>YARN-64K</td><td>3.752</td><td>6.718</td><td>7.218</td><td>5.466</td><td>1.894</td><td>4.178</td><td>4.847</td><td>4.868</td></tr><tr><td>REPLUG</td><td>3.535</td><td>6.494</td><td>6.895</td><td>5.395</td><td>1.833</td><td>4.029</td><td>4.798</td><td>4.711</td></tr><tr><td>CEPE</td><td>3.486</td><td>6.481</td><td>6.884</td><td>5.319</td><td>1.793</td><td>3.709</td><td>4.302</td><td>4.568</td></tr><tr><td colspan=\"9\">k = 20 (T = 7, 168)</td></tr><tr><td>REPLUG</td><td>3.531</td><td>6.490</td><td>6.894</td><td>5.386</td><td>1.830</td><td>4.028</td><td>4.795</td><td>4.708</td></tr><tr><td>CEPE</td><td>3.475</td><td>6.463</td><td>6.875</td><td>5.266</td><td>1.782</td><td>3.703</td><td>4.296</td><td>4.551</td></tr><tr><td colspan=\"9\">k = 50 (T = 14, 848)</td></tr><tr><td>REPLUG</td><td>3.530</td><td>6.491</td><td>6.899</td><td>5.392</td><td>1.830</td><td>4.028</td><td>4.794</td><td>4.709</td></tr><tr><td>CEPE</td><td>3.467</td><td>6.457</td><td>6.881</td><td>5.273</td><td>1.777</td><td>3.701</td><td>4.292</td><td>4.550</td></tr></table>",
+        "bbox": [
+            194,
+            82,
+            803,
+            347
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "chart",
+        "img_path": "images/fa92437c232e87d99ca9edec2edf7b3c964eaa56e2b49a5be4a8b4d6d0fa8789.jpg",
+        "content": "",
+        "chart_caption": [
+            "Table 2: Retrieval-augmented language modeling. We report test perplexity on RedPajama across all domains. We calculate perplexity on the last 1792 tokens of the decoder input (to exclude the query tokens). k is the number of retrieved contexts used, and T is the total number of tokens. For LLAMA-2, YARN-64K, and LLAMA-2-32K, we concatenate the contexts and prepend to the input. Avg. is the macro average across all domains.",
+            "Figure 3: Open-domain QA results. We report the exact match (EM) scores. LLAMA-2 is limited to 20 passages, and REPLUG is limited to 30 passages due to memory constraints. For the complete results, refer to Table 7."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            174,
+            425,
+            820,
+            580
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "We also outperform REPLUG across all domains while achieving much higher throughput— REPLUG encodes additional context in chunks but each chunk requires a forward pass of the main input, incurring slow speed, due to which we omit REPLUG at longer length. STREAMINGLLM maintains a low memory usage and a reasonable throughput, but the perplexity does not always decrease as the sequence length increases, likely due to the model only using a limited number of cached key-value pairs. Compared to STREAMINGLLM, CEPE can leverage all input tokens and achieve better perplexity with better throughput.",
+        "bbox": [
+            112,
+            631,
+            492,
+            841
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4 Retrieval-augmented Applications",
+        "text_level": 2,
+        "bbox": [
+            112,
+            859,
+            445,
+            877
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Retrieval-augmented settings naturally benefit from long-context LMs, as models can leverage the ad-",
+        "bbox": [
+            112,
+            890,
+            489,
+            922
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "ditional context to include more retrieval results. Thus, we test if CEPE trained on long-context data can transfer to retrieval-augmented settings.",
+        "bbox": [
+            507,
+            631,
+            885,
+            680
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.1 Retrieval-augmented Language Modeling",
+        "text_level": 2,
+        "bbox": [
+            509,
+            692,
+            884,
+            708
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Datasets. We use the test and retrieval split of Red-Pajama described in §2.2 for retrieval-augmented LM evaluation. Each sequence contains 2, 048 tokens, and the first 256 tokens are used as the query to retrieve passages from the retrieval split. The retrieval corpus contains 200M documents of 256 tokens each, and we use Contriever (Izacard et al., 2022a) to retrieve k passages for each sequence.",
+        "bbox": [
+            507,
+            721,
+            887,
+            852
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Models. We evaluate full-context baselines, LLAMA-2, LLAMA-2-32K, and YARN-64K, by simply prepending the retrieved passages to the input sequence. We also evaluate REPLUG, which runs one forward pass for each retrieved passage and aggregates the results. CEPE uses 2, 048 tokens in the decoder and retrieved passages are fed through the encoder in parallel.",
+        "bbox": [
+            507,
+            858,
+            887,
+            922
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "2593",
+        "bbox": [
+            478,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            151
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Results. The results are shown in Table 2. CEPE can effectively improve perplexity by using the retrieved contexts, outperforming REPLUG. Notably, CEPE continues to improve perplexity even with k = 50 (trained with k = 16). CEPE transfers well to the retrieval-augmented setting whereas the full-context decoder models degrade.",
+        "bbox": [
+            110,
+            155,
+            489,
+            269
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4.2 Open-domain Question Answering",
+        "text_level": 2,
+        "bbox": [
+            112,
+            279,
+            435,
+            296
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Given a question and a large corpus of documents, open-domain question answering (QA) requires the model to retrieve relevant passages and generate the answer. A model that can leverage a large number of retrieved passages without being distracted by irrelevant ones is desirable for this task.",
+        "bbox": [
+            112,
+            300,
+            489,
+            397
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Datasets. We adopt three open-domain QA datasets: Natural Questions (NQ; Kwiatkowski et al., 2019; Lee et al., 2019), TriviaQA (Joshi et al., 2017), and PopQA (Mallen et al., 2023). For each question, we use Contriever to retrieve k passages from Wikipedia.<sup>5</sup>",
+        "bbox": [
+            112,
+            403,
+            489,
+            500
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Models. We compare CEPE with LLAMA-2, LLAMA-2-32K, and REPLUG. For each model, we use two in-context demonstrations. For CEPE, we use 10 passages in the decoder, and all other passages are encoded separately by the encoder. Refer to §C.1 for more details.",
+        "bbox": [
+            112,
+            506,
+            490,
+            604
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Results. The results are shown in Figure 3 CEPE consistently outperforms all models across all datasets and k. Notably, CEPE outperforms LLAMA-2-32K on NQ and TriviaQA by over 3 and 4 EM points, respectively. Furthermore, CEPE does not degrade in performance as the k increases, while other models often perform worse at larger k, as they are sensitive to the large amount of redundant or irrelevant passages (Liu et al., 2024).",
+        "bbox": [
+            110,
+            609,
+            490,
+            756
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "5 In-Context Learning",
+        "text_level": 2,
+        "bbox": [
+            114,
+            765,
+            329,
+            783
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "In-context learning (ICL; Brown et al., 2020) is one of the most important emerging qualities of LLMs. In this experiment, we examine whether CEPE can effectively utilize demonstrations from the encoder context to improve performance. Specifically, we use a range of classification tasks that contains a large number (up to 150) of categories (Ratner et al., 2023), where the model can benefit from additional demonstrations. Following Ratner et al. (2023), we use a test set size of 250 examples for each dataset.",
+        "bbox": [
+            112,
+            791,
+            490,
+            889
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            887,
+            149
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Models. Our baseline is LLAMA-2 with 2 demonstrations. For CEPE, we add additional demonstrations in the encoder. We also compare with an “oracle”, where the LLAMA-2 decoder takes 40 demonstrations. Note that the oracle is significantly more expensive. More details are in §C.2.",
+        "bbox": [
+            507,
+            156,
+            887,
+            253
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Results. The results are shown in Table 3. We first observe that compared to the decoder-only baseline, CEPE can effectively use the additional demonstrations from the encoder context; the performance further increases or remains consistent with more demonstrations in the encoder. However, there is still a large gap to the 40-demonstration oracle. Our hypothesis is that in-context learning requires both query-demonstration interactions and demonstration-demonstration interactions, which CEPE cannot provide. Regardless, CEPE can be always applied on top of the decoder-only model to add additional demonstrations, with little extra computational and memory cost.",
+        "bbox": [
+            507,
+            259,
+            887,
+            487
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "6 Instruction-tuned Models for Long Text Understanding",
+        "text_level": 2,
+        "bbox": [
+            509,
+            495,
+            884,
+            530
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "In this section, we show that applying CEPED on LLAMA-2-CHAT produces instruction-following models that can leverage long inputs.",
+        "bbox": [
+            507,
+            537,
+            885,
+            587
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Datasets. ZeroSCROLLS (Shaham et al., 2023) is a collection of zero-shot long-context understanding tasks that require instruction-following abilities. Specifically, we test on NarrativeQA, QASPER, QuALITY, GovReport, SummScreenFD, and QM-Sum, which all have large validation sets made available. We follow the formats and instructions of Shaham et al. (2023) for each dataset, except the long text is placed before the instructions.",
+        "bbox": [
+            507,
+            592,
+            887,
+            739
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Models. For CEPED, we use 2, 048 tokens in the decoder and put the remaining tokens to the encoder as chunks of 256 tokens. We compare with LLAMA-2-CHAT and LLAMA-2-32K IN-STRUCT,<sup>6</sup> which was fine-tuned on multi-round conversational data as well as long-context summarization and QA data. We allow the model to generate 1, 024 tokens for the summarization tasks and 50 tokens for the question answering tasks.",
+        "bbox": [
+            507,
+            744,
+            887,
+            890
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>5</sup>Snapshot from 2018-12-20, and each passage is 100 words (Karpukhin et al., 2020).",
+        "bbox": [
+            112,
+            896,
+            489,
+            922
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>6</sup>https://huggingface.co/togethercomputer/ Llama-2-7B-32K-Instruct",
+        "bbox": [
+            509,
+            896,
+            852,
+            921
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "2594",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/99874f278055b98a44e6a7820746920d32e910cdb460c11df2a8f335f846a080.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>k</td><td>SST2</td><td>MR</td><td>AGNews</td><td>SST5</td><td>TREC</td><td>TREC-F</td><td>DBPedia</td><td>NLU-S</td><td>NLU-I</td><td>BANKING</td><td>CLINIC</td></tr><tr><td>LLAMA-2</td><td>2</td><td>89.1</td><td>96.7</td><td>72.7</td><td>3.9</td><td>48.0</td><td>16.7</td><td>94.0</td><td>42.3</td><td>22.3</td><td>38.4</td><td>59.1</td></tr><tr><td>+ CEPE</td><td> $2 + 1 8$ </td><td>90.7</td><td>98.4</td><td>71.9</td><td>46.7</td><td>47.1</td><td>22.8</td><td>94.0</td><td>48.9</td><td>30.4</td><td>42.5</td><td>62.4</td></tr><tr><td></td><td> $2 + 3 8$ </td><td>92.9</td><td>98.0</td><td>73.2</td><td>45.5</td><td>47.5</td><td>25.1</td><td>93.3</td><td>48.8</td><td>31.6</td><td>46.0</td><td>62.8</td></tr><tr><td>LLAMA-2†</td><td>40</td><td>94.3</td><td>98.7</td><td>74.7</td><td>52.3</td><td>87.7</td><td>54.8</td><td>95.1</td><td>76.7</td><td>62.1</td><td>50.4</td><td>72.0</td></tr></table>",
+        "bbox": [
+            131,
+            82,
+            870,
+            160
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/e86f0f6d5715a4ba31c7fdf5bb0e495646c9ea1b17208fd0e55088d09149472b.jpg",
+        "table_caption": [
+            "Table 3: ICL results averaged across 3 seeds. k is the number of demonstrations. All models use 2 demonstrations in the decoder, and we add +k′ demonstrations to the encoder for CEPE. † denotes the oracle setting with $k = 4 0$ demonstration in the decoder.",
+            "Table 4: ZeroSCROLLS validation results. The total number of tokens includes both the input and generated tokens. For NarrativeQA (NQA) and Qspr (QASPER), we report the F1 scores. For QALT (QuALITY), we report accuracy. For GovReport (GvRp), SummScreenFD (SSFD), and QMSum, we report the ROUGE-L scores. CEPED uses 2K tokens in the decoder, and additional tokens are inputted through the encoder. Only NQA has a substantial number of test examples with more than 32K tokens, so we exclude other dataset on 2K + All setting; see Table 11."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\"></td><td rowspan=\"2\"></td><td colspan=\"3\">Question Answering</td><td colspan=\"3\">Summarization</td></tr><tr><td>Total tokens NQA</td><td>Qspr</td><td>QALT</td><td> $\\mathrm { G v R p }$ </td><td>SSFD</td><td>QMSum</td></tr><tr><td>LLAMA-2-CHAT</td><td>2K</td><td>17.1</td><td>14.6</td><td>28.6</td><td>16.0</td><td>16.4</td><td>19.3</td></tr><tr><td rowspan=\"3\">+ CEPED</td><td> $2 K + 2 K$ </td><td>19.5</td><td>20.5</td><td>30.2</td><td>16.5</td><td>16.4</td><td>19.6</td></tr><tr><td> $2 K + 3 0 K$ </td><td>21.6</td><td>19.9</td><td>29.6</td><td>15.8</td><td>16.7</td><td>19.5</td></tr><tr><td> $2 \\mathsf { K } + \\mathsf { A l l }$ </td><td>21.9</td><td>-</td><td></td><td>-</td><td></td><td></td></tr><tr><td>LLAMA-2-CHAT</td><td>4K</td><td>18.6</td><td>16.1</td><td>30.0</td><td>17.7</td><td>17.1</td><td>19.7</td></tr><tr><td>LLAMA-2-32K INSTRUCT</td><td>32K</td><td>12.2</td><td>18.1</td><td>41.6</td><td>19.9</td><td>10.0</td><td>10.3</td></tr></table>",
+        "bbox": [
+            181,
+            225,
+            816,
+            356
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Results. Table 4 shows that CEPED improves upon LLAMA-2-CHAT with 2K tokens across all tasks. The performance of CEPED improves or remains consistent as we scale up the number of tokens in the context window. Notably, on NQA—the only dataset with a significant number of samples longer than 32K tokens (see Table 11)—CEPED improves upon LLAMA-2-CHAT by 3 points in F1 scores. Furthermore, CEPED outperforms LLAMA-2-32K INSTRUCT on 4 out of the 6 tasks, despite being trained on unlabeled data. We provide qualitative examples and analysis in §C.3.",
+        "bbox": [
+            110,
+            461,
+            490,
+            656
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "7 Ablation Studies",
+        "text_level": 2,
+        "bbox": [
+            114,
+            670,
+            294,
+            687
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "We conduct comprehensive ablations to show the effectiveness of our training data mixture, pretraining and fine-tuning the encoder, and the warmup training stage. We also ablate to verify the effectiveness of the KL divergence loss in CEPED. Lastly, we evaluate on Needle in the Haystack (Kamradt, 2024), and analyze the results in §D.",
+        "bbox": [
+            110,
+            699,
+            490,
+            814
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "7.1 Training Settings",
+        "text_level": 2,
+        "bbox": [
+            114,
+            827,
+            297,
+            845
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Training with retrieved documents. Even though CEPE was trained with long documents, it achieves strong performance on retrievalaugmented applications. We also test a different data strategy: training CEPE with retrieved documents using the training settings from §2.3.",
+        "bbox": [
+            112,
+            857,
+            492,
+            923
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/e80d8ea6f4a50f54982a0765b2f3f254ebc438f1b724f4e1d18adda01faf22fd.jpg",
+        "table_caption": [
+            "Table 5: Test perplexity in long-context and retrievalaugmented language modeling, averaged over all datasets. Full results are in Table 12 and Table 13."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\"></td><td colspan=\"2\">Long-context (total Tokens)</td><td colspan=\"2\">Retrieval- augmented (k)</td></tr><tr><td>8K</td><td>32K</td><td>8</td><td>50</td></tr><tr><td>CEPE</td><td>3.97</td><td>3.91</td><td>4.57</td><td>4.55</td></tr><tr><td>w/ RetDoc</td><td>4.01</td><td>3.99</td><td>4.53</td><td>4.50</td></tr><tr><td>w/ RPtrain-cat only w/ only</td><td>4.01 3.96</td><td>3.96 3.89</td><td>4.56 4.75</td><td>4.54 4.72</td></tr><tr><td> ${ \\mathrm { R P } } _ { \\mathrm { t r a i n - f i l t e r } }$  w/ Frozen encoder</td><td></td><td>3.99</td><td></td><td></td></tr><tr><td>w/ Random encoder</td><td>4.01 4.03</td><td>4.02</td><td>4.62 4.60</td><td>4.61 4.60</td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td>w/o Warmup</td><td>4.03</td><td>4.02</td><td>4.61</td><td>4.61</td></tr></table>",
+        "bbox": [
+            517,
+            457,
+            875,
+            620
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            689,
+            885,
+            720
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "As shown in Table 5, we find that training on retrieved documents (RetDoc) results in slightly stronger performances in the retrievalaugmentation setting, but perform worse on long documents. Augmenting a pre-training corpus with retrieval contexts is extremely computationally and storage expensive. CEPE’s simple long-document data strategy achieves a good balance between efficient training and strong performance on both long-context and retrieval-augmented applications.",
+        "bbox": [
+            507,
+            722,
+            887,
+            884
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Choices of unlabeled data. In Table 5, we show the results of training CEPE with only the filtered documents from the ArXiv and Books domains $( \\mathbf { R P _ { t r a i n - f i l t e r } } )$ , and only the concatenated RP documents $( \\mathbf { R P _ { t r a i n - c a t } } )$ We find that training on ${ \\mathrm { R P } } _ { \\mathrm { t r a i n - f i l t e r } }$ is more beneficial for the longdocument setting and training on $\\mathrm { R P } _ { \\mathrm { t r a i n - c a t } }$ is better for the retrieval setting, but using a mixture of both leads to a more balanced and generalizable model. Our findings corroborate with the recent work on long-context data engineering (Fu et al., 2024). We also ablate different training strategies for the encoder, and find both the warmup stage and fine-tuning are crucial for strong performance. More details on the training ablations are in §E.1.",
+        "bbox": [
+            507,
+            890,
+            885,
+            922
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "2595",
+        "bbox": [
+            478,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            84,
+            490,
+            296
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "7.2 KL Divergence",
+        "text_level": 2,
+        "bbox": [
+            114,
+            306,
+            282,
+            322
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "The key component of CEPED is the KL Divergence loss. To understand the importance of this auxiliary loss, we explore the performance of CEPED when trained without the KL Divergence loss as well as with difference coefficients for each loss. Results are shown in Table 14, and we find that the KL Divergence loss is crucial for summarization tasks and QALT. More details are in §E.2.",
+        "bbox": [
+            112,
+            328,
+            490,
+            457
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "8 Related Work",
+        "text_level": 2,
+        "bbox": [
+            114,
+            469,
+            270,
+            485
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Long-context language models. Many recent works on long-context LMs aim to solve the problem of positional embedding extrapolation in transformers (Peng et al., 2024; Chen et al., 2023). Others fine-tune LMs on longer sequences (Xiong et al., 2023; Chen et al., 2024; Together, 2023a) or compress the context into shorter forms (Yoshida et al., 2020; Choromanski et al., 2021; Chevalier et al., 2023). Notably, several recent papers propose to extend the context window of LMs by modifying the attention mechanism: Xiao et al. (2024b) discover the use of “sink tokens” in sliding windows, and Bertsch et al. (2023); Xiao et al. (2024a) retrieve relevant tokens from a cache instead of attending to all tokens. This results in memoryefficient long-context LMs, but they have diminishing returns with longer contexts, as the same positional embedding may be seen multiple times and they can not fully utilize all tokens. The key advantage of CEPE is that it does not degrade for inputs longer than the training length while achieving great efficiency compared to full fine-tuning approaches. Techniques have been designed for specific applications, such as for in-context learning (Ratner et al., 2023; Hao et al., 2022), but we focus on general long-context language modeling.",
+        "bbox": [
+            110,
+            504,
+            492,
+            925
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Novel architectures and pre-training methods, such as S4 (Gu et al., 2022), RPT (Rubin and Berant, 2023), YOCO (Sun et al., 2024), and Mamba (Gu and Dao, 2023), also extend the context window at greater efficiency. However, pre-training is extremely expensive at scale and these methods cannot leverage existing powerful pre-trained LLMs. It is also unclear if state-space models can achieve comparable performance with transformers (Jelassi et al., 2024).",
+        "bbox": [
+            507,
+            85,
+            887,
+            246
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Retrieval-augmented language models. Augmenting LMs with retrieval has been useful in many applications, such as open-domain question answering. Recently, combining LMs with retrieval systems for more generalized purposes has been explored: Guu et al. (2020); Borgeaud et al. (2022); Izacard et al. (2022b); Min et al. (2023) pre-train LMs with retrieval, and Shi et al. (2024); Lin et al. (2023) use logits interpolation from separate forward passes to incorporate retrieval information.",
+        "bbox": [
+            507,
+            253,
+            887,
+            414
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Our architecture is similar to Atlas (Izacard et al., 2022b), RETRO, and RETRO-Fitting (Borgeaud et al., 2022) , but they use retrieval-augmented data for pre-training, which can be expensive to acquire at a large scale. CEPE only requires fine-tuning on long document data, which are much more efficient to obtain; CEPE is also applicable to any decoderonly LM, allowing us to extend context windows for pre-existing strong models. Finally, these works do not consider long-context language modeling settings in addition to retrieval-augmented settings.",
+        "bbox": [
+            507,
+            414,
+            887,
+            594
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "9 Conclusion",
+        "text_level": 2,
+        "bbox": [
+            509,
+            605,
+            643,
+            621
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We propose CEPE to extend the context window of existing language models. The key idea is to leverage a small encoder and cross-attention modules to process long inputs and achieve low memory and computational complexity. Compared to existing methods, CEPE extrapolates to input lengths well beyond the training length, while remaining efficient and effective. Consequently, CEPE augments pre-trained models to be performant on both long-context and retrieval-augmented applications. We also show that CEPED can be applied to instruction-tuned models with additional contexts using an auxiliary loss with only unlabeled data. We believe that there is still room for improvement through better data to train flexible and robust models. We hope our work can be a useful and accessible tool for the community to study long-context models in diverse applications.",
+        "bbox": [
+            507,
+            632,
+            889,
+            923
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "2596",
+        "bbox": [
+            478,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Limitations",
+        "text_level": 2,
+        "bbox": [
+            114,
+            84,
+            220,
+            99
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "One limitation of our work is the focus on LLAMA-2-7B. We hope that future work can investigate the applicability of our framework to a wider variety of LLMs of different sizes. Similarly, we only applied CEPED to LLAMA-2-CHAT-7B, but we look forward to other researchers applying it to other instruction-tuned or fine-tuned models.",
+        "bbox": [
+            112,
+            112,
+            489,
+            224
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "We also acknowledge that certain hyperparameters are not studied in depth due to training costs – such as the ratio between ${ \\mathrm { R P } } _ { \\mathrm { t r a i n - f i l t e r } }$ and RP<sub>train-cat</sub>, learning rate, and the size of the small encoder model. We also fixed Contriever (Izacard et al., 2022a) to be the retriever in this work, but studying a greater range of retrievers would be useful.",
+        "bbox": [
+            112,
+            227,
+            490,
+            340
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "Ethics Statement",
+        "text_level": 2,
+        "bbox": [
+            114,
+            353,
+            267,
+            369
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "LLMs are known to potentially output harmful and/or offensive language, and the LLAMA-2- based models we use in this work are no exceptions. Since these models are trained on internetsize corpora (e.g., RedPajama), it can be difficult and expensive to filter out such offensive language.",
+        "bbox": [
+            112,
+            381,
+            490,
+            479
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "Our models are also fine-tuned on RedPajama, which means they may also generate undesirable language. Although addressing this issue in the large-scale pre-training corpus is out of the scope of this work, we hope that future work will carefully resolve possible misuse issues in these models.",
+        "bbox": [
+            112,
+            480,
+            489,
+            577
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "Acknowledgements",
+        "text_level": 2,
+        "bbox": [
+            114,
+            590,
+            287,
+            607
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "We want to acknowledge Sadhika Malladi, Alexander Wettig, Mengzhou Xia, Dan Friedman, Amanda Bertsch, Adithya Bhaskar, Victoria Graf, and other members of the Princeton NLP group for their useful feedback and discussion. Tianyu Gao is supported by an IBM PhD Fellowship. This work is also gratefully supported by an NSF CAREER Award (IIS-2239290) and Intel.",
+        "bbox": [
+            112,
+            619,
+            489,
+            749
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            115,
+            778,
+            215,
+            794
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Amanda Askell, Yuntao Bai, Anna Chen, Dawn Drain, Deep Ganguli, Tom Henighan, Andy Jones, Nicholas Joseph, Ben Mann, Nova DasSarma, Nelson Elhage, Zac Hatfield-Dodds, Danny Hernandez, Jackson Kernion, Kamal Ndousse, Catherine Olsson, Dario Amodei, Tom Brown, Jack Clark, Sam Mc-Candlish, Chris Olah, and Jared Kaplan. 2021. A general language assistant as a laboratory for alignment.",
+            "Zhangir Azerbayev, Edward Ayers, and Bartosz Piotrowski. 2023. Proofpile: A pre-training dataset of mathematical texts.",
+            "Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, Nicholas Joseph, Saurav Kadavath, Jackson Kernion, Tom Conerly, Sheer El-Showk, Nelson Elhage, Zac Hatfield-Dodds, Danny Hernandez, Tristan Hume, Scott Johnston, Shauna Kravec, Liane Lovitt, Neel Nanda, Catherine Olsson, Dario Amodei, Tom Brown, Jack Clark, Sam McCandlish, Chris Olah, Ben Mann, and Jared Kaplan. 2022. Training a helpful and harmless assistant with reinforcement learning from human feedback.",
+            "Amanda Bertsch, Uri Alon, Graham Neubig, and Matthew R. Gormley. 2023. Unlimiformer: Longrange transformers with unlimited length input. In Advances in Neural Information Processing Systems (NeurIPS).",
+            "Sebastian Borgeaud, Arthur Mensch, Jordan Hoffmann, Trevor Cai, Eliza Rutherford, Katie Millican, George Bm Van Den Driessche, Jean-Baptiste Lespiau, Bogdan Damoc, Aidan Clark, Diego De Las Casas, Aurelia Guy, Jacob Menick, Roman Ring, Tom Hennigan, Saffron Huang, Loren Maggiore, Chris Jones, Albin Cassirer, Andy Brock, Michela Paganini, Geoffrey Irving, Oriol Vinyals, Simon Osindero, Karen Simonyan, Jack Rae, Erich Elsen, and Laurent Sifre. 2022. Improving language models by retrieving from trillions of tokens. In International Conference on Machine Learning (ICML), volume 162, pages 2206–2240.",
+            "Tom B Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. 2020. Language models are few-shot learners. In Advances in Neural Information Processing Systems (NeurIPS).",
+            "Iñigo Casanueva, Tadas Temcinas, Daniela Gerz,ˇ Matthew Henderson, and Ivan Vulic. 2020.´ Efficient intent detection with dual sentence encoders.",
+            "Mingda Chen, Zewei Chu, Sam Wiseman, and Kevin Gimpel. 2022. SummScreen: A dataset for abstractive screenplay summarization. In Proceedings ofthe 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 8602–8615, Dublin, Ireland. Association for Computational Linguistics.",
+            "Shouyuan Chen, Sherman Wong, Liangjian Chen, and Yuandong Tian. 2023. Extending context window of large language models via positional interpolation.",
+            "Yukang Chen, Shengju Qian, Haotian Tang, Xin Lai, Zhijian Liu, Song Han, and Jiaya Jia. 2024. LongloRA: Efficient fine-tuning of long-context large language models. In The Twelfth International Conference on Learning Representations."
+        ],
+        "bbox": [
+            117,
+            803,
+            489,
+            920
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "2597",
+        "bbox": [
+            480,
+            928,
+            521,
+            941
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Alexis Chevalier, Alexander Wettig, Anirudh Ajith, and Danqi Chen. 2023. Adapting language models to compress contexts. In Proceedings ofthe 2023 Conference on Empirical Methods in Natural Language Processing, pages 3829–3846, Singapore. Association for Computational Linguistics.",
+            "Krzysztof Marcin Choromanski, Valerii Likhosherstov, David Dohan, Xingyou Song, Andreea Gane, Tamas Sarlos, Peter Hawkins, Jared Quincy Davis, Afroz Mohiuddin, Lukasz Kaiser, David Benjamin Belanger, Lucy J Colwell, and Adrian Weller. 2021. Rethinking attention with performers. In International Conference on Learning Representations.",
+            "Pradeep Dasigi, Kyle Lo, Iz Beltagy, Arman Cohan, Noah A. Smith, and Matt Gardner. 2021. A dataset of information-seeking questions and answers anchored in research papers. In Proceedings of the 2021 Conference ofthe North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 4599–4610, Online. Association for Computational Linguistics.",
+            "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: Pre-training of deep bidirectional Transformers for language understanding. In North American Chapter of the Associationfor Computational Linguistics (NAACL).",
+            "Yao Fu, Rameswar Panda, Xinyao Niu, Xiang Yue, Hannaneh Hajishirzi, Yoon Kim, and Hao Peng. 2024. Data engineering for scaling language models to 128k context.",
+            "Tianyu Gao, Howard Yen, Jiatong Yu, and Danqi Chen. 2023. Enabling large language models to generate text with citations. In Proceedings ofthe 2023 Conference on Empirical Methods in Natural Language Processing, pages 6465–6488, Singapore. Association for Computational Linguistics.",
+            "Albert Gu and Tri Dao. 2023. Mamba: Linear-time sequence modeling with selective state spaces.",
+            "Albert Gu, Karan Goel, and Christopher Re. 2022. Efficiently modeling long sequences with structured state spaces. In International Conference on Learning Representations.",
+            "Kelvin Guu, Kenton Lee, Zora Tung, Panupong Pasupat, and Ming-Wei Chang. 2020. REALM: Retrievalaugmented language model pre-training. In International Conference on Machine Learning (ICML).",
+            "Zhixiong Han, Yaru Hao, Li Dong, Yutao Sun, and Furu Wei. 2023. Prototypical calibration for fewshot learning of language models. In The Eleventh International Conference on Learning Representations.",
+            "Yaru Hao, Yutao Sun, Li Dong, Zhixiong Han, Yuxian Gu, and Furu Wei. 2022. Structured prompting: Scaling in-context learning to 1,000 examples.",
+            "Ari Holtzman, Jan Buys, Li Du, Maxwell Forbes, and Yejin Choi. 2020. The curious case of neural text degeneration. In International Conference on Learning Representations (ICLR).",
+            "Ari Holtzman, Peter West, Vered Shwartz, Yejin Choi, and Luke Zettlemoyer. 2021. Surface form competition: Why the highest probability answer isn’t always right. In Proceedings ofthe 2021 Conference on Empirical Methods in Natural Language Processing, pages 7038–7051, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics.",
+            "Luyang Huang, Shuyang Cao, Nikolaus Parulian, Heng Ji, and Lu Wang. 2021. Efficient attentions for long document summarization. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 1419–1436, Online. Association for Computational Linguistics.",
+            "Maor Ivgi, Uri Shaham, and Jonathan Berant. 2023. Efficient Long-Text Understanding with Short-Text Models. Transactions ofthe Associationfor Computational Linguistics, 11:284–299.",
+            "Hamish Ivison, Yizhong Wang, Valentina Pyatkin, Nathan Lambert, Matthew Peters, Pradeep Dasigi, Joel Jang, David Wadden, Noah A. Smith, Iz Beltagy, and Hannaneh Hajishirzi. 2023. Camels in a changing climate: Enhancing lm adaptation with Tulu 2.",
+            "Gautier Izacard, Mathilde Caron, Lucas Hosseini, Sebastian Riedel, Piotr Bojanowski, Armand Joulin, and Edouard Grave. 2022a. Unsupervised dense information retrieval with contrastive learning. Transactions on Machine Learning Research.",
+            "Gautier Izacard and Edouard Grave. 2021. Leveraging passage retrieval with generative models for open domain question answering. In Proceedings ofthe 16th Conference of the European Chapter of the Associationfor Computational Linguistics: Main Volume, pages 874–880, Online. Association for Computational Linguistics.",
+            "Gautier Izacard, Patrick Lewis, Maria Lomeli, Lucas Hosseini, Fabio Petroni, Timo Schick, Jane Dwivedi-Yu, Armand Joulin, Sebastian Riedel, and Edouard Grave. 2022b. Atlas: Few-shot learning with retrieval augmented language models. arXiv preprint arXiv:2208.03299.",
+            "Samy Jelassi, David Brandfonbrener, Sham M. Kakade, and Eran Malach. 2024. Repeat after me: Transformers are better than state space models at copying.",
+            "Mandar Joshi, Eunsol Choi, Daniel Weld, and Luke Zettlemoyer. 2017. TriviaQA: A large scale distantly supervised challenge dataset for reading comprehension. In Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 1601–1611, Vancouver, Canada. Association for Computational Linguistics."
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            166
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "2598",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Garrett Kamradt. 2024. Needle in a haystack - pressure testing LLMs.",
+            "Vladimir Karpukhin, Barlas Oguz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, and Wen-tau Yih. 2020. Dense passage retrieval for opendomain question answering. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 6769–6781, Online. Association for Computational Linguistics.",
+            "Tomáš Kociský, Jonathan Schwarz, Phil Blunsom, Chrisˇ Dyer, Karl Moritz Hermann, Gábor Melis, and Edward Grefenstette. 2018. The NarrativeQA reading comprehension challenge. Transactions ofthe Associationfor Computational Linguistics, 6:317–328.",
+            "Wojciech Kryscinski, Nazneen Rajani, Divyansh Agarwal, Caiming Xiong, and Dragomir Radev. 2022. BOOKSUM: A collection of datasets for long-form narrative summarization. In Findings ofthe Associationfor Computational Linguistics: EMNLP 2022, pages 6536–6558, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics.",
+            "Tom Kwiatkowski, Jennimaria Palomaki, Olivia Redfield, Michael Collins, Ankur Parikh, Chris Alberti, Danielle Epstein, Illia Polosukhin, Jacob Devlin, Kenton Lee, Kristina Toutanova, Llion Jones, Matthew Kelcey, Ming-Wei Chang, Andrew M. Dai, Jakob Uszkoreit, Quoc Le, and Slav Petrov. 2019. Natural questions: A benchmark for question answering research. Transactions ofthe Associationfor Computational Linguistics, 7:452–466.",
+            "Stefan Larson, Anish Mahendran, Joseph J. Peper, Christopher Clarke, Andrew Lee, Parker Hill, Jonathan K. Kummerfeld, Kevin Leach, Michael A. Laurenzano, Lingjia Tang, and Jason Mars. 2019. An evaluation dataset for intent classification and out-ofscope prediction. In Proceedings ofthe 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), pages 1311–1316, Hong Kong, China. Association for Computational Linguistics.",
+            "Kenton Lee, Ming-Wei Chang, and Kristina Toutanova. 2019. Latent retrieval for weakly supervised open domain question answering. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics, pages 6086–6096, Florence, Italy. Association for Computational Linguistics (ACL).",
+            "Xi Victoria Lin, Xilun Chen, Mingda Chen, Weijia Shi, Maria Lomeli, Rich James, Pedro Rodriguez, Jacob Kahn, Gergely Szilvasy, Mike Lewis, Luke Zettlemoyer, and Scott Yih. 2023. Ra-dit: Retrievalaugmented dual instruction tuning.",
+            "Nelson F. Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni, and Percy Liang. 2024. Lost in the Middle: How Language Models Use Long Contexts. Transactions of the Associationfor Computational Linguistics, 12:157–173.",
+            "Xingkun Liu, Arash Eshghi, Pawel Swietojanski, and Verena Rieser. 2019a. Benchmarking natural language understanding services for building conversational agents. ArXiv, abs/1903.05566.",
+            "Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019b. RoBERTa: A robustly optimized BERT pretraining approach. arXiv preprint arXiv:1907.11692.",
+            "Ilya Loshchilov and Frank Hutter. 2019. Decoupled weight decay regularization. In International Conference on Learning Representations.",
+            "Yao Lu, Max Bartolo, Alastair Moore, Sebastian Riedel, and Pontus Stenetorp. 2022. Fantastically ordered prompts and where to find them: Overcoming fewshot prompt order sensitivity. In Proceedings ofthe 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 8086–8098, Dublin, Ireland. Association for Computational Linguistics.",
+            "Alex Mallen, Akari Asai, Victor Zhong, Rajarshi Das, Daniel Khashabi, and Hannaneh Hajishirzi. 2023. When not to trust language models: Investigating effectiveness of parametric and non-parametric memories. In Associationfor Computational Linguistics (ACL), pages 9802–9822, Toronto, Canada. Association for Computational Linguistics.",
+            "Sewon Min, Weijia Shi, Mike Lewis, Xilun Chen, Wentau Yih, Hannaneh Hajishirzi, and Luke Zettlemoyer. 2023. Nonparametric masked language modeling. In Findings of the Association for Computational Linguistics: ACL 2023, pages 2097–2118, Toronto, Canada. Association for Computational Linguistics.",
+            "Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. 2022. Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems (NeurIPS), 35:27730– 27744.",
+            "Bo Pang and Lillian Lee. 2005. Seeing stars: Exploiting class relationships for sentiment categorization with respect to rating scales. In Proceedings of the 43rd Annual Meeting of the Association for Computational Linguistics (ACL’05), pages 115–124, Ann Arbor, Michigan. Association for Computational Linguistics.",
+            "Richard Yuanzhe Pang, Alicia Parrish, Nitish Joshi, Nikita Nangia, Jason Phang, Angelica Chen, Vishakh Padmakumar, Johnny Ma, Jana Thompson, He He, and Samuel Bowman. 2022. QuALITY: Question answering with long input texts, yes! In Proceedings of the 2022 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 5336–5358, Seattle, United States. Association for Computational Linguistics."
+        ],
+        "bbox": [
+            114,
+            85,
+            487,
+            114
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "page_number",
+        "text": "2599",
+        "bbox": [
+            478,
+            928,
+            521,
+            941
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Bowen Peng, Jeffrey Quesnelle, Honglu Fan, and Enrico Shippole. 2024. YaRN: Efficient context window extension of large language models. In The Twelfth International Conference on Learning Representations.",
+            "Ofir Press, Noah Smith, and Mike Lewis. 2022. Train short, test long: Attention with linear biases enables input length extrapolation. In International Conference on Learning Representations (ICLR).",
+            "Jack W. Rae, Anna Potapenko, Siddhant M. Jayakumar, Chloe Hillier, and Timothy P. Lillicrap. 2020. Compressive transformers for long-range sequence modelling. In International Conference on Learning Representations.",
+            "Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, and Peter J Liu. 2020. Exploring the limits of transfer learning with a unified text-to-text Transformer. The Journal ofMachine Learning Research (JMLR), 21(140).",
+            "Nir Ratner, Yoav Levine, Yonatan Belinkov, Ori Ram, Inbal Magar, Omri Abend, Ehud Karpas, Amnon Shashua, Kevin Leyton-Brown, and Yoav Shoham. 2023. Parallel context windows for large language models. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 6383–6402, Toronto, Canada. Association for Computational Linguistics.",
+            "Ohad Rubin and Jonathan Berant. 2023. Long-range language modeling with self-retrieval.",
+            "Uri Shaham, Maor Ivgi, Avia Efrat, Jonathan Berant, and Omer Levy. 2023. ZeroSCROLLS: A zero-shot benchmark for long text understanding. In Findings of the Association for Computational Linguistics: EMNLP 2023, pages 7977–7989, Singapore. Association for Computational Linguistics.",
+            "Uri Shaham, Elad Segal, Maor Ivgi, Avia Efrat, Ori Yoran, Adi Haviv, Ankit Gupta, Wenhan Xiong, Mor Geva, Jonathan Berant, and Omer Levy. 2022. SCROLLS: Standardized CompaRison over long language sequences. In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing, pages 12007–12021, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics.",
+            "Freda Shi, Xinyun Chen, Kanishka Misra, Nathan Scales, David Dohan, Ed Chi, Nathanael Schärli, and Denny Zhou. 2023. Large language models can be easily distracted by irrelevant context. In International Conference on Machine Learning (ICML).",
+            "Weijia Shi, Sewon Min, Michihiro Yasunaga, Minjoon Seo, Rich James, Mike Lewis, Luke Zettlemoyer, and Wen tau Yih. 2024. REPLUG: Retrieval-augmented black-box language models.",
+            "Richard Socher, Alex Perelygin, Jean Wu, Jason Chuang, Christopher D. Manning, Andrew Ng, and",
+            "Christopher Potts. 2013. Recursive deep models for semantic compositionality over a sentiment treebank. In Empirical Methods in Natural Language Processing (EMNLP).",
+            "Jianlin Su, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. 2021. Roformer: Enhanced transformer with rotary position embedding.",
+            "Yutao Sun, Li Dong, Yi Zhu, Shaohan Huang, Wenhui Wang, Shuming Ma, Quanlu Zhang, Jianyong Wang, and Furu Wei. 2024. You only cache once: Decoderdecoder architectures for language models.",
+            "Rohan Taori, Ishaan Gulrajani, Tianyi Zhang, Yann Dubois, Xuechen Li, Carlos Guestrin, Percy Liang, and Tatsunori B. Hashimoto. 2023. Stanford Alpaca: An Instruction-following LLaMA model.",
+            "Together. 2023a. Llama-2-7b-32k.",
+            "Together. 2023b. Redpajama: An open source recipe to reproduce llama training dataset.",
+            "Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al. 2023a. LLaMA: Open and Efficient Foundation Language Models. arXiv preprint arXiv:2302.13971.",
+            "Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton Ferrer, Moya Chen, Guillem Cucurull, David Esiobu, Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller, Cynthia Gao, Vedanuj Goswami, Naman Goyal, Anthony Hartshorn, Saghar Hosseini, Rui Hou, Hakan Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa, Isabel Kloumann, Artem Korenev, Punit Singh Koura, Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Diana Liskovich, Yinghai Lu, Yuning Mao, Xavier Martinet, Todor Mihaylov, Pushkar Mishra, Igor Molybog, Yixin Nie, Andrew Poulton, Jeremy Reizenstein, Rashi Rungta, Kalyan Saladi, Alan Schelten, Ruan Silva, Eric Michael Smith, Ranjan Subramanian, Xiaoqing Ellen Tan, Binh Tang, Ross Taylor, Adina Williams, Jian Xiang Kuan, Puxin Xu, Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan, Melanie Kambadur, Sharan Narang, Aurelien Rodriguez, Robert Stojnic, Sergey Edunov, and Thomas Scialom. 2023b. Llama 2: Open foundation and fine-tuned chat models.",
+            "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. Advances in Neural Information Processing Systems (NIPS), 30.",
+            "Ellen M. Voorhees and Dawn M. Tice. 2000. Building a question answering test collection. In Proceedings ofthe 23rd Annual International ACM SIGIR Conference on Research and Development in Information Retrieval, SIGIR ’00, page 200–207, New York, NY, USA. Association for Computing Machinery."
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            151
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "page_number",
+        "text": "2600",
+        "bbox": [
+            480,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Yizhong Wang, Yeganeh Kordi, Swaroop Mishra, Alisa Liu, Noah A. Smith, Daniel Khashabi, and Hannaneh Hajishirzi. 2023. Self-instruct: Aligning language models with self-generated instructions. In Proceedings ofthe 61st Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 13484–13508, Toronto, Canada. Association for Computational Linguistics.",
+            "Thomas Wolf, Loubna Ben Allal, Leandro von Werra, Li Jia, and Armel Zebaze. 2023. A dataset of python files from github. https://github.com/huggingface/blog/blob/ main/codeparrot.md?version=codeparrot/ codeparrot-valid-v2-near-dedup.",
+            "Thomas Wolf, Julien Chaumond, Lysandre Debut, Victor Sanh, Clement Delangue, Anthony Moi, Pierric Cistac, Morgan Funtowicz, Joe Davison, Sam Shleifer, et al. 2020. Transformers: State-of-the-art natural language processing. In Empirical Methods in Natural Language Processing (EMNLP): System Demonstrations.",
+            "Chaojun Xiao, Pengle Zhang, Xu Han, Guangxuan Xiao, Yankai Lin, Zhengyan Zhang, Zhiyuan Liu, Song Han, and Maosong Sun. 2024a. InfLLM: Unveiling the intrinsic capacity of LLMs for understanding extremely long sequences with training-free memory. arXiv preprint arXiv:2402.04617.",
+            "Guangxuan Xiao, Yuandong Tian, Beidi Chen, Song Han, and Mike Lewis. 2024b. Efficient streaming language models with attention sinks. In The Twelfth International Conference on Learning Representations.",
+            "Wenhan Xiong, Jingyu Liu, Igor Molybog, Hejia Zhang, Prajjwal Bhargava, Rui Hou, Louis Martin, Rashi Rungta, Karthik Abinav Sankararaman, Barlas Oguz, Madian Khabsa, Han Fang, Yashar Mehdad, Sharan Narang, Kshitiz Malik, Angela Fan, Shruti Bhosale, Sergey Edunov, Mike Lewis, Sinong Wang, and Hao Ma. 2023. Effective long-context scaling of foundation models.",
+            "Davis Yoshida, Allyson Ettinger, and Kevin Gimpel. 2020. Adding recurrence to pretrained transformers for improved efficiency and context size.",
+            "Xiang Zhang, Junbo Jake Zhao, and Yann LeCun. 2015. Character-level convolutional networks for text classification. In Neural Information Processing Systems.",
+            "Zihao Zhao, Eric Wallace, Shi Feng, Dan Klein, and Sameer Singh. 2021. Calibrate before use: Improving few-shot performance of language models. In Proceedings of the 38th International Conference on Machine Learning, volume 139 of Proceedings ofMachine Learning Research, pages 12697–12706. PMLR.",
+            "Ming Zhong, Da Yin, Tao Yu, Ahmad Zaidi, Mutethia Mutuma, Rahul Jha, Ahmed Hassan Awadallah, Asli Celikyilmaz, Yang Liu, Xipeng Qiu, and Dragomir",
+            "Radev. 2021. QMSum: A new benchmark for querybased multi-domain meeting summarization. In Proceedings ofthe 2021 Conference ofthe North American Chapter ofthe Associationfor Computational Linguistics: Human Language Technologies, pages 5905–5921, Online. Association for Computational Linguistics."
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            191
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_number",
+        "text": "2601",
+        "bbox": [
+            480,
+            929,
+            519,
+            942
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "A Training Details",
+        "text_level": 2,
+        "bbox": [
+            114,
+            84,
+            295,
+            101
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "A.1 Pre-training Encoder",
+        "text_level": 2,
+        "bbox": [
+            114,
+            110,
+            334,
+            126
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "The encoder follows the configuration of RoBERTalarge (Liu et al., 2019b) – it has 24 layers, a hidden size of 1024, and 16 attention heads. However, we use the architecture of LLAMA-2, which means that the vocabulary size is different and the attention module contains an additional output projection. We refer to Liu et al. (2019b) and Touvron et al. (2023a) for more details.",
+        "bbox": [
+            112,
+            131,
+            489,
+            260
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "We pre-trained the encoder for 100K steps on RP using the masked language modeling objective (Devlin et al., 2019). We used a batch size of 2048 sequences, where each sequence consisted of 512 tokens. The learning rate was set to $1 0 ^ { - 3 }$ with a warm-up of the first 4% of the steps. We used eight A6000 GPUs with a gradient accumulation of 16. Furthermore, we employed a masking rate of 30% and disabled the next sentence prediction objective. We always replace the token with the [MASK] token if it is masked instead of replacing it with a random token or the original token. Finally, we used the AdamW optimizer (Loshchilov and Hutter, 2019) with $\\beta _ { 1 } = 0 . 9 , \\beta _ { 2 } = 0 . 9 9 9$ , and $\\epsilon = 1 0 ^ { - 8 }$ , as implemented by the HuggingFace Transformers library (Wolf et al., 2020).",
+        "bbox": [
+            110,
+            261,
+            489,
+            519
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "A.2 Training CEPE",
+        "text_level": 2,
+        "bbox": [
+            114,
+            530,
+            287,
+            546
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "The attention module in LLAMA-2 consists of four projection matrices: key, value, query, and output. In contrast to original transformers (Vaswani et al., 2017), the output projection matrix is used as an additional attention output projection. When we first insert the cross-attention layers into the decoder, we initialize the weights of the key, value, and query projection matrices with the respective weights from the decoder’s self-attention layer in the same transformer block. Furthermore, since the hidden dimension of the encoder is smaller than the hidden dimension of the decoder, $d < D$ , we use only copy the first d rows of the key and value projection matrices from the self-attention module to the cross-attention module. Lastly, the output projection matrix is initialized with all zeros. While we did not investigate this initialization in detail, the intuition is that we want the model should use the tokens from the encoder using a similar mechanism as the decoder uses for its own tokens. However, we want the model to learn the output projection from scratch, as it may be too disruptive to have doubled the number of attention modules.",
+        "bbox": [
+            110,
+            551,
+            490,
+            922
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Then, we employ a warmup initialization method that simply trains the model to copy the input tokens from the encoder to the decoder. Specifically, we use the same inputs $X = { \\mathcal { C } }$ for both ${ \\mathcal { M } } _ { \\mathrm { e n c } }$ and ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ , and X consists of $n = 2 5 6$ tokens. However, for the encoder, we chunk X into $k = 4$ sequences of 64 tokens to construct . This step was trained for 4K steps with a batch size of 128 and peak learning rate of $5 \\times 1 0 ^ { - 4 }$ , which totals to 131M tokens. We noticed that the model quickly learned to copy the input tokens from the encoder to the decoder, and the loss was close to zero after just 1K steps. The intuition behind this initialization strategy was to instill a strong inductive bias between the encoder input and decoder outputs. From our early experiments, we found that this initialization strategy helped stabilize the later training.",
+        "bbox": [
+            507,
+            85,
+            887,
+            374
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Finally, we train CEPE for 20K steps with a batch size of 128. We use eight A100 80 GB GPUs with a per-device batch size of 2 and gradient accumulation of 8, which took approximately 750 GPU hours. We also use a peak learning rate of $3 \\times 1 0 ^ { - 4 }$ with a warm-up of 4% of the steps and a cosine learning rate schedule. We use the AdamW optimizer with $\\beta _ { 1 } = 0 . 9 , \\beta _ { 2 } = 0 . 9 9 9$ , and $\\epsilon = 1 0 ^ { - 8 }$",
+        "bbox": [
+            507,
+            375,
+            885,
+            504
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "During the standard training, we also use masking to inject noise into the parallel encodings. Intuitively, additional contexts may not always be in chunks of exactly 256 tokens in practice; for example, in open-domain question answering, the retrieved passages may vary in length. Furthermore, we may not always use exactly k = 16 contexts during inference, so we may want to train CEPE with instances with different k. To this end, for each encoder context $C _ { i } \\in { \\mathcal { C } } .$ , we apply masking with a probability of 0.3. When masking, we mask out the entire context $C _ { i }$ with probability 0.1. With probability 0.9, we mask out the suffix tokens $x _ { | C _ { i } | - t + 1 } , \\ldots , x _ { | C _ { i } | }$ , where $x _ { 1 } , \\ldots , x _ { | C _ { i } | }$ are the tokens in $C _ { i }$ and $t \\stackrel { \\cdot } { \\sim } U ( 1 , | C _ { i } | )$ . We choose to only mask out suffixes to maintain a natural distribution for encoder inputs. While we did not study the masking rate extensively, we found in preliminary experiments that masking did not hurt perplexity while improving performance on downstream tasks. We leave further explorations on masking in the encoder input for future work.",
+        "bbox": [
+            507,
+            505,
+            887,
+            858
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "A.3 Training CEPED",
+        "text_level": 2,
+        "bbox": [
+            509,
+            869,
+            697,
+            885
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "We leverage an additional distillation loss for CEPED. For encoder input  and decoder input X, we first calculate the logits $\\mathcal { M } _ { \\mathrm { d e c } } ( \\mathrm { c o n c a t } ( \\mathcal { C } , X ) )$ by running forward passes with the original model parameterized by ${ \\mathcal { M } } _ { \\mathrm { d e c } }$ . Due to storage constraints, we only store the top 50 likelihoods and their indices in the vocabulary for each token in X, following (Askell et al., 2021; Bai et al., 2022).",
+        "bbox": [
+            507,
+            890,
+            885,
+            922
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_number",
+        "text": "2602",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            84,
+            489,
+            181
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Then, during training, we define the distillation loss as the KL Divergence between the teacher model’s probability distribution and the student model’s probability distribution for the previously stored top 50 tokens. Concretely, our distillation loss is defined as follows:",
+        "bbox": [
+            112,
+            181,
+            489,
+            279
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "img_path": "images/48116808784f0d956d75f90e97d8af19be38b4abe5fbf3858fab48d6994021db.jpg",
+        "text": "$$\n\\mathcal { L } _ { \\mathrm { K L } } = D _ { \\mathrm { K L } } ( \\mathcal { M } _ { \\sf d e c } ( S ) | | \\mathcal { M } _ { \\mathrm { C E P E } } ( \\mathcal { C } , X ) )\n$$",
+        "text_format": "latex",
+        "bbox": [
+            149,
+            291,
+            450,
+            307
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "where $S = \\mathrm { c o n c a t } ( \\mathcal { C } , X ) , \\mathcal { M } _ { \\mathrm { d e c } } ( S )$ is the probability distribution of the top 50 tokens for X, and $\\mathcal { M } _ { \\mathrm { C E P E } } ( \\mathcal { C } , X )$ takes  as the encoder input and X as the decoder input and outputs the probability distribution of the same 50 tokens on X.",
+        "bbox": [
+            112,
+            321,
+            489,
+            401
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Although Bai et al. (2022) also uses an additional category that represents the sum of all other tokens’ probabilities, we found that this may cause the KL Divergence to be undefined when the sum of other probabilities is 0. For our main model, we use a coefficient of 2 in front of ${ \\mathcal { L } } _ { \\mathrm { K L } }$ when adding to the cross-entropy loss to calculate the total loss. We experiment with this coefficient in §7.1.",
+        "bbox": [
+            112,
+            401,
+            489,
+            531
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "B Baseline Implementations",
+        "text_level": 2,
+        "bbox": [
+            114,
+            542,
+            376,
+            558
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "REPLUG. Although REPLUG (Shi et al., 2024) was introduced as a method to augment language models with retrieval, we found that the technique of interpolating logits from separate forward passes can also transfer well to the long context setting. Among the methods that we compare to, REPLUG uniquely improves performance upon the base model in both the long-context and the retrievalaugmented LM settings. This gives us an additional point of comparison across the two settings.",
+        "bbox": [
+            112,
+            574,
+            489,
+            736
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Following the original authors, we use Contriever (Izacard et al., 2022a) to calculate the scores for each previous context by using the first 256 tokens following the previous context as the query in the long-context setting. We did not include the additional memory and inference time costs of calculating the Contriever scores in our evaluation.",
+        "bbox": [
+            112,
+            736,
+            490,
+            850
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "STREAMINGLLM. We follow the implementation of STREAMINGLLM from the original authors<sup>7</sup> (Xiao et al., 2024b). Specifically, we use their best settings, where we enable the positional shifts and cache 4 sink tokens and 2044 recent tokens.",
+        "bbox": [
+            114,
+            856,
+            489,
+            888
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            884,
+            133
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "The original code evaluates the model using a stride of 1 token at a time, where the cache is updated after every token, but this is not feasible for our large-scale evaluation. Therefore, we use a stride of 2048 tokens, and we update the cache after each stride. We show the difference in performance between the two settings in Table 6, and we found that STREAMINGLLM benefits from using a larger stride. We leave future exploration in this direction to future work.",
+        "bbox": [
+            507,
+            134,
+            887,
+            294
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "C Evaluation Settings",
+        "text_level": 2,
+        "bbox": [
+            509,
+            307,
+            719,
+            324
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "C.1 Open-domain Question Answering",
+        "text_level": 2,
+        "bbox": [
+            509,
+            334,
+            835,
+            350
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "The full results for the open-domain question answering experiments are shown in Table 7. RE-PLUG only uses up to k = 30 passages due to memory constraints, and LLAMA-2 has a window size of 4096, which limits k to 20. While LLAMA-2-32K can use more than $k = 6 0$ passages with a context size of 32K, we only use up to 60 passages due to the cost of generation. For each demonstration, we only show the top 1 retrieved passages instead of the top k passages.",
+        "bbox": [
+            507,
+            356,
+            887,
+            518
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "C.2 In-context Learning",
+        "text_level": 2,
+        "bbox": [
+            509,
+            530,
+            721,
+            545
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "For our in-context learning experiments, we use the datasets commonly used in previous works (Zhao et al., 2021; Lu et al., 2022; Han et al., 2023; Ratner et al., 2023): SST-2 (Socher et al., 2013), MovieReview (MR Pang and Lee, 2005), AGNews (Zhang et al., 2015), SST-5 (Socher et al., 2013), TREC (Voorhees and Tice, 2000), DBPedia (Zhang et al., 2015), NLU (Liu et al., 2019a), BANKING77 (Casanueva et al., 2020), CLINIC150 (Larson et al., 2019). We follow the prompts used in Ratner et al. (2023) for all datasets. During evaluation, we first calculate the log-likelihood of each option and select the option with the highest likelihood. We sample the in-context learning demonstrations from the training set such that each label has an equal number of demonstrations (except for possible remainders).",
+        "bbox": [
+            507,
+            552,
+            887,
+            825
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Furthermore, we first calculate the accuracy for each dataset using four different metrics: likelihood, likelihood normalized for length, calibrated likelihood, and calibrated likelihood normalized for length. We calibrate using Domain Conditional PMI (Holtzman et al., 2021), but use the empty string as the domain string for all datasets for simplicity. We then choose the metrics that yield the highest score for the LLAMA-2 model in the twoshot setting and apply the same metrics to all other models. The metrics used for each dataset are shown in Table 8. In this work, we did not investigate how to best calibrate CEPE in ICL settings. We leave these explorations for future work.",
+        "bbox": [
+            507,
+            826,
+            887,
+            922
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>7</sup>https://github.com/mit-han-lab/ streaming-llm",
+        "bbox": [
+            114,
+            896,
+            389,
+            921
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_number",
+        "text": "2603",
+        "bbox": [
+            478,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/d23b081db9bc7dc17b6626be359e39b76dc41a6a71e73eb5081bac2d5c468307.jpg",
+        "table_caption": [
+            "Table 6: Performance of STREAMINGLLM with different stride lengths."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>Stride</td><td>ArXiv</td><td>Book</td><td>PG19</td><td>ProofPile</td><td>CodeParrot</td></tr><tr><td>Total Tokens = 8192</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>STREAMINGLLM</td><td>1</td><td>2.823</td><td>6.381</td><td>7.817</td><td>2.522</td><td>1.848</td></tr><tr><td></td><td>2048</td><td>2.740</td><td>6.327</td><td>7.783</td><td>2.437</td><td>1.806</td></tr></table>",
+        "bbox": [
+            218,
+            80,
+            779,
+            152
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "table",
+        "img_path": "images/8d498b04f8ea7685b130de6db6f5089854af850654fc0db4ef74a0fcef07505e.jpg",
+        "table_caption": [
+            "Table 7: Open-domain QA results. We report exact match scores for the Natural Questions(NQ) test set, TriviaQA(TQA) validation set, and PopQA test set. All models use two-shot in-context learning. k is the number of retrieved passages, and CEPE uses the top 10 passages in the decoder and all passages in the encoder."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>k</td><td>NQ</td><td>TQA</td><td>PopQA</td></tr><tr><td rowspan=\"5\">LLAMA-2</td><td>1</td><td>28.37</td><td>56.44</td><td>27.17</td></tr><tr><td>5</td><td>31.91</td><td>61.08</td><td>33.83</td></tr><tr><td>10</td><td>32.27</td><td>62.09</td><td>34.67</td></tr><tr><td>15</td><td>31.19</td><td>61.35</td><td>33.67</td></tr><tr><td>20</td><td>30.39</td><td>60.31</td><td>31.35</td></tr><tr><td rowspan=\"5\">LLAMA-2-32K</td><td>10</td><td>30.64</td><td>56.00</td><td>32.38</td></tr><tr><td>15</td><td>31.27</td><td>56.98</td><td>33.48</td></tr><tr><td>20</td><td>31.97</td><td>57.28</td><td>33.75</td></tr><tr><td>30</td><td>30.66</td><td>57.57</td><td>33.90</td></tr><tr><td>60</td><td>30.58</td><td>57.03</td><td>34.61</td></tr><tr><td rowspan=\"5\">REPLUG</td><td>5</td><td>31.27</td><td>61.21</td><td>32.40</td></tr><tr><td>10</td><td>31.52</td><td>61.35</td><td>32.31</td></tr><tr><td>15</td><td>30.80</td><td>60.89</td><td>31.62</td></tr><tr><td>20</td><td>30.30</td><td>60.41</td><td>31.11</td></tr><tr><td>30</td><td>29.78</td><td>59.99</td><td>30.27</td></tr><tr><td rowspan=\"5\">CEPE</td><td>10</td><td>32.27</td><td>62.09</td><td>34.67</td></tr><tr><td>15</td><td>33.30</td><td>62.30</td><td>34.67</td></tr><tr><td>20</td><td>33.85</td><td>62.26</td><td>34.83</td></tr><tr><td>30</td><td>33.91</td><td>62.33</td><td>34.85</td></tr><tr><td>60</td><td>34.07</td><td>62.26</td><td>34.98</td></tr></table>",
+        "bbox": [
+            122,
+            198,
+            478,
+            542
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            665,
+            490,
+            795
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "C.3 ZeroSCROLLS",
+        "text_level": 2,
+        "bbox": [
+            114,
+            804,
+            277,
+            820
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "We use a subset of the ZeroSCROLLS (Shaham et al., 2023) with large validation sets: NarrativeQA (Kociský et al.ˇ , 2018), Qasper (Dasigi et al., 2021), QuALITY (Pang et al., 2022), GovReport (Huang et al., 2021), SummScreenFD (Chen et al., 2022), and QMSum (Zhong et al., 2021). Specifically, we use the validation sets of these datasets made available by SCROLLS (Shaham et al., 2022).",
+        "bbox": [
+            110,
+            826,
+            490,
+            923
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "table",
+        "img_path": "images/6455fbccf3b04234477169abf0666d89346d73f95db89fd45e99c7a1050d6f95.jpg",
+        "table_caption": [
+            "Table 8: Metrics used for each dataset. For normalization, we divide the log-likelihood by the length of the prompt. For calibration, we use Domain Conditional PMI (Holtzman et al., 2021) with the empty string as the domain string for all datasets for simplicity."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td colspan=\"2\">Normalized</td><td>Calibrated</td></tr><tr><td>SST2</td><td>No</td><td>Yes</td></tr><tr><td>MR</td><td>No</td><td>No</td></tr><tr><td>AGNews</td><td>No</td><td>No</td></tr><tr><td>SST5</td><td>No</td><td>Yes</td></tr><tr><td>TREC</td><td>No</td><td>No</td></tr><tr><td>TREC-F</td><td>No</td><td>No</td></tr><tr><td>DBPedia</td><td>Yes</td><td>Yes</td></tr><tr><td>NLU-S</td><td>Yes</td><td>Yes</td></tr><tr><td>NLU-I</td><td>No</td><td>No</td></tr><tr><td>BANKING</td><td>No</td><td>No</td></tr><tr><td>CLINIC</td><td>No</td><td>No</td></tr></table>",
+        "bbox": [
+            564,
+            197,
+            830,
+            355
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            467,
+            884,
+            499
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "However, we follow the same evaluation setup as ZeroSCROLLS, where models are evaluated in the zero-shot setting. We also use the same evaluation metrics as ZeroSCROLLS for each dataset. For the question answering datasets (NarrativeQA, Qasper, and QuALITY), we allow the model to generate up to 50 tokens, and we use greedy decoding.",
+        "bbox": [
+            507,
+            500,
+            885,
+            613
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "For the summarization datasets (GovReport, SummScreenFD, and QMSum), we allow the model to generate up to 1, 024 tokens, following the original authors. For SummScreenFD and QM-Sum, we use greedy decoding, and for GovReport we use nucleus sampling (Holtzman et al., 2020) with a temperature of 1.0 and top-p of 0.95 and a minimum generation length of 10 tokens.",
+        "bbox": [
+            507,
+            614,
+            887,
+            743
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "This is because GovReport has a much longer gold summary than the other datasets, and sampling methods are typically used in long-generation settings. Furthermore, greedy decoding may degenerate. The minimum generation length helps prevent trivial outputs, such as empty strings. To account for the randomness in the sampling method, we averaged GovReport performance over 3 seeded runs, and we found that the standard deviation is less than 0.20 ROUGE-L scores in all settings.",
+        "bbox": [
+            507,
+            744,
+            887,
+            904
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Furthermore, we hypothesize that LLAMA-2-",
+        "bbox": [
+            526,
+            906,
+            885,
+            922
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "page_number",
+        "text": "2604",
+        "bbox": [
+            480,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "chart",
+        "img_path": "images/46a4949d5b8435051f6e5cf0357ebb8868cd66450d9ba0cbea0ba71dd7da2511.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 4: Needle in the Haystack evaluation on CEPE-LLAMA-2. The white dotted line denotes the training length."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            119,
+            82,
+            482,
+            212
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "32K INSTRUCT may overfit to specific domains such as GovReport due to being trained on Book-Sum, a summarization dataset that also has long gold summaries (Kryscinski et al., 2022).",
+        "bbox": [
+            112,
+            287,
+            489,
+            353
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "We also show some generation examples in Table 9 and 10. We find that CEPED can especially benefit from the additional contexts in the encoder in the QA datasets, where the answer may be localized to just one small part of the entire input. On the other hand, summarization tasks do not catastrophically fail when the model only has access to only part of the input, as the model can still generate a coherent summary for the provided context, achieving reasonable ROUGE-L scores.",
+        "bbox": [
+            112,
+            353,
+            490,
+            514
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "D Needle in the Haystack",
+        "text_level": 2,
+        "bbox": [
+            112,
+            525,
+            352,
+            542
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Needle in the Haystack (Kamradt, 2024) is a synthetic task designed to test in-context retrieval abilities of long-context language models. In this task, a needle (e.g., “The best thing to do in San Francisco is to eat a sandwich and sit in Dolores Park on a sunny day”) is placed in a long text of essays, and the model is tasked with retrieving the needle from the context—that is, the model is expected to answer “What is the best thing to do in San Francisco?” with the needle.",
+        "bbox": [
+            110,
+            551,
+            490,
+            712
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "We evaluate CEPE-LLAMA-2, where 2K tokens are used in the decoder, and the rest of the context is used in the encoder. For this experiment, we also scale the cross-attention scores with the ratio between the number of tokens during inference and the number of tokens during training, following Peng et al. (2024). We follow the evaluation setting of Fu et al. (2024), but split the context by sentence boundaries when inputting additional tokens to the encoder. We find that while CEPE-LLAMA-2 is able to perfectly retrieve the needle in context at the training sequence length (\\~10K tokens) and at some longer sequences (\\~14K tokens), it struggles at other lengths. This is likely due to the training/inference discrepancies on the input length and we will explore training objectives that can mitigate such discrepancies in the future. Other efficient methods, such as StreamingLLM (Xiao et al., 2024b), also struggle with copying tokens that are far from the current context.",
+        "bbox": [
+            112,
+            713,
+            492,
+            923
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            885,
+            198
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "E Ablations",
+        "text_level": 2,
+        "bbox": [
+            509,
+            209,
+            635,
+            224
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "We show the full results for the ablation studies in Table 12 and 13, and 14. The subsections below describes the ablation settings in more details.",
+        "bbox": [
+            507,
+            234,
+            884,
+            282
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "E.1 Training Settings",
+        "text_level": 2,
+        "bbox": [
+            509,
+            292,
+            697,
+            309
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Training with retrieved documents. In this subsection, we study training CEPE with retrieved documents. Specifically, we pair the training sequences described in §2.2 with retrieved passages from the retrieval split of RP using Contriever. We use the first 256 tokens of the decoder input X as the query and retrieve k = 16 passages to form the additional contexts . Then, we train CEPE with retrieved passages (RetDoc) using the same training settings as in §2.3.",
+        "bbox": [
+            507,
+            321,
+            885,
+            482
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Encoder training. We also investigate how to best train the encoder. To this end, we train CEPE with (1) freezing the encoder after pre-training and the warmup stage, (2) training with a randomly initialized encoder, and (3) using the pre-trained model without the warmup stage. As shown in Table 5, we find that the copying warmup stage and fine-tuning the encoder during training are both crucial for strong performance.",
+        "bbox": [
+            507,
+            488,
+            885,
+            634
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "E.2 KL Divergence",
+        "text_level": 2,
+        "bbox": [
+            509,
+            644,
+            680,
+            659
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "The key component of CEPED is the KL Divergence loss. To understand the importance of this auxiliary loss, we explore the performance of CEPED with changes to the loss function in this subsection. Let $\\mathcal { L } _ { C E } , \\mathcal { L } _ { K L }$ be the cross entropy loss and the KL Divergence loss, respectively. Then, the total loss is $\\begin{array} { r } { \\mathcal { L } = c _ { C E } \\mathcal { L } _ { C E } + c _ { K L } \\mathcal { L } _ { K L } , } \\end{array}$ where $c _ { C E }$ and $c _ { K L }$ are coefficients for the cross entropy loss and the KL Divergence loss, respectively. We vary the coefficients $c _ { C E }$ and $c _ { K L }$ to study the importance of the KL Divergence loss. The results are presented in Table 14. Without the KL Divergence loss, CEPED may still perform well on NarrativeQA and Qasper, but the performance on the summarization tasks and QuALITY may decrease as a result.",
+        "bbox": [
+            507,
+            664,
+            887,
+            922
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_number",
+        "text": "2605",
+        "bbox": [
+            478,
+            929,
+            521,
+            942
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "image",
+        "img_path": "images/0f476f82a3081c11cda22a0b65ee89856c86a2620fb14948073d7a0c1f0dc404.jpg",
+        "image_caption": [
+            "Table 9: ZeroSCROLLS generation example on the Qasper dataset. CEPE sees the entire article through the decoder and the encoder, whereas LLAMA-2-CHAT only sees a 2K token window. For brevity, we omit part of the decoder input and only show 2 out of k = 17 encoder inputs for CEPE."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            127,
+            102,
+            872,
+            846
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_number",
+        "text": "2606",
+        "bbox": [
+            478,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "image",
+        "img_path": "images/485e9e5c284f2f37a0a611e7b046f37770924e284c4cf402e4717a71112d363f.jpg",
+        "image_caption": [
+            "Table 10: ZeroSCROLLS generation example on the SummScreenFD dataset. CEPE sees the entire TV script through the decoder and the encoder, whereas LLAMA-2-CHAT only sees a 2K token window. For brevity, we omit part of the decoder input and only show 2 out of k = 44 encoder inputs for CEPE."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            124,
+            102,
+            873,
+            845
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "page_number",
+        "text": "2607",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "table",
+        "img_path": "images/96c230172797715270fdf7256899d9266e3c60b95a13dd293faf64c33ec5bff5.jpg",
+        "table_caption": [
+            "Table 11: ZeroSCROLLS length statistics. l is the number of input tokens in each example. We report the mean, median, maximum, and minimum number of input tokens in each dataset. We also report the percentage of examples that have between 4, 096 and 32, 768 tokens $( l \\in [ 4 K , 3 2 K ] )$ and the percentage of examples that have over 32, 768 tokens $( l > 3 2 K )$ . We observe that only NarrativeQA has a substantial number of test examples with more than 32K tokens, making it the most useful for evaluating long-context language models."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Dataset</td><td>Mean</td><td>Median</td><td>Max.</td><td>Min.</td><td> $l \\in \\left[ 4 K , 3 2 K \\right] ( \\% )$ </td><td> $l > 3 2 K ( \\% )$ </td></tr><tr><td>NarrativeQA</td><td>75998.7</td><td>69163</td><td>264143</td><td>18260</td><td>5.8</td><td>94.2</td></tr><tr><td>QASPER</td><td>5278.5</td><td>4896.0</td><td>17626</td><td>2003</td><td>61.6</td><td>0.0</td></tr><tr><td>QuALITY</td><td>8035.8</td><td>8285.5</td><td>10779</td><td>3443</td><td>96.2</td><td>0.0</td></tr><tr><td>GovReport</td><td>11345.4</td><td>10128.5</td><td>48074</td><td>2441</td><td>91.2</td><td>0.6</td></tr><tr><td>SummŠcreenFD</td><td>9924.2</td><td>9364.0</td><td>27565</td><td>3078</td><td>99.1</td><td>0.0</td></tr><tr><td>QMSum</td><td>16027.7</td><td>14811.5</td><td>34543</td><td>3120</td><td>94.1</td><td>4.8</td></tr></table>",
+        "bbox": [
+            189,
+            151,
+            810,
+            249
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "table",
+        "img_path": "images/78bd5c32dbebce9ba1ce72771ff08517fa22662787ee6d1b9365a845bd495702.jpg",
+        "table_caption": [
+            "Table 12: Test perplexity for all ablation settings in the long-context language modeling evaluation setting."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>ArXiv</td><td>Book</td><td>PG19</td><td>ProofPile</td><td>CodeParrot</td></tr><tr><td colspan=\"6\">Total Tokens = 4096</td></tr><tr><td>CEPE</td><td>2.579</td><td>6.292</td><td>7.536</td><td>2.396</td><td>1.763</td></tr><tr><td>w/ RetDoc</td><td>2.649</td><td>6.340</td><td>7.586</td><td>2.465</td><td>1.775</td></tr><tr><td>w/ RP Only</td><td>2.633</td><td>6.335</td><td>7.604</td><td>2.446</td><td>1.766</td></tr><tr><td>w/ AB Only</td><td>2.569</td><td>6.287</td><td>7.525</td><td>2.386</td><td>1.772</td></tr><tr><td>w/ Frozen Encoder</td><td>2.631</td><td>6.353</td><td>7.603</td><td>2.446</td><td>1.785</td></tr><tr><td>w/ Random Encoder</td><td>2.680</td><td>6.374</td><td>7.617</td><td>2.488</td><td>1.797</td></tr><tr><td>w/ No Warmup</td><td>2.678</td><td>6.372</td><td>7.613</td><td>2.487</td><td>1.796</td></tr><tr><td colspan=\"6\">Total Tokens = 8192</td></tr><tr><td>CEPE</td><td>2.496</td><td>6.049</td><td>7.372</td><td>2.219</td><td>1.715</td></tr><tr><td>w/ RetDoc</td><td>2.553</td><td>6.089</td><td>7.417</td><td>2.278</td><td>1.724</td></tr><tr><td>w/ RP Only</td><td>2.543</td><td>6.085</td><td>7.434</td><td>2.262</td><td>1.718</td></tr><tr><td>w/ AB Only</td><td>2.485</td><td>6.040</td><td>7.357</td><td>2.208</td><td>1.720</td></tr><tr><td>w/ Frozen Encoder</td><td>2.541</td><td>6.099</td><td>7.430</td><td>2.261</td><td>1.734</td></tr><tr><td>w/ Random Encoder</td><td>2.571</td><td>6.108</td><td>7.439</td><td>2.291</td><td>1.739</td></tr><tr><td>w/ No Warmup</td><td>2.572</td><td>6.113</td><td>7.439</td><td>2.292</td><td>1.739</td></tr><tr><td colspan=\"6\">Total Tokens = 32768</td></tr><tr><td>CEPE</td><td>2.421</td><td>6.015</td><td>7.204</td><td>2.218</td><td>1.702</td></tr><tr><td>w/ RetDoc</td><td>2.546</td><td>6.088</td><td>7.280</td><td>2.332</td><td>1.726</td></tr><tr><td>w/RP Only</td><td>2.497</td><td>6.059</td><td>7.271</td><td>2.288</td><td>1.709</td></tr><tr><td>w/ AB Only</td><td>2.396</td><td>5.995</td><td>7.178</td><td>2.195</td><td>1.702</td></tr><tr><td>w/ Frozen Èncoder</td><td>2.520</td><td>6.091</td><td>7.282</td><td>2.297</td><td>1.739</td></tr><tr><td>w/ Random Encoder</td><td>2.571</td><td>6.108</td><td>7.303</td><td>2.346</td><td>1.752</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>w/ No Warmup</td><td>2.571</td><td>6.110</td><td>7.301</td><td>2.346</td><td>1.752</td></tr></table>",
+        "bbox": [
+            252,
+            478,
+            746,
+            825
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "page_number",
+        "text": "2608",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "table",
+        "img_path": "images/deb34150b1f40001a9d7955b2f328e623adbba0f1412f3202293c0c160908019.jpg",
+        "table_caption": [
+            "Table 13: Test perplexity on RedPajama across all domains in the retrieval-augmented setting for all ablation experiments. k is the number of additional contexts used. Avg. is the macro average across all domains."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>ArXiv</td><td>Book</td><td>C4-RP</td><td>CC</td><td>Github</td><td>StackEx</td><td>Wiki</td><td>Avg.</td></tr><tr><td colspan=\"7\">Total Tokens = 2048 (k = 0)</td><td></td><td></td></tr><tr><td>CEPE</td><td>3.486</td><td>6.481</td><td>6.884</td><td>5.319</td><td>1.793</td><td>3.709</td><td>4.302</td><td>4.568</td></tr><tr><td>w/ RetDoc</td><td>3.413</td><td>6.399</td><td>6.854</td><td>5.263</td><td>1.788</td><td>3.694</td><td>4.287</td><td>4.528</td></tr><tr><td>w/ RP Only</td><td>3.485</td><td>6.479</td><td>6.901</td><td>5.313</td><td>1.777</td><td>3.700</td><td>4.281</td><td>4.562</td></tr><tr><td>w/ AB Only</td><td>3.505</td><td>6.504</td><td>7.185</td><td>5.444</td><td>1.859</td><td>4.018</td><td>4.763</td><td>4.754</td></tr><tr><td>w/ Frozen Encoder</td><td>3.501</td><td>6.495</td><td>6.933</td><td>5.505</td><td>1.821</td><td>3.734</td><td>4.323</td><td>4.616</td></tr><tr><td>w/ Random Encoder</td><td>3.426</td><td>6.442</td><td>6.904</td><td>5.541</td><td>1.838</td><td>3.728</td><td>4.338</td><td>4.602</td></tr><tr><td>w/ No Copy Init</td><td>3.452</td><td>6.459</td><td>6.914</td><td>5.546</td><td>1.842</td><td>3.732</td><td>4.344</td><td>4.613</td></tr><tr><td colspan=\"9\">Total Tokens = 7168 (k = 20)</td></tr><tr><td>CEPE</td><td>3.475</td><td>6.463</td><td>6.875</td><td>5.266</td><td>1.782</td><td>3.703</td><td>4.296</td><td>4.551</td></tr><tr><td>w/ RetDoc</td><td>3.413</td><td>6.393</td><td>6.839</td><td>5.169</td><td>1.779</td><td>3.693</td><td>4.286</td><td>4.510</td></tr><tr><td>w/RP Only</td><td>3.479</td><td>6.467</td><td>6.894</td><td>5.249</td><td>1.767</td><td>3.696</td><td>4.276</td><td>4.547</td></tr><tr><td>w/ AB Only</td><td>3.491</td><td>6.481</td><td>7.140</td><td>5.401</td><td>1.846</td><td>4.004</td><td>4.738</td><td>4.729</td></tr><tr><td>w/ Frozen Encoder</td><td>3.485</td><td>6.482</td><td>6.930</td><td>5.500</td><td>1.815</td><td>3.727</td><td>4.318</td><td>4.608</td></tr><tr><td>w/ Random Encoder</td><td>3.426</td><td>6.442</td><td>6.904</td><td>5.540</td><td>1.837</td><td>3.727</td><td>4.337</td><td>4.602</td></tr><tr><td>w/ No Copy Init</td><td>3.447</td><td>6.457</td><td>6.913</td><td>5.545</td><td>1.841</td><td>3.721</td><td>4.332</td><td>4.608</td></tr><tr><td colspan=\"9\">Total Tokens = 14848 (k = 50)</td></tr><tr><td>CEPE</td><td>3.467</td><td>6.457</td><td>6.881</td><td>5.273</td><td>1.777</td><td>3.701</td><td>4.292</td><td>4.550</td></tr><tr><td>w/ RetDoc</td><td>3.413</td><td>6.392</td><td>6.835</td><td>5.098</td><td>1.776</td><td>3.692</td><td>4.287</td><td>4.499</td></tr><tr><td>w/ RP Only</td><td>3.472</td><td>6.465</td><td>6.900</td><td>5.243</td><td>1.762</td><td>3.693</td><td>4.274</td><td>4.544</td></tr><tr><td>w/ AB Only</td><td>3.480</td><td>6.471</td><td>7.114</td><td>5.412</td><td>1.838</td><td>3.994</td><td>4.719</td><td>4.718</td></tr><tr><td>w/ Frozen Encoder</td><td>3.474</td><td>6.474</td><td>6.930</td><td>5.509</td><td>1.814</td><td>3.723</td><td>4.316</td><td>4.606</td></tr><tr><td>w/ Random Encoder</td><td>3.426</td><td>6.442</td><td>6.904</td><td>5.540</td><td>1.837</td><td>3.726</td><td>4.337</td><td>4.602</td></tr><tr><td>w/ No Copy Init</td><td>3.445</td><td>6.456</td><td>6.913</td><td>5.545</td><td>1.841</td><td>3.716</td><td>4.329</td><td>4.606</td></tr></table>",
+        "bbox": [
+            184,
+            306,
+            811,
+            653
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "page_number",
+        "text": "2609",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "table",
+        "img_path": "images/b814bd867487899a3d693d8ed409fdb9841d9d28ba363819d0e789994529ea48.jpg",
+        "table_caption": [
+            "Table 14: ZeroSCROLLS results using different losses during training, where $c _ { K L }$ is the coefficient of the KL Divergence loss. $c _ { C E } = 1$ is the coefficient of the Cross-Entropy loss for all experiments."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td colspan=\"3\">Question Answering</td><td colspan=\"3\">Summarization</td></tr><tr><td>CKL NQA</td><td>Qspr</td><td>QALT</td><td>GvRp</td><td>SSFD</td><td>QMSum</td></tr><tr><td colspan=\"7\">Total Tokens = 4K</td></tr><tr><td>2</td><td>19.5</td><td>20.5</td><td>30.2</td><td>16.5</td><td>16.4</td><td>19.6</td></tr><tr><td>1</td><td>21.6</td><td>20.7</td><td>27.2</td><td>16.3</td><td>5.3</td><td>4.7</td></tr><tr><td>0</td><td>21.3</td><td>21.0</td><td>27.4</td><td>14.6</td><td>14.9</td><td>15.6</td></tr><tr><td colspan=\"7\">Total Tokens = 16K</td></tr><tr><td>2</td><td>20.6</td><td>19.9</td><td>29.6</td><td>15.9</td><td>16.8</td><td>19.4</td></tr><tr><td>1</td><td>21.8</td><td>20.6</td><td>26.8</td><td>16.0</td><td>15.2</td><td>16.1</td></tr><tr><td>0</td><td>22.9</td><td>20.6</td><td>26.4</td><td>14.8</td><td>5.2</td><td>4.7</td></tr><tr><td colspan=\"7\">Total Tokens = 32K</td></tr><tr><td>2</td><td>21.6</td><td>19.9</td><td>29.6</td><td>15.8</td><td>16.7</td><td>19.5</td></tr><tr><td>1</td><td>22.7</td><td>20.6</td><td>26.8</td><td>16.0</td><td>15.2</td><td>15.8</td></tr><tr><td>0</td><td>22.3</td><td>20.6</td><td>26.4</td><td>14.6</td><td>5.2</td><td>4.7</td></tr><tr><td colspan=\"7\">All Tokens</td></tr><tr><td>2</td><td>21.9</td><td>19.9</td><td>29.6</td><td>15.9</td><td>16.7</td><td>19.5</td></tr><tr><td>1</td><td>22.6</td><td>20.6</td><td>26.8</td><td>15.9</td><td>15.2</td><td>15.8</td></tr><tr><td>0</td><td>23.0</td><td>20.6</td><td>26.4</td><td>14.6</td><td>5.2</td><td>4.7</td></tr></table>",
+        "bbox": [
+            122,
+            323,
+            478,
+            607
+        ],
+        "page_idx": 22
+    },
+    {
+        "type": "page_number",
+        "text": "2610",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 22
+    }
+]

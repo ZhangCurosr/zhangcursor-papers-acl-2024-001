@@ -1,0 +1,2392 @@
+[
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "SportsMetrics: Blending Text and Numerical Data to Understand Information Fusion in LLMs"
+                    }
+                ],
+                "level": 1
+            },
+            "bbox": [
+                156,
+                89,
+                840,
+                128
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Yebowen Hu,† Kaiqiang Song,‡ Sangwoo Cho,‡ Xiaoyang Wang,‡ Hassan Foroosh,† Dong Yu,‡ Fei Liu§"
+                    }
+                ]
+            },
+            "bbox": [
+                221,
+                142,
+                781,
+                178
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "†University of Central Florida ‡Tencent AI Lab, Bellevue, WA §Emory University {yebowen.hu, hassan.foroosh}@ucf.edu"
+                    }
+                ]
+            },
+            "bbox": [
+                161,
+                184,
+                842,
+                216
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "{riversong, swcho, shawnxywang, dyu}@global.tencent.com fei.liu@emory.edu"
+                    }
+                ]
+            },
+            "bbox": [
+                154,
+                217,
+                865,
+                234
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Abstract"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                262,
+                260,
+                342,
+                275
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Large language models hold significant potential for integrating various data types, such as text documents and database records, for advanced analytics. However, blending text and numerical data presents substantial challenges. LLMs need to process and cross-reference entities and numbers, handle data inconsistencies and redundancies, and develop planning capabilities such as building a working memory for managing complex data queries. In this paper, we introduce four novel tasks centered around sports data analytics to evaluate the numerical reasoning and information fusion capabilities of LLMs. These tasks involve providing LLMs with detailed, play-by-play sports game descriptions, then challenging them with adversarial scenarios such as new game rules, longer durations, scrambled narratives, and analyzing key statistics in game summaries. We conduct extensive experiments on NBA and NFL games to assess the performance of LLMs on these tasks. Our benchmark, SportsMetrics, introduces a new mechanism for assessing LLMs numerical reasoning and fusion skills."
+                    }
+                ]
+            },
+            "bbox": [
+                141,
+                282,
+                462,
+                613
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "1 Introduction"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                619,
+                260,
+                634
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Large language models (LLMs) are more powerful than ever. OpenAI’s GPT-4 Turbo (2023) features a 128k context window, allowing it to process over 300 pages of text in a single prompt. Claude v2.1 (2023) steps it up with a 200k token window, equivalent to roughly 150,000 words or more than 500 pages. Mistral AI (2023) has created a sparse mixture of experts model capable of processing up to 32k tokens. The developments suggest language models can now engage with vast amounts of text content and data, opening doors to exciting new applications in various domains."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                644,
+                489,
+                829
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "One of the most promising uses of LLMs is in handling a combination of unstructured texts and structured data. For example, determining if a patient can be discharged from the hospital may involve reviewing doctor notes, radiology and pathology reports, lab results, and other records that blend text and structured data (Adams et al., 2021; Bardhan et al., 2022; Cai et al., 2022, 2023; Veen et al., 2023; Ben Abacha et al., 2023); LLM Assistants for online shopping need to process product catalogs, sales transactions, and customer queries (Brynjolfsson et al., 2023; Loten, 2023). Yet, summarizing key details from a mix of unstructured and structured sources remains a considerable challenge. An LLM must navigate text descriptions, link entities, aggregate numbers, handle discrepancies, and beyond."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                829,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/cc4ae70f95208930410b95fa0f1c19533c12ee9ec06d55cc59e86e329580b08b.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 1: Play-by-plays of an NBA game. We include timestamps, player actions, team affiliations and a game recap. Total points for both teams are indicated in dotted circles and are withheld from LLMs."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                529,
+                260,
+                862,
+                539
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                623,
+                887,
+                794
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Information fusion focuses on synthesizing information from multiple textual sources to derive meaningful conclusions (Barzilay et al., 1999). Current approaches involve summarizing multiple text documents, providing concise answers to user queries, and integrating summarization with natural language inference to deduce information (Bhaskar et al., 2023; Caciularu et al., 2023; Sprague et al.,"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                797,
+                887,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "267"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                515,
+                941
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 267–278 August 11-16, 2024 ©2024 Association for Computational Linguistics"
+                    }
+                ]
+            },
+            "bbox": [
+                97,
+                946,
+                900,
+                972
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/ee68470069d025ee5823d811059e0df6e4320e7d61b10b6ac1ac3bda53654bca.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 2: (TOP LEFT) We examine the impact of changing game rules on final scores. For basketball, scoring events such as free throws, three-pointers, field goals, vary from 1 to 3 points. We ask LLMs to maintain these scoring events but under a new rule where each is worth only 1 point. (BOTTOM LEFT) We randomly swapped player team affiliations in the table without altering the game’s play-by-play records. (RIGHT) LLMs are provided with detailed play-by-play descriptions of a sports game and player team affiliations. Their job is to use this information to update key game statistics in a JSON format."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                115,
+                83,
+                882,
+                268
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "2022; Bostrom et al., 2022). The output is often a short text summary, the quality of which is difficult to evaluate (Deutsch et al., 2021). In contrast, our approach emphasizes the numerical aspect of information fusion (Geva et al., 2020; Zhu et al., 2021; Zhao et al., 2023; Reddy et al., 2024). We enable the LLM to navigate through lengthy texts, gather crucial statistics, and develop a working memory to manage complex data queries."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                385,
+                489,
+                526
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We introduce SportsMetrics, a benchmark designed to assess LLMs’ abilities in numerical reasoning and data fusion. This benchmark provides LLMs with detailed, play-by-play descriptions of sports games, including timestamps, player actions, and team affiliations, as illustrated in Figure 1. We focus on four novel tasks to evaluate LLMs in adversarial scenarios: (a) adapting to new game rules, (b) handling lengthy game descriptions, (c) managing scrambled game narratives, and (d) analyzing critical statistics in game summaries. E.g., an LLM might be asked to complete a basketball game recap by inserting missing key statistics, which requires the development of a working memory for game stats and reasoning skills."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                530,
+                490,
+                764
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our SportsMetrics benchmark presents three main benefits. First, it leverages sports data, including team-player affiliations and play-by-play details; they are dynamic narratives that LLMs cannot easily memorize. Second, it allows us to evaluate LLMs’ ability to track key statistics such as team points, assists, blocks, steals, and more, while also offering an overall game efficiency score for direct LLM comparison. Lastly, its use of widely understood sports terminology makes it more accessible to researchers than specialized medical language, making it an ideal benchmarking tool. While our current focus is on English, SportsMetrics also holds promise for multilingual applications."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                768,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                385,
+                885,
+                449
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2 Related Work"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                461,
+                667,
+                476
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "There is a growing need for a benchmark to evaluate LLMs’ informationfusion capabilities, which offers clear, quantitative scores for comparing various LLMs. For example, Chatbot Arena (Zheng et al., 2023) utilizes Elo ratings (Boubdir et al., 2023), MT-Bench comprises of 80 multi-turn questions, and MMLU focuses on a model’s multitask accuracy across 57 tasks (Hendrycks et al., 2021). Multi-document summarization offers a promising benchmark (Lebanoff et al., 2021; Huang et al., 2021; Wang et al., 2022; Xu et al., 2023). However, developing a summary scoring system poses challenges due to variables such as summary length, content coverage, and faithfulness (Cao et al., 2022; Liu et al., 2023c; Krishna et al., 2023; Hu et al., 2023; Li et al., 2023; Xu et al., 2024; Joseph et al., 2024). Sports data, which combines static knowledge with player dynamics, presents an untapped opportunity for benchmarking LLMs."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                488,
+                887,
+                783
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Combining information from a blend of textual and numerical records poses a significant challenge. In traditional multi-document summarization, the system creates a concise summary from a set of topically related documents. Giorgi et al. (Giorgi et al., 2023) show that this task remains difficult in an “open-domain” setting, where the document set is generated by a retriever and may include irrelevant information. With the growing popularity of retrieval-augmented generation (RAG) (Karpukhin et al., 2020; Liu et al., 2022), there is an increasing need to accurately fuse information from various sources. We explore information fusion by examining how LLMs cross-reference players and actions, and aggregate data across play-by-play descriptions to compile key game statistics."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                783,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "268"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/5b4e25311a23f6f3d5e17e6f2ea7520d4e302b61dc560f7de760bbbed0dbccbe.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 3: We adopt the NBA’s Game Score, originally designed for player evaluation, to measure a team’s overall efficiency. For American football, we apply NCAA’s Passing Efficiency formula."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                117,
+                83,
+                880,
+                258
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                315,
+                489,
+                424
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our work relates to numerical reasoning, which uses arithmetic reasoning to tackle mathematical word problems. Prior datasets in this area include MathQA (Amini et al., 2019), GSM8k (Cobbe et al., 2021), SVAMP (Patel et al., 2021), TAT-QA (Zhu et al., 2021), FinQA (Chen et al., 2022), MATH (Liu et al., 2023d), DocMath-Eval (Zhao et al., 2023), TABMWP (Lu et al., 2023) and more, many allowing models to generate answer explanations. The problems typically have brief descriptions, with the challenge lying in creating an expression tree and applying arithmetic knowledge. In contrast, our approach focuses on assessing LLMs ability to track key statistics across extremely long contexts."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                425,
+                489,
+                657
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Sports data has been utilized in various natural language tasks, including data-to-text generation for sports games (Lareau et al., 2011; Zhang et al., 2016; Wiseman et al., 2017; van der Lee et al., 2017; Puduppully et al., 2019), real-time game summarization from live commentaries (Edouard et al., 2017; Huang et al., 2020); and other aspects such as sports commentator bias (Merullo et al., 2019). Beyond sports, there’s significant interest in annotating and analyzing large-scale game-related corpora, such as reviews and gameplay logs, and summarizing gameplay commentaries (Lukin, 2020; Kicikoglu et al., 2020; Gu et al., 2022; Furman et al., 2022). We anticipate that insights from our SportsMetrics benchmark will benefit these areas, enhancing our understanding of game narratives and player dynamics."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                659,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3 The SportsMetrics Benchmark"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                313,
+                816,
+                330
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We collect NBA and NFL play-by-play data from ESPN.com. The descriptions capture the essence of each game. They are typically written by ESPN’s sports journalists, who are experts in their respective sports. We reached out to ESPN as necessary to ensure adherence to their data policies. In Figure 1, we use “time” to indicate the exact moment of each action on the game clock, while “play” details the actions occurring at those times. Scoring actions, which change the game’s score, are identified but not disclosed to LLMs during our experiments, as are team points. Additionally, we collect data on players’ team affiliations and the game’s box scores for our analysis."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                344,
+                885,
+                562
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our task requires LLMs to track key stats across thousands of play-by-play records, which is a nontrivial effort. An ideal LLM needs to associate each action with the right player and their team in order to calculate team-level statistics. It must also monitor multiple key statistics simultaneously, such as field goals, free throws, rebounds, assists, blocks, steals, personal fouls, and turnovers in a basketball game. We believe an LLM’s ability to summarize key details and fill in the missing statistics in game summaries demonstrates its capabilities in data fusion and numerical reasoning."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                564,
+                887,
+                750
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We need a comprehensive scoring metric to evaluate LLMs’ ability to monitor key game statistics. Simply reporting individual metrics such as team points, rebounds, assists, and blocks for each team is inefficient and does not provide a holistic view of game analysis. To address this, we employ expertdeveloped team statistics formulas, as illustrated in Figure 3. We adopt the NBA’s “Game Score” by John Hollinger, originally for player evaluation, to measure a team’s overall effectiveness in basketball. It considers both positive (points, rebounds, assists) and negative (missed shots, turnovers) factors. For American football, we apply NCAA’s “Passing Efficiency” formula, as the NFL rule is more complex. In the following sections, we evaluate LLMs under different adversarial scenarios to assess their robustness."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                752,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "269"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/ba3dd3b901ac9ff673f9495839437d2af48c44b0e898a47ff40370012fe07b06.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 4: An LLM fills in missing key statistics in game summaries through a three-step process. Initially, the LLM creates an internal JSON object as its memory. It then enriches this memory by adding necessary game or player statistics, where all values are set to null, and further reflects on whether this memory is sufficient to accomplish the task. Lastly, the LLM uses detailed play-by-play and team-player data to update the JSON object’s values; it finally utilizes this updated memory to fill in the blanks in the game summary."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                115,
+                83,
+                880,
+                366
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                461,
+                489,
+                555
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.1 Long-Form Game Narratives"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                570,
+                393,
+                587
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We begin by examining LLMs’ ability to reason over long contexts. For example, Liu et al. (2023b) introduced two tasks, multi-document QA and keyvalue retrieval, which require the model to identify relevant information within long contexts. They found that LLMs’ performance significantly deteriorates when they have to access relevant information in the middle of long contexts. Our study goes a step further, requiring LLMs to not only identify relevant actions but also accurately track statistics throughout long-form game narratives."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                595,
+                489,
+                766
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this task, each LLM is provided detailed playby-play descriptions of a sports game, including timestamps and specific actions. The players’ team affiliations are listed in two rows, representing each team. The LLM’s task is to use the play-by-plays to update key game statistics within a JSON object, initially filled with null values. For long-context LLMs such as GPT-4 Turbo, Claude 2.1, and Gemini Pro (Anil et al., 2023), we provide the entire game’s data at once for processing. For LLMs with"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                766,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "4k or 8k tokens context, we break the game down into four quarters. The LLM gathers statistics quarter by quarter. It generates a JSON object that holds values from each quarter. These are then added up to derive game-level statistics."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                462,
+                885,
+                538
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We use comprehensive, expert-devised formulas to evaluate LLMs in tracking game statistics. For NBA games, we monitor 11 key statistics: team points, field goals made, field goals attempted, free throws made, free throws attempted, offensive rebounds, defensive rebounds, steals, assists, blocks, and personal fouls.<sup>1</sup> Moreover, we calculate ‘Game Score’ to measure a team’s overall effectiveness in basketball. For NFL games, we track passing yards, touchdowns, interceptions, and pass completions and attempts. These additional stats allow for the computation of ‘Passing Efficiency."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                539,
+                885,
+                727
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.2 The Impact of Changing Game Rules"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                736,
+                850,
+                752
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "It is important to understand LLMs’ ability to make decisions under changing world rules. LLMs possess extensive knowledge from pretraining on the Internet, books, and other texts. This knowledge, held in their parametric memory, might not always align with the external evidence given to the model."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                757,
+                887,
+                852
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>1</sup>We exclude turnovers from tracking due to limitations in the data. Play-by-play descriptions may not capture every turnover, making it difficult for the model to track them accurately. When necessary, we rely on the ground-truth Turnover count from the box score to calculate the Game Score."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                859,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "270"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/e7eec4c55259b855a169bfa20620c6c5fba570feadd9f1349a0363ac7e2ecc4e.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 1: LLMs used in this study. Prices are per 1,000 tokens. Llama-2 and Mistral-7B are free and open-source."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Model</td><td>Release Date</td><td>Context Len</td><td>Input</td><td>Output</td><td>Organization</td></tr><tr><td>Claude-2.1</td><td>11.21.2023</td><td>200,000</td><td>$.008</td><td>$.024</td><td>Anthropic</td></tr><tr><td>GPT-4-1106-preview</td><td>11.06.2023</td><td>128,000</td><td>$.01</td><td>$.03</td><td>OpenAI</td></tr><tr><td>Gemini-Pro</td><td>12.06.2023</td><td>32,000</td><td>$.001</td><td>$.002</td><td>Deepmind</td></tr><tr><td>GPT-3.5-Turbo-1106</td><td>11.06.2023</td><td>16,385</td><td>$.001</td><td>$.002</td><td>OpenAI</td></tr><tr><td>Mistral-7B-Instruct-v0.1</td><td>09.27.2023</td><td>8,000</td><td></td><td></td><td>Mistral</td></tr><tr><td>GPT-3.5-Turbo-0613</td><td>06.13.2023</td><td>4,096</td><td>$.0015</td><td>$.0015</td><td>OpenAI</td></tr><tr><td>Llama-2-13B-Chat</td><td>07.18.2023</td><td>4,096</td><td></td><td></td><td>Meta</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                117,
+                80,
+                878,
+                217
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Therefore, LLMs need to adjust to changing rules. Xie et al. (2023) highlight the importance of knowing when to trust a model’s own knowledge. Meng et al. (2023) explored finetuning LLMs to alter specific knowledge, but such changes are often irreversible. Here, we propose two tasks to evaluate LLMs’ abilities in adapting to new game rules."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                260,
+                490,
+                369
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "New Scoring Rules We examine the impact of changing game rules on final scores. For basketball, scoring events such as free throws, three-pointers, field goals, vary from 1 to 3 points. We ask LLMs to maintain these scoring events but under a new rule where each action is worth only 1 point. This contradicts LLMs’ existing knowledge, challenging them to recalibrate game scores accordingly. Ground-truth scores under this rule are obtained by counting the total number of scoring actions to determine each team’s total points."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                379,
+                490,
+                551
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Player Swapping We randomly swapped player team affiliations in the table without changing the game’s play-by-play records, as illustrated in Figure 2. Ground-truth team scores for this task are calculated by summing individual player scores under their new affiliations. This task allows us to vary the degree of conflict between the model’s existing knowledge and the provided evidence. Swapping more players increases the task’s difficulty."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                561,
+                489,
+                702
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.3 Robustness Against Noise"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                713,
+                364,
+                730
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Shuffling Play-by-Plays We present an adversarial challenge where we shuffle basketball game play-by-play descriptions and then ask LLMs to track the total points of each team. We choose basketball because adjacent actions in this context do not show strong causal relationships. Changing the sequence of scoring actions does not affect the teams’ total points. We anticipate that long-context LLMs will produce consistent or similar final game scores. To avoid confusing the model, we maintain the original order of timestamps."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                736,
+                489,
+                906
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We can also adjust the frequency of scoring plays in a game, making it more or less challenging for LLMs to process the narrative. By choosing a probability p from a set of values {-50%, -20%, 0, +20%, +50%}, we can either duplicate non-scoring plays (thereby decreasing scoring play density and extending the game narrative) or remove them (increasing scoring play density). Further, to test the LLM’s inherent knowledge, we randomly select players from each team in NFL games and assign them new names, such as characters from science fictions. This approach evaluates the model’s ability to adapt to changes in player identities. These alterations do not introduce new players or change the total points scored in the game; it simply varies the narrative’s complexity."
+                    }
+                ]
+            },
+            "bbox": [
+                131,
+                906,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/f140d49c8ba645ca7be045bffb09fb3498190faf3b3e32e84b64fc82ff5046b9.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 5: Effective working memory is key in this task. The variance in memory structure arises because we allowed each LLM to generate its JSON object as working memory, without enforcing a uniform schema. This step allows us to explore how each model organizes its memory to complete the task. Note that Claude’s ‘null values represent an initial state rather than an inability to aggregate information."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                515,
+                258,
+                877,
+                406
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                560,
+                887,
+                794
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.4 Planning for Complex Data Queries"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                806,
+                840,
+                824
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this task, LLMs fill in missing key statistics from game summaries (e.g., from ESPN). The process unfolds in three steps, illustrated in Figure 4. First, the LLM creates an internal JSON object memory, initially with placeholders for team points. Next, it enriches this memory by adding crucial game or player statistics. During a self-reflection phase, the LLM evaluates if its JSON memory can accurately complete the missing statistics for the given game recap. If it can, it responds with this memory; if not, it further refines the memory structure. Finally, using the detailed play-by-play and team-player data, the LLM updates the key statistics in the JSON format, then uses this information to fill in the blanks in the game summary. Figure 5 illustrates various LLM attempts building a memory."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                828,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "271"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                515,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/455eee5c5d03408fd9ba7465c99949b642ee26aab3e07555e8a230a54dc63dfc.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 2: Average absolute difference between model predictions and the actual scores on NBA data for tracking a team’s total points (Points) and all key game statistics (GScore). Moreover, we evaluate LLMs’ performance in three adversarial scenarios: ∆NewRule, ∆Swap and ∆Shuffle."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td></td><td>System</td><td>∆GScore</td><td>∆Points</td><td>∆NewRule</td><td>∆Swap</td><td>∆Shuffle</td></tr><tr><td rowspan=\"4\">Long-Context (16k+ Tokens)</td><td>GPT-3.5-Turbo-1106</td><td>33.50</td><td>9.45</td><td>14.10</td><td>13.53</td><td>9.89</td></tr><tr><td>Gemini-Pro</td><td>32.30</td><td>17.62</td><td>25.99</td><td>17.78</td><td>14.85</td></tr><tr><td>GPT-4-1106-preview</td><td>51.97</td><td>25.17</td><td>14.55</td><td>39.91</td><td>49.57</td></tr><tr><td>Claude-2.1</td><td>55.16</td><td>21.73</td><td>22.28</td><td>17.12</td><td>31.11</td></tr><tr><td rowspan=\"4\">Standard (4k to 8k Tokens)</td><td>GPT-3.5-Turbo-0613</td><td>114.28</td><td>94.34</td><td>18.22</td><td>88.25</td><td>89.11</td></tr><tr><td>Mistral-7B-Instuct</td><td>123.49</td><td>73.53</td><td>26.79</td><td>70.69</td><td>103.24</td></tr><tr><td>Llama-2-13B-Chat</td><td>110.69</td><td>70.77</td><td>83.04</td><td>53.98</td><td>81.09</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                115,
+                80,
+                880,
+                225
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                110,
+                306,
+                490,
+                462
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our task is inspired by several studies on LLM planning. Unlike LLM+P which uses the Planning Domain Definition Language (PDDL) for problemsolving (Liu et al., 2023a), we simplify the process by requiring only a valid JSON object for working memory. Relevant studies such as Reflexion (Shinn et al., 2023), ReAct (Yao et al., 2023b), and Treeof-thought (Yao et al., 2023a) have also influenced our approach. Sumers et al. (2023) have developed a framework for integrating planning into LLM agents. Prior studies have focused on ALFWorld’s interactive TextWorld environments. Our method are focused on sports, which involves masking key statistics in game recaps by sports journalists, then converting them into task data points for LLMs. We assess LLMs by their accuracy in filling in missing key statistics from game summaries."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                462,
+                489,
+                727
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4 Experiments"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                739,
+                262,
+                757
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We evaluate various LLMs in our SportsMetrics benchmark. These models are listed in Table 1 and split into two categories: long-context LLMs, capable of processing over 16k tokens, and standard LLMs, handling 4k to 8k tokens. Our evaluation focuses on their ability to accurately track a team’s total points (Points) and all key game statistics (GameScore). We measure the average absolute difference (deviation) between the models’ predictions and the actual box scores, denoted as ∆Points and ∆GScore, respectively.<sup>2</sup>"
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                766,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                509,
+                305,
+                726,
+                322
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our dataset comprises 28,492 NBA games and 5,867 NFL games spanning two decades from 2002 to 2023, available through ESPN’s archives. We randomly selected 100 games from each sport for our test set. On average, NBA games contain 466 plays and NFL games 173 plays. An average NBA game includes 6,229 tokens, while an NFL game has 6,166 tokens, with maximum lengths reaching 7,322 and 7,659 tokens, respectively."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                322,
+                885,
+                461
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "LLMs’ ability to integrate information is tested under three adversarial scenarios: (a) ‘NewRule, which assigns every scoring action just one point, regardless of the move, (b) ‘Swap’ which randomly selects two players from each team to swap their affiliations in the team-player table, (c) ‘Shuffle, which duplicates any non-scoring action with a 20% chance (p=0.2) before shuffling the play-byplays. We assess LLMs’ performance in these scenarios and report the deviation of predicted team points from actual scores as ∆NewRule, ∆Swap and ∆Shuffle."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                461,
+                887,
+                646
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In Table 2, we present our findings from the NBA section of our dataset. With ∆ representing the gap between predictions and actual scores, smaller values are preferable. We find that long-context LLMs significantly outperform standard LLMs across all tasks. GPT-3.5-Turbo-1106 leads in performance in every task except for ∆GScore, where Gemini-Pro has a slight edge. Long-context models have been released recently in late 2023. These results demonstrate their remarkable ability in identifying relevant actions from game play-by-plays, attributing each action to the right player and team, and aggregating numerical data to compute final team points and GameScore. This requires a level of numerical reasoning that humans are adept at but it is still new territory for LLMs."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                646,
+                887,
+                819
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>2</sup>∆GScore consistently shows higher values compared to ∆Points because it goes beyond counting a team’s points. It offers a full game analysis by requiring the LLM to consolidate key statistics such as points, rebounds, steals, assists and more into an overall score. Considering only team points is insufficient, especially in sports like soccer where scoring is rare. When necessary, we can convert GameScore to points by zeroing out other stats."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                825,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "272"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/496ec8d4437ba7c4b8d8ddf5801cbf8f69b50704644b5e4402504b65ca42e4cf.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 3: Discrepancies between model predictions and actual scores on NFL stats, including yards (Yards), attempts (ATT), completions (COMP), touchdowns (TD), interceptions (INT) and passing efficiency (PE)."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td></td><td>System</td><td>∆Yards</td><td>∆ATT</td><td>△COMP</td><td>∆TD</td><td>∆INT</td><td>∆PE</td></tr><tr><td rowspan=\"4\">Long-Context (16k+ Tokens)</td><td>GPT-4-1106-Preview</td><td>34.77</td><td>4.44</td><td>2.96</td><td>0.17</td><td>0.13</td><td>14.33</td></tr><tr><td>Claude-2.1</td><td>52.53</td><td>5.43</td><td>3.75</td><td>0.29</td><td>0.22</td><td>17.53</td></tr><tr><td>GPT-3.5-Turbo-1106</td><td>64.87</td><td>7.80</td><td>4.73</td><td>0.49</td><td>0.30</td><td>18.43</td></tr><tr><td>Gemini-Pro</td><td>85.14</td><td>12.68</td><td>6.87</td><td>0.83</td><td>0.52</td><td>26.17</td></tr><tr><td rowspan=\"3\">Standard (4k to 8k Tokens)</td><td>GPT-3.5-0613</td><td>105.68</td><td>24.11</td><td>15.80</td><td>1.09</td><td>0.60</td><td>89.56</td></tr><tr><td>Llama-2-13B-Chat</td><td>244.48</td><td>22.37</td><td>19.66</td><td>1.47</td><td>1.03</td><td>191.76</td></tr><tr><td>Mistral-7B-Instuct</td><td>119.31</td><td>17.64</td><td>9.05</td><td>1.23</td><td>0.69</td><td>202.07</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                115,
+                80,
+                878,
+                224
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/6ba8b62e9f5a5f393fb5d5f97fc11548fac1f01719f3933181b2bea463333c2f.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 6: We organize games based on the length of their play-by-plays, with the x-axis showing the games and the y-axis the deviation scores; lower scores indicate better performance. GPT-3.5-Turbo-1106 and Gemini-Pro stand out here, maintaining nearly flat curves."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                121,
+                282,
+                480,
+                483
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                593,
+                489,
+                670
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In Figure 6, we organize games based on the length (number of tokens) of their play-by-play descriptions, with the x-axis showing the games and the y-axis the deviation scores from various LLMs, where lower scores indicate better performance. We perform a regression analysis to demonstrate each LLM’s trend in handling games of increasing length. GPT-3.5-Turbo-1106 and Gemini-Pro stand out, maintaining nearly flat curves, which corresponds with their superior performance as shown in Table 2. By contrast, GPT-4-1106-Preview does well in shorter games but face difficulties in aggregating key statistics for longer games. Additionally, 79% its returned JSON objects contain zeros or null values, contributing to its unsatisfying performance on this task."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                674,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We note that basketball teams typically score between 100 to 120 points. Our findings show that the smallest prediction gap for ∆Points is 9.45, while the largest can exceed 100. This indicates the difficulty in accurately tracking key game statistics over long contexts, as standard LLMs can produce predictions significantly offfrom actual scores due to hallucinations. Among the three adversarial scenarios, the New Rule is relatively simpler as it requires LLMs to assign one point to every scoring action, focusing on counting these actions instead of distinguishing between types (3-pointers vs. free throws) and adding them up for a team’s score. In this scenario, Llama-2-13B-Chat scores lower than all other LLMs."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                285,
+                885,
+                517
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In Table 3, we present NFL data findings. American football’s play-by-plays have demonstrated a sequential nature, we cannot apply tests like New Rule, Swap, or Shuffle as with basketball games. Instead, we measure how model predictions deviate from actual scores on key game statistics, including yards (∆Yards), attempts (∆ATT), completions (∆COMP), touchdowns (∆TD), and interceptions (∆INT). We also combine them into Passing Efficiency (∆PE) for a holistic game analysis. Our results suggest that long-context LLMs greatly surpass standard models, with GPT-4-1106-Preview taking the lead, followed by Claude-2.1 and GPT-3.5-Turbo-1106."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                518,
+                887,
+                736
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Particularly, passing yards are vital in the NFL games, often leading to scoring opportunities like touchdowns and field goals. On average, NFL teams average 200 to 250 passing yards per game. We find that the top model, GPT-4-1106-Preview, exhibits a 34.77-yard discrepancy in passing yards prediction, while the open-source Llama-2-13B-Chat lags significantly in comparison. This highlights the difficulty of tracking passing yards, a task even more challenging than summarizing basketball points, with most models struggling to accurately aggregate such data."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                737,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "273"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/3b3e6e600a86a0ce1099eda21b85c7307a8f450b147c9c86de35821ff8baa551.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                121,
+                84,
+                374,
+                272
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/393f193dea03301fbfc41f5eebf205a7990d0871324d4f16277673905f28e043.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                374,
+                85,
+                628,
+                273
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/e16537b41f3f7d1ba131f70e849b6b89ab0ebde41db2bf7940019683a9d1e70f.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 7: (LEFT) We adjust the difficulty of identifying scoring events by either removing or duplicating non-scoring events. Moreover, we randomly swapped n players’ affiliations in the team-player table (MIDDLE) and replaced n players’ names with science fiction characters (RIGHT), all without changing the play-by-play texts."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                616,
+                85,
+                870,
+                272
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/b79f7e1df867fc60ea9a1f8054906e3d25a4bbef1b6a7fcca3aaa7e6de2c44fd.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 8: Accuracy of various LLMs in filling missing key statistics from basketball game recaps. Claude-2.1 shows strong performance, while Mistral-7B-Instruct achieves the highest accuracy among standard LLMs."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                121,
+                336,
+                472,
+                523
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our results suggest that the difference in performance between GPT-3.5-Turbo-1106 and GPT-4 across basketball and football games stems from the scoring frequency in each sport. Basketball’s frequent scoring presents a challenge for GPT-4- 1106-Preview to track all actions, while football, with less frequent scoring, is somewhat easier for the model to track. GPT-4-1106-Preview is optimized for handling extremely long contexts and it is less accurate in tracking frequent scoring. This distinct characteristic accounts for the varied performance of both models."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                611,
+                490,
+                796
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In Figure 7, we test LLMs’ robustness against adversarial conditions. In the left subfigure, we vary the difficulty of identifying scoring events by either dropping or duplicating non-scoring events. E.g., at probability "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "p { = } { - } 0 . 5"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", we eliminate any non-scoring event with a 50% chance; at "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\scriptstyle { p = 0 . 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", we duplicate any non-scoring event with a 20% chance, before shuffling the entire game description. The y-axis measures the deviation from the actual box score, with smaller values indicating better model performance. We observe that GPT-3.5-Turbo-1106 and Gemini-Pro perform the best, whose curves are quite flat, indicating their robustness to a varying level of noise in the play-by-plays. Overall, LLMs perform well when non-scoring events are removed, yet their performance drops as more non-scoring events are added, akin to searching for a needle in a larger haystack."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                797,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                340,
+                885,
+                494
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Further, we randomly swapped n players’ affiliations in the team-player table and replaced n players’ names with science fiction characters, all without changing the play-by-play texts. Our findings are shown in the middle and right subfigures. We find that Claude-2.1, Gemini-Pro, and GPT-3.5- Turbo-1106 are the top performers. Interestingly, renaming players significantly decreases all models’ performance. This suggests LLMs may use familiar basketball player names from their pretraining to guess team scores, rather than analyzing the actual play-by-plays. GPT-4-1106-Preview is the least adaptable to these adversarial conditions among the long-context LLMs. We also observe a notable performance disparity exists between opensource and proprietary LLMs."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                497,
+                887,
+                746
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We assess the accuracy of various LLMs in completing missing key statistics from basketball game recaps. The types of missing data include a player’s total points, team scores, assists, rebounds, and other stats. An LLM must understand the recap’s context to precisely estimate the missing statistic. To do this, LLMs create a JSON object as its working memory. They then calculate the needed statistics using play-by-play and team-player data and use this memory object to fill in the blanks."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                747,
+                887,
+                903
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Figure 8 presents the results of this task. Claude-"
+                    }
+                ]
+            },
+            "bbox": [
+                526,
+                906,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "274"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "2.1 shows strong performance, while Mistral-7B-Instruct achieves the highest accuracy among standard LLMs. This task requires that LLMs possess strong instruction-following capabilities to build an effective working memory. Figure 5 provides sample working memories from various LLMs. Although complex structures are possible, they increase the risk of errors when populating values. Models such as GPT-4-1106-Preview and Llama-2-13B-Chat face difficulties in creating a working memory. They hallucinate field values or fail to accurately fill fields with aggregated values from play-by-play data. By contrast, Claude-2.1’s memory structure is the best in terms of efficiency, focusing on essential game statistics. Our task crucially evaluates LLMs’ memory management skills when handling complex data queries."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                85,
+                490,
+                349
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5 Conclusion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                362,
+                247,
+                378
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We introduce SportsMetrics, a novel benchmark designed to evaluate LLMs in sports data analytics. It assess LLMs’ numerical reasoning and fusion abilities through challenges such as new game rules, lengthy descriptions, scrambled narratives and key stats analysis in game summaries. SportsMetrics highlights LLMs’ potential in fields such as multiplayer gaming and collaborative workspaces."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                390,
+                489,
+                516
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "6 Limitations"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                527,
+                250,
+                544
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our research focuses on NBA and NFL games, which are major sports with rich datasets. We are interested in exploring the generalizability of our findings to other sports. For example, soccer and cricket have distinct play styles and rules, which might challenge LLMs in unique ways. Our study has explored multiple adversarial scenarios, such as new game rules and scrambled game narratives. Such drastic changes might be uncommon in realworld conditions, and the models’ ability to handle these scenarios might not translate to improved performance in other analytical tasks. Finally, our scoring system’s effectiveness in assessing LLMs numerical reasoning capabilities in different contexts, such as multiplayer online gaming or collaborative workspaces, remains to be validated. This study explores LLMs’ potential in sports analytics. It is important to recognize these limitations when applying our findings to broader contexts."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                556,
+                490,
+                851
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Acknowledgements"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                864,
+                287,
+                881
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We are grateful to the reviewers for their insightful feedback, which has helped enhance the quality"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                890,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "of our paper. This research has been partially supported by the NSF CAREER award, #2303655."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                84,
+                885,
+                116
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "References"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                510,
+                142,
+                610,
+                158
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Griffin Adams, Emily Alsentzer, Mert Ketenci, Jason Zucker, and Noémie Elhadad. 2021. What’s in a summary? laying the groundwork for advances in hospital-course summarization. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 4794–4811, Online. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Aida Amini, Saadia Gabriel, Peter Lin, Rik Koncel-Kedziorski, Yejin Choi, and Hannaneh Hajishirzi. 2019. Mathqa: Towards interpretable math word problem solving with operation-based formalisms."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Rohan Anil, Sebastian Borgeaud, Yonghui Wu, Jean-Baptiste Alayrac, Jiahui Yu, Radu Soricut, Johan Schalkwyk, Andrew M. Dai, Anja Hauth, Katie Millican, David Silver, Slav Petrov, Melvin Johnson, Ioannis Antonoglou, Julian Schrittwieser, Amelia Glaese, Jilin Chen, and Emily Pitler. 2023. Gemini: A family of highly capable multimodal models."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Anthropic. 2023. Introducing Claude 2.1. https: //www.anthropic.com/index/claude-2-1. Accessed on: Nov 21, 2023."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jayetri Bardhan, Anthony Colas, Kirk Roberts, and Daisy Zhe Wang. 2022. DrugEHRQA: A question answering dataset on structured and unstructured electronic health records for medicine related queries. In Proceedings of the Thirteenth Language Resources and Evaluation Conference, pages 1083–1097, Marseille, France. European Language Resources Association."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Regina Barzilay, Kathleen R. McKeown, and Michael Elhadad. 1999. Information fusion in the context of multi-document summarization. In Proceedings of the 37th Annual Meeting of the Association for Computational Linguistics, pages 550–557, College Park, Maryland, USA. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Asma Ben Abacha, Wen-wai Yim, Yadan Fan, and Thomas Lin. 2023. An empirical study of clinical note generation from doctor-patient encounters. In Proceedings ofthe 17th Conference ofthe European Chapter of the Association for Computational Linguistics, pages 2291–2302, Dubrovnik, Croatia. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Adithya Bhaskar, Alex Fabbri, and Greg Durrett. 2023. Prompted opinion summarization with GPT-3.5. In Findings ofthe Associationfor Computational Linguistics: ACL 2023, pages 9282–9300, Toronto, Canada. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kaj Bostrom, Zayne Sprague, Swarat Chaudhuri, and Greg Durrett. 2022. Natural language deduction"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                512,
+                166,
+                885,
+                271
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "275"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "through search over statement compositions. In Findings of the Association for Computational Linguistics: EMNLP 2022, pages 4871–4883, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Meriem Boubdir, Edward Kim, Beyza Ermis, Sara Hooker, and Marzieh Fadaee. 2023. Elo uncovered: Robustness and best practices in language model evaluation."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Erik Brynjolfsson, Danielle Li, and Lindsey Raymond. 2023. Generative ai at work."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Avi Caciularu, Matthew Peters, Jacob Goldberger, Ido Dagan, and Arman Cohan. 2023. Peek across: Improving multi-document modeling via crossdocument question-answering. In Proceedings ofthe 61st Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 1970–1989, Toronto, Canada. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Pengshan Cai, Fei Liu, Adarsha Bajracharya, Joe Sills, Alok Kapoor, Weisong Liu, Dan Berlowitz, David Levy, Richeek Pradhan, and Hong Yu. 2022. Generation of patient after-visit summaries to support physicians. In Proceedings ofthe 29th International Conference on Computational Linguistics, pages 6234– 6247, Gyeongju, Republic of Korea. International Committee on Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Pengshan Cai, Zonghai Yao, Fei Liu, Dakuo Wang, Meghan Reilly, Huixue Zhou, Lingxi Li, Yi Cao, Alok Kapoor, Adarsha Bajracharya, Dan Berlowitz, and Hong Yu. 2023. Paniniqa: Enhancing patient education through interactive question answering."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Meng Cao, Yue Dong, and Jackie Cheung. 2022. Hallucinated but factual! inspecting the factuality of hallucinations in abstractive summarization. In Proceedings ofthe 60th Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 3340–3354, Dublin, Ireland. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zhiyu Chen, Wenhu Chen, Charese Smiley, Sameena Shah, Iana Borova, Dylan Langdon, Reema Moussa, Matt Beane, Ting-Hao Huang, Bryan Routledge, and William Yang Wang. 2022. Finqa: A dataset of numerical reasoning over financial data."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, Christopher Hesse, and John Schulman. 2021. Training verifiers to solve math word problems."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Daniel Deutsch, Rotem Dror, and Dan Roth. 2021. A statistical analysis of summarization evaluation metrics using resampling methods. Transactions ofthe Associationfor Computational Linguistics, 9:1132– 1146."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Amosse Edouard, Elena Cabrio, Sara Tonelli, and Nhan Le-Thanh. 2017. You’ll never tweet alone: Building sports match timelines from microblog posts. In Proceedings ofthe International Conference Recent Advances in Natural Language Processing, RANLP 2017, pages 214–221, Varna, Bulgaria. INCOMA Ltd."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Gregory Furman, Edan Toledo, Jonathan Shock, and Jan Buys. 2022. A sequence modelling approach to question answering in text-based games. In Proceedings ofthe 3rd Wordplay: When Language Meets Games Workshop (Wordplay 2022), pages 44–58, Seattle, United States. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Mor Geva, Ankit Gupta, and Jonathan Berant. 2020. Injecting numerical reasoning skills into language models. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, pages 946–958, Online. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "John Giorgi, Luca Soldaini, Bo Wang, Gary Bader, Kyle Lo, Lucy Wang, and Arman Cohan. 2023. Open domain multi-document summarization: A comprehensive study of model brittleness under retrieval. In Findings of the Association for Computational Linguistics: EMNLP 2023, pages 8177–8199, Singapore. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yi Gu, Shunyu Yao, Chuang Gan, Josh Tenenbaum, and Mo Yu. 2022. Revisiting the roles of “text” in text games. In Findings ofthe Associationfor Computational Linguistics: EMNLP 2022, pages 6867–6876, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou, Mantas Mazeika, Dawn Song, and Jacob Steinhardt. 2021. Measuring massive multitask language understanding."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yebowen Hu, Kaiqiang Song, Sangwoo Cho, Xiaoyang Wang, Hassan Foroosh, and Fei Liu. 2023. Decipher-Pref: Analyzing influential factors in human preference judgments via GPT-4. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 8344–8357, Singapore. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kuan-Hao Huang, Chen Li, and Kai-Wei Chang. 2020. Generating sports news from live commentary: A Chinese dataset for sports game summarization. In Proceedings ofthe 1st Conference ofthe Asia-Pacific Chapter of the Association for Computational Linguistics and the 10th International Joint Conference on Natural Language Processing, pages 609–615, Suzhou, China. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Luyang Huang, Shuyang Cao, Nikolaus Parulian, Heng Ji, and Lu Wang. 2021. Efficient attentions for long document summarization. In Proceedings ofthe 2021 Conference of the North American Chapter of the"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                131,
+                85,
+                489,
+                152
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "276"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Associationfor Computational Linguistics: Human Language Technologies, pages 1419–1436, Online. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Sebastian Antony Joseph, Lily Chen, Jan Trienes, Hannah Louisa Göke, Monika Coers, Wei Xu, Byron C Wallace, and Junyi Jessy Li. 2024. Factpico: Factuality evaluation for plain language summarization of medical evidence."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Vladimir Karpukhin, Barlas Oguz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, and Wen-tau Yih. 2020. Dense passage retrieval for opendomain question answering. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 6769–6781, Online. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Osman Doruk Kicikoglu, Richard Bartle, Jon Chamberlain, Silviu Paun, and Massimo Poesio. 2020. Aggregation driven progression system for GWAPs. In Workshop on Games and Natural Language Processing, pages 79–84, Marseille, France. European Language Resources Association."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kalpesh Krishna, Erin Bransom, Bailey Kuehl, Mohit Iyyer, Pradeep Dasigi, Arman Cohan, and Kyle Lo. 2023. LongEval: Guidelines for human evaluation of faithfulness in long-form summarization. In Proceedings ofthe 17th Conference ofthe European Chapter of the Association for Computational Linguistics, pages 1650–1669, Dubrovnik, Croatia. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "François Lareau, Mark Dras, and Robert Dale. 2011. Detecting interesting event sequences for sports reporting. In Proceedings ofthe 13th European Workshop on Natural Language Generation, pages 200– 205, Nancy, France. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Logan Lebanoff, Bingqing Wang, Zhe Feng, and Fei Liu. 2021. Modeling endorsement for multi-document abstractive summarization. In Proceedings of the Third Workshop on New Frontiers in Summarization, pages 119–130, Online and in Dominican Republic. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Sha Li, Chi Han, Pengfei Yu, Carl Edwards, Manling Li, Xingyao Wang, Yi Fung, Charles Yu, Joel Tetreault, Eduard Hovy, and Heng Ji. 2023. Defining a new NLP playground. In Findings of the Association for Computational Linguistics: EMNLP 2023, pages 11932–11951, Singapore. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Bo Liu, Yuqian Jiang, Xiaohan Zhang, Qiang Liu, Shiqi Zhang, Joydeep Biswas, and Peter Stone. 2023a. Llm+p: Empowering large language models with optimal planning proficiency."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Linqing Liu, Patrick Lewis, Sebastian Riedel, and Pontus Stenetorp. 2022. Challenges in generalization in open domain question answering. In Findings of the Associationfor Computational Linguistics: NAACL 2022, pages 2014–2029, Seattle, United States. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Nelson F. Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni, and Percy Liang. 2023b. Lost in the middle: How language models use long contexts."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yixin Liu, Alexander R. Fabbri, Jiawen Chen, Yilun Zhao, Simeng Han, Shafiq Joty, Pengfei Liu, Dragomir Radev, Chien-Sheng Wu, and Arman Cohan. 2023c. Benchmarking generation and evaluation capabilities of large language models for instruction controllable summarization."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yixin Liu, Avi Singh, C. Daniel Freeman, John D. Co-Reyes, and Peter J. Liu. 2023d. Improving large language model fine-tuning for solving math problems."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Angus Loten. 2023. Wendy’s, Google train next-generation order taker: an AI Chatbot. https://www.wsj.com/articles/wendys-google -train-next-generation-order-taker-an-aichatbot-968ff865. Accessed on: May 9, 2023."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Pan Lu, Liang Qiu, Kai-Wei Chang, Ying Nian Wu, Song-Chun Zhu, Tanmay Rajpurohit, Peter Clark, and Ashwin Kalyan. 2023. Dynamic prompt learning via policy gradient for semi-structured mathematical reasoning."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Stephanie M. Lukin, editor. 2020. Workshop on Games and Natural Language Processing. European Language Resources Association, Marseille, France."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kevin Meng, Arnab Sen Sharma, Alex Andonian, Yonatan Belinkov, and David Bau. 2023. Massediting memory in a transformer."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jack Merullo, Luke Yeh, Abram Handler, Alvin Grissom II, Brendan O’Connor, and Mohit Iyyer. 2019. Investigating sports commentator bias within a large corpus of American football broadcasts. In Proceedings ofthe 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), pages 6355–6361, Hong Kong, China. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "MistralAI. 2023. Mixtral of experts. https://mistral. ai/news/mixtral-of-experts/. Accessed on: December 11, 2023."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "OpenAI. 2023. New models and developer products announced at DevDay. https://openai.com/blog/ new-models-and-developer-products-announced -at-devday. Accessed on: November 6, 2023."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Arkil Patel, Satwik Bhattamishra, and Navin Goyal. 2021. Are nlp models really able to solve simple math word problems?"
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ratish Puduppully, Li Dong, and Mirella Lapata. 2019. Data-to-text generation with entity modeling. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics, pages 2023– 2035, Florence, Italy. Association for Computational Linguistics."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                131,
+                85,
+                489,
+                126
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "277"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Varshini Reddy, Rik Koncel-Kedziorski, Viet Dac Lai, Michael Krumdick, Charles Lovering, and Chris Tanner. 2024. Docfinqa: A long-context financial reasoning dataset."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Noah Shinn, Federico Cassano, Edward Berman, Ashwin Gopinath, Karthik Narasimhan, and Shunyu Yao. 2023. Reflexion: Language agents with verbal reinforcement learning."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zayne Sprague, Kaj Bostrom, Swarat Chaudhuri, and Greg Durrett. 2022. Natural language deduction with incomplete information. In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing, pages 8230–8258, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Theodore R. Sumers, Shunyu Yao, Karthik Narasimhan, and Thomas L. Griffiths. 2023. Cognitive architectures for language agents."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Chris van der Lee, Emiel Krahmer, and Sander Wubben. 2017. PASS: A Dutch data-to-text system for soccer, targeted towards specific audiences. In Proceedings of the 10th International Conference on Natural Language Generation, pages 95–104, Santiago de Compostela, Spain. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Dave Van Veen, Cara Van Uden, Louis Blankemeier, Jean-Benoit Delbrouck, Asad Aali, Christian Bluethgen, Anuj Pareek, Malgorzata Polacin, Eduardo Pontes Reis, Anna Seehofnerova, Nidhi Rohatgi, Poonam Hosamani, William Collins, Neera Ahuja, Curtis P. Langlotz, Jason Hom, Sergios Gatidis, John Pauly, and Akshay S. Chaudhari. 2023. Clinical text summarization: Adapting large language models can outperform human experts."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Alex Wang, Richard Yuanzhe Pang, Angelica Chen, Jason Phang, and Samuel R. Bowman. 2022. SQuAL-ITY: Building a long-document summarization dataset the hard way. In Proceedings ofthe 2022 Conference on Empirical Methods in Natural Language Processing, pages 1139–1156, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Sam Wiseman, Stuart Shieber, and Alexander Rush. 2017. Challenges in data-to-document generation. In Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing, pages 2253–2263, Copenhagen, Denmark. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jian Xie, Kai Zhang, Jiangjie Chen, Renze Lou, and Yu Su. 2023. Adaptive chameleon or stubborn sloth: Revealing the behavior of large language models in knowledge conflicts."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Liyan Xu, Zhenlin Su, Mo Yu, Jin Xu, Jinho D. Choi, Jie Zhou, and Fei Liu. 2024. Identifying factual inconsistency in summaries: Towards effective utilization of large language model."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ruochen Xu, Song Wang, Yang Liu, Shuohang Wang, Yichong Xu, Dan Iter, Pengcheng He, Chenguang Zhu, and Michael Zeng. 2023. LMGQS: A largescale dataset for query-focused summarization. In Findings ofthe Associationfor Computational Linguistics: EMNLP 2023, pages 14764–14776, Singapore. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Thomas L. Griffiths, Yuan Cao, and Karthik Narasimhan. 2023a. Tree of thoughts: Deliberate problem solving with large language models."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, and Yuan Cao. 2023b. React: Synergizing reasoning and acting in language models."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jianmin Zhang, Jin-ge Yao, and Xiaojun Wan. 2016. Towards constructing sports news from live text commentary. In Proceedings of the 54th Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 1361–1371, Berlin, Germany. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yilun Zhao, Yitao Long, Hongjun Liu, Linyong Nan, Lyuhao Chen, Ryo Kamoi, Yixin Liu, Xiangru Tang, Rui Zhang, and Arman Cohan. 2023. Docmath-eval: Evaluating numerical reasoning capabilities of llms in understanding long documents with tabular data."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric. P Xing, Hao Zhang, Joseph E. Gonzalez, and Ion Stoica. 2023. Judging llm-as-a-judge with mt-bench and chatbot arena."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Fengbin Zhu, Wenqiang Lei, Youcheng Huang, Chao Wang, Shuo Zhang, Jiancheng Lv, Fuli Feng, and Tat-Seng Chua. 2021. Tat-qa: A question answering benchmark on a hybrid of tabular and textual content in finance."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                85,
+                489,
+                140
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "278"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ]
+]
