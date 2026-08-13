@@ -1,0 +1,453 @@
+# AoE: Angle-optimized Embeddings for Semantic Textual Similarity
+
+Xianming Li <sup>1</sup>, Jing Li <sup>1,2</sup>†
+
+<sup>1</sup> Department of Computing
+
+<sup>2</sup> Research Centre on Data Science & Artificial Intelligence The Hong Kong Polytechnic University xianming.li@connect.polyu.hk, jing-amelia.li@polyu.edu.hk
+
+## Abstract
+
+Text embedding is pivotal in semantic textual similarity (STS) tasks, which are crucial components in Large Language Model (LLM) applications. STS learning largely relies on the cosine function as the optimization objective to reflect semantic similarity. However, the cosine has saturation zones rendering vanishing gradients and hindering learning subtle semantic differences in text embeddings. To address this issue, we propose a novel Angle-optimized Embedding model, AoE. It optimizes angle differences in complex space to explore similarity in saturation zones better. To set up a comprehensive evaluation, we experimented with existing short-text STS, our newly collected long-text STS, and downstream task datasets. Extensive experimental results on STS and MTEB benchmarks show that AoE significantly outperforms popular text embedding models neglecting cosine saturation zones. It highlights that AoE can produce highquality text embeddings and broadly benefit downstream tasks. The code is available at: https://github.com/SeanLee97/AnglE
+
+## 1 Introduction
+
+Text embeddings, essential language features, are foundations of semantic textual similarity (STS) tasks, which quantify how similar two text pieces are in semantics (Kiros et al., 2015; Hill et al., 2016; Conneau et al., 2017; Cer et al., 2018; Reimers and Gurevych, 2019; Gao et al., 2021). They broadly benefit downstream tasks, such as information retrieval (Asai et al., 2023) and clustering (Xu et al., 2023), and are particularly helpful in many recent LLMs-based applications (OpenAI, 2022a; Touvron et al., 2023); e.g., many RAG tasks employ text embeddings for retrieval (Asai et al., 2023).
+
+The existing STS training commonly involves optimizing cosine functions — the learning objective to indicate the similarity of pairwise text embeddings (Reimers and Gurevych, 2019; Gao et al., 2021; Su, 2022; Zhuo et al., 2023). However, the cosine has saturation zones, resulting in gradient vanishing in optimization regardless of the network depth (Roodschild et al., 2020). The gradient will be close to zero for embedding pairs falling in the saturation zone, preventing parameters from updating in backpropagation. Because embedding pairs in saturation zones are nearly aligned or antialigned, it hinders text embedding models from discerning subtle, implicit differences that appear similar yet are actually dissimilar in semantics.
+
+![](images/f6ca05cc44f2af407ec2ccfb7ac595c52b1f14929eb4c8a8f483f3a4172ec9b5.jpg)  
+Figure 1: A case from SNLI. SimCSE and SBERT ignore the effects of cosine saturation zones and wrongly predict “entailment” due to shallow features of highly overlapping words, while the correct label is “neutral.”
+
+Such pairs commonly appear in STS training data from Natural Language Inference (NLI) datasets, such as the Multi-Genre NLI (MNLI) (Williams et al., 2018) and the Stanford NLI (SNLI) (Bowman et al., 2015). They typically include three labels of entailment, neutral, and contradict; pairs in saturation zones may render obscure cross-label boundaries. To illustrate this point, Figure 1 shows an example from the SNLI dataset. The “neutral” pair shows a high appearance similarity (with many shared words) instead of semantically similar. The similar appearance similarity results in them falling into cosine’s saturation zones, causing vanishing gradients during optimization. Consequently, the model mistakenly considers their relations as “entailment” instead of their correct label “neutral.”
+
+Viewing these concerns, we aim to tackle the negative effects of the cosine’s saturation zones in embeddings and propose a novel Angle-optimized Embedding (AoE) model for STS. It decomposes an embedding into real and imaginary components through complex division, aiming to employ the real component for reflecting appearance differences and the imaginary component for subtle differences. It allows AoE to involve the optimization of the angle difference to understand subtle differences in text pairs for similarity learning.
+
+To the best of our knowledge, we are thefirst to explore the negative effects ofcosine’s saturation zones and optimize angle differences through division in complex spacefor text embedding learning.
+
+In the STS experimental setup, we observed that most existing STS benchmarks focus on evaluating models on short texts. Unfortunately, limited datasets are available to evaluate the STS performance on long texts. However, long texts are prevalent in real-world applications such as financial and legal documents (Li et al., 2023). To tackle this challenge, we present a high-quality long-text STS dataset collected from GitHub Issues with roughly 22K samples. It allows for a more comprehensive evaluation of STS performance with long texts.
+
+We first experimented with short- and long-text STS datasets in the standard and in-domain STS tasks, where AoE outperforms non-trivial baselines in varying embedding backbones. Then, AoE shows consistently superior results in facilitating various downstream tasks, indicating its benefits in diverse scenarios. In particular, AoE achieves SOTA results on the Massive Text Embedding Benchmark (MTEB) (Muennighoff et al., 2022) at the same model scale. Next, an ablation study indicates that all modules positively contribute to AoE. Finally, we further discuss how AoE learns better embeddings in cosine saturation zones.
+
+In summary, our contributions are as follows:
+
+We investigate the effects of cosine saturation zones for STS and optimize angle differences in complex space for improving text embedding.
+
+We extend the existing STS benchmark with a new long-text dataset from Github Issues to allow more comprehensive STS empirical studies.
+
+We present extensive experiments demonstrating that AoE effectively handles cosine saturation zones to broadly benefit text embedding learning and create positive effects in various scenarios.
+
+## 2 Related Work
+
+Our work is related to text embedding learning. Compared to early efforts focusing on word embeddings (Mikolov et al., 2013), text embeddings (a more general concept) enable semantic representation for richer context. Many prior studies (Li et al., 2020; Su et al., 2021a) employed pretrained models such as BERT (Devlin et al., 2019) for learning text embeddings without fine-tuning. More recent work showed the benefits of fine-tuning the pretrained models to improve STS. Some studies (Conneau et al., 2017; Cer et al., 2018) involved humanlabeled training data, e.g., NLI datasets. In training methods, SBERT (Reimers and Gurevych, 2019) used siamese BERT, while many others adopted contrastive learning (Zhang et al., 2020; Gao et al., 2021; Chuang et al., 2022; Zhuo et al., 2023).
+
+Most widely-used models employ cosine to measure similarity in their learning objectives, as shown in Table 6, Appendix A. Cosine exhibits saturation zones leading to gradient vanishing (Roodschild et al., 2020). It hinders embedding models from encoding subtle differences in pairs falling in the saturation zones. However, none of the existing work considers such an issue, and we propose the angle-optimized AoE model to mitigate this gap.
+
+AoE is inspired by complex embeddings for using complex division to exploit angle differences. In positional word embedding learning, Su et al. (2021b) adopted complex multiplication to introduce rotary position embedding into transformer architecture. In knowledge graph learning, Trouillon et al. (2016); Sun et al. (2019) presented entity embedding in complex space to model the source to target rotations for link prediction. However, their embeddings are on the word or entity level and focus on their position modeling. On the contrary, we make the first efforts to leverage complex division to compute normalized angle differences between sentence-level text embeddings for mitigating the negative effects of the cosine’s saturation zones.
+
+## 3 AoE Framework
+
+Here, we will introduce the AoE methods with the overall framework in Figure 2. We will first present how to encode the complex text embeddings in Section 3.1, followed by the angle objective in Section 3.2. At last, Section 3.3 will outline the final learning objective to describe AoE’s training process.
+
+![](images/f8f7f82b07067456bab9eadc5edfec8ac8851886bfcd27f2eeef112553e57fda.jpg)  
+Figure 2: The overall framework of AoE. Initially, the input text pairs $( x _ { i } , x _ { j } )$ and $( x _ { m } , x _ { n } )$ are processed by the encoder to obtain real and imaginary text embeddings: $( \mathbf { X } _ { i } ^ { r e } , \mathbf { X } _ { i } ^ { i m } ) , ( \mathbf { X } _ { j } ^ { r e } , \mathbf { \tilde { X } } _ { j } ^ { i m } ) , ( \mathbf { X } _ { m } ^ { r e } , \mathbf { X } _ { m } ^ { i m } )$ , and $( \mathbf { X } _ { n } ^ { r e } , \mathbf { X } _ { n } ^ { i m } )$ After obtaining these complex text embeddings, the angle differences, $\Delta \bar { \theta } _ { i j }$ and $\Delta \theta _ { m n } ,$ can be computed. Finally, the angle differences are then used in the optimization of the angle objective.
+
+## 3.1 Complex Text Embeddings
+
+The first step of AoE is to transform the input text into complex text embeddings. Our intuition is to employ real components for learning appearance differences (like prior practices (Reimers and Gurevych, 2019; Gao et al., 2021)) and imaginary ones for subtle semantic differences. This way, we can exploit the angle differences for embeddings similarity learning in cosine saturation zones.
+
+To achieve this, we first input the text x into the embedding layer to obtain the token embeddings: ${ \bf E } = \mathrm { E m b } ( x ) \in \mathbb { R } ^ { 2 d }$ . Inspired by Sun et al. (2019), the token embeddings E include two sub-spaces. The first d embeddings represent the real token embeddings $\mathbf { E } ^ { r e } = \mathbf { E } _ { 1 : d } \in \mathbb { R } ^ { d }$ , while the embeddings from d to 2d represent the imaginary token embeddings, denoted as $\mathbf { E } ^ { i m } = \mathbf { E } _ { d : 2 d } \in \mathbb { R } ^ { d }$
+
+Then, the token embeddings are fed into Transformer encoders like BERT (Devlin et al., 2019) or LLaMA (Touvron et al., 2023) to obtain the text embeddings: $\mathbf { X } \ = \ \operatorname { E n c o d e r } _ { p } ( \mathbf { E } ) \ \in \ \mathbb { R } ^ { 2 d }$ where p means pooling. Specifically, embeddings of the $\because \mathrm { C L } S '$ token for BERT and the last token for LLaMA represent sentence-level text embeddings. Consequently, a text embedding has real $( \mathbf { X } ^ { r e } = \mathbf { X } _ { 1 : d } \in \mathbb { R } ^ { d } )$ and imaginary components $( \mathbf { \boldsymbol { X } } ^ { i m } = \mathbf { \boldsymbol { X } } _ { d : 2 d } \in \mathbb { R } ^ { d } )$ , where wave henceforth indicates the imaginary embeddings for easy reading.
+
+## 3.2 Angle Objective
+
+After obtaining the complex text embeddings, we present the angle objective in complex space. Specifically, for the input text pair $( x _ { i } , x _ { j } )$ , we obtain their real and imaginary text embeddings $( \mathbf { X } _ { i } ^ { r e }$ $\underset { \sim } { \bf X } _ { i } ^ { i m } )$ and $( \mathbf { X } _ { j } ^ { r e } , \mathbf { X } _ { j } ^ { i m } )$ via the process in Section
+
+3.1. To allow clearer formula derivation, we define:
+
+$$
+\mathbf { z } = \mathbf { a } + \mathbf { b } i \in \mathbb { C } , \mathbf { w } = \mathbf { c } + \mathbf { d } i \in \mathbb { C } ,\tag{1}
+$$
+
+where $\mathbf { a } = \mathbf { X } _ { i } ^ { r e } \in \mathbb { R } ^ { d } , \mathrm { \textmu } _ { \times } = \mathbf { X } _ { i } ^ { i m } \in \mathbb { R } ^ { d } , \mathrm { \textbf { c } = }$ $\mathbf { X } _ { j } ^ { r e } \in \mathbb { R } ^ { d }$ , and $\mathbf { \underset { \sim } { d } } = \mathbf { \underset { \sim } { X } } _ { j } ^ { i m } \in \mathbb { R } ^ { d }$ . Then, we conduct complex division to determine the angle difference and the factor in magnitude. Based on the complex division rule, we can measure the angle difference between embeddings z and $\mathbf { w } , \Delta \theta _ { z w } ,$ as follows:
+
+$$
+\Delta \theta _ { z w } = \log \left[ \frac { ( \mathbf { a c } + \mathbf { b d } ) + ( \mathbf { b c } - \mathbf { a d } ) } { \sqrt { ( \mathbf { c } ^ { 2 } + \backprime ^ { 2 } ) ( \mathbf { a } ^ { 2 } + \mathbf { b } ^ { 2 } ) } } \right] ,\tag{2}
+$$
+
+where the denominator serves as the normalization term (naturally derived from complex division). For detailed derivation, we refer readers to Appendix C. Based on that and following Su (2022), we optimize the angle difference between input text pairs with the ranking objective function below:
+
+$$
+\mathcal { L } _ { a n g l e } = \log \left[ 1 + \sum _ { \substack { s _ { i j } > s _ { m n } } } \exp ( \frac { \Delta \theta _ { i j } - \Delta \theta _ { m n } } { \tau } ) \right] ,\tag{3}
+$$
+
+where τ is a temperature hyperparameter. $s _ { i j }$ is the similarity between text $x _ { i }$ and $x _ { j }$ , and $s _ { m n }$ is the similarity between text $x _ { m }$ and $x _ { n } . \ s _ { i j } \ > \ s _ { m n }$ is from the ranking of training data labels. By optimizing the angle objective, $\mathcal { L } _ { a n g l e } ,$ we aim to minimize the angle difference for pairs with high similarity compared to those with low similarity. Thus, for embedding pairs in cosine saturation zones (e.g., similar ones in appearance), the angle objective helps reflect the subtle semantic differences, mitigating the negative effects of gradient vanishing.
+
+## 3.3 Training Process of AoE Framework
+
+In the embedding training of AoE, we optimize the angle objective (Section 3.2) with the auxiliary objective. This multi-objective approach allows the AoE framework to learn text embeddings comprehensively from multiple perspectives, enhancing the model’s overall performance. Here, we employ the widely-used supervised contrastive learning objective as the auxiliary objective $\mathcal { L } _ { c l }$ , as follows:
+
+$$
+\mathcal { L } _ { c l } = - \sum _ { b } \sum _ { i } ^ { m } \log \left[ \frac { e ^ { \cos ( \mathbf { X } _ { b _ { i } } , \mathbf { X } _ { b _ { i } } ^ { + } ) / \tau } } { \sum _ { j } ^ { N } e ^ { \cos ( \mathbf { X } _ { b _ { i } } , \mathbf { X } _ { b _ { j } } ^ { + } ) / \tau } } \right] ,\tag{4}
+$$
+
+where τ is a temperature hyperparameter, b stands for the b-th batch, $\mathbf { X } _ { b _ { i } } ^ { + }$ and $\mathbf { X } _ { b _ { i } } ^ { + }$ are the respective positive samples of $\mathbf { X } _ { b _ { i } }$ and $\mathbf { X } _ { b _ { j } } ^ { ' } ,$ , m represents the number of positive pairs in b-th batch, N is the batch size, and cos( ) is the cosine similarity.
+
+In the training, we combine the angle objective and the contrastive objective in the following manner to form the final objective function:
+
+$$
+\mathcal { L } = w _ { 1 } \cdot \mathcal { L } _ { a n g l e } + w _ { 2 } \cdot \mathcal { L } _ { c l } ,\tag{5}
+$$
+
+where $w _ { 1 }$ and $w _ { 2 }$ are two hyperparameters to control the weights of balancing the two objectives.
+
+## 4 Experimental Setup
+
+Here, we elaborate on the experimental setup, including datasets, baselines, evaluation metrics, and implementation details. We also open-source our trained models in Appendix Section E.
+
+Datasets. Following standard setup (Gao et al., 2021), the training data is from MultiNLI and SNLI. Our statistics reveal that 33% of the text pairs show a similarity above 0.95 and 66% above 0.8. It means a large proportion of samples in or near cosine saturation zones, implying the challenges of learning subtle semantic differences for them.
+
+For evaluation, we test AoE on STS tasks with existing widely-used short-text STS datasets and our newly proposed long-text GitHub Issue Similarity Dataset. Furthermore, we examine AoE on downstream data with 7 popular tasks and MTEB.
+
+Existing Short-text STS Tasks. We first evaluate AoE on 7 widely-adopted STS datasets, namely: STS 2012-2016 (Agirre et al., 2012, 2013, 2014, 2015, 2016), SICK-R (Marelli et al., 2014), and STS-B (Cer et al., 2017). These datasets mainly consist of short text (less than 512 tokens), whereas real-world scenarios often involve long texts. Viewing this gap, we introduce a new long-text dataset called GitHub Issues Similarity Dataset (GIS) as follows for a more extensive STS evaluation.
+
+GitHub Issues Similarity Dataset (GIS). The GIS dataset was gathered based on the GitHub duplicate issues indicating high similarity. The duplication label is easy to access because maintainers of open source organizations tend to mark these duplicate issues as closed with a comment like “closing as a duplicate of #id.” Consequently, these duplicate issues inherently serve as a source of the STS task. Here, most issues contain long text because of the large amount of code involved.
+
+We extracted duplicated issues from 55 famous open-source projects (see Appendix B) on GitHub using GitHub API to compile the dataset. The duplicate issues served as positive samples, while the remaining ones were considered negative. These open-source projects have active participation from maintainers and volunteers to maintain the issue quality. Additionally, We randomly selected 10% of the data for manual inspection, and the quality was found to be satisfactory. 93% of the sampled data can be clearly classified as either similar with label 0 or dissimilar with label 1. Our statistics show that the proportion of long text (with token length > 512) for the train, validation, and test sets is 61.03%, 60.85%, and 60.50%, respectively. More details of GIS are presented in Appendix B.<sup>1</sup>
+
+Downstream Tasks. Following standard practice, we evaluate AoE on 7 downstream tasks: MR (Pang and Lee, 2005), CR (Hu and Liu, 2004), SUBJ (Pang and Lee, 2004), MPQA (Wiebe et al., 2005), SST2 (Socher et al., 2013), TREC (Voorhees and Tice, 2000), and MRPC (Dolan et al., 2004). These tasks mainly evaluate the classification performance of text embeddings. We also examine AoE on the MTEB (Muennighoff et al., 2022) for a more thorough downstream task evaluation. It includes classification (12 datasets), clustering (11 datasets), pair classification (3 datasets), reranking (4 datasets), retrieval (15 datasets), STS (10 datasets), and summarization (1 dataset) tasks.
+
+<table><tr><td>Model</td><td>STS12</td><td>STS13</td><td>STS14</td><td>STS15</td><td>STS16</td><td>STS-B</td><td>SICK-R</td><td>Avg.</td></tr><tr><td colspan="9">Closed-source Models</td></tr><tr><td>openai-ada-002</td><td>69.80</td><td>83.27</td><td>76.09</td><td>86.12</td><td>85.96</td><td>83.17</td><td>80.60</td><td>80.72</td></tr><tr><td>openai-text-embedding-3</td><td>72.84</td><td>86.10</td><td>81.15</td><td>88.49</td><td>85.08</td><td>83.56</td><td>79.00</td><td>82.32</td></tr><tr><td colspan="9">Open-source Models</td></tr><tr><td>InferSent-GloVe †</td><td>52.86</td><td>66.75</td><td>62.15</td><td>72.77</td><td>66.87</td><td>68.03</td><td>65.65</td><td>65.01</td></tr><tr><td>USE↑</td><td>64.49</td><td>67.80</td><td>64.61</td><td>76.83</td><td>73.18</td><td>74.92</td><td>76.69</td><td>71.22</td></tr><tr><td colspan="9"> $B E R T _ { b a s e }$ </td></tr><tr><td>ConSERT</td><td>74.07</td><td>83.93</td><td>77.05</td><td>83.66</td><td>78.76</td><td>81.36</td><td>76.77</td><td>79.37</td></tr><tr><td>CoSENT</td><td>71.35</td><td>77.52</td><td>75.05</td><td>79.68</td><td>76.05</td><td>78.99</td><td>71.19</td><td>75.69</td></tr><tr><td>SBERT ↑</td><td>70.97</td><td>76.53</td><td>73.19</td><td>79.09</td><td>74.30</td><td>77.03</td><td>72.91</td><td>74.89</td></tr><tr><td>SimCSE AoE (ours)</td><td>75.30</td><td>84.67</td><td>80.19</td><td>85.40</td><td>80.82</td><td>84.25</td><td>80.39</td><td>81.57  $8 0 . 9 9 { \scriptstyle \pm 0 . 0 9 }$  82.43</td></tr><tr><td colspan="9"> $7 5 . 2 6 { \scriptstyle \pm 0 . 0 4 }$  85.61±0.06  $8 0 . 6 4 _ { \pm 0 . 1 2 }$ </td></tr><tr><td>SBERT ★</td><td></td><td></td><td> $L L a M A _ { 7 B }$ </td><td></td><td></td><td></td><td></td><td>84.65</td></tr><tr><td>SimCSE ★</td><td> $7 7 . 5 8 _ { \pm 0 . 1 5 }$ </td><td> $8 9 . 2 1 _ { \pm 0 . 3 1 }$ </td><td> $8 4 . 3 2 _ { \pm 0 . 3 3 }$ </td><td> $8 7 . 6 3 { \scriptstyle \pm 0 . 2 8 }$ </td><td> $8 5 . 7 8 { \scriptstyle \pm 0 . 4 0 }$ </td><td> $8 7 . 0 6 _ { \pm 0 . 3 1 }$ </td><td> $8 0 . 9 5 { \scriptstyle \pm 0 . 2 9 }$ </td><td>85.24</td></tr><tr><td>AoE (ours)</td><td> $7 8 . 3 9 _ { \pm 0 . 1 2 }$   $7 9 . 0 0 { \scriptstyle \pm 0 . 1 2 }$ </td><td> $8 9 . 9 5 _ { \pm 0 . 2 3 }$   $9 0 . 5 6 { \scriptstyle \pm 0 . 2 1 }$ </td><td> $8 4 . 8 0 { \scriptstyle \pm 0 . 1 9 }$   $8 5 . 7 9 { \scriptstyle \pm 0 . 1 8 }$ </td><td> $8 8 . 5 0 { \scriptstyle \pm 0 . 4 0 }$   $8 9 . 4 3 { \scriptstyle \pm 0 . 3 6 }$ </td><td> $8 6 . 0 4 { \scriptstyle \pm 0 . 2 9 }$   $8 7 . 0 0 { \scriptstyle \pm 0 . 2 9 }$ </td><td> $8 7 . 8 6 _ { \pm 0 . 3 5 }$   $8 8 . 9 7 { \scriptstyle \pm 0 . 3 2 }$ </td><td> $8 1 . 1 1 { \scriptstyle \pm 0 . 4 3 }$   $8 0 . 9 4 { \scriptstyle \pm 0 . 2 9 }$ </td><td>85.96</td></tr><tr><td colspan="9"> $L L a M A _ { 1 3 B }$ </td></tr><tr><td>SBERT ★</td><td> $7 8 . 0 3 { \scriptstyle \pm 0 . 1 2 }$ </td><td> $8 9 . 8 9 _ { \pm 0 . 3 2 }$ </td><td> $8 5 . 0 3 { \scriptstyle \pm 0 . 2 8 }$ </td><td> $8 8 . 9 6 _ { \pm 0 . 3 1 }$ </td><td> $8 6 . 1 2 _ { \pm 0 . 4 1 }$ </td><td> $8 8 . 0 3 { \scriptstyle \pm 0 . 4 4 }$ </td><td> $8 1 . 1 1 { \scriptstyle \pm 0 . 4 7 }$ </td><td>85.31</td></tr><tr><td>SimCSE ★</td><td> $7 8 . 6 9 { \scriptstyle \pm 0 . 1 9 }$ </td><td> $9 0 . 5 8 { \scriptstyle \pm 0 . 3 1 }$ </td><td> $8 5 . 5 0 { \scriptstyle \pm 0 . 2 4 }$ </td><td> $8 9 . 5 6 _ { \pm 0 . 2 5 }$ </td><td> $8 6 . 9 2 _ { \pm 0 . 3 7 }$ </td><td> $8 8 . 9 2 _ { \pm 0 . 3 7 }$ </td><td> $8 1 . 2 8 { \scriptstyle \pm 0 . 4 4 }$ </td><td>85.92</td></tr><tr><td>AoE (ours)</td><td> ${ \bf 7 9 . 3 3 { \scriptstyle \pm 0 . 1 8 } }$ </td><td> $\mathbf { 9 0 . 6 5 { \scriptstyle \pm 0 . 2 8 } }$ </td><td> $\mathbf { 8 6 . 8 9 _ { \pm 0 . 2 1 } }$ </td><td> $\mathbf { 9 0 . 4 5 { \scriptstyle \pm 0 . 2 6 } }$ </td><td> $\mathbf { 8 7 . 3 2 } _ { \pm 0 . 3 3 }$ </td><td> $\mathbf { 8 9 . 6 9 } \pm \mathrm { 0 . 3 8 }$ </td><td> ${ \bf 8 1 . 3 2 } _ { \pm 0 . 4 2 }$ </td><td>86.52</td></tr></table>
+
+Table 1: Text embedding performance on the standard STS tasks. The blue cell background indicates that our results are the best among the corresponding backbones. The results highlighted in bold represent the global best performance. Results are obtained from (Reimers and Gurevych, 2019). Results ⋆ denote our implementation using the official code. For the remaining baselines, we obtain their results from their original papers. Given any backbone, the paired t-test reveals significant improvements in AoE compared to all baselines with p-values $< 5 \% .$
+
+<table><tr><td>Model</td><td>STS-B</td><td>GIS</td><td>Avg. Spearman&#x27;s</td></tr><tr><td>SimCSE</td><td> $7 6 . 2 7 { \scriptstyle \pm 0 . 2 3 }$ </td><td> $6 0 . 3 8 { \scriptstyle \pm 0 . 1 8 }$ </td><td>68.33</td></tr><tr><td>SBERT</td><td> $8 4 . 6 7 { \scriptstyle \pm 0 . 3 5 }$ </td><td> $6 9 . 5 0 { \scriptstyle \pm 0 . 4 7 }$ </td><td>77.09</td></tr><tr><td>AoE</td><td> $\mathbf { 8 6 . 2 8 _ { \pm 0 . 1 9 } }$ </td><td> ${ \bf 7 0 . 5 9 { \scriptstyle \pm 0 . 3 5 } }$ </td><td>78.44</td></tr></table>
+
+Table 2: Results of the in-domain STS tasks. All baselines are our implementation using the official code. $\mathbf { B E R T } _ { b a s e }$ is the backbone for all models.
+
+Evaluation Metrics. For STS, we follow previous studies to use SentEval (Conneau and Kiela, 2018) to compute Spearman’s correlation and report the “all” setting. For downstream tasks, we employ SentEval to assess the performance of text embeddings. For a fair comparison, we follow baselines and use the default parameters of SentEval. For MTEB, we employ the official MTEB evaluation code to test the performance of AoE.
+
+For all our implementations, we will report the average score over five runs and the std value ( ).
+
+Baselines. Because AoE is supervised, we primarily compare it with widely used supervised embedding baselines for a fair comparison. They are: InferSent (Conneau et al., 2017), USE (Cer et al., 2018), SBERT (Reimers and Gurevych, 2019), CoSENT (Su, 2022), and supervised versions of SimCSE (Gao et al., 2021) and ConSERT (Yan et al., 2021). In particular, given different backbones, we compare AoE with SBERT and SimCSE, the two most widely-used text embedding baselines. All the above baselines are opensource embeddings. In addition, we adopt two popular closed-source baselines, OpenAI’s Ada-002 (OpenAI, 2022b) and OpenAI’s text-embeddings-3 (OpenAI, 2024), for a comprehensive comparison.
+
+Implementation Details. We extensively examine AoE on three scales of pre-trained backbone models: $\mathrm { B E R T } _ { b a s e }$ (uncased) (Devlin et al., 2019), $\mathbf { L L a M A } _ { 7 B }$ (LLaMA2-7B) (Touvron et al., 2023) and its counterpart in 13B. As for BERT, we set the initial learning rate to 5e  5. For LLaMA, we apply the QLoRA (Dettmers et al., 2023) technique for efficient fine-tuning with the initial learning rate to $1 e - 4$ . For embeddings, we used the prompt “Summarize sentence {text} in one word:” to obtain the summative token and concatenate it to the last token of the text and then apply its token embeddings as the text embeddings, inspired by (Jiang et al., 2023). For the temperature in objectives, we set the τ to 0.05 following the previous practice (Gao et al., 2021). For $w _ { 1 }$ and $w _ { 2 }$ in Equation 5, we use the grid search strategy to search for their values. For a fair comparison with prior work, we follow SimCSE (Gao et al., 2021) to set the random seed to 42 for all main experiments. Yet, in Section 5.2, we test AoE without fixed random seeds to examine its robustness.
+
+<table><tr><td>Model</td><td>MR</td><td>CR</td><td>SUBJ</td><td>MPQA</td><td>SST2</td><td>TREC</td><td>MRPC</td><td> $\operatorname { A v g } .$ </td></tr><tr><td>openai-ada-002</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>90.10</td></tr><tr><td> $\mathbf { A v g . B E R T \mid }$ </td><td>78.66</td><td>86.25</td><td>94.37</td><td>88.66</td><td>84.40</td><td>92.80</td><td>69.54</td><td>84.94</td></tr><tr><td> $_ { \mathrm { B E R T - C L S \dagger } }$ </td><td>78.68</td><td>84.85</td><td>94.21</td><td>88.23</td><td>84.13</td><td>91.40</td><td>71.13</td><td>84.66</td></tr><tr><td>IS-BERT</td><td>81.09</td><td>87.18</td><td>94.96</td><td>88.75</td><td>85.96</td><td>88.64</td><td>74.24</td><td>85.83</td></tr><tr><td> $\mathrm { D i f f C S E - B E R T } _ { b a s e }$ </td><td>82.69</td><td>87.23</td><td>95.23</td><td>89.28</td><td>86.60</td><td>90.40</td><td>76.58</td><td>86.86</td></tr><tr><td> $\mathrm { S i m C S E - B E R T } _ { b a s e }$ </td><td>81.18</td><td>86.46</td><td>94.45</td><td>88.88</td><td>85.50</td><td>89.80</td><td>74.43</td><td>85.81</td></tr><tr><td> $\mathrm { S B E R T } _ { b a s e } { \star }$ </td><td>80.10</td><td>86.25</td><td>94.61</td><td>88.78</td><td>84.90</td><td>89.00</td><td>73.25</td><td>85.27</td></tr><tr><td> $\mathrm { A o E - B E R T } _ { b a s e } \ ( \mathrm { o u r s } )$ </td><td> $8 3 . 0 0 { \scriptstyle \pm 0 . 2 4 }$ </td><td> $8 9 . 3 8 { \scriptstyle \pm 0 . 2 7 }$ </td><td> $9 4 . 7 2 { \scriptstyle \pm 0 . 3 1 }$ </td><td> $8 9 . 8 7 { \scriptstyle \pm 0 . 4 6 }$ </td><td> $8 7 . 2 0 { \scriptstyle \pm 0 . 2 3 }$ </td><td> $8 9 . 0 0 { \scriptstyle \pm 0 . 4 5 }$ </td><td> $7 5 . 5 4 { \scriptstyle \pm 0 . 3 9 }$ </td><td>86.96</td></tr><tr><td> $\mathrm { A o E \mathrm { - } L L a M A _ { 7 B } \ ( o u r s ) }$ </td><td> $9 0 . 5 4 { \scriptstyle \pm 0 . 2 7 }$ </td><td> $\mathbf { 9 3 . 0 6 _ { \pm 0 . 3 2 } }$ </td><td>96.14±0.40</td><td> $9 1 . 6 1 _ { \pm 0 . 4 5 }$ </td><td> $\mathbf { 9 5 . 0 0 _ { \pm 0 . 2 8 } }$ </td><td> $9 5 . 8 0 { \scriptstyle \pm 0 . 5 8 }$ </td><td> $7 4 . 9 0 { \scriptstyle \pm 0 . 3 8 }$ </td><td>91.01</td></tr><tr><td> $\mathbf { A o E - L L a M A _ { 1 3 B } }$  (ours)</td><td> $\mathbf { 9 0 . 7 7 _ { \pm 0 . 3 3 } }$ </td><td> $9 3 . 0 1 _ { \pm 0 . 3 3 }$ </td><td> $\mathbf { 9 6 . 1 5 _ { \pm 0 . 4 5 } }$ </td><td> $\mathbf { 9 1 . 8 3 _ { \pm 0 . 4 8 } }$ </td><td> $9 4 . 9 5 _ { \pm 0 . 2 7 }$ </td><td> $\mathbf { 9 6 . 6 0 } _ { \pm 0 . 6 0 }$ </td><td> ${ \bf 7 6 . 8 7 _ { \pm 0 . 4 3 } }$ </td><td>91.45</td></tr></table>
+
+Table 3: Results of text embeddings on the downstream classification tasks. The reported metrics is accuracy. : results from (OpenAI, 2022b); : results from Reimers and Gurevych (2019); ⋆: results are our implementation using the official code. For the remaining baselines, we obtain their results from their original papers.
+
+## 5 Experimental Results
+
+Section 5.1 first presents the main comparison results, followed by an ablation study in Section 5.2. Finally, we will further discuss AoE in Section 5.3.
+
+## 5.1 Main Comparison Results
+
+In the experimental comparison, we examine benchmark results of STS and downstream tasks for intrinsic and extrinsic embedding evaluations.
+
+Standard STS. We begin with the standard STS benchmark experiments for models trained using MultiNLI and SNLI datasets and evaluated on SentEval. The results are presented in Table 1, where we can draw the following observations.
+
+First, larger backbone models generally result in better performance. It implies the larger model scales of LLMs can helpfully capture deeper semantics for the STS prediction. Second, SimCSE works better than SBERT, possibly benefitting from contrastive learning for capturing semantic similarity. Third, given any backbone, AoE consistently performs best in all STS benchmarks. For example, compared to SimCSE, AoE demonstrates average score improvements of 0.86%, 0.72%, and 0.60% for $\mathrm { B E R T } _ { b a s e }$ $\mathrm { L L a M A } _ { 7 B }$ , and LLaMA<sub>13B</sub>, respectively. While sharing a contrastive learning objective with SimCSE, AoE’s performance gain likely comes from the novel addition of the angle objective. It allows optimizing the angle differences to explore the subtle semantic differences of training samples in cosine saturation zones, which is prevalent in the training data as we showed in Section 4. Furthermore, AoE’s improvements observed across different backbone model sizes indicate that the benefit from the angle objective is universal.
+
+In-domain STS. To further examine the embedding training specifically, we experimented with in-domain STS tasks for STS-B with short text and GIS with long text. Here, the training and test sets are obtained from the same dataset, and $\mathrm { B E R T } _ { b a s e }$ is the backbone for efficiency restrictions with long text. Table 2 presents the results. As can be seen, all models perform much worse on GIS than STS-B. It implies that long-text STS presents non-trivial challenges, requiring more indepth exploration. We also note that SimCSE performs worse than SBERT (opposite to standard STS). It indicates that contrastive learning may rely on large-scale training samples, which is inadequate for in-domain STS. Nevertheless, AoE consistently performs the best, achieving improvements of 1.35% and 10.11% compared to SBERT and SimCSE, respectively. It indicates that the angle objective may enable more efficient STS training, reducing reliance on large-scale training data.
+
+Downstream Tasks. The above experiments concerned intrinsic evaluations. For extrinsic evaluations, we assess how the embeddings can benefit downstream tasks. Here, we first consider 7 popular classification tasks and show the results in Table 3. We can see that $\mathbf { A o E - B E R T } _ { b a s e }$ performs better than other $\mathrm { B E R T } _ { b a s e }$ baselines, showing the subtle semantics captured by the angle objective can further benefit downstream tasks. Moreover, $\mathbf { A o E \mathrm { - } L L a M A _ { 1 3 B } }$ achieves the best performance. These results indicate that AoE can produce text embeddings that helpfully assist downstream tasks.
+
+MTEB Benchmark. We have shown the superiority of AoE embeddings on classification. Here, the leaderboard experiments of MTEB benchmark further provide a more extensive study in downstream tasks (Muennighoff et al., 2022). We trained AoE using the widely-used embedding $\mathrm { d a t a } ^ { 2 }$ and the supervised data released by BGE (Zhang et al., 2023). In the experimental results, AoE achieved SOTA performance in BERT-large scale models, with an average score of 64.64. Specifically, AoE outperformed the top 2 open-source BERT-large models: bge-large-en-v1.5 (64.23) and ember-v1 (63.54). Moreover, it outperforms popular closedsource models: openai-text-embedding-3-large (OpenAI, 2024) (64.59), voyage-lite-01-instruct (64.49), and Cohere-embed-english-v3.0 (64.47). Most aforementioned comparison models are based on contrastive learning. It indicates that our novel angle objective design can provide performance gain for more challenging downstream tasks.
+
+## 5.2 Ablation Study
+
+While AoE has demonstrated overall effectiveness, we conduct ablation studies on the standard STS to investigate the contributions of AoE’s different modules. The results are shown in Table 4.
+
+First, we examine AoE’s performance with varying objectives. Interstingly, using only the angle objective outperforms the counterpart using only the contrastive objective. It indicates that our angle objective might be more effective in learning semantic similarity than the contrastive objective. Nevertheless, combining both of them yields the best results. Second, we test AoE’s performance on four different pooling strategies and find that the “cls” pooling is the most helpful one. Third, we test how random seeds affect AoE, and the results show that AoE is not sensitive to random seeds and robustly effective across varying selections.
+
+<table><tr><td>Model</td><td>Avg. Spearman&#x27;s Correlation</td></tr><tr><td colspan="2">Objective</td></tr><tr><td>AoE</td><td> $\mathbf { 8 2 . 4 3 { \scriptstyle \pm 0 . 0 8 } }$ </td></tr><tr><td>only angle objective</td><td> $8 2 . 3 6 _ { \pm 0 . 1 4 }$ </td></tr><tr><td>only contrastive objective</td><td> $8 1 . 5 3 { \scriptstyle \pm 0 . 1 9 }$ </td></tr><tr><td colspan="2">Pooling Strategy</td></tr><tr><td>cls</td><td> $\mathbf { 8 2 . 4 3 _ { \pm 0 . 1 1 } }$ </td></tr><tr><td>avg</td><td> $8 1 . 6 9 { \scriptstyle \pm 0 . 1 8 }$ </td></tr><tr><td>max</td><td> $7 7 . 9 6 _ { \pm 0 . 2 1 }$ </td></tr><tr><td colspan="2">Random Seed</td></tr><tr><td>fixed random seed=42</td><td> $8 2 . 4 3 { \scriptstyle \pm 0 . 1 0 }$ </td></tr><tr><td>different random seeds</td><td> $\mathbf { 8 2 . 4 5 _ { \pm 1 . 4 2 } }$ </td></tr></table>
+
+Table 4: The ablation study of AoE on the standard STS benchmark with $\mathbf { B E R T } _ { b a s e }$ . We report the average (Avg.) Spearman’s correlation over varying datasets.
+
+## 5.3 Further Discussions and Analyses
+
+To provide more insight, we further probe into AoE’s output to interpret why it enables effective embedding learning as follows. Besides, we discuss its efficiency (training time) in Appendix D.
+
+<table><tr><td>Model</td><td>MultiNLI</td><td>SNLI</td><td>Avg.</td></tr><tr><td> $\mathrm { B E R T } _ { b a s e }$ </td><td> $5 2 . 5 6 _ { \pm 0 . 2 2 }$ </td><td> $6 1 . 6 4 6 _ { \pm 0 . 2 7 }$ </td><td>57.10</td></tr><tr><td> $\mathrm { S i m C S E - B E R T } _ { b a s e }$ </td><td> $5 4 . 5 7 { \scriptstyle \pm 0 . 2 1 }$ </td><td> $6 2 . 3 8 { \scriptstyle \pm 0 . 2 7 }$ </td><td>58.48</td></tr><tr><td> $\mathbf { A o E - B E R T } _ { b a s e }$ </td><td> ${ \bf 5 6 . 6 0 _ { \pm 0 . 1 9 } }$ </td><td> ${ \bf 6 3 . 8 8 _ { \pm 0 . 2 5 } }$ </td><td>60.24</td></tr></table>
+
+Table 5: Results on NLI tasks (by accuracy). All results are our implementation using the official code.
+
+NLI Performance. Recall that we employed NLI datasets to train text embeddings, whereas the downstream task benchmarks do not involve NLI (see Table 3). We are hence interested in how AoE embeddings can benefit NLI tasks. Here, AoE is mainly compared with BERT and SimCSE text embeddings. Specifically, we input “[CLS]premise[SEP]hypothesis[SEP]” into the model and extract the representation of the “[CLS]” token for the logistic regression classification following SentEval (Conneau and Kiela, 2018). For the MultiNLI task, we report the average accuracy of validation\_matched and validation\_mismatched datasets. For the SNLI task, we report accuracy on the test set. The results are presented in Table 5. AoE consistently outperforms BERT and Sim-CSE. It suggests that AoE can well capture subtle semantics via training and thus benefit NLI tasks.
+
+Real and Imaginary Text Embeddings in Cosine Saturation Zone. We then study what is encoded in imaginary text embeddings to tackle text pairs in cosine saturation zones. To that end, we focus on the data in the STS-B test set’s saturation zone (weighted similarity score > 0.95) and visualize them in a 2D plot using t-SNE (Van der Maaten and Hinton, 2008). Figures 3a and 3b show that imaginary text embeddings are more scattered than the real ones. To probe into the results, we draw lines between 5 sample text pairs and observe that the lengths of the lines, i.e., distances between text pairs, are larger for imaginary text embeddings than for real ones. For instance, consider one of the sample text pairs Ukraine to implement unilateral ceasefire and Ukraine offers unilateral ceasefire. The real distance is 11.8, while the imaginary distance is 22.1. This larger imaginary distance better reflects the subtle difference between “to implement” and “offers”. AoE optimizes the angle differences to encode such subtle differences in the imaginary embeddings, resulting in better effectiveness. Figure 3c further supports this observation, as it shows that distances between text pairs are greater for imaginary text embeddings. This can be explained by the tendency that real text embeddings primarily capture appearance semantic differences, which can be influenced by saturation zones. Meanwhile, imaginary text embeddings specialize in capturing subtle semantic differences and help mitigate the negative effects of cosine saturation zones. We also visualize the full STS-B test set in Appendix D and have similar observations.
+
+![](images/bec82421b38a25d65b14b692762d93310f11e00be2b4295afa7f5e58fde6ab4f.jpg)  
+(a) Re Text Embedding
+
+![](images/06713bbc0789c74c0755ee1f8b2dc9d74a579e96bdee9cb297afcd5fc1568088.jpg)  
+(b) Im Text Embedding
+
+![](images/9e9f5ee03fe5b40e0a0ea75d92b488308aa60307768f47cdcc2ef6bc7e2ec7ea.jpg)  
+(c) Distance Distribution
+
+Figure 3: The t-SNE visualization of the real (Re) and imaginary (Im) text embeddings and the kernel density estimate plot of the real and imaginary distance between text pairs in the saturation zone of the STS-B test. $\operatorname { A V G } _ { r e }$ and $\mathrm { A V G } _ { i m }$ indicate the average distance between text pairs of the real and imaginary text embeddings.  
+![](images/55d97909029c6e83ff94d581b761c9167b278bb97f2f0e3ebb55cb301da89bc1.jpg)  
+Figure 4: Density plots of cosine similarities between text pairs in the STS-B test set. The y-axis denotes the ground truth ratings (higher ratings indicate higher similarities). The x-axis is the cosine similarity.
+
+![](images/9c0bd291fa2fdb790ea721127f1a08322f9ce716b9cc069693ea7bfab840f112.jpg)  
+Figure 5: Density plots of golden (human annotated) scores between sentence pairs in the STS-B test set, ranging from 0 (dissimilar) to 5 (similar).
+
+Text Embedding Distributions. Finally, we examine embedding distributions and how they align with the human senses. Figure 4 depicts the density plots of the cosine similarities between text pairs in the STS-B test set. Figure 5 shows the golden (human-labeled) scores, where human annotations are evenly distributed across varying similarity levels. However, Figure 4 implies that SimCSE and SBERT tend to focus their predictions within larger similarity intervals; in contrast, AoE’s distribution leans towards the left, indicating its ability to utilize a broader range to diversify similarity predictions. It could be attributed to AoE’s angle optimization, allowing imaginary embeddings to reflect subtle semantic differences. As a result, AoE’s distribution aligns more closely with the humans’ distribution.
+
+## 6 Conclusion
+
+In this paper, we have presented a novel text embedding model called AoE, which optimizes the angle difference in complex space to mitigate the negative effects of cosine saturation zones. To comprehensively evaluate AoE with STS tasks, we have introduced a GitHub Issues Similarity Dataset for long-text STS evaluation. Extensive experiments have suggested that AoE outperforms baselines, indicating that AoE can produce high-quality text embeddings and benefit various downstream tasks.
+
+## Ethics Statement
+
+In this paper, we present a newly developed longtext STS dataset called GitHub Issue Similarity (GIS). The data collection process for GIS follows the guidelines of GitHub, and we use the official GitHub API to collect the necessary data. We have carefully reviewed the data and are confident that there are no ethical issues, such as offensive content. All repositories included in the GIS dataset are open source.
+
+## Limitations
+
+One limitation of AoE lies in its performance improvement on our proposed long-text STS dataset GIS is comparatively lower than its performance on short-text STS tasks. We plan to improve AoE’s performance on long-text STS tasks in future work.
+
+## Acknowledgements
+
+This work is supported by the NSFC Young Scientists Fund (Project No. 62006203), a grant from the Research Grants Council of the Hong Kong Special Administrative Region, China (Project No. PolyU/25200821), the Innovation and Technology Fund (Project No. PRP/047/22FX), and PolyU Internal Fund from RC-DSAI (Project No. 1-CE1E).
+
+Here, we sincerely thank the reviewers and ACs for their valuable input, which has greatly improved our work.
+
+## References
+
+Eneko Agirre, Carmen Banea, Claire Cardie, Daniel Cer, Mona Diab, Aitor Gonzalez-Agirre, Weiwei Guo, Iñigo Lopez-Gazpio, Montse Maritxalar, Rada
+
+Mihalcea, German Rigau, Larraitz Uria, and Janyce Wiebe. 2015. SemEval-2015 task 2: Semantic textual similarity, English, Spanish and pilot on interpretability. In Proceedings of the 9th International Workshop on Semantic Evaluation (SemEval 2015), pages 252–263, Denver, Colorado. Association for Computational Linguistics.
+
+Eneko Agirre, Carmen Banea, Claire Cardie, Daniel Cer, Mona Diab, Aitor Gonzalez-Agirre, Weiwei Guo, Rada Mihalcea, German Rigau, and Janyce Wiebe. 2014. SemEval-2014 task 10: Multilingual semantic textual similarity. In Proceedings ofthe 8th International Workshop on Semantic Evaluation (SemEval 2014), pages 81–91, Dublin, Ireland. Association for Computational Linguistics.
+
+Eneko Agirre, Carmen Banea, Daniel Cer, Mona Diab, Aitor Gonzalez-Agirre, Rada Mihalcea, German Rigau, and Janyce Wiebe. 2016. SemEval-2016 task 1: Semantic textual similarity, monolingual and cross-lingual evaluation. In Proceedings ofthe 10th International Workshop on Semantic Evaluation (SemEval-2016), pages 497–511, San Diego, California. Association for Computational Linguistics.
+
+Eneko Agirre, Daniel Cer, Mona Diab, and Aitor Gonzalez-Agirre. 2012. SemEval-2012 task 6: A pilot on semantic textual similarity. In \*SEM 2012: The First Joint Conference on Lexical and Computational Semantics – Volume 1: Proceedings of the main conference and the shared task, and Volume 2: Proceedings of the Sixth International Workshop on Semantic Evaluation (SemEval 2012), pages 385– 393, Montréal, Canada. Association for Computational Linguistics.
+
+Eneko Agirre, Daniel Cer, Mona Diab, Aitor Gonzalez-Agirre, and Weiwei Guo. 2013. \*SEM 2013 shared task: Semantic textual similarity. In Second Joint Conference on Lexical and Computational Semantics (\*SEM), Volume 1: Proceedings ofthe Main Conference and the Shared Task: Semantic Textual Similarity, pages 32–43, Atlanta, Georgia, USA. Association for Computational Linguistics.
+
+Akari Asai, Sewon Min, Zexuan Zhong, and Danqi Chen. 2023. Retrieval-based language models and applications. In Proceedings ofthe 61st Annual Meeting ofthe Associationfor Computational Linguistics (Volume 6: Tutorial Abstracts), pages 41–46, Toronto, Canada. Association for Computational Linguistics.
+
+Samuel R. Bowman, Gabor Angeli, Christopher Potts, and Christopher D. Manning. 2015. A large annotated corpus for learning natural language inference. In Proceedings of the 2015 Conference on Empirical Methods in Natural Language Processing, pages 632–642, Lisbon, Portugal. Association for Computational Linguistics.
+
+Daniel Cer, Mona Diab, Eneko Agirre, Iñigo Lopez-Gazpio, and Lucia Specia. 2017. SemEval-2017 task 1: Semantic textual similarity multilingual and crosslingual focused evaluation. In Proceedings
+
+of the 11th International Workshop on Semantic Evaluation (SemEval-2017), pages 1–14, Vancouver, Canada. Association for Computational Linguistics.
+
+Daniel Cer, Yinfei Yang, Sheng-yi Kong, Nan Hua, Nicole Limtiaco, Rhomni St. John, Noah Constant, Mario Guajardo-Cespedes, Steve Yuan, Chris Tar, Brian Strope, and Ray Kurzweil. 2018. Universal sentence encoder for English. In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing: System Demonstrations, pages 169–174, Brussels, Belgium. Association for Computational Linguistics.
+
+Yung-Sung Chuang, Rumen Dangovski, Hongyin Luo, Yang Zhang, Shiyu Chang, Marin Soljacic, Shang-Wen Li, Scott Yih, Yoon Kim, and James Glass. 2022. DiffCSE: Difference-based contrastive learning for sentence embeddings. In Proceedings of the 2022 Conference of the North American Chapter of the Associationfor Computational Linguistics: Human Language Technologies, pages 4207–4218, Seattle, United States. Association for Computational Linguistics.
+
+Alexis Conneau and Douwe Kiela. 2018. SentEval: An evaluation toolkit for universal sentence representations. In Proceedings ofthe Eleventh International Conference on Language Resources and Evaluation (LREC 2018), Miyazaki, Japan. European Language Resources Association (ELRA).
+
+Alexis Conneau, Douwe Kiela, Holger Schwenk, Loïc Barrault, and Antoine Bordes. 2017. Supervised learning of universal sentence representations from natural language inference data. In Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing, pages 670–680, Copenhagen, Denmark. Association for Computational Linguistics.
+
+Tim Dettmers, Artidoro Pagnoni, Ari Holtzman, and Luke Zettlemoyer. 2023. Qlora: Efficient finetuning of quantized llms. arXiv preprint arXiv:2305.14314.
+
+Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: pre-training of deep bidirectional transformers for language understanding. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 4171–4186.
+
+Bill Dolan, Chris Quirk, and Chris Brockett. 2004. Unsupervised construction of large paraphrase corpora: Exploiting massively parallel news sources. In COL-ING 2004: Proceedings of the 20th International Conference on Computational Linguistics, pages 350– 356, Geneva, Switzerland. COLING.
+
+Tianyu Gao, Xingcheng Yao, and Danqi Chen. 2021. Simcse: Simple contrastive learning of sentence embeddings. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing, pages 6894–6910. Association for Computational Linguistics.
+
+Felix Hill, Kyunghyun Cho, and Anna Korhonen. 2016. Learning distributed representations of sentences from unlabelled data. In NAACL HLT 2016, The 2016 Conference of the North American Chapter of the Associationfor Computational Linguistics: Human Language Technologies, pages 1367–1377. The Association for Computational Linguistics.
+
+Minqing Hu and Bing Liu. 2004. Mining and summarizing customer reviews. In Proceedings of the tenth ACM SIGKDD international conference on Knowledge discovery and data mining, pages 168–177.
+
+Ting Jiang, Shaohan Huang, Zhongzhi Luan, Deqing Wang, and Fuzhen Zhuang. 2023. Scaling sentence embeddings with large language models. arXiv preprint arXiv:2307.16645.
+
+Yuxin Jiang, Linhan Zhang, and Wei Wang. 2022. Improved universal sentence embeddings with promptbased contrastive learning and energy-based learning. In Findings of the Association for Computational Linguistics: EMNLP 2022, Abu Dhabi, United Arab Emirates, December 7-11, 2022, pages 3021–3035. Association for Computational Linguistics.
+
+Ryan Kiros, Yukun Zhu, Ruslan Salakhutdinov, Richard S. Zemel, Raquel Urtasun, Antonio Torralba, and Sanja Fidler. 2015. Skip-thought vectors. In Advances in Neural Information Processing Systems 28: Annual Conference on Neural Information Processing Systems 2015, pages 3294–3302.
+
+Bohan Li, Hao Zhou, Junxian He, Mingxuan Wang, Yiming Yang, and Lei Li. 2020. On the sentence embeddings from pre-trained language models. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 9119–9130, Online. Association for Computational Linguistics.
+
+Xianming Li, Zongxi Li, Xiaotian Luo, Haoran Xie, Xing Lee, Yingbin Zhao, Fu Lee Wang, and Qing Li. 2023. Recurrent attention networks for long-text modeling. In Findings of the Association for Computational Linguistics: ACL 2023, pages 3006–3019, Toronto, Canada. Association for Computational Linguistics.
+
+Marco Marelli, Stefano Menini, Marco Baroni, Luisa Bentivogli, Raffaella Bernardi, and Roberto Zamparelli. 2014. A SICK cure for the evaluation of compositional distributional semantic models. In Proceedings of the Ninth International Conference on Language Resources and Evaluation (LREC’14), pages 216–223, Reykjavik, Iceland. European Language Resources Association (ELRA).
+
+Tomás Mikolov, Ilya Sutskever, Kai Chen, Gregory S. Corrado, and Jeffrey Dean. 2013. Distributed representations of words and phrases and their compositionality. In 27th Annual Conference on Neural Information Processing Systems 2013., pages 3111– 3119.
+
+Niklas Muennighoff, Nouamane Tazi, Loïc Magne, and Nils Reimers. 2022. Mteb: Massive text embedding benchmark. arXiv preprint arXiv:2210.07316.
+
+OpenAI. 2022a. Introducing chatgpt.
+
+OpenAI. 2022b. text-embedding-ada-002.
+
+OpenAI. 2024. text-embedding-3.
+
+Bo Pang and Lillian Lee. 2004. A sentimental education: Sentiment analysis using subjectivity summarization based on minimum cuts. In Proceedings of the 42nd Annual Meeting of the Association for Computational Linguistics (ACL-04), pages 271–278, Barcelona, Spain.
+
+Bo Pang and Lillian Lee. 2005. Seeing stars: Exploiting class relationships for sentiment categorization with respect to rating scales. In Proceedings of the 43rd Annual Meeting of the Association for Computational Linguistics (ACL’05), pages 115–124, Ann Arbor, Michigan. Association for Computational Linguistics.
+
+Nils Reimers and Iryna Gurevych. 2019. Sentence-bert: Sentence embeddings using siamese bert-networks. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing, pages 3980–3990. Association for Computational Linguistics.
+
+Matías Roodschild, Jorge Gotay Sardiñas, and Adrián Will. 2020. A new approach for the vanishing gradient problem on sigmoid activation. Progress in Artificial Intelligence, 9(4):351–360.
+
+Richard Socher, Alex Perelygin, Jean Wu, Jason Chuang, Christopher D. Manning, Andrew Ng, and Christopher Potts. 2013. Recursive deep models for semantic compositionality over a sentiment treebank. In Proceedings of the 2013 Conference on Empirical Methods in Natural Language Processing, pages 1631–1642, Seattle, Washington, USA. Association for Computational Linguistics.
+
+Jianlin Su. 2022. Cosent (1): A more effective sentence vector scheme than sentence bert.
+
+Jianlin Su, Jiarun Cao, Weijie Liu, and Yangyiwen Ou. 2021a. Whitening sentence representations for better semantics and faster retrieval. arXiv preprint arXiv:2103.15316.
+
+Jianlin Su, Yu Lu, Shengfeng Pan, Ahmed Murtadha, Bo Wen, and Yunfeng Liu. 2021b. Roformer: Enhanced transformer with rotary position embedding. arXiv preprint arXiv:2104.09864.
+
+Zhiqing Sun, Zhi-Hong Deng, Jian-Yun Nie, and Jian Tang. 2019. Rotate: Knowledge graph embedding by relational rotation in complex space. In International Conference on Learning Representations.
+
+Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. 2023. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288.
+
+Théo Trouillon, Johannes Welbl, Sebastian Riedel, Eric Gaussier, and Guillaume Bouchard. 2016. Complex embeddings for simple link prediction. In Proceedings of The 33rd International Conference on Machine Learning, volume 48 of Proceedings of Machine Learning Research, pages 2071–2080, New York, New York, USA. PMLR.
+
+Laurens Van der Maaten and Geoffrey Hinton. 2008. Visualizing data using t-sne. Journal of machine learning research, 9(11).
+
+Ellen M Voorhees and Dawn M Tice. 2000. Building a question answering test collection. In Proceedings ofthe 23rd annual international ACM SIGIR conference on Research and development in information retrieval, pages 200–207.
+
+Janyce Wiebe, Theresa Wilson, and Claire Cardie. 2005. Annotating expressions of opinions and emotions in language. Language resources and evaluation, 39:165–210.
+
+Adina Williams, Nikita Nangia, and Samuel Bowman. 2018. A broad-coverage challenge corpus for sentence understanding through inference. In Proceedings ofthe 2018 Conference ofthe North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers), pages 1112–1122, New Orleans, Louisiana. Association for Computational Linguistics.
+
+Lingling Xu, Haoran Xie, Zongxi Li, Fu Lee Wang, Weiming Wang, and Qing Li. 2023. Contrastive learning models for sentence representations. ACM Trans. Intell. Syst. Technol., 14(4).
+
+Yuanmeng Yan, Rumei Li, Sirui Wang, Fuzheng Zhang, Wei Wu, and Weiran Xu. 2021. Consert: A contrastive framework for self-supervised sentence representation transfer. In Proceedings ofthe 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing, pages 5065–5075. Association for Computational Linguistics.
+
+Peitian Zhang, Shitao Xiao, Zheng Liu, Zhicheng Dou, and Jian-Yun Nie. 2023. Retrieve anything to augment large language models. arXiv preprint arXiv:2310.07554.
+
+Yan Zhang, Ruidan He, Zuozhu Liu, Kwan Hui Lim, and Lidong Bing. 2020. An unsupervised sentence embedding method by mutual information maximization. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 1601–1610, Online. Association for Computational Linguistics.
+
+Wenjie Zhuo, Yifan Sun, Xiaohan Wang, Linchao Zhu, and Yi Yang. 2023. WhitenedCSE: Whitening-based contrastive learning of sentence embeddings. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 12135–12148, Toronto, Canada. Association for Computational Linguistics.
+
+## A Related Work
+
+Table 6 provides a list of models that include cosine similarity in their objective functions. We observe that using cosine similarity to measure similarity in objective functions that pose a gradient vanishing challenge is quite common.
+
+<table><tr><td>Model</td><td>Use Cosine</td><td>Learning Algorithm</td></tr><tr><td>USE ↑</td><td>x</td><td>Ensemble</td></tr><tr><td>SBERT </td><td>√</td><td>Regression</td></tr><tr><td>SimCSE</td><td>√</td><td>Contrastive Learning</td></tr><tr><td>ConSERT </td><td>√</td><td>Contrastive Learning</td></tr><tr><td>DiffCSE ♡</td><td>√</td><td>Contrastive Learning</td></tr><tr><td>PromptCSE</td><td>√</td><td>Contrastive Learning</td></tr><tr><td>WhitenedCSE◆</td><td>√</td><td>Contrastive Learning</td></tr></table>
+
+Table 6: The similarity measurements and learning algorithms of widely-used text embedding models. : Cer et al. (2018). : Reimers and Gurevych (2019). : Gao et al. (2021). : Yan et al. (2021). : Chuang et al. (2022). is Jiang et al. (2022). ♦: Zhuo et al. (2023). The majority of them used cosine to measure similarity.
+
+## B Details of GIS Dataset
+
+We collected GitHub issues via the official GitHub API from the following popular 55 repositories:
+
+Figure 6 shows an example of the proposed GIS dataset. We can see that the texts are long, and there is a higher overlap among duplicate issues than non-duplicate issues.
+
+Figure 7 shows the data source count distribution of the proposed GIS. We can observe that there is a wide range of repositories in GIS, most of which consist of over 100 samples.
+
+Table 7 presents the data split and data size of the proposed GIS dataset, and Figure 9 depicts a violin plot illustrating the token-level text length distribution. The violin plot reveals a substantial number of lengthy texts.
+
+Figure 8 depicts the distribution of the n-gram overlapping for non-duplicate and duplicate issue pairs. We can see that the overlapping becomes more significant as the grams decrease. Additionally, the overlapping of duplicate issue pairs is slightly larger than non-duplicate pairs. Specifically, the average overlapping of non-duplicate
+
+microsoft/terminal axios/axios   
+mwaskom/seaborn freeCodeCamp/freeCodeCamp   
+google/jax apache/shardingsphere   
+twbs/bootstrap numpy/numpy   
+JuliaLang/julia microsoft/playwright   
+microsoft/vscode scikit-learn/scikit-learn   
+apache/airflow apache/superset   
+electron/electron denoland/deno   
+apache/druid microsoft/PowerToys   
+apache/dubbo kubernetes/kubernetes   
+scipy/scipy symfony/symfony   
+scrapy/scrapy flutter/flutter   
+babel/babel microsoft/TypeScript   
+vercel/next.js ansible/ansible   
+golang/go spring-projects/spring-framework   
+tiangolo/fastapi pandas-dev/pandas   
+webpack/webpack angular/angular   
+neo4j/neo4j elastic/elasticsearch   
+facebook/react psf/requests   
+bumptech/glide pytorch/pytorch   
+keras-team/keras npm/cli   
+mrdoob/three.js tensorflow/tensorflow   
+celery/celery DefinitelyTyped/DefinitelyTyped   
+rust-lang/rust sqlalchemy/sqlalchemy   
+mui/material-ui pallets/flask   
+opencv/opencv huggingface/transformers   
+vuejs/vue matplotlib/matplotlib   
+atom/atom
+
+<table><tr><td></td><td>Split → | Train Set</td><td>Validation Set</td><td>Test Set</td></tr><tr><td>#Pos</td><td>9,457</td><td>774</td><td>807</td></tr><tr><td>#Neg</td><td>9,108</td><td>773</td><td>741</td></tr><tr><td>Total</td><td>18,565</td><td>1,547</td><td>1,548</td></tr></table>
+
+Table 7: Data split and data size of the GIS dataset. #Pos and #Neg is the count of positive and negative pairs, respectively.
+
+pairs for 1-gram, 2-gram, and 3-gram is 22, 12, and 9, respectively. Similarly, the average overlapping of non-duplicate pairs for 1-gram, 2-gram, and 3-gram is 26, 16, and 13, respectively. These statistics highlight the importance of using deep networks, even large language models, to identify duplicate and non-duplicate issues.
+
+## C Detailed Derivation of Angle Difference
+
+Complex division involves determining the angle difference and the factor in magnitude. Based on this, we calculate complex division between z and w as follows:
+
+$$
+\begin{array} { c } { \frac { \bf z } { \bf w } = \gamma e ^ { i \Delta \theta _ { z w } } } \\ { \gamma = \frac { r _ { \bf z } } { r _ { \bf w } } = \frac { \sqrt { { \bf a } ^ { 2 } + { \bf b } ^ { 2 } } } { \sqrt { { \bf c } ^ { 2 } + { \bf d } ^ { 2 } } } } \\ { \Delta \theta _ { z w } = \theta _ { \bf z } - \theta _ { \bf w } , } \end{array}\tag{6}
+$$
+
+where $r _ { \mathbf { z } }$ and $r _ { \mathbf { w } }$ represent the magnitudes of z and $\mathbf { w } ,$ while $\theta _ { \mathbf { z } }$ and $\theta _ { \mathbf { w } }$ denote the respective angles of
+
+![](images/6a6509db63a466c2f23536260da054d87ca9e5b12fd2d0c8ae7fe7a2f8e0aae9.jpg)  
+Figure 6: An example of the proposed GIS dataset. The blue circle denotes non-duplicate issues labeled as 0, while the green one is duplicate issues labeled as 1. The “...” indicates the truncated text of the lengthy attached code.
+
+![](images/79e5c8de0ba88bbfbdf597ccb313aa72be82782ce178c5dabba0edf2a0db6907.jpg)  
+Figure 7: The distribution of data source counts in the proposed GIS dataset. The x-axis denotes the selected repository from GitHub.
+
+![](images/033106746397189d5d997630c0633ca7b0d617d75cc229ed8c363cec7e4f811c.jpg)
+
+![](images/747b8ce300fdcb91007803043fbcd0318c52c18467208fc92bc99bf24ce2eb1c.jpg)  
+Figure 8: The distribution of the n-gram overlapping for the non-duplicate issue pairs and the duplicate issue pairs in the proposed GIS dataset.
+
+<table><tr><td>URL</td><td>Description</td></tr><tr><td colspan="2">Universal AoE Embedding Collection</td></tr><tr><td>https://hf.co/WhereIsAI/UAE-Large-V1 一  $\mathsf { \Omega } \mathsf { \cap } \mathsf { t t p s } : / / \mathsf { h f } . \mathsf { c o } / \mathsf { W h e r e I s A I } / \mathsf { U A E } - \mathsf { C o d e } - \mathsf { L a r g e } - \mathsf { V } 1$ </td><td>Universal AoE Embedding (English). AoE Embedding For Code Similarity</td></tr><tr><td>AoE NLI Embedding Collection</td><td></td></tr><tr><td>https://hf.co/SeanLee  $9 7 / 2 \eta \mathrm { g } \mathrm { 1 e - b e r t - b a s e - u n c a s e d - n } \mathrm { 1 i - e n - v } \mathrm { 1 }$ </td><td> $\mathbf { B E R T } _ { b a s e } \mathbf { N L I }$ </td></tr><tr><td>https://hf.co/SeanLee97/angle-1lama-7b-nli-v2</td><td> $\mathrm { L L a M A 2 – 7 B N L I }$ </td></tr><tr><td>https://hf.co/SeanLee97/angle-1lama-13b-nli</td><td> $\mathrm { L L a M A } 2 – 1 3 \mathrm { B } \mathrm { N L I }$ </td></tr></table>
+
+Table 8: Pretrained models of AoE on HuggingFace.
+
+<sup>a</sup>https://huggingface.co/collections/WhereIsAI/universal-angle-embeddings-663b0618ade1a39663e48190 <sup>b</sup>https://huggingface.co/collections/SeanLee97/angle-nli-sentence-embeddings-6646de386099d0472c5e21c0  
+![](images/6e8e73e4363efc901a3d42be85a97050daca119bff23353ec73f820ad0760d1c.jpg)  
+Figure 9: Log token-level length distribution of the GIS dataset. The red dashed line indicates the boundary line for long text. e servers as the base for log.
+
+z and w. Next, we compute the value of $\frac { \mathbf { z } } { \mathbf { w } }$ by the division rule in complex space as follows:
+
+$$
+{ \frac { \mathbf { z } } { \mathbf { w } } } = { \frac { \mathbf { a } + { \underset { \sim } { \mathbf { b } } } i } { \mathbf { c } + { \underset { \sim } { \mathbf { d } } } i } } = { \frac { ( \mathbf { a c } + { \underset { \sim } { \mathbf { b d } } } ) + ( { \underset { \sim } { \mathbf { b c } } } - \mathbf { a d } ) i } { \mathbf { c } ^ { 2 } + { \underset { \sim } { \mathbf { d } ^ { 2 } } } } } .\tag{7}
+$$
+
+After that, we combine Eq. 6 and Eq. 7 to calculate the angle difference $\Delta \theta _ { z w }$ between z and w. By combing Eq. 6 and Eq. 7, we can obtain the following equation:
+
+$$
+\frac { ( \mathbf { a c } + \mathbf { b d } ) + ( \mathbf { b c } - \mathbf { a d } ) i } { \mathbf { c } ^ { 2 } + \mathbf { d } ^ { 2 } } = \gamma e ^ { i \Delta \theta _ { z w } } .\tag{8}
+$$
+
+Then, we apply log( ) function to both sides, as follows:
+
+$$
+\log ( \frac { ( \mathbf { a c } + \mathbf { b d } ) + ( \mathbf { b c } - \mathbf { a d } ) i } { \mathbf { c } ^ { 2 } + \mathbf { d } ^ { 2 } } ) = \log ( \gamma ) + i \Delta \theta _ { z w } .\tag{9}
+$$
+
+Next, we move $\log ( \gamma )$ to the left side and replace γ to $\frac { \sqrt { \mathbf { a } ^ { 2 } + \mathbf { b } ^ { 2 } } } { \sqrt { \mathbf { c } ^ { 2 } + \mathbf { d } ^ { 2 } } }$ , as follows:
+
+$$
+\log \left[ \frac { ( \mathbf { a c } + \mathbf { b d } ) + ( \mathbf { b c } - \mathbf { a d } ) i } { \mathbf { c } ^ { 2 } + \mathbf { \underbrace { d ^ { 2 } } _ { \sim } } } \times \frac { \sqrt { \mathbf { c } ^ { 2 } + \mathbf { d } ^ { 2 } } } { \sqrt { \mathbf { a } ^ { 2 } + \mathbf { b } ^ { 2 } } } \right] = i \Delta \theta _ { z w } .\tag{10}
+$$
+
+Finally, we simplify it and follow Sun et al. (2019) to use the real and imaginary text embeddings for the calculation to obtain Eq. 2
+
+## D Discussion
+
+Discussion of Training Time. To evaluate the efficiency of AoE, we compare its training time with SBERT and SimCSE. We train the models on the STS-B dataset for one epoch using a single GPU (Nvidia GeForce RTX3090 Ti). For $\mathbf { B E R T } _ { b a s e } ,$ the training times are 14.35, 14.93, and 14.94 seconds for SBERT, SimCSE, and AoE, respectively. For $\mathbf { L L a M A } _ { 7 B }$ , the training times are as follows: 1027.02 seconds for SBERT, 1027.67 seconds for SimCSE, and 1027.18 seconds for AoE. We find that AoE’s training time is similar to SBERT and SimCSE, suggesting that AoE can achieve better performance with comparable efficiency.
+
+Analysis of Real and Imaginary Text Embeddings in Saturation Zone. Figure 10 displays a 2D plot using t-SNE, showing the full STS-B test set’s real and imaginary text embeddings. The imaginary text embeddings are more vertically scattered than the real text embeddings shown in Figure 10a and Figure 10b. The figures also include lines representing five sample text pairs, where the lines of the imaginary text embeddings are longer than those of the real text embeddings.
+
+Figure 10c depicts the distance distribution of text pairs. It is noticeable that the distribution of imaginary text embeddings is shifted towards higher distances compared to the real text embeddings. Moreover, the average distance of the imaginary text embeddings is also larger than that of the real text embeddings.
+
+![](images/dabe911785039b80282e8cced6af2d16190acb4fdaeafd7198754884e9eee451.jpg)  
+(a) Re Text Embedding
+
+![](images/660bc9655670884d39a6d633ae35255febab76f013143a5e503913a54da54835.jpg)  
+(b) Im Text Embedding
+
+![](images/0bf772249a69a31903a1727eb822bb4fac96224f4128da2f385c67539a4a5250.jpg)  
+(c) Distance Distribution  
+Figure 10: The t-SNE visualization of real (Re) and imaginary (Im) text embeddings and the kernel density estimate plot of the real and imaginary distance between text pairs in STS-B test set. $\operatorname { A V G } _ { r e }$ and $\operatorname { A V G } _ { i m }$ indicate the average distance between text pairs of the real and imaginary text embeddings.
+
+This evidence suggests that the imaginary text embeddings possess stronger capabilities in distinguishing semantic differences, thereby better discerning subtle semantic differences.
+
+## E Pretrained Models of AoE
+
+We open source multiple AoE embeddings for various scenarios, as listed in Table 8. The universal AoE embeddings (UAE) can be used for information retrieval, retrieval-augmented generation (RAG), semantic textual similarity, code similarity, clustering, classification, and many other applications. The AoE NLI embeddings can be used for semantic textual similarity.
