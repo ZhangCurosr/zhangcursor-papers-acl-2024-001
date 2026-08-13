@@ -1,0 +1,3485 @@
+[
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Improving Event Definition Following For Zero-Shot Event Detection"
+                    }
+                ],
+                "level": 1
+            },
+            "bbox": [
+                139,
+                89,
+                857,
+                111
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Zefan Cai∗†⋄, Po-Nien Kung∗‡, Ashima Suvarna‡, Mingyu Derek Ma‡, Hritik Bansal‡, Baobao Chang⋄, P. Jeffrey Brantingham‡, Wei Wang‡, Nanyun Peng‡ †University of Wisconsin - Madison, ‡University of California, Los Angeles, ⋄Peking University zefncai@gmail.com, ponienkung@cs.ucla.edu"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                133,
+                872,
+                217
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Abstract"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                262,
+                260,
+                342,
+                277
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Existing approaches on zero-shot event detection usually train models on datasets annotated with known event types, and prompt them with unseen event definitions. These approaches yield sporadic successes, yet generally fall short of expectations. In this work, we aim to improve zero-shot event detection by training models to better follow event definitions. We hypothesize that a diverse set of event types and definitions are the key for models to learn to follow event definitions while existing event extraction datasets focus on annotating many high-quality examples for a few event types. To verify our hypothesis, we construct an automatically generated Diverse Event Definition (DivED) dataset and conduct comparative studies. Our experiments reveal that a large number of event types (200) and diverse event definitions can significantly boost event extraction performance; on the other hand, the performance does not scale with over ten examples per event type. Beyond scaling, we incorporate event ontology information and hard-negative samples during training, further boosting the performance. Based on these findings, we fine-tuned a LLaMA-2-7B model on our DivED dataset, yielding performance that surpasses SOTA large language models like GPT-3.5 across three open benchmarks on zero-shot event detection. Our code and data can be found at https://github.com/PlusLabNLP/ZeroED"
+                    }
+                ]
+            },
+            "bbox": [
+                141,
+                291,
+                460,
+                746
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "1 Introduction"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                759,
+                260,
+                776
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Event detection (ED) focuses on identifying event triggers of specific event types in a given text with predefined event ontology. Prior work has studied event detection largely in a fully-supervised fashion (Wadden et al., 2019; Lin et al., 2020; Nguyen and Grishman, 2015; Nguyen et al., 2016; Han et al., 2019; Du and Cardie, 2020; Cheng et al., 2023b; Cai et al., 2023; Cheng et al., 2023a; Huang et al., 2020; Huang and Peng, 2020; ?; Paolini et al., 2021; Ma et al., 2023b). While these work show promising performance on seen events, it cannot generalize well to long-tailed and unseen events (Ma et al., 2024; Zhang et al., 2022). To further enable generalization to low-resource events, prior work proposed to tackle few-shot event detection by training model on generated pseudo data (Ma et al., 2024; Kumar et al., 2020; Schick and Schütze, 2021). Despite the success in data-efficient event detection, they cannot zero-shot extract unseen events in real-time due to the need for prior training, limiting their applicability to a wider range of scenarios."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                787,
+                489,
+                900
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/16f07e1e6db8eadd74dc04f9842dd421ab0da048fdd4a2fcfee240be4f85a2d0.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 1: Zero-shot generative event detection formulation. We demonstrate a generated event type and sample from our DivED dataset. The input prompt includes information about Event Type, Event Definition, Event Ontology and the query passage, and the expected output is a verbalized extracted result."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                514,
+                259,
+                880,
+                429
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                535,
+                885,
+                776
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The success of task generalization of LLMs enabled by instruction tuning further advances zero-shot event detection. Recent work started to extract events of novel type by providing LLMs with the event definition of unseen events during inference, as demonstrated in Figure 1. They either prompt closed-source LLMs, such as GPT-3.5 (Wang et al., 2022; Gao et al., 2023a; Wei et al., 2023), or apply transfer learning on open-sourced LMs with EE training data of seen event types (Huang et al., 2018a; Lyu et al., 2021). While the former methods achieve acceptable performance, they are not flexible and reproducible due to their closed nature, leading to the difficulty in further improving the models’ performance. In contrast, the latter methods while reproducible and flexible, suffer from low performance."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                777,
+                887,
+                922
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "*Equal contribution."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                908,
+                263,
+                921
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 2842–2863 August 11-16, 2024 ©2024 Association for Computational Linguistics"
+                    }
+                ]
+            },
+            "bbox": [
+                89,
+                945,
+                907,
+                973
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2842"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                489,
+                214
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this work, we aim to enhance zero-shot event detection (ED) by training a model with improved generalization to unseen event types. During inference, the model, prompted with definitions of previously unseen events, relies on its instructionfollowing ability to understand event definitions and identify correct triggers. Despite recent impressive results of instruction following by Large Language Models (LLMs), there is room for improvement (Kung and Peng, 2023; Shao et al., 2023; Yin et al., 2023), and we focus on enhancing it via instruction fine-tuning with strategically generated data. Specifically, we hypothesize that transfer learning from conventional EE datasets might not be ideal (Kung et al., 2021, 2023). Though a large amount of high-quality training samples for only a few event types equips the model to perform EE on homogeneous data, it is not sufficient for the model to develop generalizability towards unseen situations. Different from existing works that aim to improve ED model by generating more homogeneous EE data (Ma et al., 2024), we posit that a large number of event types and a diverse set of event definitions are the keys to improving the event definition following capabilities."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                214,
+                490,
+                617
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To verify our assumption, we develop Diverse Event Definition (DivED) Dataset, which is generated from LLMs with diverse event definitions and samples. DivED includes 3000+ event types, each with 10 event definitions and 10 samples. Since event types can be organized into tree-structure ontology, we further inject each event’s event type dependencies information into its event definition, including the name of its parent and sibling events."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                617,
+                489,
+                762
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our study on the DivED dataset supports our hypothesis. The results indicate that a sufficient amount of event types (200) and diverse event definitions significantly enhance zero-shot event detection performance on out-of-distribution data, underscoring their crucial role in event definition comprehension. On the other hand, the performance doesn’t improve significantly with more than ten samples per event type. This is attributed to the reliance of zero-shot event detection on the model’s ability to generalize to new event types and definitions. While a few samples aid in learning the meaning of event types, an excessive number is unnecessary. In addition to scaling, we explore the impact of incorporating event ontology information in event definition and utilizing hard-negative samples during training. We observe that incorporating both components enhances the model’s comprehension of event boundaries, resulting in higher recall and F1 scores."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                762,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                885,
+                247
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Following this finding, we further train our model on the DivED and Geneva (Parekh et al., 2023a) datasets, and achieve state-of-the-art zero-shot event detection performance on ACE (Doddington et al., 2004a), M2E2 (Li et al., 2020a) and MEE (Veyseh et al., 2022) test sets benchmarked in TextEE (Huang et al., 2023), surpassing strong LLMs such as Chat-GPT with less than 5 percents of model parameters, showing the effectiveness and efficiency of our method. To conclude, our main contributions are as follows:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                248,
+                887,
+                425
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "1. We design a data generation pipeline to generate a Diverse Event Definition dataset (DivED) with 3000+ event types and 10 diverse event definitions for each type. Our experiments reveal that diverse event types and event definitions are crucial to improve zero-shot ED."
+                    }
+                ]
+            },
+            "bbox": [
+                524,
+                445,
+                885,
+                560
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "2. We systematically study the impact of various components of EE training data on the ability of large instruction-tuned models to follow event definitions."
+                    }
+                ]
+            },
+            "bbox": [
+                524,
+                577,
+                885,
+                643
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "3. Our proposed model achieves SOTA results on ACE, M2E2, and MEE datasets, surpassing GPT-3.5-Turbo model with drastically fewer parameters."
+                    }
+                ]
+            },
+            "bbox": [
+                524,
+                661,
+                885,
+                727
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2 Method"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                746,
+                615,
+                763
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we describe our data generation pipeline to generate the Diverse Event Definition Dataset (DivED) and our systematic study on the impact of various components within event detection training data. We investigate how (1) the scaling of event types, event definition, and training samples and (2) incorporating ontology information and hard-negative samples can impact models generalization to unseen event types."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                777,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2843"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/ea5a5944422d4950f8a8c98696139eee9252a3a01b5a7081ea6cacd73c68a5fa.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 2: Data generation pipeline to generate DivED dataset. The pipeline includes five main steps: (1) Even Type Name Retrieval: retrieve events from XPO overlap (Spaulding et al., 2023b); (2) Ontology-Aware Event Definition Curation: generate event type definitions for the event types retrieved from (1); (3) Ontology-Aware Sample Curation: generate samples for the retrieved event type names from (1) and event definition from (2); (4) Event Definition Expansion: Paraphrase and expand the event definition from (2), and (5) Ontology Pruning: Prune out events with high trigger overlap. Details of our prompt templates can be found in Appendix B."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                114,
+                82,
+                882,
+                274
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.1 DivED Dataset Generation"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                397,
+                371,
+                412
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "An event detection dataset with diverse event types and definitions is necessary to investigate the effect of training data components systematically. Thus, we propose an automatic data generation pipeline that leverages proprietary LLM to generate Diverse Event Definition Dataset (DivED). The data generation pipeline includes (1) Event Type Name Retrieval, (2) Ontology-Aware Event Definition Curation, (3) Ontology-Aware Sample Curation, (4) Event Definition Expansion, and (5) Ontology Pruning. Figure 2 illustrates the five-step data generation pipeline. We use ChatGPT (GPT-3.5-Turbo) for the dataset generation process. The average number of sibling event types is 2.14, and the number of ancestor event types is 1510. The total number of events is 3232. The examples of DivED and the data generation pipeline templates can be found in Appendix B."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                419,
+                490,
+                711
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Step 1: Event Type Name Retrieval We follow (Zhan et al., 2023) methods to collect around 6000 event type names with ontology (dependency trees) from XPO-overlap (Spaulding et al., 2023a), which provides a large set of event entities that occurred in Wikidata.* To guarantee the testing events from ACE (Doddington et al., 2004b), M2E2 (Li et al., 2020b), and (Veyseh et al., 2022) datasets are held out for our later experiments, we manually filtered out all events that share the same dependency trees with these testing events."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                720,
+                489,
+                898
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Step 2: Ontology-Aware Event Definition Curation After acquiring event type names and ontology (dependency trees of events), we instruct the model to simultaneously generate concise definitions for all event types within the ontology. Using one manually curated in-context example, we guide the model to differentiate similar events within the same ontology, resulting in distinct and welldistinguished event definitions, as demonstrated in Table 1."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                397,
+                887,
+                558
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Step 3: Ontology-Aware Sample Curation We follow a similar method as in Ontology-Aware Event Definition Curation to prompt the model with relative event types, event definition, and one manually curated in-context example to generate ten samples for multiple event types simultaneously. Each generated sample includes an input sentence and an output trigger of the corresponding event type. The generated samples can be seen in Table 1."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                567,
+                885,
+                713
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Step 4: Event Definition Expansion To get multiple event definitions for each event type, we prompt the model to expand or paraphrase the event definition ten times with the provided event type name, event definition, event ontology, and one manually curated in-context example."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                720,
+                885,
+                819
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Step 5: Ontology Pruning After generating data for all event types, we further prune out duplicate events within the same event ontology by identifying their output trigger overlap. Specifically, <sup>for</sup> <sup>an</sup> <sup>event</sup> <sup>ontology</sup> <sup>tree</sup> {<sup>e</sup>1<sup>,</sup> <sup>e</sup>2<sup>,</sup> <sup>...</sup>} ∈ <sup>E</sup> <sup>with</sup> multiple event types and ten samples per event, we calculate the output trigger overlap ratio between two event types "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { e } _ { i } , \\mathbf { e } _ { j }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "i \\neq j"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The trigger overlap is measured by exact string matching each of the ten triggers in "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { e } _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "with the ten triggers in "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { e } _ { j }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "If the overlap ratio of output triggers exceeds a certain threshold (in our implementation, it is 0.5), we will consider one of the two events as duplicate and remove it from our dataset. This way, we can guarantee that the event types and output triggers of our dataset are diverse."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                826,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>*</sup>wikidata.org"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                908,
+                238,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2844"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/8a068d0fa38d0befda8465a27fd876fe8af806925ed6c87d8744e75ced5bfcc7.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 1: We demonstrate the generated event definition and samples of a few sibling event types in the DivED dataset. During data curation, we specifically prompt models to generate distinct event type definitions and samples for these similar event types to enhance the diversity of the generated data."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=1 colspan=1>Event</td><td rowspan=1 colspan=1>Event Definition</td><td rowspan=1 colspan=1>Sample</td><td rowspan=1 colspan=1>Trigger</td></tr><tr><td rowspan=1 colspan=1>Arriving</td><td rowspan=1 colspan=1>Event Definition 1: The act of Arriving in-volves the physical or virtual arrival at a destina-tion ... Event Definition 10: The Arrival eventcaptures the moment when someone ..</td><td rowspan=1 colspan=1>Sample 1:The school field trip participantsarrived at the museum and were greeted .. Sam-ple 10: The visitors arrived at the aquariumand were led to the dolphin show by the staff.</td><td rowspan=1 colspan=1>arrived,</td></tr><tr><td rowspan=1 colspan=1>Drop inon</td><td rowspan=1 colspan=1>Event Definition 1: Drop in on refers to anunplanned and impromptu visit to a friend oracquaintance .. Event Definition 10: The actof drop in on signifies an unscheduled visit to anindividual&#x27;s place ...</td><td rowspan=1 colspan=1>Sample 1:Renee decided to pop in on herfriend who lived nearby and catch up. ... Sam-ple 10: Jane had some free time on her handsand wanted to pay a visit to her former collegeroommate who lived close by.</td><td rowspan=1 colspan=1>pop in,pay   avisit, ...</td></tr><tr><td rowspan=1 colspan=1>Visitingscenarioarrival</td><td rowspan=1 colspan=1>Event Definition 1: Visiting scenario arrivalentails arriving at a planned destination ... EventDefinition 10: The event of Visiting scenarioarrival involves arriving ...</td><td rowspan=1 colspan=1>Sample 1: The investors arrived at the com-pany&#x27;s headquarters for their business presenta-tion. ... Sample 10: The family reached thetheme park with their pre-booked ride tickets.</td><td rowspan=1 colspan=1>arrived,reached,</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                115,
+                80,
+                880,
+                252
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                331,
+                489,
+                493
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.2 Data Impact Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                510,
+                332,
+                526
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "With the generated DivED dataset, we systematically study the impact of various components in training data to understand how to train the model with improved event definition following ability."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                536,
+                489,
+                601
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Scaling of data components In Figure 1, we show the data components within the training data. During training, we will provide several samples, each corresponding to an event type and definition, to query the models about the event trigger. In testing time, we will further test on the unseen events, in which all the event types, definitions, and samples are unseen from training. This requires the model to generalize to the unseen events to be able to perform well during testing. Following this intuition, we aim to investigate how different numbers of events, definitions, and samples can influence models’ performance. Specifically, for each dataset component, we fix the quantity of other components and evaluate the scaling law associated with it. For example, to investigate the scaling of event definition, we will use different number of event definitions per event, with a fixed amount of event type and samples."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                617,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Ontology information We further look into the construction of event definition and negative samples. In most zero-shot EE methods, they solely provide the information (event type, event definition) of the current event, without providing the event ontology information. We explore adding ontology information to the input definition in order to see how it helps models with the understanding of the event, and generalize better to unseen event types. The additional ontology information includes the parent and child events of an event ontology, as shown in Figure 1."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                331,
+                887,
+                525
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Hard-negative samples During model training, we use input sentences paired with output triggers. Positive samples are based on ground truth events, where the output for event trigger identification is not \"None.\" To incorporate predictions for \"None\" events, we create negative samples by prompting the model with input sentences and an event type that does not occur in the sentence. In this work, we aim to explore how integrating ontology information into negative sample construction affects the model’s ability to learn event definitions and boundaries. Instead of randomly assigning unrelated events during negative sample creation, we will assign sibling event types to form hard-negative samples. These challenging examples may offer additional signals about event boundaries that aid the model in distinguishing between similar events and improve its understanding of event definitions."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                532,
+                887,
+                824
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3 Experimental Setup"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                833,
+                719,
+                851
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we first describe the details of Data Impact Analysis experiments, which analyze the impact of different data components. We further describe baselines and training details in Enhancing"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                858,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2845"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/374120c2dab9e639b8d3df5f9c19ceab87892d0ff2db581b1f3125ec0a739e11.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 3: The scaling of different dataset components. We train the models with different number of event types, event definitions per event type and samples per event type. After training, we further report the F1 scores on DivED – Validation and ACE Validation set. Note that we do not report the DivED – Validation score separately for sample scaling as we utilize the Geneva (Parekh et al., 2023a) train set to explore sample scaling rather than DivED train set."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                117,
+                82,
+                878,
+                355
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Zero-Shot Event Detection, in which we integrate the optimal settings from Data Impact Analysis to train our zero-shot event detection model and compare to previous state-of-the-art large language models (LLMs) on three event extraction datasets."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                449,
+                489,
+                531
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.1 Data Impact Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                544,
+                332,
+                561
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Model and Training Details We utilize LLaMA-2-7B (Touvron et al., 2023) for our experiments to examine the impact of various data components. Employing a batch size of 96, a learning rate of 2e-5, and training for 20 epochs. We divide the DivED dataset into training and validation sets by random sampling event ontologies. For the training set, We consistently use the DivED dataset with unified variables: 200 Event Types, 10 Event Definitions, 10 Samples, and 10 negative samples per sample. For the validation set, we first random sample around 50 event ontology, each including a parent event and multiple child events, in total 100 event types. The validation set can be considered an in-domain zero-shot ED evaluation set with all test events unseen from training but in a similar domain (all generated by ChatGPT), while ACE is a out-of-domain zero-shot ED test set previously curated by human annotators and has many different data characteristics, as described in Table 2. In each scaling experiment, only one variable is scaled while others are fixed. Notably, ACE-related events are excluded from the DivED dataset to ensure the test events are entirely novel."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                568,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                450,
+                884,
+                482
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Event type and event definition scaling We experiment on [200, 400, 800, 1600, 3200] events on the DivED dataset for event-type scaling. For Event definition scaling, we test [1, 2, 4, 8, 10] event definition to investigate the scaling law of these variables."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                492,
+                887,
+                588
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We employ the DivED dataset for definition and event type scaling due to its extensive collection of event definitions and types, a feature absent in traditional event detection datasets like the Geneva dataset. We present the evaluation results of the DivED validation set for event type and definition scaling since it reflects in-domain performance, as both DivED-train and DivED-val are generated using the LLM with similar prompts."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                589,
+                887,
+                736
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Sample scaling For sample scaling, since DivED only has ten samples per event, we conduct it on the Geneva (Parekh et al., 2023a) dataset and test with [1, 5, 10, 20, 40] samples per event. We filter out all ACE-related events for the Geneva dataset to make sure the test events are unseen."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                744,
+                885,
+                841
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We have studied sampling scaling using the GENEVA dataset, containing up to 40 high-quality human-generated event samples, a resource lacking in our DivED datasets (which have ten samples per event). When using the Geneva dataset, evaluation results on the DivED validation set do not represent in-domain performance like event type and definition scaling, which may cause confusion to the reader. Thus, we do not show the DivED-val result here. While there exist prior work studying sample scaling, our focus is to study event definition and types scaling since the feature is absent in traditional ED datasets."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                841,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2846"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                929,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                490,
+                214
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "From sample scaling experiments on the Geneva dataset, the main insight is that a sufficient amount (10) of samples are sufficient for zero-shot event detection, and we further follow this insight to generate the DivED dataset. It is possible that the DivED data samples can suffer from the diversity issue, and the exact number of samples to achieve optimal performance can be different from Geneva; however, we show that using ten samples can already achieve performance superior to proprietary LLM such as ChatGPT. Further hyperparameter tuning and optimization might achieve higher performance but is not the focus of our paper."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                214,
+                490,
+                424
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Event Ontology and Hard Negative Samples In event ontology experiments, we assess two settings: with or without event ontology. For hard negative samples, we experiment using zero or three hard negative samples within the ten negative samples. Evaluation is conducted on the ACE dataset."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                431,
+                490,
+                529
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Evaluation We report the F1 scores of event trigger identification and event trigger classification on DivED (in-domain) and ACE (out-domain) validation set. In in-domain evaluation, 50 unseen events from DivED (absent in training) are tested. For out-domain assessment, the model is tested on the ACE dataset, comprising 33 event types unseen during training. We analyze the models’ zero-shot generalization on these sets, presenting a comparison in Figure 3. Notably, DivED (in-domain) exhibits similar event definition and sample length to the training set, while ACE (out-domain) has longer definitions and a different writing style, focusing on argument details alongside the event itself."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                537,
+                492,
+                764
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.2 Enhancing Zero-Shot Event Detection"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                772,
+                462,
+                789
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Training Details Following our observation in Data Impact Analysis, we further train the LLaMA-2-7B (Touvron et al., 2023) models on DivED and Geneva (Parekh et al., 2023a) dataset following the optimal setting. We aim to show that our method has the potential to achieve performance surpassing large language models such as ChatGPT with a small 7B LLaMA model. By mixing the event type definitions from DivED and GENEVA, we can further improve the diversity of the input and event definition styles to achieve improved performance, surpassing ChatGPT models with orders of magnitude fewer model parameters. By merging these two datasets, we also demonstrate that our method is scalable and has the potential to be combined with existing EE datasets to achieve improvements. We use 200 + 90 event types from DivED and Geneva (Parekh et al., 2023a) datasets. We use ten event definitions, ten samples, and ten negative samples per sample for each event type while incorporating the ontology information and three hard-negative samples."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                793,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/ad63d3f036582388bfd132bcda7ac5537881d8b1b6b1b10b2375d04f6f79fd82.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 2: Dataset comparison. We show the comparison of the definition, average definition token length and average sample token length between DivED train set, DivED validation set and ACE test set."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=1 colspan=1>DivED-Train – Event: Money Laundering</td></tr><tr><td rowspan=1 colspan=1>Event Definition:Money Laundering is the process of moving illicit fundsthrough complex financial transactions, disguising the ori-gin of the money and making them seem legitimate.Avg. Def. Length: 42.9; Avg. Sample Length: 23.3</td></tr><tr><td rowspan=1 colspan=1>DivED-Validation – Event: Ceasefire</td></tr><tr><td rowspan=1 colspan=1>Event Definition:A ceasefire is a mutual agreement between opposing armedgroups to halt all aggressive actions and refrain from initi-ating any new hostilities, often negotiated to allow for thedelivery of aid and the creation of safe zones for civilians.Avg. Def. Length: 42.2; Avg. Sample Length: 23.3</td></tr><tr><td rowspan=1 colspan=1>Ace-Validation – Event: BE-BORN</td></tr><tr><td rowspan=1 colspan=1>Event Definition:BE-BORN Event occurs whenever a PERSON Entity isgiven birth to. Please note that we do not include the birthof other things or ideas.Avg. Def. Length: 65.3;Avg. Sample Length: 35.6</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                514,
+                80,
+                878,
+                318
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                406,
+                887,
+                633
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Baselines In our experiments, we conduct a comparison between our finetuned LLaMA-2-7B (Touvron et al., 2023) and several zero-shot event detection baselines, including ChatGPT (OpenAI, 2021), ChatIE (Wei et al., 2023) and (Gao et al., 2023a) and LLaMA-2-Geneva. Prompt templates for the baselines are provided at Appendix C."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                642,
+                887,
+                756
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• ChatGPT (OpenAI, 2021): GPT-3.5-Turbo was prompted with the proposed method for a fair comparison with finetuned LLaMA-2-7B."
+                    }
+                ]
+            },
+            "bbox": [
+                531,
+                765,
+                885,
+                815
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• ChatIE (Wei et al., 2023): ChatIE is a framework that transforms the zero-shot event detection task into a multi-turn question-answering problem. Here, LLMs are first prompted (as shown in Appendix C) to identify the event type and then sequentially prompted to iden-"
+                    }
+                ]
+            },
+            "bbox": [
+                531,
+                826,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2847"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "tify the trigger."
+                    }
+                ]
+            },
+            "bbox": [
+                151,
+                85,
+                267,
+                102
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Gao et al. (2023a): This work explores the feasibility of ChatGPT as a zero-shot event detection model and further analyses the impact of event definitions, in-context examples and counterfactual examples in the prompt template presented at Appendix C. We prompt ChatGPT with event definitions and positive examples in our implementation as this setup performed best on Gao et al. (2023a) evaluation."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                112,
+                490,
+                274
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• LLaMA-2-Geneva: We additionally train an LLaMA2-7B model (Touvron et al., 2023) on Geneva (Parekh et al., 2023a) datasets as a transfer learning baseline. We first filter out all events related to ACE, M2E2, and MEE datasets from the training set, leaving 90 event types. We further train the model with all samples on the remaining event types."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                285,
+                489,
+                416
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Evaluation Datasets Our experiments comprehensively compare our fine-tuned LLaMa-2-7B with baselines across three popular event extraction benchmarks, including ACE05, M2E2, and MEE. We consider the English annotations of these datasets and report the F1 scores of event trigger identification and event trigger classification on their test set process by TextEE (Huang et al., 2023)."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                425,
+                492,
+                571
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• ACE05 (Doddington et al., 2004b) is an endto-end event extraction dataset which covers texts from several sources such as newswire, broadcast news and weblogs."
+                    }
+                ]
+            },
+            "bbox": [
+                134,
+                581,
+                490,
+                648
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• M2E2 (Li et al., 2020b) is an end-to-end event extraction dataset collected from the multimedia domain. We only consider the text part."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                657,
+                490,
+                707
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• MEE (Veyseh et al., 2022) is a multilingual end-to-end event extraction dataset collected from Wikipedia which is extended from MIN-ION (Song et al., 2015)."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                718,
+                489,
+                783
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4 Results"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                794,
+                215,
+                810
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.1 Data Impact Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                820,
+                332,
+                837
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Scaling of event types In Figure 3 column (a), we show the results of training a LLaMA-2-7B model with different numbers of events. It is seen that scaling up the number of events consistently helps the model performance on the in-domain"
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                841,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/a2e2c18785bda3bac1a51c62626cd88fe49b13372523e8e39a9c6fdbae0987e7.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 3: We report the experiment results of providing ontology information and using hard negative samples."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=\"2\">Metric → Model ↓</td><td colspan=\"3\">Trigger ID</td><td colspan=\"3\">Trigger CLS</td></tr><tr><td>Prec.</td><td>Rec.</td><td>F1</td><td>Prec.</td><td>Rec.</td><td>F1</td></tr><tr><td>Ours</td><td>45.3</td><td>22.0</td><td>29.1</td><td>36.6</td><td>20.4</td><td>26.2</td></tr><tr><td>w/o Ontology</td><td>55.0</td><td>11.8</td><td>19.4</td><td>34.3</td><td>11.1</td><td>16.7</td></tr><tr><td>w/o Hard Neg.</td><td>53.5</td><td>16.6</td><td>25.3</td><td>45.5</td><td>15.6</td><td>23.2</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                509,
+                80,
+                884,
+                145
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "DivED validation set. However, while training the model with more events continuously scales up the performance on the ACE validation set under 200 events, using more than 200 events leads to degeneration of the performance. This can be caused by the model overfitting to the domain of training data. While we continuously train on new events, the model can still overfit to the domain of the data itself, for example, the format of the event definition and samples. This also shows that while our generated DivED dataset has a large number of events, the generated samples and event definition might still have spurious correlations that can lead to overfitting."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                200,
+                885,
+                429
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Scaling of event definition In Figure 3 column (b), we show the results of event definition scaling. On both the DivED and ACE validation sets, the performance scales up with four event definitions per event. While using more than four event definitions does not help the in-domain performance, it can help the model generalize better to the out-domain test set. This shows that adding more diverse event definitions during training can further improve the model’s robustness. Helping the model to generalize to more diverse event formats during inference, thus improving zero-shot performance."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                439,
+                887,
+                636
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Scaling of samples To evaluate how using more samples helps the model’s zero-shot generalization, we experiment using the Geneva dataset, which has a large number of high-quality samples per event type, and test on the ACE validation set. The results are shown in Figure 3 column (c). Surprisingly, while using more samples usually helps models performance in a supervised setting, using more than ten samples hurts models’ performance. This can be caused by the model overfitting the training data and becoming less robust to unseen events."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                648,
+                887,
+                825
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Following the results above, we conclude that the key to improving models’ zero-shot generalization to unseen events is to use a diverse set of event definitions with a certain amount of event types and samples. While a small amount of event type and samples helps, using too much can make the models overfit to the training source, leading to a degeneration of the generalization ability. This effect can be specifically obvious in machine-generated data, which can have spurious correlations and lack diversity in certain aspects."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                826,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2848"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/c20e93b5c4a3e5c1032501884bd526111f0b674a4de90bc3ec2b767d3e3a7517.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 4: The experiment results on ACE ,M2E2 and MEE test set. We compare the performance of LLaMA-2-7b training on DivED dataset (Ours) with ChatIE (Wei et al., 2023), Gao et al. (2023a), GPT3.5 model and LLaMA-2-7b trained on Geneva (Parekh et al., 2023a) dataset. We report the Precision, Recall and F1 scores. We also report the average F1 score across all datasets. We abbreviate Trigger as Trig."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td></td><td colspan=\"2\">ACE</td><td colspan=\"2\">M2E2</td><td colspan=\"2\">MEE</td><td colspan=\"2\">Average</td></tr><tr><td>Metric → Model ↓</td><td>Trig. ID Prec. Rec. F1</td><td>Trig. CLS Prec. Rec. F1</td><td>Trig. ID Prec. Rec. F1</td><td>Trig. CLS Prec. Rec. F1</td><td>Trig. ID Prec. Rec. F1</td><td>Trig. CLS Prec. Rec. F1</td><td>Trig. IDTrig. CLS F1</td><td>F1</td></tr><tr><td>ChatIE</td><td>4.8 11.9 6.8</td><td>2.5 6.4 3.6</td><td>4.3 31.4 7.5</td><td>2.6 19.2 4.6</td><td>12.4 31.2 17.2</td><td>7.5 24.2 11.9</td><td>10.5</td><td>6.7</td></tr><tr><td>Gao et al.</td><td>42.528.7 34.2</td><td>30.6 20.6 24.6</td><td>16.6 38.0 23.1</td><td>14.533.2 20.2</td><td>84.77.8 14.2</td><td>77.9 7.1513.9</td><td>23.8</td><td>19.6</td></tr><tr><td>GPT-3.5</td><td>9.2 60.7 15.9|</td><td>3.643.9 6.6</td><td>7.063.3 12.6|</td><td>4.954.2 8.9</td><td>12.5 33.2 18.2</td><td>7.624.4 11.6</td><td>15.6</td><td>9.0</td></tr><tr><td>Geneva</td><td>47.714.5 22.2</td><td>18.2 13.8 15.7</td><td>19.1 17.9 18.5|</td><td>17.917.0 17.4</td><td>70.524.5 36.4</td><td>63.024.1 34.9</td><td>25.7</td><td>22.6</td></tr><tr><td>Ours</td><td>46.7 26.9 34.2</td><td>36.7 24.1 29.1</td><td>21.2 26.1 23.419.8 24.7 22.0</td><td></td><td>70.916.727.1</td><td>65.716.2 26.0</td><td>28.2</td><td>25.7</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                119,
+                80,
+                878,
+                180
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                274,
+                489,
+                355
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Event ontology and hard-negative samples In Table 3, we further investigate the usefulness of the event ontology and hard-negative samples. It can be seen that after removing the event ontology or hard-negative samples, fewer triggers are predicted, which leads to a much lower recall and F1 score. This means that the model becomes more conservative at predicting triggers. We hypothesize that the model can be trained to distinguish similar events by providing ontology and hard negative samples. At testing time, this can help the models be more certain at predicting the triggers and increase the number of matching triggers."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                368,
+                489,
+                579
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.2 Enhancing Zero-Shot Event Detection"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                593,
+                460,
+                608
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Following the observation from Data Impact Analysis, we further apply the best setting and compare it with baseline models described in section 3.2. We show the results in Table 4. It can be seen that LLaMA-2-7B trained on the DivED dataset (Ours) consistently outperforms GPT baselines (ChatIE, Gao et al. (2023a) and GPT-3.5) on all ACE, M2E2, and MEE datasets and surpasses our LLaMA2-Geneva baselines on ACE and M2E2 datasets. For the MEE dataset, LLaMA2-Geneva achieves the best performance. Upon further investigation into the predicted results, we found that LLaMA2-Geneva can better predict samples that have multiple ground truth event triggers in one event type, which frequently occurred in MEE Geneva datasets but less occurred in ACE, M2E2 and DivED datasets, directly leading to higher Recall and F1 scores on MEE dataset. Generally, our proposed model achieves the best average F1 scores on both Event Trigger Identification and Event Trigger Classification, showing the superiority of the training method."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                617,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/d337745e24a3c67f90f1c6a647991f79c35fdc0c22ab3861c8dcf4e98bfd2792.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 5: Ablation study of training data."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=\"2\">Metric → Model ↓</td><td colspan=\"3\">Trigger ID</td><td colspan=\"3\">Trigger CLS</td></tr><tr><td>Prec.</td><td>Rec.</td><td>F1</td><td>Prec.</td><td>Rec.</td><td>F1</td></tr><tr><td>Geneva</td><td>47.7</td><td>14.5</td><td>22.2</td><td>18.2</td><td>13.8</td><td>15.7</td></tr><tr><td>DivED</td><td>43.5</td><td>21.87</td><td>29.1</td><td>36.6</td><td>20.43</td><td>26.23</td></tr><tr><td>Div. + Gen.</td><td>46.7</td><td>26.9</td><td>34.2</td><td>36.7</td><td>24.1</td><td>29.1</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                514,
+                269,
+                877,
+                334
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                375,
+                885,
+                424
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5 Discussion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                436,
+                638,
+                453
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.1 Ablation Study of Training Data"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                463,
+                811,
+                480
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "As mentioned in section 3.2, we train the LLaMA-2-7B (Touvron et al., 2023) models on DivED and Geneva (Parekh et al., 2023a) dataset. In Table 5, we further provide results that only use the DivED dataset without GENEVA."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                487,
+                885,
+                565
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "It can be seen that, by solely training on the DivED dataset, we can already achieve significant performance improvement and surpass model training on the human-curated Geneva dataset. When combined with the Geneva dataset, we can further boost the performance, showing the good scalability of our method."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                568,
+                887,
+                680
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "For the results in Table 5, it does show that the current models are still limited to generalize to expert domains without domain adaptation. This can be due to the models’ lack of the basic knowledge to solve these expert domains. While our work provides a method to improve event definition following for better zero-shot ED, the base model we used (llama-2) does not have information about these expert domains and still requires further domain adaptation to achieve a generally good performance on them. This limitation also happens with low-resourced language. If the base model is not trained on a specific knowledge, even if our curated dataset helps with event definition following, the model cannot perform it well, due to the lack of language information. Note that while our proposed DivED dataset does not directly generalize to these expert domains or other languages, the insight from data impact analysis can be utilized to generate specific datasets for these domains, and potentially help the zero-shot ED performance."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                681,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2849"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/59e4c69578e47edb86179a7935a2ac61403d93d1014f2562ddbaccce151beccc.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 6: We assess model performance drop by removing event definitions during training. We compare LLaMA-2 models trained on Geneva and DivED datasets. A higher drop rate indicates greater reliance on event definitions."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=1 colspan=1>Metric →Model ↓</td><td rowspan=1 colspan=1>Trigger IDF1</td><td rowspan=1 colspan=1>∆</td><td rowspan=1 colspan=1>Trigger CLSF1</td><td rowspan=1 colspan=1>∆</td></tr><tr><td rowspan=1 colspan=1>Oursw/o Def</td><td rowspan=1 colspan=1>29.114.15</td><td rowspan=1 colspan=1>-52%</td><td rowspan=1 colspan=1>26.210.83</td><td rowspan=1 colspan=1>-59%</td></tr><tr><td rowspan=1 colspan=1>Genevaw/o Def</td><td rowspan=1 colspan=1>25.223.44</td><td rowspan=1 colspan=1>-7%</td><td rowspan=1 colspan=1>17.48.2</td><td rowspan=1 colspan=1>-53%</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                139,
+                80,
+                463,
+                156
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                256,
+                489,
+                354
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.2 Do Models Follow the Event Definition?"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                367,
+                473,
+                382
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Instruction-tuned models excel in various zero-shot tasks but can excessively rely on the spurious patterns within the provided prompt, neglecting instruction semantics (Kung and Peng, 2023; Yin et al., 2023). In this work, we aim to enhance zeroshot event detection by training model with better event definition following. To assess the model’s event definition following ability, we conduct an ablation study following prior work’s setting (Kung and Peng, 2023), comparing our LLaMA-2-7B model trained on DivED data with one trained on the conventional EE dataset Geneva (Parekh et al., 2023b). To verify whether our proposed model have better event definition following ability compare to models learning on convention EE datasets, we follow prior work (Kung and Peng, 2023) to conduct an ablation study. We compare our LLaMA-2-7B (Touvron et al., 2023) model trained on DivED data with a LLaMA-2-7B model trained on conventional EE dataset such as Geneva (Parekh et al., 2023b). Despite having numerous samples per event, conventional EE dataset has only one definition per event type, which largely differs from DivED dataset. We report the performance drop rate after removing the event definition during training and testing for both models in Table Table 6. It can be seen that while the performance drops for both models after removing the event definition during training, the model trained on the DivED dataset has a higher performance drop, especially in Event Trigger Identification, showing that our proposed model heavily relies on event definition during training and inference. This indicates that our model is better at utilizing the event definition information, potentially exhibiting a better event definition following ability."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                392,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                884,
+                134
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "6 Related Work"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                143,
+                667,
+                160
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Low-resource information extraction Lowresource IE models (Si et al., 2023; Hu et al., 2023) secure their performance with limited training data by cross-task transfer learning that uses supervision from tasks like Semantic Role Labeling (Zhang et al., 2021; Huang et al., 2018b), indirect supervision that reformulates the task as data-rich tasks like NLI or QA (Xu et al., 2023; Sainz et al., 2022; Ma et al., 2023a; Lu et al., 2022), both heavily rely on task compatibility. Some works focus on prompting generative LMs with enriched task requirements and examples (Li et al., 2023; Gao et al., 2023b), which is constrained the diversity of human-curated training data."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                168,
+                887,
+                395
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Data generation for IE Existing works explore different strategies to generate training data instances given a known task output space through analogous input (Kumar et al., 2020; Lee et al., 2021), creating pesudo labels with weak annotator (He et al., 2021; Chia et al., 2022; Ye et al., 2022; Wang et al., 2023; Schick and Schütze, 2021), reverse generation (Meng et al., 2022; Gao et al., 2021; Josifoski et al., 2023) and structure-to-text generation (Ma et al., 2024). Different from introducing more data instances for observed task space, we instead aim to extend the model’s generalizability by generating new types and their definitions for unseen data distribution that extend the task space with LLM-oriented data generation."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                403,
+                889,
+                645
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "7 Conclusion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                655,
+                643,
+                671
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We investigate how incorporating diverse event types and definitions benefits zero-shot event detection models. The proposed DivED dataset features a large number of diverse event types and definitions, which helps train the model to better generalize to unseen event definitions. By further incorporating event ontology and hard negative samples, we finetuned a LLaMA-2 model on DivED and Geneva datasets, which consistently surpasses previous SOTA ChatGPT prompting baselines in zero-shot ED on ACE, M2E2, and MEE datasets. Overall, our findings provide insights to improve models’ event definition following ability and provide an opportunity to further advance zero-shot ED on open-sourced models."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                681,
+                889,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2850"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Limitation"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                84,
+                213,
+                99
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our study on zero-shot event detection, despite its advances, faces several limitations. The reliance on automatically generated datasets may not fully capture complex real-world events, potentially limiting the model’s generalizability. Additionally, the effectiveness of our approach depends on detailed event ontology and the availability of hard-negative samples, which might not always be accessible. Scalability also poses a challenge, as expanding the diversity of event types requires significant computational and data resources. Moreover, our findings are primarily based on English language benchmarks, raising questions about the applicability of our results across different languages and domains. Future research should address these limitations to enhance the robustness and universality of zeroshot event detection models."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                109,
+                490,
+                384
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Acknowledgements"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                394,
+                287,
+                410
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We would like to thank the anonymous reviewers for their feedback. This work was partially supported by AFOSR MURI via Grant #FA9550-22-1-0380, Defense Advanced Research Project Agency (DARPA) grant #HR00112290103/HR0011260656, CISCO and ONR grant #N00014-23-1-2780."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                419,
+                489,
+                532
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "References"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                558,
+                215,
+                574
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zefan Cai, Xin Zheng, Tianyu Liu, Xu Wang, Haoran Meng, Jiaqi Han, Gang Yuan, Binghuai Lin, Baobao Chang, and Yunbo Cao. 2023. Dialogvcs: Robust natural language understanding in dialogue system upgrade."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xuxin Cheng, Zhihong Zhu, Bowen Cao, Qichen Ye, and Yuexian Zou. 2023a. Mrrl: Modifying the reference via reinforcement learning for nonautoregressive joint multiple intent detection and slot filling. In Proc. ofEMNLP."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xuxin Cheng, Zhihong Zhu, Wanshi Xu, Yaowei Li, Hongxiang Li, and Yuexian Zou. 2023b. Accelerating multiple intent detection and slot filling via targeted knowledge distillation. In Proc. ofEMNLP."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yew Ken Chia, Lidong Bing, Soujanya Poria, and Luo Si. 2022. RelationPrompt: Leveraging Prompts to Generate Synthetic Data for Zero-Shot Relation Triplet Extraction. In Findings of the Association for Computational Linguistics: ACL 2022."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "George Doddington, Alexis Mitchell, Mark Przybocki, Lance Ramshaw, Stephanie Strassel, and Ralph Weischedel. 2004a. The automatic content extraction (ACE) program – tasks, data, and evaluation. In"
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Proceedings ofthe Fourth International Conference on Language Resources and Evaluation (LREC’04), Lisbon, Portugal. European Language Resources Association (ELRA)."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "George R Doddington, Alexis Mitchell, Mark A Przybocki, Lance A Ramshaw, Stephanie M Strassel, and Ralph M Weischedel. 2004b. The automatic content extraction (ace) program-tasks, data, and evaluation. In Lrec, volume 2, pages 837–840. Lisbon."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xinya Du and Claire Cardie. 2020. Event extraction by answering (almost) natural questions. arXiv preprint arXiv:2004.13625."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jun Gao, Huan Zhao, Changlong Yu, and Ruifeng Xu. 2023a. Exploring the feasibility of chatgpt for event extraction. arXiv preprint arXiv:2303.03836."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jun Gao, Huan Zhao, Changlong Yu, and Ruifeng Xu. 2023b. Exploring the Feasibility of ChatGPT for Event Extraction."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Tianyu Gao, Adam Fisch, and Danqi Chen. 2021. Making Pre-trained Language Models Better Few-shot Learners. In Proceedings of the 59th Annual Meeting ofthe Associationfor Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers)."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Rujun Han, I Hsu, Mu Yang, Aram Galstyan, Ralph Weischedel, Nanyun Peng, et al. 2019. Deep structured neural network for event temporal relation extraction. arXiv preprint arXiv:1909.10094."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xuanli He, Islam Nassar, Jamie Ryan Kiros, Gholamreza Haffari, and Mohammad Norouzi. 2021. Generate, Annotate, and Learn: Generative Models Advance Self-Training and Knowledge Distillation."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Helan Hu, Shuzheng Si, Haozhe Zhao, Shuang Zeng, Kaikai An, Zefan Cai, and Baobao Chang. 2023. Distantly-supervised named entity recognition with uncertainty-aware teacher learning and studentstudent collaborative learning."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kuan-Hao Huang, I-Hung Hsu, Tanmay Parekh, Zhiyu Xie, Zixuan Zhang, Premkumar Natarajan, Kai-Wei Chang, Nanyun Peng, and Heng Ji. 2023. A reevaluation of event extraction: Past, present, and future challenges."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kung-Hsiang Huang and Nanyun Peng. 2020. Document-level event extraction with efficient end-to-end learning of cross-event dependencies. arXiv preprint arXiv:2010.12787."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kung-Hsiang Huang, Mu Yang, and Nanyun Peng. 2020. Biomedical event extraction with hierarchical knowledge graphs. arXiv preprint arXiv:2009.09335."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Lifu Huang, Heng Ji, Kyunghyun Cho, Ido Dagan, Sebastian Riedel, and Clare Voss. 2018a. Zero-shot transfer learning for event extraction. In Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers),"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                581,
+                487,
+                646
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2851"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                929,
+                519,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "pages 2160–2170, Melbourne, Australia. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Lifu Huang, Heng Ji, Kyunghyun Cho, Ido Dagan, Sebastian Riedel, and Clare Voss. 2018b. Zero-Shot Transfer Learning for Event Extraction. In Proceedings ofthe 56th Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers)."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Martin Josifoski, Marija Sakota, Maxime Peyrard, and Robert West. 2023. Exploiting asymmetry for synthetic training data generation: SynthIE and the case of information extraction. In Proceedings ofthe 2023 Conference on Empirical Methods in Natural Language Processing."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Varun Kumar, Ashutosh Choudhary, and Eunah Cho. 2020. Data Augmentation using Pre-trained Transformer Models. In Proceedings ofthe 2nd Workshop on Life-long Learningfor Spoken Language Systems."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Po-Nien Kung and Nanyun Peng. 2023. Do models really learn to follow instructions? an empirical study of instruction tuning. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers), pages 1317– 1328, Toronto, Canada. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Po-Nien Kung, Fan Yin, Di Wu, Kai-Wei Chang, and Nanyun Peng. 2023. Active instruction tuning: Improving cross-task generalization by training on prompt sensitive tasks."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Po-Nien Kung, Sheng-Siang Yin, Yi-Cheng Chen, Tse-Hsuan Yang, and Yun-Nung Chen. 2021. Efficient multi-task auxiliary learning: Selecting auxiliary data by feature similarity. In Proceedings ofthe 2021 Conference on Empirical Methods in Natural Language Processing, pages 416–428, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kenton Lee, Kelvin Guu, Luheng He, Tim Dozat, and Hyung Won Chung. 2021. Neural data augmentation via example extrapolation. arXiv preprint 2102.01335."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Bo Li, Gexiang Fang, Yang Yang, Quansen Wang, Wei Ye, Wen Zhao, and Shikun Zhang. 2023. Evaluating ChatGPT’s Information Extraction Capabilities: An Assessment of Performance, Explainability, Calibration, and Faithfulness."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Manling Li, Alireza Zareian, Qi Zeng, Spencer Whitehead, Di Lu, Heng Ji, and Shih-Fu Chang. 2020a. Cross-media structured common space for multimedia event extraction. In Proceedings ofthe 58th Annual Meeting ofthe Associationfor Computational Linguistics, pages 2557–2568, Online. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Manling Li, Alireza Zareian, Qi Zeng, Spencer Whitehead, Di Lu, Heng Ji, and Shih-Fu Chang. 2020b. Cross-media structured common space for multimedia event extraction. arXiv preprint arXiv:2005.02472."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ying Lin, Heng Ji, Fei Huang, and Lingfei Wu. 2020. A joint neural model for information extraction with global features. In Proceedings of the 58th annual meeting of the association for computational linguistics, pages 7999–8009."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Keming Lu, I-Hung Hsu, Wenxuan Zhou, Mingyu Derek Ma, and Muhao Chen. 2022. Summarization as indirect supervision for relation extraction. In Findings of the Association for Computational Linguistics: EMNLP 2022, pages 6575–6594, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Qing Lyu, Hongming Zhang, Elior Sulem, and Dan Roth. 2021. Zero-shot event extraction via transfer learning: Challenges and insights. In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 2: Short Papers), pages 322–332."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Mingyu Derek Ma, Jiun-Yu Kao, Shuyang Gao, Arpit Gupta, Di Jin, Tagyoung Chung, and Nanyun Peng. 2023a. Parameter-Efficient Low-Resource Dialogue State Tracking by Prompt Tuning. In INTER-SPEECH 2023."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Mingyu Derek Ma, Alexander Taylor, Wei Wang, and Nanyun Peng. 2023b. DICE: Data-efficient clinical event extraction with generative models. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 15898–15917, Toronto, Canada. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Mingyu Derek Ma, Xiaoxuan Wang, Po-Nien Kung, P. Jeffrey Brantingham, Nanyun Peng, and Wei Wang. 2024. Star: Improving low-resource information extraction by structure-to-text data generation with large language models. Proceedings of the AAAI Conference on Artificial Intelligence."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yu Meng, Jiaxin Huang, Yu Zhang, and Jiawei Han. 2022. Generating Training Data with Language Models: Towards Zero-Shot Language Understanding."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Thien Huu Nguyen, Kyunghyun Cho, and Ralph Grishman. 2016. Joint event extraction via recurrent neural networks. In Proceedings ofthe 2016 conference of the North American chapter of the association for computational linguistics: human language technologies, pages 300–309."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Thien Huu Nguyen and Ralph Grishman. 2015. Event detection and domain adaptation with convolutional neural networks. In Proceedings ofthe 53rd Annual Meeting of the Association for Computational Linguistics and the 7th International Joint Conference on Natural Language Processing (Volume 2: Short Papers), pages 365–371."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "OpenAI. 2021. ChatGPT: Large-scale language model. Accessed: June 17, 2023."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                132,
+                85,
+                487,
+                114
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2852"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                929,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Giovanni Paolini, Ben Athiwaratkun, Jason Krone, Jie Ma, Alessandro Achille, Rishita Anubhai, Cicero Nogueira dos Santos, Bing Xiang, and Stefano Soatto. 2021. Structured prediction as translation between augmented natural languages. arXiv preprint arXiv:2101.05779."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Tanmay Parekh, I-Hung Hsu, Kuan-Hao Huang, Kai-Wei Chang, and Nanyun Peng. 2023a. Geneva: Benchmarking generalizability for event argument extraction with hundreds of event types and argument roles. In Proceedings of the 61st Annual Meeting of the Associationfor Computational Linguistics (Volume 1: Long Papers), pages 3664–3686."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Tanmay Parekh, I-Hung Hsu, Kuan-Hao Huang, Kai-Wei Chang, and Nanyun Peng. 2023b. GENEVA: Benchmarking generalizability for event argument extraction with hundreds of event types and argument roles. In Proceedings ofthe 61st Annual Meeting of the Associationfor Computational Linguistics (Volume 1: Long Papers), pages 3664–3686, Toronto, Canada. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Oscar Sainz, Itziar Gonzalez-Dios, Oier Lopez de Lacalle, Bonan Min, and Eneko Agirre. 2022. Textual Entailment for Event Argument Extraction: Zeroand Few-Shot with Multi-Source Learning. In Findings ofthe Associationfor Computational Linguistics: NAACL 2022."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Timo Schick and Hinrich Schütze. 2021. Generating Datasets with Pretrained Language Models. In Proceedings ofthe 2021 Conference on Empirical Methods in Natural Language Processing."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Nan Shao, Zefan Cai, Hanwei xu, Chonghua Liao, Yanan Zheng, and Zhilin Yang. 2023. Compositional task representations for large language models. In The Eleventh International Conference on Learning Representations."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Shuzheng Si, Zefan Cai, Shuang Zeng, Guoqiang Feng, Jiaxing Lin, and Baobao Chang. 2023. Santa: Separate strategies for inaccurate and incomplete annotation noise in distantly-supervised named entity recognition."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zhiyi Song, Ann Bies, Stephanie Strassel, Tom Riese, Justin Mott, Joe Ellis, Jonathan Wright, Seth Kulick, Neville Ryant, and Xiaoyi Ma. 2015. From light to rich ere: annotation of entities, relations, and events. In Proceedings ofthe the 3rd Workshop on EVENTS: Definition, Detection, Coreference, and Representation, pages 89–98."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Elizabeth Spaulding, Kathryn Conger, Anatole Gershman, Rosario Uceda-Sosa, Susan Windisch Brown, James Pustejovsky, Peter Anick, and Martha Palmer. 2023a. The darpa wikidata overlay: Wikidata as an ontology for natural language processing. In Workshop on Interoperable Semantic Annotation (ISA-19), page 1."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Elizabeth Spaulding, Gary Kazantsev, and Mark Dredze. 2023b. Joint end-to-end semantic proto-role labeling."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers), pages 723–736, Toronto, Canada. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. 2023. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Amir Pouran Ben Veyseh, Javid Ebrahimi, Franck Dernoncourt, and Thien Huu Nguyen. 2022. Mee: A novel multilingual event extraction dataset. arXiv preprint arXiv:2211.05955."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "David Wadden, Ulme Wennberg, Yi Luan, and Hannaneh Hajishirzi. 2019. Entity, relation, and event extraction with contextualized span representations. arXiv preprint arXiv:1909.03546."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Peiyi Wang, Lei Li, Liang Chen, Dawei Zhu, Binghuai Lin, Yunbo Cao, Qi Liu, Tianyu Liu, and Zhifang Sui. 2023. Large language models are not fair evaluators. arXiv preprint arXiv:2305.17926."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xingyao Wang, Sha Li, and Heng Ji. 2022. Code4struct: Code generation for few-shot event structure prediction. arXiv preprint arXiv:2210.12810."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xiang Wei, Xingyu Cui, Ning Cheng, Xiaobin Wang, Xin Zhang, Shen Huang, Pengjun Xie, Jinan Xu, Yufeng Chen, Meishan Zhang, et al. 2023. Zeroshot information extraction via chatting with chatgpt. arXiv preprint arXiv:2302.10205."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jiashu Xu, Mingyu Derek Ma, and Muhao Chen. 2023. Can NLI Provide Proper Indirect Supervision for Low-resource Biomedical Relation Extraction? In Proceedings of the 61st Annual Meeting of the Associationfor Computational Linguistics (Volume 1: Long Papers)."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jiacheng Ye, Jiahui Gao, Qintong Li, Hang Xu, Jiangtao Feng, Zhiyong Wu, Tao Yu, and Lingpeng Kong. 2022. ZeroGen: Efficient Zero-shot Learning via Dataset Generation."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Fan Yin, Jesse Vig, Philippe Laban, Shafiq Joty, Caiming Xiong, and Chien-Sheng Jason Wu. 2023. Did you read the instructions? rethinking the effectiveness of task definitions in instruction learning. arXiv preprint arXiv:2306.01150."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Qiusi Zhan, Sha Li, Kathryn Conger, Martha Palmer, Heng Ji, and Jiawei Han. 2023. Glen: Generalpurpose event detection for thousands of types. arXiv preprint arXiv:2303.09093."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Hongming Zhang, Haoyu Wang, and Dan Roth. 2021. Zero-shot Label-Aware Event Trigger and Argument Classification. In Findings of the Association for Computational Linguistics: ACL-IJCNLP 2021."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                85,
+                489,
+                165
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2853"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                929,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Hongming Zhang, Wenlin Yao, and Dong Yu. 2022. Efficient zero-shot event extraction with context-definition alignment. arXiv preprint arXiv:2211.05156."
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                85,
+                489,
+                139
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A Cost Estimates for OpenAI"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                83,
+                783,
+                101
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We implement all baselines in Section 3.2 with GPT-3.5-Turbo. The estimated cost of implementing our baselines is approximately 100 USD. Similarly, the estimated cost of implementing our baselines on GPT-4 will be approximately 3000 USD and we leave this implementation for future due to limited resources. This further emphasizes that our finetuned model surpasses larger LLMs in performance as well as accessibility due to the cost effectiveness of the method."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                110,
+                887,
+                271
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "For Event Definition Curation, Sample Curation, and Event Definition Expansion, the expense of using GPT models was less than 100 USD; for Event Type Name Retrieval and Ontology Pruning, the whole process was automatically conducted without labor or expenses. Therefore, the effort needed to produce the curated dataset is very small compared to manually collected datasets."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                273,
+                885,
+                403
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "B Data Generation of DivED dataset"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                414,
+                845,
+                430
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Step 1: Event Type Name Retrieval We follow (Zhan et al., 2023) methods to collect around 6000 event type names with ontology (dependency trees) from XPO-overlap (Spaulding et al., 2023a), which provides a large set of event entities that occurred in Wikidata.<sup>†</sup> To guarantee the testing events from ACE (Doddington et al., 2004b), M2E2 (Li et al., 2020b), and (Veyseh et al., 2022) datasets are held out for our later experiments, we manually filtered out all events that share the same dependency trees with these testing events."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                441,
+                885,
+                620
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Step 2: Ontology-Aware Event Definition Curation After acquiring event type names and ontology (dependency trees of events), we instruct the model to simultaneously generate concise definitions for all event types within the ontology. Using one manually curated in-context example, we guide the model to differentiate similar events within the same ontology, resulting in distinct and welldistinguished event definitions, as demonstrated in Table 1. The template utilized in this step is presented at Table 7."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                630,
+                887,
+                808
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Step 3: Ontology-Aware Sample Curation We follow a similar method as in Ontology-Aware Event Definition Curation to prompt the model with relative event types, event definition, and one manually curated in-context example to generate ten samples for multiple event types simultaneously. Each generated sample includes an input sentence and an output trigger of the corresponding event type. The generated samples can be seen in Table 1. The template utilized in this step is presented at Table 8."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                816,
+                885,
+                898
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>†</sup>wikidata.org"
+                    }
+                ]
+            },
+            "bbox": [
+                531,
+                907,
+                635,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2854"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                490,
+                181
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Step 4: Event Definition Expansion To get multiple event definitions for each event type, we prompt the model to expand or paraphrase the event definition ten times with the provided event type name, event definition, event ontology, and one manually curated in-context example. The template utilized in this step is presented at Table 9."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                189,
+                489,
+                303
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Step 5: Ontology Pruning After generating data for all event types, we further prune out duplicate events within the same event ontology by identifying their output trigger overlap. Specifically, for an event ontology tree "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\{ \\mathbf { e } _ { 1 } , \\mathbf { e } _ { 2 } , \\dots \\} \\in \\mathbf { E }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "with multiple event types and ten samples per event, we calculate the output trigger overlap ratio between two event types "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { e } _ { i } , \\mathbf { e } _ { j }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "i \\neq j"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The trigger overlap is measured by exact string matching each of the ten triggers in "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { e } _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "with the ten triggers in "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { e } _ { j }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "If the overlap ratio of output triggers exceeds a certain threshold (in our implementation, it is 0.5), we will consider one of the two events as duplicate and remove it from our dataset. This way, we can guarantee that the event types and output triggers of our dataset are diverse."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                310,
+                490,
+                568
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Generated Samples Table 13, Table 14 and Table 15 present examples of DivED dataset."
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                575,
+                489,
+                607
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "C Templates for Experiments"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                617,
+                388,
+                634
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The compared baselines include ChatGPT, ChatIE (Wei et al., 2023) and (Gao et al., 2023a)."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                642,
+                487,
+                675
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• ChatGPT: ChatGPT were prompted with the proposed method for a fair comparison with our finetuned LLaMA-2-7B. Prompt template is provided in Table 12."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                680,
+                489,
+                745
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• ChatIE (Wei et al., 2023): ChatIE is a framework that transforms the zero-shot event detection task into a multi-turn question-answering problem. Here, LLMs are first prompted (as shown in Table 11 )to identify the event type and then sequentially prompted to identify the trigger."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                752,
+                489,
+                866
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Gao et al. (2023a): This work explores the feasibility of ChatGPT as a zero-shot event datection model and further analyses the impact of event definitions, in-context examples and counterfactual examples in the prompt template in Table 10. We prompt ChatGPT with event definitions and positive examples in our implementation as this setup performed best on Gao et al. (2023a) evaluation."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                875,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                544,
+                85,
+                885,
+                183
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2855"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                929,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/d3585a9358709835a42308dea34ef15b64ed4ddbf04039863b3f55eb86ce16d5.jpg"
+                },
+                "table_caption": [],
+                "table_footnote": [],
+                "html": "<table><tr><td>Instruction:</td></tr><tr><td>Now I will give you some ontology, and then you need to output their definitions. Your output should carefully focus on the difference between these events.</td></tr><tr><td>In-Context Demonstration: Input:</td></tr><tr><td>parent event: ... son event: ...</td></tr><tr><td>Output:</td></tr><tr><td>parent event: event definition of parent event . son event: event definition of son event ...</td></tr><tr><td>Instruction:</td></tr><tr><td>Now I will give you some event ontology, and your output should carefully follow the previous examples. Your output should carefully focus on the event ontology.</td></tr><tr><td>Query:</td></tr><tr><td>Input:</td></tr><tr><td>parent event: mental state son event: belief</td></tr><tr><td>son event: doubt</td></tr><tr><td>son event: awakening</td></tr><tr><td>son event: emotional state</td></tr><tr><td>son event: intention</td></tr><tr><td>son event: mental confusion</td></tr><tr><td>son event: understanding</td></tr><tr><td>GPT Output:</td></tr><tr><td>Mental State: A mental state refers to an individual's current psychological condition or state of mind.</td></tr><tr><td>It encompasses various emotions, thoughts, and cognitive processes that a person may experience at any given time.</td></tr><tr><td>Belief: Belief is a mental state characterized by the acceptance or conviction that something is true or</td></tr><tr><td>exists, often without concrete evidence. It involves having confidence in the validity of a particular idea, concept, or proposition.</td></tr><tr><td>Doubt: Doubt is a mental state characterized by uncertainty or skepticism regarding the truth or validity of a belief or idea. It involves questioning or being unsure about the accuracy of a particular belief or</td></tr><tr><td>assertion.</td></tr><tr><td>Awakening: Awakening refers to a profound shift in an individual's perception or understanding. It is often associated with a realization or enlightenment, leading to a significant change in one's perspective</td></tr><tr><td>or awareness, often of a spiritual or philosophical nature.</td></tr><tr><td>Emotional State: An emotional state relates to a person's feelings and emotions at a specific moment. These states can include happiness, sadness, anger, fear, or any other emotional response to internal or</td></tr><tr><td>external stimuli.</td></tr><tr><td>Intention: Intention is a mental state involving a purposeful and deliberate desire to perform a particular</td></tr><tr><td>action or achieve a specific goal. It is often accompanied by a plan or strategy to accomplish the intended</td></tr><tr><td></td></tr><tr><td>outcome.</td></tr><tr><td></td></tr><tr><td>Mental Confusion: Mental confusion is a mental state characterized by a lack of clarity or cognitive</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>disarray. It involves difficulty in processing information, making decisions, or understanding one's</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>surroundings, leading to a sense of disorientation.</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>Understanding: Understanding is a mental state involving comprehension and insight into a concept,</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>Instruction: Here we provide the definition and examples of three event types. The word between &lt;trigger&gt; and</td></tr><tr><td>&lt;trigger&gt; is the trigger. The trigger must be a verb. Your output should be very diverse. In-Context Demonstration: Input: Event type: ..</td></tr><tr><td>Event Definition: ... Output: Sample 1: ...</td></tr><tr><td>Sample 2: .. Instruction: Please generating a new event type following the same format. Note that there is an ontology, we</td></tr><tr><td>provide event types and their definitions. Instruction: Please generate samples for event rebellion. Your output should carefully consider the ontology. Your</td></tr><tr><td>output examples should not be examples for other son events. Query: Event Ontology: parent event: historical event son event: ceasefire</td></tr><tr><td>son event: rebellion son event: revolt Event Type: rebellion Event Definition: Rebellion is an organized and sustained attempt to challenge an established power</td></tr><tr><td>structure, often involving large numbers of people and various forms of resistance, including civil disobedience and armed struggle.</td></tr><tr><td>GPT Output:</td></tr><tr><td>Sample 1: The American Revolution was a &lt;trigger&gt;rebellion&lt;trigger&gt; against British colonial rule</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>and led to the establishment of the United States.</td></tr><tr><td></td></tr><tr><td>Sample 2: The Syrian Civil War began as a &lt;trigger&gt;rebellion&lt;trigger&gt; against the government of</td></tr><tr><td>President Bashar al-Assad.</td></tr><tr><td>Sample 3: The Boxer Rebellion was a failed &lt;trigger&gt;rebellion&lt;trigger&gt; against foreign influence in</td></tr><tr><td>China in 1900.</td></tr><tr><td></td></tr><tr><td>Sample 4: The Haitian Revolution was a successful &lt;trigger&gt;rebellion&lt;trigger&gt; led by enslaved people</td></tr><tr><td>against French colonial rule.</td></tr><tr><td></td></tr><tr><td>Sample 5: The Glorious Revolution of 1688 was a peaceful &lt;trigger&gt;rebellion&lt;trigger&gt; in England that</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>resulted in the overthrow of King James II and the establishment of a constitutional monarchy.</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>Sample 6: The Arab Spring uprisings were a series of &lt;trigger&gt;rebellions&lt;trigger&gt; across the Middle</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>East and North Africa in 2011 that aimed to overthrow authoritarian regimes.</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>Sample 7: The Boston Tea Party was an act of &lt;trigger&gt;rebellion&lt;trigger&gt; by American colonists in</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>Instruction: Now I will give you an event ontology and its corresponding event definitions for each event. You</td></tr><tr><td>difference between these events in the event ontology. The output event definitions for the target event should be different from event definitions for other events. And you need to try to give me diverse event definitions for the target event, but maintain the original semantics. In-Context Demonstration:</td></tr><tr><td>Input: parent event: ... son event: ...</td></tr><tr><td>Output: 1. ...</td></tr><tr><td>Instruction: Now I will give you some event ontology, and your output should carefully follow the previous examples. Your output should carefully focus on the event ontology.</td></tr><tr><td>Query: Input: parent event: Mental State: A mental state refers to an individual's current psychological condition or</td></tr><tr><td>state of mind. It encompasses various emotions, thoughts, and cognitive processes that a person may experience at any given time. son event: Belief: Belief is a mental state characterized by the acceptance or conviction that something</td></tr><tr><td>is true or exists, often without concrete evidence. It involves having confidence in the validity of a particular idea, concept, or proposition.</td></tr><tr><td>son event: Doubt: Doubt is a mental state characterized by uncertainty or skepticism regarding the truth or validity of a belief or idea. It involves questioning or being unsure about the accuracy of a particular belief or assertion.</td></tr><tr><td>son event: Awakening: Awakening refers to a profound shift in an individual's perception or understand- ing. It is often associated with a realization or enlightenment, leading to a significant change in one's</td></tr><tr><td>perspective or awareness, often of a spiritual or philosophical nature. Instruction:</td></tr><tr><td>Now please give me 10 more definitions for the event Awakening: Your output event definitions should be diverse, but maintain the semantics of the original definition. Your output should follow the below</td></tr><tr><td>format. GPT Output:</td></tr><tr><td>1. Awakening is a transformative experience marked by a deep and sudden insight that fundamentally</td></tr><tr><td>alters a person's way of thinking or viewing the world, frequently triggering a newfound sense of purpose or clarity.</td></tr><tr><td>2. An Awakening signifies a profound shift in an individual's consciousness, usually triggered by a</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>moment of profound understanding or revelation, which can lead to a complete reevaluation of their</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>beliefs and values.</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>3. The concept of Awakening encompasses a powerful, introspective moment where an individual</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>experiences a heightened awareness of their existence, often bringing about a renewed sense of meaning</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>Instruction: This is an event extraction task where the goal is to extract structured events from the text. A structured</td></tr><tr><td>event contains an event trigger word and an event type. Event Types and their definitions:</td></tr><tr><td>Event type 1 : Event Definition 1 Event type 2 : Event Definition 2</td></tr><tr><td></td></tr><tr><td>In-Context Examples from the dataset Positive Example 1 Sentence 1: ...</td></tr><tr><td>Output: Trigger, Event Type Positive Example 2 Sentence 2: ...</td></tr><tr><td>Output: Trigger, Event Type Positive Example 3 Sentence 3: ...</td></tr><tr><td>Output: Trigger, Event Type Example 4</td></tr><tr><td>Sentence : User Query Output:</td></tr><tr><td>Table 10: Template for Guo et al</td></tr><tr><td></td></tr><tr><td>Instruction:</td></tr><tr><td>The list of event types: &lt;list all event types for the dataset&gt; Give a sentence: &lt;user query&gt;.</td></tr><tr><td>What types of events are included in this sentence? Please return the most likely answer according to the list of event types above. Require the answer in the form: Event type.</td></tr><tr><td></td></tr><tr><td>GPT Response:</td></tr><tr><td>Event Type</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>Instruction:</td></tr><tr><td></td></tr><tr><td>If the event type is identified, return the event trigger word(s). Return 'NONE’ if the event type</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>is absent. Separate multiple event trigger words with semicolon (;). Refrain from explaining your</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td>reasoning—provide only the direct answer.</td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                115,
+                68,
+                885,
+                906
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "Table 7: Template for Ontology-Aware Event Definition Curation 2856 2856"
+                    }
+                ]
+            },
+            "bbox": [
+                275,
+                919,
+                721,
+                938
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": []
+            },
+            "bbox": [
+                480,
+                931,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/"
+                },
+                "table_caption": [],
+                "table_footnote": [],
+                "html": "",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                115,
+                101,
+                885,
+                871
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Table 8: Template for Ontology-Aware Sample Curation"
+                    }
+                ]
+            },
+            "bbox": [
+                305,
+                882,
+                690,
+                898
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2857"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/"
+                },
+                "table_caption": [],
+                "table_footnote": [],
+                "html": "",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                114,
+                102,
+                885,
+                873
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Table 9: Template for ontology-aware event definition addition"
+                    }
+                ]
+            },
+            "bbox": [
+                284,
+                882,
+                712,
+                898
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2858"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/"
+                },
+                "table_caption": [],
+                "table_footnote": [],
+                "html": "",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                112,
+                117,
+                887,
+                853
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Table 11: Template for multi-turn ChatIE"
+                    }
+                ]
+            },
+            "bbox": [
+                356,
+                863,
+                640,
+                878
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2859"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Instruction:"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                124,
+                392,
+                225,
+                407
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Act as an AI assistant specialized in extracting events. When given a sentence, a specified event type, and its definition, examine the sentence for the event type. If the event type is identified, return the event trigger(s). Return ’NONE’ if the event type is absent. Separate multiple event triggers with semicolon (;). Refrain from explaining your reasoning—provide only the direct answer."
+                    }
+                ]
+            },
+            "bbox": [
+                122,
+                407,
+                880,
+                474
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Sentence: <Sentence>"
+                    }
+                ]
+            },
+            "bbox": [
+                124,
+                488,
+                295,
+                504
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Event Type: <Type of Event>"
+                    }
+                ]
+            },
+            "bbox": [
+                124,
+                505,
+                349,
+                520
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Event Definition: <Definition of the Event>"
+                    }
+                ]
+            },
+            "bbox": [
+                124,
+                520,
+                453,
+                537
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "TRIGGER:"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                124,
+                552,
+                215,
+                568
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Table 12: Template for GPT-3.5-Turbo. We prompt the model with the definition of each possible event type from the dataset and aggregate the predictions for evaluation."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                583,
+                882,
+                614
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2860"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/920b4243ac9bf2dbcc58ab3a3ff19d111ddd4e191f2c3af7dbdd7a420787c26e.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 13: Examples for the generated data for event ceasefire."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                144,
+                83,
+                853,
+                890
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2861"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                519,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/6cc0998c5108723d2c4fb6a803110246647029bf523d8fcab4dab2224381626f.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 14: Examples for the generated data for event Change_event_time."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                117,
+                107,
+                885,
+                865
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2862"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/4f2fa08e6b9448be2ab1e422bc7b25099c4269f950e599629b28521441606b6f.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 15: Qualitative examples of DivED dataset. DivED contains diverse sibling events, high-quality samples with diverse triggers for each event type. The event definitions significantly distinguish the slight differences between sibling events."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Ontology: Parent: Arriving; Sons: Visiting scenario arrival, Drop in on, Access scenario</td></tr><tr><td>Parent: Arriving Event Definition 1: The act of Arriving involves the physical or virtual arrival at a destination or location, often involving anticipation and preparation for the event or activity that will follow.</td></tr><tr><td>Event Definition 10: The Arrival event captures the moment when someone arrives at a particular location, often involving an emotional and physical shift as they transition into a new environment. Sample 1: The school field trip participants arrived at the museum and were greeted by the tour guide. Sample 10: The visitors arrived at the aquarium and were led to the dolphin show by the staff.</td></tr><tr><td>Son 1: Drop in on Event Definition 1: Drop in on refers to an unplanned and impromptu visit to a friend or acquaintance, often characterized by a surprise element and lack of formal invitations or arrangements. * . Event Definition 10: The act of drop in on signifies an unscheduled visit to an individual&#x27;s place without prior notice or</td></tr><tr><td>appointment, possibly to offer support or check on their well-being. Sample 1: Sarah decided to pop in on her friend who lived nearby and catch up.</td></tr><tr><td>Sample 10: Jane had some free time on her hands and wanted to pay a visit to her former college roommate.</td></tr><tr><td>Son 2: Visiting scenario arrival</td></tr><tr><td>Event Definition 1: Visiting scenario arrival entails arriving at a planned destination, such as a theater or concert, where specific events have been organized for the visitor&#x27;s entertainment or education, creating a unique and memorable experience.</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                115,
+                292,
+                885,
+                652
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2863"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ]
+]

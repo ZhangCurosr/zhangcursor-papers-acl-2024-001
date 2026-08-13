@@ -1,0 +1,2296 @@
+[
+    {
+        "type": "text",
+        "text": "UniBridge: A Unified Approach to Cross-Lingual Transfer Learning for Low-Resource Languages",
+        "text_level": 1,
+        "bbox": [
+            127,
+            89,
+            872,
+            130
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Trinh Pham<sup>1</sup>∗, Khoi M. Le<sup>2</sup>\\*, Luu Anh Tuan<sup>3†</sup>",
+        "bbox": [
+            302,
+            146,
+            704,
+            162
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "<sup>1</sup>Ho Chi Minh City University of Technology (HCMUT), VNU-HCM, Ho Chi Minh City, Vietnam <sup>2</sup>VinAI Research, Vietnam",
+        "bbox": [
+            102,
+            162,
+            902,
+            196
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "<sup>3</sup>Nanyang Technological University, Singapore",
+        "bbox": [
+            307,
+            196,
+            695,
+            214
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "phkhanhtrinh23@gmail.com, v.khoilm1@vinai.io, anhtuan.luu@ntu.edu.sg",
+        "bbox": [
+            154,
+            214,
+            848,
+            231
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            262,
+            260,
+            342,
+            275
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "In this paper, we introduce UniBridge (Cross-Lingual Transfer Learning with Optimized Embeddings and Vocabulary), a comprehensive approach developed to improve the effectiveness of Cross-Lingual Transfer Learning, particularly in languages with limited resources. Our approach tackles two essential elements of a language model: the initialization of embeddings and the optimal vocabulary size. Specifically, we propose a novel embedding initialization method that leverages both lexical and semantic alignment for a language. In addition, we present a method for systematically searching for the optimal vocabulary size, ensuring a balance between model complexity and linguistic coverage. Our experiments across multilingual datasets show that our approach greatly improves the F1-Score in several languages. UniBridge is a robust and adaptable solution for cross-lingual systems in various languages, highlighting the significance of initializing embeddings and choosing the right vocabulary size in cross-lingual environments.",
+        "bbox": [
+            141,
+            285,
+            462,
+            614
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            115,
+            623,
+            260,
+            638
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Recently, multilingual pre-trained language models (LMs) have significantly advanced natural language processing (NLP) tasks, narrowing the performance gap between English and various other languages. Multilingual pre-trained models such as XLM-R (Conneau et al., 2020) and mBERT (Devlin et al., 2019) are currently strong models for effectively cross-lingual transfer (Hu et al., 2020; Artetxe et al., 2020; Le et al., 2024). However, these models pose a limitation that they are pretrained on a limited set of approximately 100 languages, leaving a substantial void for the vast array of the world’s nearly 7000 languages (van Esch et al., 2022). The resultant disparity disproportionately affects low-resource languages that are",
+        "bbox": [
+            110,
+            648,
+            490,
+            890
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "table",
+        "img_path": "images/b26ae7913fd3f95caa1778aca7ca7482daec4073b0b4786c2156d6006704c318.jpg",
+        "table_caption": [
+            "not covered in their pre-trained corpora (Wu and Dredze, 2020; Pfeiffer et al., 2020), impeding their performance compared to their high-resource counterparts.",
+            "Figure 1: Some languages/scripts are not covered in the pre-trained corpora. Hence, the pre-trained tokenizer will eventually produce many unknown tokens which corrupts the sentence’s meaning and results in poor performance."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Language</td><td>Pashto</td><td>Amharic</td></tr><tr><td>Original</td><td> $( 1 0 ) \\cos ( 5 0 ) = \\cos ( 0 . 5 ) \\sin ( 5 0 )$ </td><td>05 0+:00+76C</td></tr><tr><td>mBERT</td><td> $S i g o l s p a b \\equiv P U N K 1 S i n s i o n ( U N K ) i n u _ { 2 } e$ </td><td>[UNK] [UNK] [UNK] [UNK]</td></tr><tr><td>UniBridge</td><td> $j L _ { 0 } = i \\sin ( s ) \\cos \\phi \\sin \\phi$ </td><td>05 +: 00+76</td></tr></table>",
+        "bbox": [
+            512,
+            340,
+            880,
+            428
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Recent efforts propose the use of adapters to mitigate the knowledge gap in low-resource languages prior to transferring knowledge for specific tasks (Pfeiffer et al., 2020; Üstün et al., 2020; Ansell et al., 2021). These methods adapt the pre-trained LMs to a new language by utilizing monolingual data, enabling the model to acquire a robust representation of the target language before receiving knowledge from the source language. Despite enhanced performance in languages not included in the pre-trained corpora, these approaches still exhibit poor performance in languages with unseen scripts (i.e., the scripts that are not presented in the pre-training corpora; see Figure 1). To address the issue of unseen scripts, existing studies (Artetxe et al., 2020; Pfeiffer et al., 2021) propose acquiring a new vocabulary embedding for newly discovered languages. However, these methods heavily rely on manually configuring the vocabulary size and initializing the embedding matrix.",
+        "bbox": [
+            507,
+            518,
+            887,
+            840
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Furthermore, recent Cross-Lingual Transfer Learning studies focus on English due to its abundant pre-trained data and impressive task performance, our experiments reveal that high performance in English tasks does not necessarily guarantee successful transfer to other languages, particularly low-resource languages. Therefore, we suggest an automated method utilizing the LMs to identify the most suitable set of source languages for knowledge aggregation, leading to notable performance improvements over single-source language transfer.",
+        "bbox": [
+            507,
+            841,
+            887,
+            922
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "Equal Contribution.",
+        "bbox": [
+            136,
+            895,
+            285,
+            908
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>†</sup>Corresponding author.",
+        "bbox": [
+            136,
+            908,
+            284,
+            922
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 3168–3184 August 11-16, 2024 ©2024 Association for Computational Linguistics",
+        "bbox": [
+            89,
+            945,
+            909,
+            973
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "3168",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            490,
+            197
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Our research empirically tested the effectiveness of newly random initialized embeddings and fixed vocabulary size. We then introduce an efficient technique for determining the optimal vocabulary size for new languages, utilizing the syntactic and semantic insights from the pre-trained LMs. In addition, we present an innovative method for transferring knowledge from multiple sources, which allows the model to choose the best combination of source languages to improve the overall performance. Our results contribute to the ongoing discussion about managing linguistic diversity in NLP, particularly for languages with limited resources, emphasizing the importance of a detailed and inclusive strategy in creating multilingual pre-trained LMs.",
+        "bbox": [
+            112,
+            198,
+            490,
+            455
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "We evaluate our approach on sequence tagging tasks (e.g. NER, POS) and classification (e.g. NLI) with two strong baselines, mBERT and XLM-R, and observe a significant increase in the F1 and accuracy score <sup>1</sup>. In summary, our contributions are:",
+        "bbox": [
+            112,
+            455,
+            489,
+            551
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• We propose a novel approach to automatic search for a suitable vocabulary size to adapt to a new language.",
+        "bbox": [
+            134,
+            562,
+            489,
+            609
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• We propose a new strategy to initialize the embedding that leverages the syntactic and semantic knowledge encoded in the pre-trained LMs to address the missing tokens when adapting to low-resource languages.",
+        "bbox": [
+            136,
+            609,
+            489,
+            690
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• We propose a method to aggregate multisource transfer learning to enhance the performance on cross-lingual transfer tasks. We show that multi-source can outperform effective multi-language learning.",
+        "bbox": [
+            136,
+            690,
+            490,
+            772
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Methodology",
+        "text_level": 2,
+        "bbox": [
+            114,
+            782,
+            263,
+            800
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Our proposed framework includes five stages as illustrated in Figure 2. In the following section we will detail each stage of the framework: 1) Vocabulary size searching, 2) Language-specific embedding initialization, 3) Model adaptation to new languages not covered in the pre-training data, 4) Downstream task training, 5) Multi-source transfer downstream task inference.",
+        "bbox": [
+            112,
+            808,
+            489,
+            889
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            84,
+            885,
+            134
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2.1 Vocabulary size searching",
+        "text_level": 2,
+        "bbox": [
+            509,
+            161,
+            761,
+            178
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Whether training from scratch or starting with a pre-trained language model, every NLP practitioner faces the task of determining the appropriate vocabulary size. Thus, choosing a suitable vocabulary size requires exhaustive searching (i.e., the whole training and testing process is required to determine the best vocabulary size). For UniBridge, the vocabulary is determined by using only CPU and is not time-consuming as it does not require any language model training phases. This is achieved by leveraging the average log probability (ALP, Zheng et al. (2021)). The algorithm for vocabulary size searching is illustrated by Algorithm 1.",
+        "bbox": [
+            507,
+            192,
+            887,
+            404
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "code",
+        "sub_type": "algorithm",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "Algorithm 1 Vocabulary size searching algorithm.   \nRequire: : monolingual data, contains a list of   \nwords sentences, $v _ { i } \\colon$ initial vocabulary size,   \nv<sub>m</sub>: maximum vocabulary size that the system   \nshould not exceed, $\\delta _ { v } \\colon$ increased step of vo  \ncabulary size, ϵ<sub>s</sub>: a threshold for stopping the   \nalgorithm.   \n1: v v<sub>i</sub>   \n2: t build tokenizer with vocab size v on   \n3: $s _ { p r e v } \\gets A L P ( \\mathcal { D } , t )$   \n4: $\\Delta _ { s } = \\infty$   \n5: while $\\Delta _ { s } > \\epsilon _ { s }$ do   \n6: v v + δ<sub>v</sub>   \n7: if v > v<sub>m</sub> then   \n8: v  v<sub>m</sub>   \n9: t build tokenizer with v on   \n10: Break the loop   \n11: else   \n12: t build tokenizer with v on   \n13: s<sub>curr</sub> ALP( , t)   \n14: <sup>∆</sup>s <sup>=</sup> <sup>s</sup>curr − <sup>s</sup>prev   \n15: <sup>s</sup>prev ← <sup>s</sup>curr   \n16: end if   \n17: end while   \n18: return Tokenizer t with vocab size v",
+        "bbox": [
+            510,
+            424,
+            885,
+            833
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "The concept of Average Log Probability (ALP) was introduced by Zheng et al. (2021), who argue that ALP is related to the effectiveness of subsequent tasks.",
+        "bbox": [
+            507,
+            858,
+            887,
+            922
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>1</sup>https://github.com/TokisakiKurumi2001/ UniBridge",
+        "bbox": [
+            112,
+            896,
+            435,
+            921
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "3169",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/b1ce45416f1ba517ee83a57264330d4658c7fabcbd5a52201d9343d6c3663f6f.jpg",
+        "image_caption": [
+            "Figure 2: Illustration of UniBridge: UniBridge represents an end-to-end framework for Cross-Lingual Transfer Learning. The framework encompasses various stages, including determining the appropriate vocabulary size, initializing language-specific embedding, adapting the model to new languages, and transferring task knowledge from multiple source languages. This approach aims to harness the power of a multilingual embedding space rather than relying on a single-source transfer language, such as English."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            117,
+            84,
+            868,
+            399
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "img_path": "images/f004e6ea3b1e5e1c98f384e52f5effac3d756277540eff6404dd1fe853281e4e.jpg",
+        "text": "$$\nA L P ( \\mathcal D , t ) = \\frac { 1 } { | t ( \\mathcal D ) | } \\sum _ { j = 1 } ^ { | t ( \\mathcal D ) | } \\sum _ { k = 1 } ^ { | s _ { j } | } \\log p _ { u n i } ( s _ { j } ^ { k } )\\tag{1}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            131,
+            529,
+            452,
+            575
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "For more details, readers are advised to refer to the work of Zheng et al. (2021). It is worth noting that although ALP has a high correlation with downstream tasks, the work did not provide a solution to find an optimal vocabulary size. Therefore, in this work, we propose using the ‘degree of changes’ in the ALP score, $\\mathrm { e . g . } , \\Delta _ { s }$ . Initially, the starting vocabulary size is chosen and the ALP is calculated. Through a series of increases in the vocab size by $\\delta _ { v }$ , we can calculate the difference between the current ALP and the previous one. Thus, the algorithm will stop when the difference reaches a specific threshold $\\epsilon _ { s } .$ This threshold indicates that the optimal vocabulary size has been obtained. Continuing to increase the size will result in similar or worse performance. Therefore, we stop the algorithm to maintain the efficiency of training. Additionally, our method stands out from traditional grid search by using the ‘degree of changes’ of the ALP score indirectly, rather than directly as in grid search.",
+        "bbox": [
+            112,
+            585,
+            490,
+            922
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2.2 Language-specific embedding initialization",
+        "text_level": 2,
+        "bbox": [
+            509,
+            505,
+            789,
+            537
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "When training for a new language, using a randomly initialized embedding can lead to prolonged training times for optimal performance, especially in low-resource settings with a dataset size of around 10K samples. In such cases, strategically initializing the embedding proves to be more effective than a random approach. While FOCUS (Dobler and de Melo, 2023) demonstrates the use of a pre-trained LM’s embedding for initialization, it depends heavily on a simple lexical overlapped alignment for subsequent stages, thus decreasing the downstream task performance. To address this gap, our approach initializes the new embedding by leveraging the pre-trained LMs in both syntactic and semantic aspects. In the initial stage, we obtain the target tokenizer $t _ { T }$ for the new language, with $t _ { S }$ being the source tokenizer of the pre-trained LMs. Representing the vocabulary sets as $V ^ { T }$ and $V ^ { S }$ for the target and source tokenizers respectively, and embedding matrices as $E ^ { T } [ \\cdot ]$ and $E ^ { S } [ \\cdot ]$ , we copy the source embedding to the target embedding for the overlapping tokens $O ^ { L } = V ^ { \\mathbf { \\breve { T } } } \\cap V ^ { S }$ . This method ensures a seamless integration of knowledge from the pre-trained LMs, addressing both syntactic and semantic aspects of the new language’s embedding initialization.",
+        "bbox": [
+            507,
+            551,
+            887,
+            922
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "3170",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            84,
+            489,
+            134
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/a572027e4acee58e00d83854f6e4d55f5dddab92fd60a53aa6941d89882053cb.jpg",
+        "text": "$$\n\\forall o \\in O ^ { L } : E ^ { T } [ o ] = E ^ { S } [ o ]\\tag{2}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            198,
+            147,
+            401,
+            167
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Although the number of lexical overlapping tokens can be substantial when utilizing the same script, such as Latin or Han, this phenomenon does not extend to unseen scripts. To address this challenge, we define the non-lexical alignment set as $A _ { T } ^ { L } \\ = \\ V ^ { T } \\setminus O ^ { L }$ and initiate a search for semantically aligned tokens within this set. Despite languages having different scripts, the underlying meanings often converge on similar definitions. To facilitate this alignment, we train two static embeddings—one for the source tokenizer $( F ^ { S } )$ and another for the target tokenizer $( F ^ { T } )$ —using the monolingual dataset . These embeddings are denoted as $F ^ { S } [ \\cdot ]$ for the source tokenizer and $F ^ { T } [ \\cdot ]$ for the target tokenizer. For each token $v _ { i }$ in $A _ { T } ^ { L }$ we calculate the cosine similarity with every token $v _ { j }$ in $A _ { S } ^ { L } = V ^ { S } \\setminus O ^ { L }$ , resulting in a matrix $S _ { i , j } \\in \\mathbb { R } ^ { | A _ { T } ^ { L } | \\times | A _ { S } ^ { L } | }$ . A pair of semantically aligned tokens $( v _ { i } , v _ { j } )$ is defined as a pair of source and target tokens whose embeddings exhibit the highest cosine similarity score to each other, or:",
+        "bbox": [
+            112,
+            177,
+            489,
+            517
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/8bc7c35b59324f437e51a4a708d1307e6621d08ba338d7bfc6fbf38b1d613a6c.jpg",
+        "text": "$$\ni = a r g m a x ( S _ { l , j } ) \\mathrm { a n d } j = a r g m a x ( S _ { i , l } )\\tag{3}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            122,
+            546,
+            457,
+            573
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Refer to Equation 3, we define $S = \\{ ( i , j ) | i =$ argmax $( S _ { l , j } )$ and $j = a r g m a x ( S _ { i , l } ) \\}$ . Each tol l ken that is semantically aligned will have the embedding copied from their counterpart from the source embeddings.",
+        "bbox": [
+            112,
+            586,
+            489,
+            674
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/1436082586f965bbba11a6b31a9204afba054155c452ea73ff360ebad6a25bbb.jpg",
+        "text": "$$\n\\forall ( i , j ) \\in S : E ^ { T } [ i ] = E ^ { S } [ j ]\\tag{4}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            191,
+            688,
+            408,
+            707
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "For the remaining non-aligned tokens, $A _ { T } =$ $A _ { T } ^ { L } \\setminus S _ { i }$ and $A _ { S } ~ = ~ A _ { S } ^ { L } ~ \\backslash ~ S _ { j }$ where $S _ { i } , \\ S _ { j }$ is the set of semantically aligned token of the target and source vocabulary (i.e. $S _ { i } = \\{ i | ( i , j ) \\in S \\}$ $S _ { j } = \\{ j | ( i , j ) \\in S \\} )$ , we initialize the target embedding using the weighted sum of the aligned target tokens. We compute the cosine similarity between each non-aligned token $a _ { T } \\in A _ { T }$ and the set of aligned target tokens (comprising both lexical and semantically aligned tokens) $o _ { T } \\in O ^ { L } \\cup S _ { i }$",
+        "bbox": [
+            112,
+            717,
+            489,
+            878
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/21462ad7a4d82337796554c4ff48302fb39e2e666e30bf7e9925a55ad334a388.jpg",
+        "text": "$$\nc _ { a , o } = { \\frac { F ^ { T } [ a _ { T } ] F ^ { T } [ o _ { T } ] ^ { \\top } } { \\Vert F ^ { T } [ a _ { T } ] \\Vert \\cdot \\Vert F ^ { T } [ o _ { T } ] \\Vert } }\\tag{5}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            186,
+            889,
+            411,
+            927
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "To obtain the most similar aligned symbols $o _ { T }$ for a single symbol $a _ { T }$ , we use the same approach in Dobler and de Melo (2023), using sparsemax (Martins and Astudillo, 2016) over $c _ { a }$ , where $c _ { a }$ is a vector containing all similarity scores from $\\textstyle c _ { a , o } .$ Sparsemax is a variant softmax, but it assigns zero to low-probability element. By this, we can overcome the problem posted by skew distribution where some tokens has only one or two similar tokens while others have more. The weight $w _ { a , o }$ for each aligned token $o _ { T }$ as defined in Equation $^ { 6 . }$",
+        "bbox": [
+            507,
+            85,
+            885,
+            262
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/efd5052975c8963f90c416e92f36123cf95237875751c8c4bde166753b34830c.jpg",
+        "text": "$$\nw _ { a , o } = \\mathrm { s p a r s e m a x } _ { o } ( c _ { a } )\\tag{6}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            606,
+            279,
+            786,
+            296
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We denote $S _ { a }$ as a set of similar aligned tokens, which contains $o _ { T }$ whose probability is non-zero assigned by sparesemax.",
+        "bbox": [
+            507,
+            303,
+            884,
+            353
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/824635517d4090ba05b283bfab615be2811dee39f15012385b82a549d89f36ed.jpg",
+        "text": "$$\nS _ { a } = \\{ o _ { T } \\in O ^ { L } \\cup S _ { i } | w _ { a , o } > 0 \\}\\tag{7}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            574,
+            367,
+            818,
+            386
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Using the set $S _ { a }$ and the weight $w _ { a , o }$ , the embedding for the non-aligned token $a T$ is calculated as the weighted sum of its most similar aligned tokens.",
+        "bbox": [
+            507,
+            393,
+            885,
+            457
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/b575c78a03366749bdecc3f467f36f5d2483bbf30da6fc69bd89a50458109450.jpg",
+        "text": "$$\n\\forall a _ { T } \\in A _ { T } : E ^ { T } [ a _ { T } ] = \\sum _ { o _ { T } \\in S _ { a } } w _ { a _ { T } , o _ { T } } E ^ { T } [ o _ { T } ]\\tag{8}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            515,
+            468,
+            853,
+            502
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "2.3 Model adaptation to new languages & Downstream task training",
+        "text_level": 2,
+        "bbox": [
+            509,
+            514,
+            853,
+            546
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Continual pre-training, also known as language adaptation, has proven to be an effective method for enhancing the downstream performance of zeroshot cross-lingual tasks, as demonstrated by studies such as Ke et al. (2023); Alabi et al. (2022); Ebrahimi and Kann (2021). To mitigate the environmental impact and reduce model storage requirements, we opt to pre-train only a portion of the model, aligning with the approach introduced in MAD-X (Pfeiffer et al., 2020).",
+        "bbox": [
+            507,
+            551,
+            885,
+            712
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "As in Figure 2, we made some modifications to the MAD-X configuration. Firstly, we initialize a new embedding for UniBridge which is achieved from previous stages and train the embedding together with adapters while still freezing all the pretrained LMs’ parameters. Secondly, we propose using the KL divergence together with the MLM loss (Appendix A). We see that although the frozen parameter in each layer of the pre-trained LMs helps guide the trainable adapters of the new language’s embedding representation into the same pre-trained LM’s embedding space, MLM is not sufficient as it only enforces the adapter to predict the mask token and this cannot guarantee the new language’s representation is the same as multilingual embedding space encoded by the pre-trained LMs. This limitation prohibits the knowledge transferability of task adaptation since task adaptation takes a source language (usually high-resource languages such as English, Chinese, etc) and transfers the task knowledge directly to the target language without any alignment between the two languages. Therefore, we use KL divergence as a regularizer to guide the model not only to learn the language representation well, but also to maintain the same space as the source language in order to achieve better transferability.",
+        "bbox": [
+            507,
+            713,
+            885,
+            923
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "footer",
+        "text": "3171",
+        "bbox": [
+            480,
+            928,
+            519,
+            942
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            490,
+            311
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/0838e3bd8191ca1d1be5b20b33674a274a86b37d94b99bbecedd3d2b7127884c.jpg",
+        "text": "$$\n\\begin{array} { r l } & { \\mathcal { L } = \\mathcal { L } _ { M L M } ( y , \\hat { y } ) } \\\\ & { \\quad + \\beta D _ { K L } ( \\pi _ { U n i B r i d g e } ( h | x ) \\| \\pi _ { P L M } ( h | x ) ) } \\end{array}\\tag{9}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            129,
+            337,
+            452,
+            375
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "y and $\\hat { y }$ are the ground truth and prediction logits of the mask prediction task, respectively. $\\pi _ { U n i B r i d g e } ( h | x )$ is the last hidden state of UniBridge, it is the output of the invertible adapter before goes to the linear classification head for masked predicting. $\\pi _ { P L M } ( h | x )$ is the last hidden state of the pre-trained LMs, it is the output of the last Transformer layer, as in Figure 2, and is the input of the linear classification head for mask predicting.",
+        "bbox": [
+            112,
+            387,
+            489,
+            535
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "2.4 Multi-source transfer downstream task inference",
+        "text_level": 2,
+        "bbox": [
+            114,
+            545,
+            468,
+            577
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Instead of using one task adapter from one source language, we propose aggregating the knowledge from multiple source languages to derive a better result. For each target language, we compute the harmony weight or similarity distance between languages. Some libraries such as Lang2Vec (Malaviya et al., 2017) provide a similarity score between languages. However it does not cover all the languages. To overcome this problem, we directly use the language model (that UniBridge produced from previous stages) to measure the similarity between languages. In the Appendix D.2, we will provide a detailed comparison between Lang2Vec and UniBridge. This analysis will highlight the differences and similarities between the two approaches, offering insights into their respective performances and effectiveness.",
+        "bbox": [
+            110,
+            583,
+            490,
+            857
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "For each target language, we collect K samples of parallel sentences from datasets such as Tatoeba (Tiedemann, 2020) or FLORES-200 (Guzmán et al., 2019; Goyal et al., 2022; Team et al., 2022)",
+        "bbox": [
+            110,
+            858,
+            489,
+            922
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "between the target language and a set of $N$ source languages.",
+        "bbox": [
+            507,
+            84,
+            882,
+            117
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "We denote $\\mathcal { D } ^ { T }$ as a monolingual dataset extracted from the parallel dataset on the target side, $\\mathcal { D } ^ { S _ { i } }$ is the monolingual dataset extracted from the parallel dataset on the source side of the i-th source language. Each sentence is fed into the UniBridge with the corresponding language adapters and obtains a set of hidden states (i.e., output from the invertible adapter).",
+        "bbox": [
+            507,
+            117,
+            887,
+            247
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/29a5dd7307692cccfbe9c08fa5d20fc9377e3ebab6995a72bc6b1ed6108e33b3.jpg",
+        "text": "$$\nH _ { l } = \\{ \\pi _ { U n i B r i d g e } ^ { l } ( s ) | s \\in \\mathcal { D } ^ { l } \\}\\tag{10}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            581,
+            261,
+            810,
+            281
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "$\\pi _ { U n i B r i d g e } ^ { l }$ is the UniBridge model which use the l adapter; $\\mathcal { D } ^ { l }$ is $\\mathcal { D } ^ { T }$ for the target language and $\\mathcal { D } ^ { S _ { i } }$ for the i-th source languages. The inverse $L _ { 2 }$ distance between the target hidden state $H _ { t }$ for target language t and source hidden state $H _ { s }$ for source language s will be computed.",
+        "bbox": [
+            509,
+            290,
+            885,
+            390
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/ee6b9f47444d5841e375c945b39636af85764efa72dc1d4f522ea47cce631419.jpg",
+        "text": "$$\nd _ { t , s } = \\frac { 1 } { L _ { 2 ^ { - } \\mathrm { n o r m } \\left( H _ { t } , H _ { s } \\right) } }\\tag{11}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            598,
+            399,
+            791,
+            434
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "After that, we compute the softmax over the inverse $L _ { 2 }$ distance to gain the harmony weight between target language t and set of source languages ${ \\cal { S } } = \\{ s _ { i } \\} _ { i = 1 } ^ { N }$",
+        "bbox": [
+            507,
+            439,
+            885,
+            505
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/2e652905f15a5d8b9b5fc7b0c27307f74e61b418648d2390a6bb87a50a7c9be7.jpg",
+        "text": "$$\nw _ { t } = \\mathrm { s o f t m a x } _ { s } ( d _ { t , s } )\\tag{12}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            616,
+            520,
+            774,
+            537
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Using this harmony weight, instead of replacing the task adapter for each different source language during inference like MAD-X, we forward through all the task adapters in parallel. The last logit prediction will be the weighted sum of all the logits predicted by each source language weighted by the harmony weight.",
+        "bbox": [
+            507,
+            545,
+            885,
+            659
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/01a09a6ca6d95fab224dd3454689540cc48dde12f2792c2e0c6846b99f000175.jpg",
+        "text": "$$\n\\hat { y } = \\sum _ { s \\in S } w _ { t , s } \\hat { y } _ { s }\\tag{13}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            636,
+            671,
+            754,
+            707
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "$\\hat { y } _ { s }$ is the logit prediction from source language s.",
+        "bbox": [
+            509,
+            713,
+            882,
+            744
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "The intuition behind the harmony weight is that given a pair of parallel sentence, each sentence is encoded by a different language model. The difference between the hidden states produced by this process turns out to be the difference between languages itself since the sentences convey the same meaning. Therefore, inversing the difference and applying softmax will result in the similarity that we can up-weight for languages, and they could be beneficial to the target language on downstream tasks and, at the same time, down-weight the languages that are distant from the target language. Through our experiment, we show that multi-source inference outperforms single-source transfer and multi-language learning settings.",
+        "bbox": [
+            507,
+            745,
+            887,
+            922
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_number",
+        "text": "3172",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            151
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "3 Experimental setup",
+        "text_level": 2,
+        "bbox": [
+            114,
+            162,
+            319,
+            179
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Language set: The set of source languages are: English, Chinese, Russian, Arabic and Japanese. For the target languages, we evaluate 14 low-resource languages from WikiANN (Rahimi et al., 2019) whose training set consists of only 100 samples per language, 9 low-resource languages from Universal Dependencies (UD) (Zeman et al., 2023) whose training set consists of just few thousands samples per language and 10 languages from the AmericasNLI (Ebrahimi et al., 2022).",
+        "bbox": [
+            112,
+            190,
+            490,
+            350
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Monolingual data: For the language adaptation part, we extract from the Wikipedia dataset from HuggingFace <sup>2</sup> 10K samples for simulating the low-resource settings, each sample consists of 128 words, for each target language. For source languages, the number of samples is 50K per language to simulate the rich-resource languages. For languages in AmericasNLI, we use one side of the translation dataset from Mager et al. (2021).",
+        "bbox": [
+            112,
+            351,
+            490,
+            497
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Tokenizer: We use the SentencePiece (Kudo and Richardson, 2018) to learn the token from the monolingual data with the vocab size determined by our Algorithm 1.",
+        "bbox": [
+            112,
+            498,
+            489,
+            562
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Downstream data: NER: We train UniBridge on the train split of WikiANN for all the source language sets and perform inference for the target language on the test split. POS: We train UniBridge from the train split of UD for all the source languages sets. NLI: We train UniBridge from the train split of XNLI (Conneau et al., 2018) for English, Chinese, Arabic and Russia due to the missing Japanese set.",
+        "bbox": [
+            112,
+            562,
+            489,
+            708
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Baseline: We evaluate UniBridge against the MAD-X framework and zero-shot cross-lingual fine-tuning using pre-trained language models (LMs). In the zero-shot approach, we fine-tune the entire pre-trained LM on the combined training data of all source languages and then directly infer on the target languages. With MAD-X, we adhere to its standard setup, training on monolingual data. To perform multi-language training, we combine training data from all source languages to train a “universal” task adapter. For inference, we swap the language adapter for each target language and integrate the “universal” task adapter. For UniBridge, we implement the language adaptation and task training stages as detailed in Section 2.3. During inference, we combine the task adapters from 5 source languages for multi-source transfer and report the F1 score for NER and accuracy score POS, NLI on the target language’s test split.",
+        "bbox": [
+            112,
+            708,
+            490,
+            887
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            885,
+            214
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "The hyperparameters for training, inference as well as the computational resources are given in Appendix C.",
+        "bbox": [
+            507,
+            215,
+            885,
+            265
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4 Results and Analysis",
+        "text_level": 2,
+        "bbox": [
+            509,
+            280,
+            726,
+            297
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "We present the result of our method and the baselines in Table 1 and 2 for NER task and Table 3 and 4 for POS tagging task. We report the NLI results in Table 12 and 13 in Appendix D.1. UniB ridge outperforms strong baselines such as whole model fine-tuned (XLM-R, mBERT) and MAD-X framework by a large margin, i.e, for the XLM-R model, we outperform 11 over 14 languages. For POS tagging task, we outperform both baselines with two different backbone models. We also see this trend in NLI task (Appendix D.1). This highlights the effect of leveraging multiple source languages during inference to help make better de cisions since each language contributes knowledge that benefits the model at prediction. Meanwhile, multi-training offers a more robust performance but also introducing more difficulties during training. The fact that UniBridge outperforms strong baselines such as whole fine-tuned model indicates that given a small monolingual and lightweight adaptation using adapters, we can significantly improve the cross-lingual tasks for uncovered languages. Compared to MAD-X, our approach differs from the use of a new embedding layer. For unseen languages, using a more specific layer of embedding can remarkably enhance the performance. Even though MAD-X already uses the invertible adapters as a component to adapt embedding layer to unseen languages, these components may not sufficient for rare languages with unseen scripts such as Amharic (amh), Khmer (khm), Kanada (kan). In addition, to evaluate UniBridge with large (decoder-style) Language Models (LLMs), we expanded our experiments beyond XLM-R and mBERT to include mGPT (Shliazhko et al., 2024) and mBART (Liu et al., 2020). This extension provides a more robust assessment of UniBridge’s effectiveness across different model types, demonstrating its versatilit and potential in leveraging various LLM architectures for improved language representation. The results are presented in Appendix D.8, showcasing the comparative performance and strengths of UniBridge in diverse settings.",
+        "bbox": [
+            507,
+            310,
+            889,
+            925
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>2</sup>https://huggingface.co/datasets/graelo/ wikipedia",
+        "bbox": [
+            112,
+            895,
+            443,
+            922
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "3173",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "table",
+        "img_path": "images/d6a41179fa51e2837c64a3ae05406036a179ead4daff86f69c0c8071dd459e3b.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>amh</td><td>ang</td><td>cdo</td><td>crh</td><td>eml</td><td>frr</td><td>khm</td><td>kan</td><td>lij</td><td>pbt</td><td>san</td><td>snd</td><td>sin</td><td>som</td><td>Average</td></tr><tr><td>XLM-R</td><td>43.31</td><td>52.71</td><td>22.04</td><td>44.62</td><td>40</td><td>44.17</td><td>40.69</td><td>45.34</td><td>40.45</td><td>46</td><td>41.28</td><td>43.13</td><td>50.03</td><td>50.23</td><td>43.14</td></tr><tr><td>MAD-X (XLM-R)</td><td>39.3</td><td>46.59</td><td>17.32</td><td>36.63</td><td>33.86</td><td>39.51</td><td>50</td><td>45.24</td><td>38.13</td><td>42.66</td><td>19.93</td><td>39.06</td><td>39.55</td><td>49.6</td><td>38.38</td></tr><tr><td>UniBridge (XLM-R)</td><td>49.6</td><td>43.24</td><td>42.91</td><td>46.03</td><td>40.15</td><td>50.67</td><td>42.67</td><td>48.72</td><td>45.16</td><td>46.09</td><td>29.74</td><td>51.32</td><td>52.86</td><td>54.22</td><td>45.95</td></tr></table>",
+        "bbox": [
+            119,
+            82,
+            880,
+            128
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/5afe90bc43672d3737205176319d23b71888c71a89964ae7d90a3e85f2ac9985.jpg",
+        "table_caption": [
+            "Table 1: The results of the F1 Score for every setup with XLM-R as a backbone are showcased in 14 diverse languages of WikiANN. We highlight in bold the highest F1 score and underline the second highest of each target language for each backbone model.",
+            "Table 2: The results of the F1 Score for every setup with mBERT as a backbone showcased in 14 diverse languages of WikiANN. We highlight in bold the highest F1 score and underline the second highest of each target language for each backbone model."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>amh</td><td>ang</td><td>cdo</td><td>crh</td><td>eml</td><td>frr</td><td>khm</td><td>kan</td><td>lij</td><td>pbt</td><td>san</td><td>snd</td><td>sin</td><td>som</td><td>Average</td></tr><tr><td>mBERT</td><td>12.87</td><td>52.24</td><td>19.76</td><td>47.81</td><td>39.71</td><td>51.3</td><td>18.46</td><td>42.86</td><td>45</td><td>25.86</td><td>30.71</td><td>13.61</td><td>2.79</td><td>46.15</td><td>32.08</td></tr><tr><td>MAD-X (mBERT)</td><td>13.91</td><td>51.48</td><td>16.22</td><td>46.22</td><td>39.2</td><td>45.76</td><td>19.2</td><td>31.3</td><td>37.35</td><td>29.25</td><td>22.96</td><td>20.31</td><td>12.34</td><td>37.66</td><td>30.23</td></tr><tr><td>UniBridge (mBERT)</td><td>15.46</td><td>53.28</td><td>30.42</td><td>45.67</td><td>36.15</td><td>54.72</td><td>19.49</td><td>44.07</td><td>45.49</td><td>39.33</td><td>20.55</td><td>42.36</td><td>13.68</td><td>62.28</td><td>37.35</td></tr></table>",
+        "bbox": [
+            117,
+            195,
+            880,
+            241
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            321,
+            489,
+            400
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Although UniBridge can successfully improve cross-lingual generalization, there are still some inconsistencies in the performance of a language on different tasks, e.g., Amharic (amh), Ligurian (lij), and Sanskrit (san) on NER and POS tasks. We hypothesize that the inconsistency arises from the misalignment in the subspace between the language adapter and the task adapter. One approach to mitigate this misalignment is to regularize the representation so that the newly learned representation is shared between the source and target languages. UniBridge leverages KL divergence as a regularization approach. This may not be sufficient to completely resolve the inconsistency, but given our constrained resources, KL divergence fits our requirements well. We leave other advanced methods, such as optimal transport or contrastive learning, for future work.",
+        "bbox": [
+            112,
+            403,
+            490,
+            693
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "5 Ablation study",
+        "text_level": 2,
+        "bbox": [
+            114,
+            708,
+            277,
+            725
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "5.1 Contribution of each component",
+        "text_level": 2,
+        "bbox": [
+            114,
+            738,
+            416,
+            753
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We study the contribution of each UniBridge component independently to investigate the critical components of each module. To remove KL divergence, we simply remove the KL loss from equation 9, keeping only MLM loss. To remove the embedding initialization component, we randomly initialize the embedding drawn from the Xavier normal distribution (Glorot and Bengio, 2010). To remove the vocab size search component, we fix the vocab size to 10k for every target language and use SentencePiece (Kudo and Richardson, 2018). To remove the multi-source transfer, we consider English as the single source language transferred due to its wide use in many cross-lingual transfer works.",
+        "bbox": [
+            110,
+            760,
+            490,
+            923
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            319,
+            885,
+            399
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We report the mean and standard deviation of the F1 scores between 14 languages of 2 backbone models when applying UniBridge and the components removed from UniBridge in Table 5, details of each language can be found in Appendix D.3. Among components, embedding initialization plays the most critical role since removing it, we experience performance drops of about 39 and 20 for XLM-R and mBERT, respectively. For multi-source transfer component, mBERT experiences a larger drop with 11 F1 drop while XLM-R is down from 45 to 42. However, the standard deviation when removing multi-source transfer is larger than that of UniBridge (XLM-R), indicating that multi-source benefits more languages compared to single language transferred. Although removing KL divergence off the XLM-R improves its performance by 1 F1 score, the standard deviation increases by 1 score. Thus, KL divergence benefits languages in maintaining a more stable improvement among languages. On the other hand, removing KL divergence while using mBERT as a backbone model hurts the performance and drops 3 F1 scores. In order to clarify the effectiveness of KL-Divergence in the other model, we conducted experiments in Appendix D.4. Vocab size searching with dynamic vocab size significantly improves the performance for mBERT backbone with an improvement of the 7 F1 score. This implies that different languages should be applied differently and dynamically to best adapt to their linguistic features.",
+        "bbox": [
+            507,
+            406,
+            889,
+            922
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "3174",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/1101c35d11384420f00be13dcaf77d6031cf96a716d46eebd0311dc7eff07b27.jpg",
+        "table_caption": [
+            "Table 3: The results of the accuracy for every setup with XLM as a backbone are showcased in 9 diverse languages of UD. We highlight in bold the highest accuracy score and underline the second highest of each target language for each backbone model."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>amh</td><td>lij</td><td>olo</td><td>san</td><td>snd</td><td>sin</td><td>tam</td><td>tgl</td><td>tat</td><td>Average</td></tr><tr><td>XLM-R</td><td>46.02</td><td>39.15</td><td>60.69</td><td>32.9</td><td>70.01</td><td>76.25</td><td>85.53</td><td>67.45</td><td>57.89</td><td>59.54</td></tr><tr><td>MAD-X (XLM-R)</td><td>47.72</td><td>58.28</td><td>69.48</td><td>36.1</td><td>71.2</td><td>73.86</td><td>83.85</td><td>69.01</td><td>65.83</td><td>63.88</td></tr><tr><td>UniBridge (XLM-R)</td><td>40.88</td><td>73.75</td><td>81.45</td><td>38.94</td><td>71.37</td><td>63.52</td><td>83.5</td><td>72.62</td><td>81.3</td><td>67.81</td></tr></table>",
+        "bbox": [
+            200,
+            80,
+            800,
+            134
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/697b6fd7efda54e5eafd1cc8d13b8678e7749aedcc438cc0b07119de03726d36.jpg",
+        "table_caption": [
+            "Table 4: The results of the accuracy for every setup with mBERT as a backbone are showcased in 9 diverse languages of UD. We highlight in bold the highest accuracy score and underline the second highest of each target language for each backbone model."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>amh</td><td>lij</td><td>olo</td><td>san</td><td>snd</td><td>sin</td><td>tam</td><td>tgl</td><td>tat</td><td>Average</td></tr><tr><td>mBERT</td><td>8.59</td><td>60.66</td><td>61.49</td><td>9.35</td><td>20.39</td><td>11.47</td><td>72.93</td><td>66.3</td><td>83.2</td><td>37.82</td></tr><tr><td>MAD-X (mBERT)</td><td>13.31</td><td>50.47</td><td>59.61</td><td>10.88</td><td>24.93</td><td>25.68</td><td>66.61</td><td>55.56</td><td>74.17</td><td>42.36</td></tr><tr><td>UniBridge (mBERT)</td><td>29.24</td><td>65.53</td><td>70.65</td><td>12.86</td><td>66.78</td><td>52.61</td><td>75.23</td><td>70.65</td><td>84.16</td><td>58.64</td></tr></table>",
+        "bbox": [
+            200,
+            198,
+            800,
+            250
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/d55c5c561ee6db046cb8bd62aeefa5cbc67973617b18649c09d09e8b90f9ebe4.jpg",
+        "table_caption": [
+            "Table 5: The performance of UniBridge when removing each component independently. Here, each removed component are indicating by the minus sign (-). For each removed components, other components are remained the same as the default configuration."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>XLM-R</td><td>mBERT</td><td></td></tr><tr><td>UniBridge</td><td> $4 5 . 9 5 { \\pm } 6 . 2 8$ </td><td> $3 7 . 3 5 { \\pm } 1 5 . 3 8$ </td><td rowspan=\"5\"></td></tr><tr><td>- KL Divergence</td><td> $4 6 . 8 7 { \\pm } 7 . 0 2$ </td><td> $3 \\hat { 4 } . \\hat { 7 } 8 \\pm 1 \\hat { 7 } . \\hat { 4 } \\hat { 8 }$ </td></tr><tr><td>- Embedding initialization</td><td> $6 . 5 6 { \\pm } 6 . 1 1$ </td><td> $1 0 . 2 1 { \\pm } 8 . 7 2 $ </td></tr><tr><td>- Vocab size searching</td><td> $4 5 . 4 8 { \\pm } 7 . 5 4 $ </td><td> $3 0 . 5 9 { \\pm } 1 4 . 5 5$ </td></tr><tr><td>- Multi-source transfer</td><td> $4 2 . 0 5 { \\pm } 9 . 9 1 $ </td><td> $2 5 . 6 6 { \\pm } 1 2 . 3$ </td></tr></table>",
+        "bbox": [
+            126,
+            324,
+            478,
+            405
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "5.2 Vocabulary size",
+        "text_level": 2,
+        "bbox": [
+            114,
+            513,
+            285,
+            530
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "In this section, we contrast our approach with a novel technique for vocabulary initialization called EXTEND (Wang et al., 2020). EXTEND operates by initially expanding mBERT’s vocabulary to accommodate the new language and then proceeding with pre-training on this language. In our comparison, EXTEND undergoes full fine-tuning for the MLM pre-training task. Subsequently, EX-TEND is further fine-tuned using the monolingual data of each target language. Despite its extensive fine-tuning and high computational requirements, EXTEND does not perform satisfactorily on NER in comparison to UniBridge, as illustrated in Table 19 in Appendix D.5. UniBridge offers a much lighter and faster alternative, employing adapters for cross-lingual transfer learning. The lightweight and rapid nature of UniBridge significantly enhances the effectiveness of our method. Furthermore, we present an elaborate Table 20 containing various vocabulary sizes for each target language in the Appendix D.6. Regarding the lexical similarity of subwords in the vocabulary, we offer illustrations of subwords that exhibit similarity in both mBERT and XLM-R. These examples can be found in Figure 4 within Appendix B.",
+        "bbox": [
+            110,
+            536,
+            492,
+            923
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            509,
+            329,
+            793,
+            344
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "5.3 ALP Threshold",
+        "text_level": 2,
+        "bbox": [
+            509,
+            355,
+            680,
+            370
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "We conducted experiments using different ALP thresholds to identify the most effective one. We tested threshold values such as 5.0, 10.0, and 15.0 during the pre-training process of UniBridge. In essence, raising the threshold led to a decrease in vocabulary size as the algorithm ended prematurely. As a result, we noticed a decrease in the F1-Score of mBERT and XLM-R as the threshold values increased, as illustrated in Figure 3.",
+        "bbox": [
+            507,
+            376,
+            885,
+            523
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "chart",
+        "img_path": "images/c4780140b2ea4cac30f805bd2ce0e7a6ccfd01fc32e06f3f573a0ed1944a65a7.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 3: Mean F1-Score across various ALP thresholds."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            514,
+            536,
+            877,
+            730
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "More experiments and ablation study can be found in Appendix D.",
+        "bbox": [
+            507,
+            788,
+            884,
+            821
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "6 Related works",
+        "text_level": 2,
+        "bbox": [
+            509,
+            832,
+            670,
+            848
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Dynamic vocabulary size: It is common among NLP practitioners that the vocabulary size is considered a hyperparameter and requires manual settings. Algorithms such as BPE (Gage, 1994), Word-",
+        "bbox": [
+            507,
+            858,
+            887,
+            923
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "3175",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Piece (Wu et al., 2016), SentencePiece (Kudo and Richardson, 2018) focus more on how to build a set of predefined number of tokens that statistically retrieved from the monolingual dataset. Some work such as VoCAP (Zheng et al., 2021), XLM-V (Liang et al., 2023) proposed algorithm to dynamically assign a vocabulary size for each language during the multilingual training. However, in monolingual training, there are some few works concerning this problem such as BPE-dropout (Provilkov et al., 2020), VOLT (Xu et al., 2021) learns to have an optimal vocab size via reducing the original vocab size using optimal transport as in VOLT or randomly removing merge in BPE-dropout.",
+        "bbox": [
+            112,
+            85,
+            490,
+            310
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Initialization: Artetxe et al. (2020) proposed to randomly initialize the new embedding for new language adaptation. Meanwhile, Wang et al. (2020), Chau et al. (2020), Pfeiffer et al. (2021) leverage the lexical similarity between the old vocabulary and the new vocabulary to initialize the embedding. On the other hand, there are works that explore the semantic space for initialization. SMALA (Vernikos and Popescu-Belis, 2021) directly finds the aligned token through the highest cosine similarity score. WECHSEL (Minixhofer et al., 2022) and FOCUS (Dobler and de Melo, 2023) use static embedding to find aligned tokens.",
+        "bbox": [
+            112,
+            312,
+            490,
+            521
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Multi-source transfer: Single-source transfer, especially, English-as-the-source-language receives many attentions. Artetxe et al. (2020), Ansell et al. (2021), Tu et al. (2022) leverages the multilingual backbone model, fine-tune on English downstream task and perform zero-shot transfer on target language test’s set. Until recently, researchers have pointed out that using a multilingual training set is more beneficial compared to a single language. DeMuX (Khanuja et al., 2023) investigates the dataset level to accumulate examples that best benefit transferring using active learning. Dossou et al. (2022), Ogunremi et al. (2023) pre-train on the multilingual African dataset before distilling knowledge to downstream tasks.",
+        "bbox": [
+            112,
+            523,
+            490,
+            765
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "7 Conclusion",
+        "text_level": 2,
+        "bbox": [
+            114,
+            781,
+            247,
+            796
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "In this paper, we investigate Cross-Lingual Transfer Learning, focusing on languages with constrained resources. Our contribution lies in an algorithm that autonomously determines the optimal vocabulary size for a new language, informed by its monolingual corpus, and an innovative method for initializing a new embedding matrix, drawing from both semantic and lexical facets of the pre-trained language models. Additionally, we introduce a novel technique for aggregating multi-source transfer learning, enhancing the efficacy of cross-lingual transfer tasks. Our empirical tests demonstrate the adaptability of our method across different models, yielding significant enhancements in performance. A thorough investigation of key elements highlights UniBridge’s effectiveness in various situations, offering an in-depth understanding of the robustness of our approach.",
+        "bbox": [
+            110,
+            809,
+            490,
+            923
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            887,
+            262
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Limitation",
+        "text_level": 2,
+        "bbox": [
+            509,
+            273,
+            608,
+            290
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "UniBridge is trained on the extracted Wikipedia with some heuristic noise filtering. However, we believe that further pre-processing such as language identification and noise filtering pipeline could further produce higher-quality monolingual data, which potentially improve the language adaptation stage. UniBridge incorporates the use of adapter to perform cross-lingual generalization, while this leverages the modular characteristic of adapter, it also inherited some limitation of the adapter itself (Kunz and Holmström, 2024; Alabi et al., 2024).",
+        "bbox": [
+            507,
+            299,
+            885,
+            478
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            510,
+            502,
+            610,
+            518
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Jesujoba O. Alabi, David Ifeoluwa Adelani, Marius Mosbach, and Dietrich Klakow. 2022. Adapting pretrained language models to African languages via multilingual adaptive fine-tuning. In Proceedings of the 29th International Conference on Computational Linguistics, pages 4336–4349, Gyeongju, Republic of Korea. International Committee on Computational Linguistics.",
+            "Jesujoba O. Alabi, Marius Mosbach, Matan Eyal, Dietrich Klakow, and Mor Geva. 2024. The hidden space of transformer language adapters.",
+            "Alan Ansell, Edoardo Maria Ponti, Jonas Pfeiffer, Sebastian Ruder, Goran Glavaš, Ivan Vulic, and Anna´ Korhonen. 2021. MAD-G: Multilingual adapter generation for efficient cross-lingual transfer. In Findings of the Association for Computational Linguistics: EMNLP 2021, pages 4762–4781, Punta Cana, Dominican Republic. Association for Computational Linguistics.",
+            "Mikel Artetxe, Sebastian Ruder, and Dani Yogatama. 2020. On the cross-lingual transferability of monolingual representations. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, pages 4623–4637, Online. Association for Computational Linguistics.",
+            "Ethan C. Chau, Lucy H. Lin, and Noah A. Smith. 2020. Parsing with multilingual BERT, a small corpus, and"
+        ],
+        "bbox": [
+            512,
+            526,
+            884,
+            630
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "3176",
+        "bbox": [
+            480,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "a small treebank. In Findings of the Association for Computational Linguistics: EMNLP 2020, pages 1324–1334, Online. Association for Computational Linguistics.",
+            "Alexis Conneau, Kartikay Khandelwal, Naman Goyal, Vishrav Chaudhary, Guillaume Wenzek, Francisco Guzmán, Edouard Grave, Myle Ott, Luke Zettlemoyer, and Veselin Stoyanov. 2020. Unsupervised cross-lingual representation learning at scale. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, pages 8440– 8451, Online. Association for Computational Linguistics.",
+            "Alexis Conneau, Ruty Rinott, Guillaume Lample, Adina Williams, Samuel Bowman, Holger Schwenk, and Veselin Stoyanov. 2018. XNLI: Evaluating crosslingual sentence representations. In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing, pages 2475–2485, Brussels, Belgium. Association for Computational Linguistics.",
+            "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: Pre-training of deep bidirectional transformers for language understanding. In Proceedings ofthe 2019 Conference of the North American Chapter ofthe Associationfor Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers), pages 4171–4186, Minneapolis, Minnesota. Association for Computational Linguistics.",
+            "Konstantin Dobler and Gerard de Melo. 2023. Focus: Effective embedding initialization for monolingual specialization of multilingual models.",
+            "Bonaventure F. P. Dossou, Atnafu Lambebo Tonja, Oreen Yousuf, Salomey Osei, Abigail Oppong, Iyanuoluwa Shode, Oluwabusayo Olufunke Awoyomi, and Chris Emezue. 2022. AfroLM: A selfactive learning-based multilingual pretrained language model for 23 African languages. In Proceedings ofThe Third Workshop on Simple and Efficient Natural Language Processing (SustaiNLP), pages 52–64, Abu Dhabi, United Arab Emirates (Hybrid). Association for Computational Linguistics.",
+            "Abteen Ebrahimi and Katharina Kann. 2021. How to adapt your pretrained multilingual model to 1600 languages. In Proceedings ofthe 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers), pages 4555–4567, Online. Association for Computational Linguistics.",
+            "Abteen Ebrahimi, Manuel Mager, Arturo Oncevay, Vishrav Chaudhary, Luis Chiruzzo, Angela Fan, John Ortega, Ricardo Ramos, Annette Rios, Ivan Vladimir Meza Ruiz, Gustavo Giménez-Lugo, Elisabeth Mager, Graham Neubig, Alexis Palmer, Rolando Coto-Solano, Thang Vu, and Katharina Kann. 2022. AmericasNLI: Evaluating zero-shot natural language",
+            "understanding of pretrained multilingual models in truly low-resource languages. In Proceedings of the 60th Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 6279–6299, Dublin, Ireland. Association for Computational Linguistics.",
+            "Philip Gage. 1994. A new algorithm for data compression. C Users Journal, 12(2):23–38.",
+            "Xavier Glorot and Yoshua Bengio. 2010. Understanding the difficulty of training deep feedforward neural networks. In Proceedings of the Thirteenth International Conference on Artificial Intelligence and Statistics, volume 9 of Proceedings of Machine Learning Research, pages 249–256, Chia Laguna Resort, Sardinia, Italy. PMLR.",
+            "Naman Goyal, Cynthia Gao, Vishrav Chaudhary, Peng-Jen Chen, Guillaume Wenzek, Da Ju, Sanjana Krishnan, Marc’Aurelio Ranzato, Francisco Guzmán, and Angela Fan. 2022. The Flores-101 evaluation benchmark for low-resource and multilingual machine translation. Transactions ofthe Associationfor Computational Linguistics, 10:522–538.",
+            "Francisco Guzmán, Peng-Jen Chen, Myle Ott, Juan Pino, Guillaume Lample, Philipp Koehn, Vishrav Chaudhary, and Marc’Aurelio Ranzato. 2019. The FLORES evaluation datasets for low-resource machine translation: Nepali–English and Sinhala– English. In Proceedings ofthe 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), pages 6098–6111, Hong Kong, China. Association for Computational Linguistics.",
+            "Junjie Hu, Sebastian Ruder, Aditya Siddhant, Graham Neubig, Orhan Firat, and Melvin Johnson. 2020. XTREME: A massively multilingual multitask benchmark for evaluating cross-lingual generalization. CoRR, abs/2003.11080.",
+            "Zixuan Ke, Yijia Shao, Haowei Lin, Tatsuya Konishi, Gyuhak Kim, and Bing Liu. 2023. Continual pretraining of language models. In The Eleventh International Conference on Learning Representations.",
+            "Simran Khanuja, Srinivas Gowriraj, Lucio Dery, and Graham Neubig. 2023. Demux: Data-efficient multilingual learning.",
+            "Taehyeon Kim, Jaehoon Oh, NakYil Kim, Sangwook Cho, and Se-Young Yun. 2021. Comparing kullbackleibler divergence and mean squared error loss in knowledge distillation.",
+            "Taku Kudo and John Richardson. 2018. SentencePiece: A simple and language independent subword tokenizer and detokenizer for neural text processing. In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing: System Demonstrations, pages 66–71, Brussels, Belgium. Association for Computational Linguistics."
+        ],
+        "bbox": [
+            131,
+            85,
+            487,
+            140
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "3177",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Jenny Kunz and Oskar Holmström. 2024. The impact of language adapters in cross-lingual transfer for NLU. In Proceedings ofthe 1st Workshop on Modular and Open Multilingual NLP (MOOMIN 2024), pages 24– 43, St Julians, Malta. Association for Computational Linguistics.",
+            "Khoi M. Le, Trinh Pham, Tho Quan, and Anh Tuan Luu. 2024. LAMPAT: Low-Rank Adaption for Multilingual Paraphrasing Using Adversarial Training. In Proceedings ofthe AAAI Conference on Artificial Intelligence.",
+            "Davis Liang, Hila Gonen, Yuning Mao, Rui Hou, Naman Goyal, Marjan Ghazvininejad, Luke Zettlemoyer, and Madian Khabsa. 2023. XLM-V: Overcoming the vocabulary bottleneck in multilingual masked language models. In Proceedings ofthe 2023 Conference on Empirical Methods in Natural Language Processing, pages 13142–13152, Singapore. Association for Computational Linguistics.",
+            "Yinhan Liu, Jiatao Gu, Naman Goyal, Xian Li, Sergey Edunov, Marjan Ghazvininejad, Mike Lewis, and Luke Zettlemoyer. 2020. Multilingual denoising pretraining for neural machine translation. Transactions ofthe Associationfor Computational Linguistics, 8:726–742.",
+            "Manuel Mager, Arturo Oncevay, Abteen Ebrahimi, John Ortega, Annette Rios, Angela Fan, Ximena Gutierrez-Vasques, Luis Chiruzzo, Gustavo Giménez-Lugo, Ricardo Ramos, Ivan Vladimir Meza Ruiz, Rolando Coto-Solano, Alexis Palmer, Elisabeth Mager-Hois, Vishrav Chaudhary, Graham Neubig, Ngoc Thang Vu, and Katharina Kann. 2021. Findings of the AmericasNLP 2021 shared task on open machine translation for indigenous languages of the Americas. In Proceedings of the First Workshop on Natural Language Processing for Indigenous Languages of the Americas, pages 202–217, Online. Association for Computational Linguistics.",
+            "Chaitanya Malaviya, Graham Neubig, and Patrick Littell. 2017. Learning language representations for typology prediction. In Proceedings ofthe 2017 Conference on Empirical Methods in Natural Language Processing, pages 2529–2535, Copenhagen, Denmark. Association for Computational Linguistics.",
+            "André F. T. Martins and Ramón Fernandez Astudillo. 2016. From softmax to sparsemax: A sparse model of attention and multi-label classification.",
+            "Benjamin Minixhofer, Fabian Paischer, and Navid Rekabsaz. 2022. WECHSEL: Effective initialization of subword embeddings for cross-lingual transfer of monolingual language models. In Proceedings of the 2022 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 3992–4006, Seattle, United States. Association for Computational Linguistics.",
+            "Tolulope Ogunremi, Dan Jurafsky, and Christopher Manning. 2023. Mini but mighty: Efficient multilingual pretraining with linguistically-informed data selection. In Findings of the Association for Computational Linguistics: EACL 2023, pages 1251–1266, Dubrovnik, Croatia. Association for Computational Linguistics.",
+            "Jonas Pfeiffer, Ivan Vulic, Iryna Gurevych, and Se-´ bastian Ruder. 2020. MAD-X: An Adapter-Based Framework for Multi-Task Cross-Lingual Transfer. In Proceedings ofthe 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 7654–7673, Online. Association for Computational Linguistics.",
+            "Jonas Pfeiffer, Ivan Vulic, Iryna Gurevych, and Sebas-´ tian Ruder. 2021. UNKs everywhere: Adapting multilingual language models to new scripts. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing, pages 10186–10203, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics.",
+            "Ivan Provilkov, Dmitrii Emelianenko, and Elena Voita. 2020. BPE-dropout: Simple and effective subword regularization. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, pages 1882–1892, Online. Association for Computational Linguistics.",
+            "Afshin Rahimi, Yuan Li, and Trevor Cohn. 2019. Massively multilingual transfer for NER. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics, pages 151–164, Florence, Italy. Association for Computational Linguistics.",
+            "Oleh Shliazhko, Alena Fenogenova, Maria Tikhonova, Anastasia Kozlova, Vladislav Mikhailov, and Tatiana Shavrina. 2024. mGPT: Few-Shot Learners Go Multilingual. Transactions of the Association for Computational Linguistics, 12:58–79.",
+            "Koustuv Sinha, Robin Jia, Dieuwke Hupkes, Joelle Pineau, Adina Williams, and Douwe Kiela. 2021. Masked language modeling and the distributional hypothesis: Order word matters pre-training for little. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing, pages 2888–2913, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics.",
+            "NLLB Team, Marta R. Costa-jussà, James Cross, Onur Çelebi, Maha Elbayad, Kenneth Heafield, Kevin Heffernan, Elahe Kalbassi, Janice Lam, Daniel Licht, Jean Maillard, Anna Sun, Skyler Wang, Guillaume Wenzek, Al Youngblood, Bapi Akula, Loic Barrault, Gabriel Mejia Gonzalez, Prangthip Hansanti, John Hoffman, Semarley Jarrett, Kaushik Ram Sadagopan, Dirk Rowe, Shannon Spruit, Chau Tran, Pierre Andrews, Necip Fazil Ayan, Shruti Bhosale, Sergey Edunov, Angela Fan, Cynthia Gao, Vedanuj Goswami, Francisco Guzmán, Philipp Koehn, Alexandre Mourachko, Christophe Ropers, Safiyyah Saleem, Holger Schwenk, and Jeff Wang."
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            166
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "3178",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "2022. No language left behind: Scaling humancentered machine translation.",
+            "Jörg Tiedemann. 2020. The tatoeba translation challenge – realistic data sets for low resource and multilingual MT. In Proceedings ofthe Fifth Conference on Machine Translation, pages 1174–1182, Online. Association for Computational Linguistics.",
+            "Lifu Tu, Caiming Xiong, and Yingbo Zhou. 2022. Prompt-tuning can be much better than fine-tuning on cross-lingual understanding with multilingual language models. In Findings of the Association for Computational Linguistics: EMNLP 2022, pages 5478–5485, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics.",
+            "Ahmet Üstün, Arianna Bisazza, Gosse Bouma, and Gertjan van Noord. 2020. UDapter: Language adaptation for truly Universal Dependency parsing. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 2302–2315, Online. Association for Computational Linguistics.",
+            "Daan van Esch, Tamar Lucassen, Sebastian Ruder, Isaac Caswell, and Clara Rivera. 2022. Writing system and speaker metadata for 2,800+ language varieties. In Proceedings ofthe Thirteenth Language Resources and Evaluation Conference, pages 5035–5046, Marseille, France. European Language Resources Association.",
+            "Giorgos Vernikos and Andrei Popescu-Belis. 2021. Subword mapping and anchoring across languages. In Findings of the Association for Computational Linguistics: EMNLP 2021, pages 2633–2647, Punta Cana, Dominican Republic. Association for Computational Linguistics.",
+            "Zihan Wang, Karthikeyan K, Stephen Mayhew, and Dan Roth. 2020. Extending multilingual BERT to lowresource languages. In Findings of the Association for Computational Linguistics: EMNLP 2020, pages 2649–2656, Online. Association for Computational Linguistics.",
+            "Shijie Wu and Mark Dredze. 2020. Are all languages created equal in multilingual BERT? In Proceedings ofthe 5th Workshop on Representation Learningfor NLP, pages 120–130, Online. Association for Computational Linguistics.",
+            "Yonghui Wu, Mike Schuster, Zhifeng Chen, Quoc V. Le, Mohammad Norouzi, Wolfgang Macherey, Maxim Krikun, Yuan Cao, Qin Gao, Klaus Macherey, Jeff Klingner, Apurva Shah, Melvin Johnson, Xiaobing Liu, Łukasz Kaiser, Stephan Gouws, Yoshikiyo Kato, Taku Kudo, Hideto Kazawa, Keith Stevens, George Kurian, Nishant Patil, Wei Wang, Cliff Young, Jason Smith, Jason Riesa, Alex Rudnick, Oriol Vinyals, Greg Corrado, Macduff Hughes, and Jeffrey Dean. 2016. Google’s neural machine translation system: Bridging the gap between human and machine translation.",
+            "Jingjing Xu, Hao Zhou, Chun Gan, Zaixiang Zheng, and Lei Li. 2021. Vocabulary learning via optimal transport for neural machine translation. In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers), pages 7361–7373, Online. Association for Computational Linguistics."
+        ],
+        "bbox": [
+            131,
+            85,
+            489,
+            114
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Daniel Zeman, Joakim Nivre, Mitchell Abrams, Elia Ackermann, Noëmi Aepli, Hamid Aghaei, Željko Agic, Amir Ahmadi, Lars Ahrenberg, Chika Kennedy´ Ajede, Gabriele Aleksandravi˙ ciˇ ut¯ e, Ika Alfina, Lene˙ Antonsen, Katya Aplonova, Angelina Aquino, Carolina Aragon, Maria Jesus Aranzabe, Hórunn Arnardóttir, Gashaw Arutie, Jessica Naraiswari Arwidarasti, Masayuki Asahara, Luma Ateyah, Furkan Atmaca, Mohammed Attia, Aitziber Atutxa, Liesbeth Augustinus, Elena Badmaeva, Keerthana Balasubra mani, Miguel Ballesteros, Esha Banerjee, Sebastian Bank, Verginica Barbu Mititelu, Victoria Basmov, Colin Batchelor, John Bauer, Seyyit Talha Bedir, Kepa Bengoetxea, Gözde Berk, Yevgeni Berzak, Irshad Ahmad Bhat, Riyaz Ahmad Bhat, Erica Biagetti, Eckhard Bick, Agne Bielinskien˙ e, Kristín Bjarnadót-˙ tir, Rogier Blokland, Victoria Bobicev, Loïc Boizou, Emanuel Borges Völker, Carl Börstell, Cristina Bosco, Gosse Bouma, Sam Bowman, Adriane Boyd Kristina Brokaite, Aljoscha Burchardt, Marie Can-˙ dito, Bernard Caron, Gauthier Caron, Tatiana Cavalcanti, Gulsen Cebiroglu Eryigit, Flavio Massimiliano Cecchini, Giuseppe G. A. Celano, Slavomir Ceplo, Savas Cetin, Ozlem Cetinoglu, Fabricio Chalub, Ethan Chi, Yongseok Cho, Jinho Choi, Jayeol Chun, Alessandra T. Cignarella, Silvie Cinkova, Aure lie Collomb, Cagrı Coltekin, Miriam Connor, Ma rine Courtin, Elizabeth Davidson, Marie-Catherine de Marneffe, Valeria de Paiva, Mehmet Oguz De rin, Elvis de Souza, Arantza Diaz de Ilarraza, Carly Dickerson, Arawinda Dinakaramani, Bamba Dione, Peter Dirix, Kaja Dobrovoljc, Timothy Dozat, Kira Droganova, Puneet Dwivedi, Hanne Eckhoff, Marhaba Eli, Ali Elkahky, Binyam Ephrem, Olga Erina, Tomaz Erjavec, Aline Etienne, Wograine Evelyn, Sidney Facundes, Richárd Farkas, Marília Fernanda, Hector Fernandez Alcalde, Jennifer Foster, Cláudia Freitas, Kazunori Fujita, Katarína Gajdosová, Daniel Galbraith, Marcos Garcia, Moa Gärdenfors, Sebastian Garza, Fabrício Ferraz Gerardi, Kim Gerdes, Filip Ginter, Iakes Goenaga, Koldo Gojenola, Memduh Gökırmak, Yoav Goldberg, Xavier Gómez Guinovart, Berta González Saavedra, Bernadeta Griciut¯ e, Matias Grioni, Loïc Grobol, Nor-˙ munds Gruz¯ ¯ıtis, Bruno Guillaume, Céline Guillot-Barbance, Tunga Güngör, Nizar Habash, Hinrik Hafsteinsson, Jan Hajic, Jan Hajiˇ c jr., Mika Hämäläi-ˇ nen, Linh Hà My, Na-Rae Han, Muhammad Yudi-˜ stira Hanifmuti, Sam Hardwick, Kim Harris, Dag Haug, Johannes Heinecke, Oliver Hellwig, Fe lix Hennig, Barbora Hladká, Jaroslava Hlavácová,ˇ Florinel Hociung, Petter Hohle, Eva Huber, Jena Hwang, Takumi Ikeda, Anton Karl Ingason, Radu Ion, Elena Irimia, O<sub>.</sub> lájídé Ishola, Tomáš Jelínek, Anders Johannsen, Hildur Jónsdóttir, Fredrik Jørgensen, Markus Juutinen, Sarveswaran K, Hüner Ka¸sıkara, Andre Kaasen, Nadezhda Kabaeva, Syl vain Kahane, Hiroshi Kanayama, Jenna Kanerva, Boris Katz, Tolga Kayadelen, Jessica Kenney, Vá clava Kettnerová, Jesse Kirchner, Elena Klementieva, Arne Köhn, Abdullatif Köksal, Kamil Kopacewicz, Timo Korkiakangas, Natalia Kotsyba, Jolanta Ko valevskaite, Simon Krek, Parameswari Krishna-˙ murthy, Sookyoung Kwak, Veronika Laippala, Lu cia Lam, Lorenzo Lambertino, Tatiana Lando, Septina Dian Larasati, Alexei Lavrentiev, John Lee, Phng Lê Hông, Alessandro Lenci, Saran Lertpra-<sup>\\`</sup> dit, Herman Leung, Maria Levina, Cheuk Ying Li, Josie Li, Keying Li, Yuan Li, KyungTae Lim, Krister Linden, Nikola Ljubesic, Olga Loginova, Andry Luthfi, Mikko Luukko, Olga Lyashevskaya, Teresa Lynn, Vivien Macketanz, Aibek Makazhanov, Michael Mandl, Christopher Manning, Ruli Manu rung, Catalina Maranduc, David Marcek, Katrin Marheinecke, Héctor Martínez Alonso, André Mar tins, Jan Masek, Hiroshi Matsuda, Yuji Matsumoto, Ryan McDonald, Sarah McGuinness, Gustavo Men donca, Niko Miekka, Karina Mischenkova, Mar garita Misirpashayeva, Anna Missilä, Catalin Mi titelu, Maria Mitrofan, Yusuke Miyao, AmirHossein Mojiri Foroushani, Amirsaeid Moloodi, Simonetta Montemagni, Amir More, Laura Moreno Romero, Keiko Sophie Mori, Shinsuke Mori, Tomohiko Morioka, Shigeki Moro, Bjartur Mortensen, Bohdan Moskalevskyi, Kadri Muischnek, Robert Munro, Yugo Murawaki, Kaili Müürisep, Pinkey Nainwani, Mariam Nakhlé, Juan Ignacio Navarro Horñiacek, Anna Nedoluzhko, Gunta Nešpore-Berzkalne, Lng¯ Nguy<sup>˜</sup>ên Thi, Huy<sup>\\`</sup>ên Nguy<sup>˜</sup>ên Thi Minh, Yoshihiro Nikaido, Vitaly Nikolaev, Rattima Nitisaroj, Alireza Nourian, Hanna Nurmi, Stina Ojala, Atul Kr. Ojha, Adédayo<sub>.</sub> Olúòkun, Mai Omura, Emeka Onwueg buzia, Petya Osenova, Robert Östling, Lilja Øvre lid, ¸Saziye Betül Özate¸s, Arzucan Özgür, Balkız Öztürk Ba¸saran, Niko Partanen, Elena Pascual, Marco Passarotti, Agnieszka Patejuk, Guilherme Paulino-Passos, Angelika Peljak-Łapinska, Siyao´ Peng, Cenel-Augusto Perez, Natalia Perkova, Guy Perrier, Slav Petrov, Daria Petrova, Jason Phelan, Jussi Piitulainen, Tommi A Pirinen, Emily Pitler, Barbara Plank, Thierry Poibeau, Larisa Ponomareva, Martin Popel, Lauma Pretkalnina, Sophie Prévost, Prokopis Prokopidis, Adam Przepiórkowski, Tiina Puolakainen, Sampo Pyysalo, Peng Qi, Andriela Rääbis, Alexandre Rademaker, Taraka Rama, Lo ganathan Ramasamy, Carlos Ramisch, Fam Rashel, Mohammad Sadegh Rasooli, Vinit Ravishankar, Livy Real, Petru Rebeja, Siva Reddy, Georg Rehm, Ivan Riabov, Michael Rießler, Erika Rimkute, Larissa Ri-˙ naldi, Laura Rituma, Luisa Rocha, Eiríkur Rögnvalds son, Mykhailo Romanenko, Rudolf Rosa, Valentin Rosca, Davide Rovati, Olga Rudina, Jack Rueter, Kristjan Rúnarsson, Shoval Sadde, Pegah Safari, Benoit Sagot, Aleksi Sahala, Shadi Saleh, Alessio Salomoni, Tanja Samardzic, Stephanie Samson,´ Manuela Sanguinetti, Dage Särg, Baiba Saul¯ıte, Yanin Sawanakunanon, Kevin Scannell, Salvatore Scarlata, Nathan Schneider, Sebastian Schuster,",
+        "bbox": [
+            514,
+            203,
+            887,
+            922
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "page_number",
+        "text": "3179",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            131,
+            86,
+            492,
+            913
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Djamé Seddah, Wolfgang Seeker, Mojgan Seraji, Mo Shen, Atsuko Shimada, Hiroyuki Shirasu, Muh Shohibussirri, Dmitry Sichinava, Einar Freyr Sigurðsson, Aline Silveira, Natalia Silveira, Maria Simi, Radu Simionescu, Katalin Simkó, Mária Šimková, Kiril Simov, Maria Skachedubova, Aaron Smith, Isabela Soares-Bastos, Carolyn Spadine, Steinhór Ste- ingrímsson, Antonio Stella, Milan Straka, Emmett Strickland, Jana Strnadová, Alane Suhr, Yogi Lesmana Sulestio, Umut Sulubacak, Shingo Suzuki, Zsolt Szántó, Dima Taji, Yuta Takahashi, Fabio Tamburini, Mary Ann C. Tan, Takaaki Tanaka, Samson Tella, Isabelle Tellier, Guillaume Thomas, Liisi Torga, Marsida Toska, Trond Trosterud, Anna Trukhina, Reut Tsarfaty, Utku Türk, Francis Tyers, Sumire Uematsu, Roman Untilov, Zdenka Uresová, Larraitz Uria, Hans Uszkoreit, Andrius Utka, Sowmya Vajjala, Daniel van Niekerk, Gertjan van Noord, Viktor Varga, Eric Villemonte de la Clergerie, Veronika Vincze, Aya Wakasa, Joel C. Wallenberg, Lars Wallin, Abigail Walsh, Jing Xian Wang, Jonathan North Washington, Maximilan Wendt, Paul Widmer, Seyi Williams, Mats Wirén, Christian Wittern, Tsegay Woldemariam, Tak-sum Wong, Alina Wróblewska, Mary Yako, Kayo Yamashita, Naoki Yamazaki, Chunxiao Yan, Koichi Yasuoka, Marat M. Yavrumyan, Zhuoran Yu, Zdenek Zabokrtský, Shorouq Zahra, Amir Zeldes, Hanzhi Zhu, and Anna Zhuravleva. 2023. Universal dependencies 2.13. LINDAT/CLARIAH-CZ digital library at the Institute of Formal and Applied Linguistics (ÚFAL), Faculty of Mathematics and Physics, Charles University.",
+        "bbox": [
+            526,
+            85,
+            887,
+            519
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Bo Zheng, Li Dong, Shaohan Huang, Saksham Singhal, Wanxiang Che, Ting Liu, Xia Song, and Furu Wei. 2021. Allocating large vocabulary capacity for crosslingual language model pre-training. In Proceedings ofthe 2021 Conference on Empirical Methods in Natural Language Processing, pages 3203–3215, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics.",
+        "bbox": [
+            509,
+            525,
+            885,
+            632
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "A Why KL Divergence and MLM Loss work?",
+        "text_level": 2,
+        "bbox": [
+            509,
+            639,
+            863,
+            671
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "For the KL-Divergence effect, in contrast to MAD-X, UniBridge incorporates a novel training embedding. This results in the pre-task adapter representation being more inclined to reflect the characteristics of the target language compared to solely using the language adapter in MAD-X. Consequently, this introduces a misalignment between the language adapter and the task adapter, as each represents a different language.",
+        "bbox": [
+            507,
+            681,
+            887,
+            826
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "In our research, we opt for KL-Divergence to regulate the representation to ensure it is shared across both the source and target languages (Kim et al., 2021). KL-Divergence requires less computational resources compared to other methods like layer-wise regularization or optimal transport.",
+        "bbox": [
+            507,
+            826,
+            887,
+            923
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "page_number",
+        "text": "3180",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "For the MLM Loss effect, it is extremely effective in training encoder-only LMs because it encourages the model to learn rich contextual representations of language and facilitates effective pre-training.",
+        "bbox": [
+            112,
+            84,
+            490,
+            165
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "In MLM, a portion of the input tokens is randomly masked, and the model is trained to predict these masked tokens based on the context provided by the surrounding tokens. This forces the model to learn contextual representations of words and phrases of that target language (Sinha et al., 2021). Moreover, by randomly masking tokens, MLM introduces noise into the training process, which can prevent overfitting and encourage the model to learn more generalizable features of the data.",
+        "bbox": [
+            112,
+            165,
+            490,
+            328
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "B Similar tokens between pre-trained LM and UniBridge specific tokenizer",
+        "text_level": 2,
+        "bbox": [
+            114,
+            338,
+            487,
+            373
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "We illustrate the similar tokens between pre-trained LM and UniBridge specific tokenizer in Figure 4.",
+        "bbox": [
+            112,
+            382,
+            487,
+            416
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/83c91e67228c244f2061629f17d02d80fa0e51c7a799bd56de4611a0f9d351b6.jpg",
+        "table_caption": [
+            "Figure 4: Illustrations of subwords exhibiting similarity in both mBERT and XLM-R."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td colspan=\"2\">mBERT</td><td colspan=\"2\">XLM-R</td></tr><tr><td>1480</td><td>August</td><td>二+7-Φ</td><td>_nt</td></tr><tr><td>ova</td><td>0</td><td>1976</td><td>_hlx</td></tr><tr><td>search</td><td>港</td><td>_History _o9Cggd</td><td></td></tr></table>",
+        "bbox": [
+            115,
+            425,
+            485,
+            556
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "C Computational resources and hyperparameter for training, inference",
+        "text_level": 2,
+        "bbox": [
+            114,
+            624,
+            487,
+            659
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "All experiments are conducted on T4 machines. Training the UniBridge’s language adapter takes approximately 2.5 hours on a single T4 machine with a batch size of 16. Separately, training UniBridge’s task adapter, takes about 0.5 hours per source language on a single T4 machine with a batch size of 16.",
+        "bbox": [
+            112,
+            668,
+            490,
+            781
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "We present the hyperparameters for training and inference for UniBridge and all the baselines’ configurations in Table 6, 7, 8, 9, 10, and 11.",
+        "bbox": [
+            112,
+            781,
+            490,
+            831
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "D More experiments and ablation study",
+        "text_level": 2,
+        "bbox": [
+            112,
+            841,
+            477,
+            859
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "D.1 Performance of UniBridge on NLI task",
+        "text_level": 2,
+        "bbox": [
+            114,
+            868,
+            472,
+            884
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "We report the performance of UniBridge on the AmericasNLI dataset in Tables 12 and 13.",
+        "bbox": [
+            114,
+            890,
+            487,
+            922
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/e486f01ac8487f1a509921a975df55dffc2f0101c9ef18d1638373729eb3243a.jpg",
+        "table_caption": [
+            "Table 6: The hyperparameter for vocabulary size searching process."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Hyperparameter</td><td>Value</td></tr><tr><td>Initial vocab size  $v _ { i }$ </td><td>7000</td></tr><tr><td>Maximum vocab size  $v _ { m }$ </td><td>60000</td></tr><tr><td>Increased step of vocab size  $\\delta _ { v }$ </td><td>1000</td></tr><tr><td>Threshold for stopping the algorithm  $\\epsilon _ { v }$ </td><td>5.0</td></tr></table>",
+        "bbox": [
+            529,
+            87,
+            868,
+            162
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/d715ac6e5059448b615ed1024abbd7f646a1e7846c8eafcece044a44e1f523b6.jpg",
+        "table_caption": [
+            "Table 7: The hyperparameter for embedding initialization stage."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Hyperparameter</td><td>Value</td></tr><tr><td>Static embedding model</td><td>FastText</td></tr><tr><td>Static embedding dimension</td><td>300</td></tr><tr><td>Number of epoch of training</td><td>3</td></tr></table>",
+        "bbox": [
+            539,
+            224,
+            852,
+            290
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/f32367930c79abd507d84c638774e9f320127ce99c31a5df86b7e69c72fa4b81.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Hyperparameter</td><td>Value</td></tr><tr><td>Invertible adapter reduced factor</td><td>2</td></tr><tr><td>Language adapter reduced factor</td><td>2</td></tr><tr><td>KL divergence weight β</td><td>1.0</td></tr><tr><td>Masked probability</td><td>0.15</td></tr><tr><td>Number of epochs trained</td><td>50</td></tr><tr><td>Batch size</td><td>32</td></tr><tr><td>Learning rate</td><td>{5e-5, 2e-4, 5e-4, 1e-3}</td></tr></table>",
+        "bbox": [
+            515,
+            350,
+            894,
+            461
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Table 8: The hyperparameter for language adaptation training. The adapter dimension is dynamically determined by reducing the Transformer’s hidden size by a factor of reduced factor. Each language has a different proportion in the pre-trained LMs’ knowledge; therefore, to have an optimal language adaptation, different learning rate for different language is required.",
+        "bbox": [
+            507,
+            470,
+            885,
+            573
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/93d75272b0712f62d908d1e80db7c3c3f446404c929d842b5d69293b07d310ca.jpg",
+        "table_caption": [
+            "Table 9: The hyperparameter for task adaptation. Each language has a different proportion in the pre-trained LMs’ knowledge; therefore, to have an optimal language adaptation, a different learning rate for different languages is required."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Hyperparameter</td><td>Value</td></tr><tr><td>Task adapter reduced factor</td><td>16</td></tr><tr><td>Number of epochs trained</td><td>11</td></tr><tr><td>Batch size</td><td>32</td></tr><tr><td>Learning rate</td><td>{5e-4, 1e-3}</td></tr></table>",
+        "bbox": [
+            527,
+            592,
+            863,
+            675
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/a918870ad23af0c8830bb82d51256033b97491c62c6b3e84f8486ba8a4087742.jpg",
+        "table_caption": [
+            "Table 10: The configuration of the pre-trained LMs fine-tuning on source downstream task and zero-shot transfer to target language."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Hyperparameter</td><td>Value</td></tr><tr><td>Number of epochs trained</td><td>10</td></tr><tr><td>Batch size</td><td>32</td></tr><tr><td>Learning rate</td><td>1e-5</td></tr></table>",
+        "bbox": [
+            559,
+            790,
+            833,
+            857
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_number",
+        "text": "3181",
+        "bbox": [
+            480,
+            928,
+            519,
+            942
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/a127b859c1668f7465fb7338d07e8907dc0ae915e973d60284f38357b3dcc265.jpg",
+        "table_caption": [
+            "Table 11: The configuration for multi-source inference."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Hyperparameter</td><td>Value</td></tr><tr><td>Number of parallel sentences K</td><td>10</td></tr></table>",
+        "bbox": [
+            141,
+            82,
+            462,
+            115
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D.2 UniBridge v.s. Lang2Vec",
+        "text_level": 2,
+        "bbox": [
+            114,
+            168,
+            359,
+            184
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Our method’s reliance on parallel data enables it to capture typological similarities as well as syntactic and semantic relationships between languages. By utilizing parallel sentences, we can develop more nuanced representations that reflect the intricacies of language structures and meanings.",
+        "bbox": [
+            112,
+            190,
+            489,
+            287
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Moreover, the quality and coverage of typological databases can be inconsistent. Although these databases are available for many languages, they often lack completeness and accuracy. In contrast, parallel corpora, while more challenging to obtain, provide direct evidence of language similarities and differences in real-world contexts. Additionally, our method has shown superior performance compared to Lang2Vec in the experiments conducted on the WikiANN dataset in Table 14 and 15.",
+        "bbox": [
+            112,
+            287,
+            490,
+            449
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D.3 Detail performance of each factor",
+        "text_level": 2,
+        "bbox": [
+            114,
+            461,
+            430,
+            476
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "We present the detailed performance of UniBridge on 14 languages on NER task when removing the contributed components in Table 16 and 17.",
+        "bbox": [
+            112,
+            482,
+            489,
+            532
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D.4 Effectiveness of KL Divergence",
+        "text_level": 2,
+        "bbox": [
+            112,
+            543,
+            411,
+            558
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "In contrast to MAD-X, UniBridge employs a novel training embedding, leading to a pretask adapter representation that better captures the characteristics of the target language than solely using the language adapter in MAD-X. To ensure that the output representation is shared between both source and target languages, we use KL-Divergence. This approach is less computationally intensive than methods such as layer-wise regularization or optimal transport (Section 6).",
+        "bbox": [
+            112,
+            565,
+            490,
+            726
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "To assess the effectiveness of using KL-Divergence within UniBridge, we conducted extensive tests on an alternative Language Model, such as mBART, using the WikiANN dataset. The results in Table 18 indicate that KL-Divergence significantly contributes to the overall performance of UniBridge, enhancing its effectiveness considerably.",
+        "bbox": [
+            112,
+            727,
+            490,
+            857
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D.5 UniBridge v.s. EXTEND",
+        "text_level": 2,
+        "bbox": [
+            114,
+            868,
+            359,
+            884
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "We report the result on NER task compared between UniBridge and EXTEND method in Table",
+        "bbox": [
+            112,
+            890,
+            490,
+            922
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "19.",
+        "bbox": [
+            510,
+            84,
+            537,
+            99
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D.6 Vocabulary searching result of UniBridge",
+        "text_level": 2,
+        "bbox": [
+            509,
+            110,
+            882,
+            127
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "We report the searched size of the Algorithm 1 for each language in Table 20.",
+        "bbox": [
+            507,
+            131,
+            885,
+            165
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D.7 UniBridge v.s. FOCUS",
+        "text_level": 2,
+        "bbox": [
+            509,
+            174,
+            741,
+            190
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "We compared UniBridge initialization and FOCUS initialization. For UniBridge, the whole pipeline is kept the same as discussed in the paper. For FO-CUS (Dobler and de Melo, 2023), we replace step 2 discussed in Section 2.2 with FOCUS initialization pipeline while other steps are kept the same as UniBridge. We report the results on NER task in Table 21 and Table 22.",
+        "bbox": [
+            507,
+            195,
+            885,
+            323
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "UniBridge surpasses FOCUS in performance across 10 out of 14 languages and 9 out of 14 languages on WikiANN. Among these languages, approximately 10-15% of the tokens exhibit semantic alignment. We theorize that UniBridge’s advantage lies in its ability to leverage these aligned tokens, which facilitates a smoother and quicker convergence during the subsequent MLM training phase compared to FOCUS initialization.",
+        "bbox": [
+            507,
+            324,
+            887,
+            470
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D.8 UniBridge with Large Language Models",
+        "text_level": 2,
+        "bbox": [
+            509,
+            480,
+            878,
+            497
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "To evaluate UniBridge with large (decoder-style) Language Models (LLMs), we extended our experiments to include mGPT and mBART, alongside XLM-R and mBERT. This broader assessment demonstrates UniBridge’s versatility and effectiveness across different model types. The results, presented in Table 23, highlight the strengths of UniBridge in diverse settings.",
+        "bbox": [
+            507,
+            500,
+            887,
+            631
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_number",
+        "text": "3182",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "table",
+        "img_path": "images/667d5595070dd37cff1c2c4afd79e0622049fa7eac87e5b99016ac0b5959efd0.jpg",
+        "table_caption": [
+            "Table 12: The results of the accuracy score for every setup with XLM as a backbone showcased in 10 diverse languages of AmericasNLI. We highlight in bold the highest accuracy and underline the second highest of each target language for each backbone model."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>aym</td><td>bzd</td><td>cni</td><td>grn</td><td>hch</td><td>nah</td><td>oto</td><td>quy</td><td>shp</td><td>tar</td><td>Average</td></tr><tr><td>XLM-R</td><td>36.26</td><td>38.53</td><td>36.4</td><td>37.33</td><td>37.33</td><td>39.43</td><td>36.89</td><td>37.6</td><td>35.86</td><td>34.66</td><td>37.03</td></tr><tr><td>MAD-X (XLM-R)</td><td>39.46</td><td>36.8</td><td>38.93</td><td>39.73</td><td>35.86</td><td>40.78</td><td>33.42</td><td>37.46</td><td>39.06</td><td>36.53</td><td>37.80</td></tr><tr><td>UniBridge (XLM-R)</td><td>52.13</td><td>36.8</td><td>40.26</td><td>59.59</td><td>35.86</td><td>46.88</td><td>42.38</td><td>59.86</td><td>35.6</td><td>36.4</td><td>44.58</td></tr></table>",
+        "bbox": [
+            159,
+            86,
+            842,
+            140
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/b327a3e229c33052aaa3cd0d6b120d30930be87ebb3b330071847747186faa9a.jpg",
+        "table_caption": [
+            "Table 13: The results of the accuracy score for every setup with mBERT as a backbone showcased in 10 diverse languages of AmericasNLI. We highlight in bold the highest accuracy and underline the second highest of each target language for each backbone model."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>aym</td><td>bzd</td><td>cni</td><td>grn</td><td>hch</td><td>nah</td><td>oto</td><td>quy</td><td>shp</td><td>tar</td><td>Average</td></tr><tr><td>mBERT</td><td>33.33</td><td>33.33</td><td>33.33</td><td>33.33</td><td>33.33</td><td>33.33</td><td>33.2</td><td>33.28</td><td>33.33</td><td>33.33</td><td>33.31</td></tr><tr><td>MAD-X (mBERT)</td><td>33.06</td><td>33.33</td><td>34.4</td><td>33.46</td><td>34</td><td>33.33</td><td>33.42</td><td>33.73</td><td>32.93</td><td>33.2</td><td>33.54</td></tr><tr><td>UniBridge (mBERT)</td><td>35.73</td><td>33.33</td><td>33.33</td><td>37.46</td><td>34.4</td><td>36.31</td><td>33.42</td><td>36.66</td><td>34.4</td><td>34.4</td><td>34.94</td></tr></table>",
+        "bbox": [
+            159,
+            212,
+            840,
+            267
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/16f6ff915884153ef0434314a1e29a3bd798eda10817ea14a55042a69f6efd97.jpg",
+        "table_caption": [
+            "Table 14: Comparison between Lang2Vec and UniBridge using the XLM-R backbone on the WikiANN dataset. The highest F1 score for each target language is highlighted in bold. The average value for each row is calculated in the last column. †: The language Pashto (pbt) does not exist in the dictionary of lang2vec thus we set the average weight for it, e.g. 0.2 for every source language."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>amh</td><td>ang</td><td>cdo</td><td>crh</td><td>eml</td><td>frr</td><td>khm</td><td>kan</td><td>lij</td><td>pbt</td><td>san</td><td>snd</td><td>sin</td><td>som</td><td>Average</td></tr><tr><td>lang2vec (XLM-R)</td><td>30.19</td><td>45.51</td><td>36.28</td><td>45.8</td><td>32.23</td><td>41.72</td><td>37.75</td><td>47.45</td><td>31.67</td><td>40.05†</td><td>49.79</td><td>44.84</td><td>48.95</td><td>42.17</td><td>38.03</td></tr><tr><td>UniBridge (XLM-R)</td><td>49.6</td><td>43.24</td><td>42.91</td><td>46.03</td><td>40.15</td><td>50.67</td><td>42.67</td><td>48.72</td><td>45.16</td><td>46.09</td><td>29.74</td><td>51.32</td><td>52.86</td><td>54.22</td><td>45.96</td></tr></table>",
+        "bbox": [
+            156,
+            338,
+            843,
+            372
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/c4b61d17e721aa09d5d05c6cf622817aa4f1dadfed7ec6d9cb7a8f03f3a15ab8.jpg",
+        "table_caption": [
+            "Table 15: Comparison between Lang2Vec and UniBridge using the mBERT backbone on the WikiANN dataset. The highest F1 score for each target language is highlighted in bold. The average value for each row is calculated in the last column. †: The language Pashto (pbt) does not exist in the dictionary of lang2vec thus we set the average weight for it, e.g. 0.2 for every source language."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>amh</td><td>ang</td><td>cdo</td><td>crh</td><td>eml</td><td>frr</td><td>khm</td><td>kan</td><td>lij</td><td>pbt</td><td>san</td><td>snd</td><td>sin</td><td>som</td><td>Average</td></tr><tr><td>lang2vec (mBERT)</td><td>8.76</td><td>26.85</td><td>32.25</td><td>34.0</td><td>21.23</td><td>16.0</td><td>26.85</td><td>37.38</td><td>27.51</td><td>28.32†</td><td>12.12</td><td>11.34</td><td>12.57</td><td>35.42</td><td>23.61</td></tr><tr><td>UniBridge (mBERT)</td><td>15.46</td><td>53.28</td><td>30.42</td><td>45.67</td><td>36.15</td><td>54.72</td><td>19.49</td><td>44.07</td><td>45.49</td><td>39.33</td><td>20.55</td><td>42.36</td><td>13.68</td><td>62.28</td><td>37.35</td></tr></table>",
+        "bbox": [
+            156,
+            458,
+            843,
+            492
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/29c439fb391cc45b8c44ad19d3f10ff0e1365a4991a2bc00334f3f9b24acadca.jpg",
+        "table_caption": [
+            "Table 16: The detailed performance of UniBridge based on backbone model XLM-R when removing contributed components."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>am</td><td>ang</td><td>cdo</td><td>crh</td><td>eml</td><td>frr</td><td>km</td><td>kn</td><td>lij</td><td>ps</td><td>sa</td><td>sd</td><td>si</td><td>sO</td></tr><tr><td>UniBridge (XLM-R)</td><td>49.6</td><td>43.24</td><td>42.91</td><td>46.03</td><td>40.15</td><td>50.67</td><td>42.67</td><td>48.72</td><td>45.16</td><td>46.09</td><td>29.74</td><td>51.32</td><td>52.86</td><td>54.22</td></tr><tr><td>- KL Divergence</td><td>47.66</td><td>45.61</td><td>47.1</td><td>45.91</td><td>37.78</td><td>58.1</td><td>40</td><td>50</td><td>43.92</td><td>49.61</td><td>31.91</td><td>50.74</td><td>5ī.1</td><td>56.79</td></tr><tr><td>- Embedding initialization</td><td>6.64</td><td>1.23</td><td>0.59</td><td>2.43</td><td>1.56</td><td>2.49</td><td>15.53</td><td>11.32</td><td>12.32</td><td>2.32</td><td>1.15</td><td>15.38</td><td>2.87</td><td>15.95</td></tr><tr><td>- Vocab size searching</td><td>36.13</td><td>57.14</td><td>47.37</td><td>47.54</td><td>42.91</td><td>54.95</td><td>39.65</td><td>45.76</td><td>42.75</td><td>46.44</td><td>28.06</td><td>47.35</td><td>47.51</td><td>53.11</td></tr><tr><td>- Multi-source transfer</td><td>40.58</td><td>56.13</td><td>36.68</td><td>45.49</td><td>35.96</td><td>57.14</td><td>32.67</td><td>45.53</td><td>39.23</td><td>33.77</td><td>22.93</td><td>39.27</td><td>47.37</td><td>55.97</td></tr></table>",
+        "bbox": [
+            156,
+            577,
+            843,
+            644
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/fe44df31cb0c844ec3df6c51c51db5703ff7a2b1d0d5f9779f92b44f779b15b7.jpg",
+        "table_caption": [
+            "Table 17: The detailed performance of UniBridge based on backbone model mBERT when removing contributed components."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>am</td><td>ang</td><td>cdo</td><td>crh</td><td>eml</td><td>frr</td><td>km</td><td>kn</td><td>lij</td><td>ps</td><td>sa</td><td>sd</td><td>si</td><td>sO</td></tr><tr><td>UniBridge (mBERT)</td><td>15.46</td><td>53.28</td><td>30.42</td><td>45.67</td><td>36.15</td><td>54.72</td><td>19.49</td><td>44.07</td><td>45.49</td><td>39.33</td><td>20.55</td><td>42.36</td><td>13.68</td><td>62.28</td></tr><tr><td>- KL Divergence</td><td>2.42</td><td>52.07</td><td>25.52</td><td>42.97</td><td>32.7</td><td>55.56</td><td>19.29</td><td>40.69</td><td>46.15</td><td>40.15</td><td>16.43</td><td>40.14</td><td>11.58</td><td>61.26</td></tr><tr><td>- Embedding initialization</td><td>6.58</td><td>3.59</td><td>23.53</td><td>12.35</td><td>9.84</td><td>27.75</td><td>2.34</td><td>11.06</td><td>13.04</td><td>7.61</td><td>1.54</td><td>1.1</td><td>1.2</td><td>21.36</td></tr><tr><td>- Vocab size searching</td><td>0.15</td><td>43.82</td><td>17.78</td><td>48.8</td><td>32.74</td><td>47.58</td><td>16.74</td><td>33.61</td><td>34.92</td><td>29.06</td><td>23.32</td><td>35.99</td><td>15.18</td><td>48.51</td></tr><tr><td>- Multi-source transfer</td><td>25.08</td><td>47.21</td><td>15.68</td><td>30.72</td><td>19.86</td><td>41.95</td><td>9.33</td><td>29.37</td><td>29.86</td><td>21.73</td><td>11.26</td><td>22.84</td><td>10.69</td><td>43.66</td></tr></table>",
+        "bbox": [
+            156,
+            702,
+            843,
+            769
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/6643852d62c6d87789688d02560c3a544607a777edc0af0f46e33faf4a77c9cf.jpg",
+        "table_caption": [
+            "Table 18: Various configurations with the mBART backbone on the WikiANN dataset. We highlight in bold the highest F1 score and underline the second highest of each target language for each backbone model."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>amh</td><td>ang</td><td>cdo</td><td>crh</td><td>eml</td><td>frr</td><td>khm</td><td>kan</td><td>lij</td><td>pbt</td><td>san</td><td>snd</td><td>sin</td><td>som</td><td>Average</td></tr><tr><td>mBART</td><td>19.19</td><td>15.47</td><td>10.46</td><td>9.1</td><td>14.92</td><td>18.86</td><td>13.16</td><td>15.52</td><td>6.22</td><td>11.45</td><td>19.31</td><td>16.68</td><td>13.21</td><td>14.04</td><td>14.11</td></tr><tr><td>MAD-X (mBART)</td><td>67.03</td><td>51.24</td><td>56.57</td><td>29.73</td><td>39.13</td><td>51.5</td><td>28.79</td><td>43.52</td><td>49.72</td><td>45.25</td><td>51.85</td><td>58.64</td><td>60.33</td><td>51.2</td><td>48.89</td></tr><tr><td>UniBridge without KL-Divergence (mBART)</td><td>53.76</td><td>60.7</td><td>62.4</td><td>65.67</td><td>66.27</td><td>56.08</td><td>33.43</td><td>39.13</td><td>42.67</td><td>33.13</td><td>59.52</td><td>45.91</td><td>58.9</td><td>52.02</td><td>52.11</td></tr><tr><td>UniBridge (mBART)</td><td>69.15</td><td>67.5</td><td>67.89</td><td>61.91</td><td>67.14</td><td>57.07</td><td>41.74</td><td>48.37</td><td>44.1</td><td>52.47</td><td>60.99</td><td>59.12</td><td>59.29</td><td>54.48</td><td>57.94</td></tr></table>",
+        "bbox": [
+            156,
+            827,
+            843,
+            873
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_number",
+        "text": "3183",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/62df0f10e883939168aaf772db46864e3ce248d4912de85aa53f74d1aa1d4c46.jpg",
+        "table_caption": [
+            "Table 19: The results of the F1 Score for every setup with mBERT as a backbone showcased in 14 diverse languages of WikiANN. We highlight in bold the highest F1 score and underline the second highest of each target language for each backbone model."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>amh</td><td>ang</td><td>cdo</td><td>crh</td><td>eml</td><td>frr</td><td>khm</td><td>kan</td><td>lij</td><td>pbt</td><td>san</td><td>snd</td><td>sin</td><td>som</td><td></td><td>Average</td></tr><tr><td>mBERT</td><td>12.87</td><td>52.24</td><td>19.76</td><td>47.81</td><td>39.71</td><td>51.3</td><td>18.46</td><td>42.86</td><td>45</td><td></td><td>25.86</td><td>30.71</td><td>13.61</td><td>2.79</td><td>46.15</td><td>32.08</td></tr><tr><td>EXTEND (mBERT)</td><td>10.25</td><td>60.66</td><td>26.95</td><td>42.58</td><td>30.42</td><td>29.71</td><td>22.04</td><td>35.41</td><td>48.63</td><td></td><td>21.16</td><td>14.27</td><td>49.94</td><td>11.45</td><td>50.78</td><td>32.45</td></tr><tr><td>UniBridge (mBERT)</td><td>15.46</td><td>53.28</td><td>30.42</td><td>45.67</td><td>36.15</td><td>54.72</td><td>19.49</td><td>44.07</td><td>45.49</td><td>39.33</td><td></td><td>20.55</td><td>42.36</td><td>13.68</td><td>62.28</td><td>37.35</td></tr></table>",
+        "bbox": [
+            156,
+            122,
+            842,
+            166
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "table",
+        "img_path": "images/5ebe861b10355fb3833706804a45f457484f346609167557f25ea98ae5e5018d.jpg",
+        "table_caption": [
+            "Table 20: The approximate vocabulary sizes of each target language."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>am</td><td>ang</td><td>cdo</td><td>crh</td><td>eml</td><td>frr</td><td>khm</td><td>kan</td><td>lij</td><td>pbt</td><td>san</td><td>snd</td><td>sin</td><td>som</td></tr><tr><td>UniBridge</td><td>19k</td><td>19k</td><td>10k</td><td>8k</td><td>8k</td><td>18k</td><td>51k</td><td>27k</td><td>20k</td><td>16k</td><td>31k</td><td>14k</td><td>20k</td><td>26k</td></tr></table>",
+        "bbox": [
+            156,
+            311,
+            842,
+            342
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "table",
+        "img_path": "images/65505985dd17243a38b38ff72f8a9b62f77e63d2ba9f257259fc50efa163a1e1.jpg",
+        "table_caption": [
+            "Table 21: FOCUS initialization and UniBridge with XLM-R backbone on WikiANN."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>am</td><td>ang</td><td>cdo</td><td>crh</td><td>eml</td><td>frr</td><td>khm</td><td>kan</td><td>lij</td><td>pbt</td><td>san</td><td>snd</td><td>sin</td><td>som</td></tr><tr><td>FOCUS (XLM-R)</td><td>45.72</td><td>40.13</td><td>43.03</td><td>46.03</td><td>41.53</td><td>45.24</td><td>35.12</td><td>45.85</td><td>40.09</td><td>43.24</td><td>30.15</td><td>50.67</td><td>51.22</td><td>46.89</td></tr><tr><td>UniBridge (XLM-R)</td><td>49.6</td><td>43.24</td><td>42.91</td><td>46.03</td><td>40.15</td><td>50.67</td><td>42.67</td><td>48.72</td><td>45.16</td><td>46.09</td><td>29.74</td><td>51.32</td><td>52.86</td><td>54.22</td></tr></table>",
+        "bbox": [
+            156,
+            460,
+            842,
+            497
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "table",
+        "img_path": "images/a9daced1600aa41bbaf94651f173b2089bd2122af0725ea8817010517bb57426.jpg",
+        "table_caption": [
+            "Table 22: FOCUS initialization and UniBridge with mBERT backbone on WikiANN."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>am</td><td>ang</td><td>cdo</td><td>crh</td><td>eml</td><td>frr</td><td>khm</td><td>kan</td><td>lij</td><td>pbt</td><td>san</td><td>snd</td><td>sin</td><td>som</td></tr><tr><td>FOCUS (mBERT)</td><td>17.85</td><td>48.82</td><td>20.25</td><td>46.05</td><td>45.01</td><td>55 15.83</td><td>43.16</td><td>43.17</td><td>36.55</td><td>21.24</td><td>40.83</td><td>11.07</td><td>55.85</td><td></td></tr><tr><td>UniBridge (mBERT)</td><td>15.46</td><td>53.28</td><td>30.42</td><td>45.67</td><td>36.15</td><td>54.72</td><td>19.49</td><td>44.07</td><td>45.49</td><td>39.33</td><td>20.55</td><td>42.36</td><td>13.68</td><td>62.28</td></tr></table>",
+        "bbox": [
+            156,
+            612,
+            842,
+            649
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "table",
+        "img_path": "images/5dee03910705225bcbfede0cf6f89a3aebd421f8ebaa7ad2f28ce72251476ac7.jpg",
+        "table_caption": [
+            "Table 23: Various configurations with the mGPT and mBART backbone on the WikiANN dataset. We highlight in bold the highest F1 score and underline the second highest of each target language for each backbone model."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>amh</td><td>ang</td><td>cdo</td><td>crh</td><td>eml</td><td>frr</td><td>khm</td><td>kan</td><td>lij</td><td>pbt</td><td>san</td><td>snd</td><td>sin</td><td>som</td><td>Average</td></tr><tr><td>mGPT</td><td>7.49</td><td>18.29</td><td>17.44</td><td>9.41</td><td>9.79</td><td>5.14</td><td>7.85</td><td>7.28</td><td>14.14</td><td>6.35</td><td>18.53</td><td>11.28</td><td>12.69</td><td>18.66</td><td>11.74</td></tr><tr><td>MAD-X (mGPT)</td><td>63.1</td><td>51.15</td><td>62.28</td><td>55.6</td><td>43.79</td><td>60.55</td><td>60.32</td><td>55.75</td><td>63.11</td><td>50.03</td><td>61.62</td><td>56.66</td><td>64.27</td><td>61.36</td><td>57.83</td></tr><tr><td>UniBridge (mGPT)</td><td>61.09</td><td>60.32</td><td>65.13</td><td>63.73</td><td>54.06</td><td>69.43</td><td>62.35</td><td>55.38</td><td>62.24</td><td>54.28</td><td>66.07</td><td>54.51</td><td>66.42</td><td>70.29</td><td>61.81</td></tr><tr><td>mBART</td><td>19.19</td><td>15.47</td><td>10.46</td><td>9.1</td><td>14.92</td><td>18.86</td><td>13.16</td><td>15.52</td><td>6.22</td><td>11.45</td><td>19.31</td><td>16.68</td><td>13.21</td><td>14.04</td><td>14.11</td></tr><tr><td>MAD-X (mBART)</td><td>67.03</td><td>51.24</td><td>56.57</td><td>29.73</td><td>39.13</td><td>51.5</td><td>28.79</td><td>43.52</td><td>49.72</td><td>45.25</td><td>51.85</td><td>58.64</td><td>60.33</td><td>51.2</td><td>48.89</td></tr><tr><td>UniBridge (mBART)</td><td>69.15</td><td>67.5</td><td>67.89</td><td>61.91</td><td>67.14</td><td>57.07</td><td>41.74</td><td>48.37</td><td>44.1</td><td>52.47</td><td>60.99</td><td>59.12</td><td>59.29</td><td>54.48</td><td>57.94</td></tr></table>",
+        "bbox": [
+            156,
+            764,
+            843,
+            838
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "page_number",
+        "text": "3184",
+        "bbox": [
+            478,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 16
+    }
+]

@@ -1,0 +1,3537 @@
+[
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Empowering Character-level Text Infilling by Eliminating Sub-Tokens"
+                    }
+                ],
+                "level": 1
+            },
+            "bbox": [
+                136,
+                89,
+                862,
+                111
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Houxing Ren<sup>1,3</sup> Mingjie Zhan<sup>2</sup>* Zhongyuan Wu<sup>2</sup> Hongsheng Li<sup>3,4,5</sup>*"
+                    }
+                ]
+            },
+            "bbox": [
+                179,
+                128,
+                826,
+                146
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>1</sup>Shanghai Jiao Tong University <sup>2</sup>SenseTime Research"
+                    }
+                ]
+            },
+            "bbox": [
+                270,
+                146,
+                734,
+                162
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>3</sup>Shanghai Artificial Intelligence Laboratory <sup>4</sup>CUHK MMLab <sup>5</sup>CPII under InnoHK"
+                    }
+                ]
+            },
+            "bbox": [
+                142,
+                161,
+                860,
+                179
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "{renhouxing,georgewzy01}@gmail.com"
+                    }
+                ]
+            },
+            "bbox": [
+                336,
+                179,
+                670,
+                196
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "zhanmingjie@sensetime.com hsli@ee.cuhk.edu.hk"
+                    }
+                ]
+            },
+            "bbox": [
+                282,
+                196,
+                721,
+                211
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "https://raccoon.sensetime.com/code"
+                    }
+                ]
+            },
+            "bbox": [
+                326,
+                214,
+                677,
+                228
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Abstract"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                262,
+                260,
+                342,
+                275
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In infilling tasks, sub-tokens, representing instances where a complete token is segmented into two parts, often emerge at the boundaries of prefixes, middles, and suffixes. Traditional methods focused on training models at the token level, leading to sub-optimal performance in character-level infilling tasks during the inference stage. Alternately, some approaches considered character-level infilling, but they relied on predicting sub-tokens in inference, yet this strategy diminished ability in character-level infilling tasks due to the large perplexity of the model on sub-tokens. In this paper, we introduce FIM-SE, which stands for Fill-In-the-Middle with both Starting and Ending character constraints. The proposed method addresses character-level infilling tasks by utilizing a line-level format to avoid predicting any sub-token in inference. In addition, we incorporate two special tokens to signify the rest of the incomplete lines, thereby enhancing generation guidance. Extensive experiments demonstrate that our proposed approach surpasses previous methods, offering a significant advantage. Code is available at https://github.com/SenseLLM/FIM-SE."
+                    }
+                ]
+            },
+            "bbox": [
+                141,
+                286,
+                462,
+                657
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "1 Introduction"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                667,
+                260,
+                683
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The Transformer (Vaswani et al., 2017) decoderonly architecture has proven highly effective in various natural language processing (NLP) tasks. This success has paved the way for the development of advanced causal decoder-only models like GPT-4 (OpenAI, 2023), PaLM (Chowdhery et al., 2023; Anil et al., 2023b), Llama (Touvron et al., 2023a,b; Rozière et al., 2023), and Falcon (Penedo et al., 2023). These innovative models excel at generating coherent and contextually relevant responses to natural language prompts, showcasing state-of-the-art performance across various tasks, including question answering (Lewis et al., 2020b), logical reasoning (Kojima et al., 2022), and code synthesis (Li et al., 2023; Rozière et al., 2023)."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                692,
+                490,
+                902
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/51bc9560261728e566a484e9be7d8ad9278b99fbb6463974c769ca80e82c6521.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 1: Examples for random splitting with Llama tokenizer, where the red, blue, and green text indicates the prefix, the middle, and the suffix, respectively. These four rows represent the pieces after randomly splitting, the sentence after exchanging suffix and middle, tokenized results, and token IDs, respectively."
+                    },
+                    {
+                        "type": "text",
+                        "content": "(a) The first splitting case."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Pieces | A fine day.</td><td></td></tr><tr><td>Reorder | A f day. ine</td><td></td></tr><tr><td></td><td>Tokens | [&#x27;A&#x27;, _f&#x27;, &#x27;day&#x27;, &#x27;∵’, &#x27;ine&#x27;, &#x27;_&#x27;]</td></tr><tr><td>IDs</td><td>|[29909, 285, 3250, 29889, 457, 29871]</td></tr><tr><td></td><td>(b) The second splitting case.</td></tr><tr><td>Pieces | A fine day.</td><td></td></tr><tr><td>Reorder | A fi day. ne</td><td></td></tr><tr><td></td><td>Tokens | [&#x27;A&#x27;, _fi&#x27;, &#x27;day&#x27;, &#x27;&#x27;, &#x27;ne&#x27;, −&#x27;]</td></tr><tr><td>IDs</td><td>[29909, 5713, 3250, 29889, 484, 29871]</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                527,
+                375,
+                860,
+                557
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                595,
+                882,
+                629
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Despite the success, the proficiency of these models is somewhat limited in tasks involving text infilling, which aims to generate text at a specific location within a prompt, while conditioning on both a prefix and a suffix. The main reason is their intrinsic left-to-right autoregressive design. To address this issue, CM3 (Aghajanyan et al., 2022) introduced the causal masking objective, placing a mask token at the intended fill location and completing the fill at the end. In contrast, FIM (Bavarian et al., 2022) proposed a fill-in-the-middle technique, which randomly divides documents into three segments and tags them with three special tokens. This technique then rearranges the middle and suffix segments, to use the prefix and the suffix to predict the middle segment in auto-regressive format. With these methods, decoder-only based models can effectively handle various infilling tasks and achieve excellent performance."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                632,
+                887,
+                922
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "*Corresponding author."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                907,
+                282,
+                922
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 3253–3267 August 11-16, 2024 ©2024 Association for Computational Linguistics"
+                    }
+                ]
+            },
+            "bbox": [
+                89,
+                945,
+                907,
+                973
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3253"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/c80a3a853c57d86b459341383eb09c75e9ce24025fcbc554d057e1629d4f1cb3.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "(a) Experiment."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                136,
+                86,
+                289,
+                196
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/1bf25fe70fba99bf654fe7428e4632fb78d0defc89310f1162e1b18d5e960493.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(b) Probabilities."
+                    },
+                    {
+                        "type": "text",
+                        "content": "Figure 1: The probabilities of prediction when inconsistent labels appear in the training data."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                307,
+                87,
+                472,
+                196
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                114,
+                291,
+                379,
+                305
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "However, employing the aforementioned methods may introduce inconsistencies during training. This arises from the potential division of a single token into multiple sub-tokens, as exemplified in Table 1. As we can see, due to character-level random splitting, the same prefixes ([29909]) have inconsistent objectives (285 and 5713, respectively) in different cases. The inconsistent objectives will significantly impact the model’s perplexity, especially on sub-tokens. To illustrate, we construct a simple experiment on a classification task shown in Figure 1(a). The training data only contains three samples and they have the same input but different labels. We train a simple network on the training data and record the predicted probabilities of the three labels at each training step. As shown in Figure 1(b), the predicted probabilities for these three classes converge to 0.33, indicating a large perplexity of the model on the inconsistent objectives. The large perplexity on sub-tokens makes the probability of error increase when predicting a sub-token. This phenomenon is notably detrimental in sensitive tasks such as code completion, where even a minor error in any token can result in program malfunction. As a result, previous approaches have yet to fully inspire the potential of Transformer decoder-only models in infilling tasks."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                307,
+                490,
+                744
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To effectively address the issue, it is crucial to acknowledge and resolve an inherent conflict. (1) We need to avoid the model predicting sub-tokens. In the infilling training mode, the model’s perplexity in sub-tokens is large, resulting in the low accuracy of predicting sub-tokens. (2) We need to output a sub-token when the user only writes part of a token. Because it is necessary to ensure that the output fits the context. If we directly drop several tokens to make sure no sub-tokens exist, the model’s output may no longer align with the removed context, rendering it unreasonable in practical use."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                745,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                509,
+                85,
+                821,
+                99
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Based on these concerns, we propose FIM-SE, which stands for Fill-In-the-Middle with both Starting and Ending character constraints. Our method enhances the organizational framework of FIM (Bavarian et al., 2022) to concurrently address the two scenarios mentioned earlier. In simple terms, we transfer the random-span infilling task to the multi-line infilling task. Specifically, after random character level splitting, we utilize two distinct special tokens to mark the Last line ofthe Prefix (L-Prefix) and the First line ofthe Suffix (F-Suffix). The model is then tasked to generate text at line level that starts with L-Prefix and ends with F-Suffix. Their inclusion in the prompt simplifies the task for the model, facilitating the generation of text that seamlessly starts with L-Prefix and ends with F-Suffix. Overall, this method is designed to unlock the capabilities of decoder-only models in infilling tasks."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                102,
+                887,
+                407
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The core contribution of the paper is that we design a novel training method for the infilling task, a solution designed to effectively mitigate conflicts mentioned above in infilling tasks. Our method can effectively eliminate any potential inconsistencies and earnestly guarantee that the model’s output aligns cohesively with the given context. Extensive experiments demonstrate the effectiveness of the proposed method on infilling tasks while not compromising code generation capabilities. Based on Code Llama 13B, our approach not only achieves an 8.8% enhancement in the Humaneval randomspan infilling task, with substantial improvements of 11.5% and 10.7% in the single-line and multiline infilling tasks respectively, but also maintains minimal impact on the model’s performance in code generation tasks."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                407,
+                887,
+                683
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2 Related Work"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                695,
+                667,
+                712
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.1 Large Language Models for Infilling"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                722,
+                843,
+                739
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Various Large Language Models (LLMs) have been developed for general generation tasks (Touvron et al., 2023a; Xiong et al., 2023; Chowdhery et al., 2023; Penedo et al., 2023; Jiang et al., 2023; Yang et al., 2023; Bai et al., 2023; Anthropic, 2024; Jiang et al., 2024; Anil et al., 2023a). Most of these models adopt a left-to-right autoregressive generation approach due to its effectiveness, as validated by research such as GPT (Radford et al., 2018, 2019; Brown et al., 2020; Ouyang et al., 2022; OpenAI, 2023). In the realm of code-related tasks, where infilling is essential, LLMs are specifically trained for this task. For instance, InCoder (Fried et al., 2023) utilizes a causal masking objective, while SantaCoder (Allal et al., 2023), StarCoder (Li et al., 2023), and Code Llama (Rozière et al., 2023) employ the fill-in-the-middle technique introduced by FIM (Bavarian et al., 2022)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                745,
+                887,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3254"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                110,
+                84,
+                490,
+                198
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.2 Text Infilling Models"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                206,
+                326,
+                223
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The infilling task plays a crucial role in numerous real-world applications, including document editing<sup>1</sup> and code completion<sup>2</sup>. Three common Transformer (Vaswani et al., 2017) architectures are capable of executing this task, i.e., encoderonly, encoder-decoder, decoder-only. In encoder only architectures, masked language modeling is employed as the pre-training task, exemplified by models like BERT (Devlin et al., 2019) and RoBERTa (Liu et al., 2019). These models are de signed to infill brief spans, ranging from a single token (Devlin et al., 2019) to a word (Cui et al., 2021), and even several contiguous tokens (Joshi et al., 2020). In encoder-decoder architectures, a common approach involves masking several tokens in the encoder and then tasking the model with de coding the complete sentence, as exemplified by MASS (Song et al., 2019). Additionally, models like BART (Lewis et al., 2020a) and T5 (Raffel et al., 2020) have introduced an infilling noising method. This technique replaces multiple tokens with a single mask token, challenging the model to decode the masked span. In decoder-only architectures, several methods are employed for infilling tasks. The Insertion Transformer (Stern et al., 2019) instructs the model to first determine the location for the next token, followed by the token prediction itself. Meanwhile, GLM (Du et al., 2022), CM3 (Aghajanyan et al., 2022), and InCoder (Fried et al., 2023) adopt a different approach. They shift the target span to the end of the context, employing left-to-right autoregressive modeling for training. In addition, MIM (Nguyen et al., 2023) proposed to use both forward and backward LMs that share parameters to significantly enhance the performance."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                227,
+                492,
+                793
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Most of these models are designed for tokenlevel infilling tasks, which often don’t align with real-world applications due to the incomplete nature of the final token in actual prompts. FIM (Bavarian et al., 2022) explored various levels of spans, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "i . e . ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", line level, token level, and character level. As shown in their results, models trained with line-level or token-level spans perform poorly on character-level infilling tasks. To enhance the performance of models trained on token-level spans in character-level infilling tasks, token healing was proposed to fix tokenization artifacts that normally arise at the boundary between the end of a prompt and the beginning of a set of generated tokens<sup>3</sup>. While it effectively bridges the gap between the prefix and generated text, it falls short in handling the transition between generated text and the suffix, highlighting the need for further research in character-level infilling."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                793,
+                492,
+                889
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                887,
+                294
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3 Preliminaries"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                305,
+                663,
+                322
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we provide a straightforward introduction to the FIM (Bavarian et al., 2022) method and conduct a theoretical analysis of how inconsistent labeling affects the model’s perplexity."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                330,
+                887,
+                397
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.1 Fill-In-the-Middle (FIM)"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                405,
+                754,
+                420
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "FIM is designed to train models to complete the central sections of documents. This approach involves joint training on a combined dataset of traditional left-to-right sequences and data transformed by FIM, with an infilling rate reaching as high as 90%. According to experimental results, FIM maintains the autoregressive test losses of the left-toright models without incurring significant costs, and it only slightly impacts the performance in downstream evaluations (Allal et al., 2023)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                425,
+                887,
+                586
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In a particular document, FIM segments a document into three distinct parts: the prefix, the middle, and the suffix. It introduces three levels of segmentation: single-line, multi-line, and random-span. Because random-span is more in line with actual usage conditions, previous studies (Rozière et al., 2023; Li et al., 2023) usually trained the model with random-span level splitting. After splitting, it moves the middle piece to the end as"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                587,
+                889,
+                733
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathrm { d o c }  ( \\mathrm { p r e , m i d , s u f } )  ( \\mathrm { p r e , s u f , m i d } ) ,",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/1a49597c50027e2cf7869c98c83dac85dac8709b3133fbb98802f3167281600c.jpg"
+                }
+            },
+            "bbox": [
+                541,
+                743,
+                848,
+                759
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "then concatenate the three pieces using special tokens as"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                770,
+                887,
+                802
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "< \\mathrm { P R E } > \\mathrm { p r e } < \\mathrm { S U F } > \\mathrm { s u f } < \\mathrm { M I D } > \\mathrm { m i d } < \\mathrm { E O T } > .",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/45358d8da9b49c084c11b0b97a4b7e17e1ec6e9dca76a9553c5e05e536b647f9.jpg"
+                }
+            },
+            "bbox": [
+                527,
+                813,
+                863,
+                829
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "This mode is termed Prefix-Suffix-Middle (PSM) mode. Additionally, FIM introduced the Suffix-Prefix-Middle (SPM) mode, which interchanges the positions of the prefix and suffix. A variant of the SPM mode is also proposed, maintaining the same structure as the PSM mode. Detailed descriptions of these modes are provided in Appendix A."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                840,
+                885,
+                889
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>1</sup>https://copilot.microsoft.com"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                894,
+                369,
+                908
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>2</sup>https://github.com/features/copilot"
+                    }
+                ]
+            },
+            "bbox": [
+                134,
+                907,
+                413,
+                922
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>3</sup>https://github.com/guidance-ai/guidance/blob/ main/notebooks/tutorials/token_healing.ipynb"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                895,
+                884,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3255"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                110,
+                84,
+                489,
+                149
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.2 Impact of Inconsistent Labels"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                159,
+                394,
+                174
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "When the FIM method employs the random-span approach, a training sample can contain up to four sub-tokens. This can potentially lead to inconsistent labels that indicate the same input but with different labels. This issue becomes particularly critical when the model is required to predict a sub-token. In Section 1, we construct a simple experiment to illustrate that this inconsistency can significantly affect the model’s perplexity. Here, we offer a theoretical analysis to further elucidate this phenomenon."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                179,
+                489,
+                356
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We are considering a classification task involving n classes, where each sample’s label is associated with one of m different categories across various training instances. Let "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\pmb { y } \\in \\{ 0 , 1 \\} ^ { n }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "represent the actual label, and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\hat { \\pmb y } \\in \\mathbb { R } ^ { n }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "represent the predicted probabilities. In this context, the crossentropy loss is computed as"
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                356,
+                490,
+                470
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathcal { L } = - \\sum _ { i = 0 } ^ { n } y _ { i } \\log \\hat { y } _ { i } .\\tag{1}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/e5bba4626b62d292c67e9a0e5e8384db3fbd312afd889e7ccd2e9a4cbc102f08.jpg"
+                }
+            },
+            "bbox": [
+                220,
+                476,
+                379,
+                518
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Assuming that the first m elements of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "{ \\textbf { \\textit { y } } } ( { \\mathrm { i . e . } }"
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "y _ { 1 } , \\ldots , y _ { m } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are set to 1, while the rest are 0, the loss function is defined as"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                525,
+                487,
+                571
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathcal { L } ( \\hat { \\pmb y } ) = - \\sum _ { i = 0 } ^ { m } \\log \\hat { \\pmb y } _ { i } .\\tag{2}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/05625f4761b5b6a6e32173f1546eff14ec4e0e640e15d61c883e1c4ad6f4abbe.jpg"
+                }
+            },
+            "bbox": [
+                216,
+                576,
+                383,
+                618
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Then our objective can be expressed as"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                624,
+                408,
+                640
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\pmb { \\hat { y } } ^ { * } = \\arg \\operatorname* { m a x } \\mathcal { L } ( \\pmb { \\hat { y } } ) , \\quad s . t . \\sum _ { i = 0 } ^ { n } \\pmb { \\hat { y } _ { i } } = 1 .\\tag{3}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/578b67206ad07459a7143ca387eea949184fc893ed30ca2326a062e1eb12cfe1.jpg"
+                }
+            },
+            "bbox": [
+                152,
+                648,
+                447,
+                688
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Here, we introduce the concept of the Lagrange Multiplier, which enables us to formulate the target function as"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                695,
+                487,
+                743
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathcal { L } ( \\hat { \\pmb { y } } , \\lambda ) = - \\sum _ { i = 0 } ^ { m } \\log \\hat { \\pmb { y } } _ { i } - \\lambda ( \\sum _ { i = 0 } ^ { n } \\hat { \\pmb { y } } _ { i } - 1 ) .\\tag{4}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/ca9e3b8172c880caab295c704af7fec2daddf582329a0e80362598f6c3f56202.jpg"
+                }
+            },
+            "bbox": [
+                136,
+                747,
+                443,
+                789
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We then calculate the partial derivatives of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\hat { y } _ { 1 } , \\ldots , \\hat { y } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "respectively, which allows us to obtain"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                795,
+                489,
+                832
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "{ \\frac { \\partial { \\mathcal { L } } ( { \\hat { y } } , \\lambda ) } { \\partial { \\hat { y } } _ { i } } } = - { \\frac { 1 } { \\hat { y } _ { i } } } - \\lambda { \\mathrm { ~ w h e n ~ } } i = 1 , \\ldots , m .\\tag{5}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/5cbf08a892b4517f90b457fa8d1ef200ce521dc71e9dacd0edc1698dbfeb0615.jpg"
+                }
+            },
+            "bbox": [
+                124,
+                834,
+                457,
+                869
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "By setting these derivatives to zero, we obtain"
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                873,
+                457,
+                889
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\hat { \\pmb { y } } _ { 1 } ^ { * } = \\cdot \\cdot \\cdot = \\hat { \\pmb { y } } _ { m } ^ { * } = - \\frac { 1 } { \\lambda } .\\tag{6}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/311b666e7381e5b07066bb7fe9c5cda11ca9c74fb1d3aac5cc4e70bdba9b59c1.jpg"
+                }
+            },
+            "bbox": [
+                208,
+                896,
+                391,
+                927
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Since "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "{ \\hat { y } } _ { m + 1 } , \\ldots , { \\hat { y } } _ { n }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are not included in the objective function of Eq. (3), and given that the logarithm is a monotonically increasing function, setting these values to 0 would maximize the objective function. Consequently, the condition is formulated as "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\textstyle \\sum _ { i = 1 } ^ { m } { \\hat { y } } _ { i } = 1"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". By incorporating this condition, we derive"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                84,
+                887,
+                197
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\hat { \\pmb { y } } _ { 1 } ^ { * } = \\cdots = \\hat { \\pmb { y } } _ { m } ^ { * } = \\frac { 1 } { m } .\\tag{7}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/2dd38c60ffe6734e12386763e2ebc0f720627076c4558286368bb17cd3df0ccd.jpg"
+                }
+            },
+            "bbox": [
+                610,
+                206,
+                781,
+                239
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We have now completed the proof, demonstrating that when a data point is labeled differently across various samples, the model tends to assign an equal probability of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\textstyle { \\frac { 1 } { m } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "to each label. This behavior leads to a large perplexity of the model, which further suggests its limited modeling capability."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                248,
+                885,
+                346
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We consider this proof to be a microscopic explanation, which demonstrates that the perplexity of sub-tokens will be higher. In contrast, macroscopically speaking, we assume that the probability of the next token prediction obeys a certain distribution. Then, these sub-tokens are outliers. The presence of several outliers in each piece of training data will result in a low confidence in the model, that is, a high degree of perplexity."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                346,
+                887,
+                492
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "This phenomenon is notably detrimental in sensitive tasks. For example, the initially predicted token in practical completion is usually a sub-token. The higher perplexity of the first token has little impact on the overall quality of the generated text, but in some sensitive tasks such as code completion, even a minor error in any token can result in program malfunction."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                492,
+                887,
+                621
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4 Methodology"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                634,
+                658,
+                651
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we introduce the proposed method. We begin by outlining the training process with FIM-SE, followed by an explanation of the inference procedure. Finally, we delve into more training details and highlight the distinctions between our approach and the traditional FIM method."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                661,
+                887,
+                759
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.1 FIM-SE Training"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                771,
+                695,
+                788
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The core idea of FIM-SE is to ensure that the tokens predicted by the model are complete, thereby circumventing the issue of large perplexity associated with sub-tokens. Specifically, we shift from character-level to line-level random splitting in training data construction and then reconstruct the prompt to keep the ability of the model on the character-level infilling tasks."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                794,
+                887,
+                922
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "3256"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/9a5483c987af46c82cbd4a5d8b008e041812e9b4591ad4c2e1746b1b7016ecce.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 2: An overview of the difference between FIM and the proposed FIM-SE. Here, the green background indicates vanilla FIM and the blue background indicates our FIM-SE."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                136,
+                90,
+                860,
+                410
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "As shown in Figure 2, our process for forming the final training sample from a specific document involves three distinct steps. (1) Splitting: we split the original document into three pieces at the character level, namely the prefix, the middle, and the suffix (2) Refining: we distinguish between the last line of the prefix and the first line of the suffix, denoting them as L-Prefix and F-Suffix, respectively. Correspondingly, we label the remaining lines of the prefix and the suffix as R-Prefix and R-Suffix. (3) Concatenating: we concatenate all these sections in the following order along with their special tokens as"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                482,
+                490,
+                693
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\begin{array} { r l } & { < \\mathrm { P R E } > R { \\cdot } P r e f i x < \\mathrm { S U F } > R { \\cdot } S u f f i x } \\\\ & { < \\mathrm { S T A R T } > L { \\cdot } P r e f i x < \\mathrm { E N D } > F { \\cdot } S u f f i x } \\\\ & { < \\mathrm { M I D } > L { \\cdot } P r e f i x M i d d l e F { \\cdot } S u f f i x < \\mathrm { E O T } > . } \\end{array}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/3ccb99a7158c43df475c7f7372d50783f2860703cad54582bb1d4b5a954af87d.jpg"
+                }
+            },
+            "bbox": [
+                142,
+                703,
+                455,
+                759
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "When tokenizing a sample, we tokenize each section individually and then concatenate them with the special tokens, which ensures that special tokens will not be cut or merged."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                774,
+                490,
+                839
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.2 FIM-SE Inference"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                852,
+                305,
+                868
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "During the inference stage, the model can be employed for left-to-right generation in a standard manner. When working with an arbitrary location within an existing document, we establish the preceding lines as R-Prefix and the following lines as R-Suffix. For the specific line at the target location, the text before this point is termed L-Prefix, and the text following it is named F-Suffix. Subsequently, a span is generated to be inserted at this location by autoregressively sampling tokens from the structured prompt"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                875,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                482,
+                887,
+                612
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "< \\mathrm { P R E } > R  – \\mathit { P r e f i x } < \\mathrm { S U F } > R – \\mathit { S u f f i x }",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/44c6d2916abdae208060de7b20c8cd7616c68116c5c07ecf48baf37f982f7c72.jpg"
+                }
+            },
+            "bbox": [
+                527,
+                618,
+                779,
+                634
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "< \\mathrm { S T A R T } > L \\cdot P r e f i x < \\mathrm { E N D } > F \\cdot S u f f i x < \\mathrm { M I D } > .",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/8278a2fa8f4e4fd5e24da36d4c2c8d4195ae8a4b78d99c273012715e5c8b847e.jpg"
+                }
+            },
+            "bbox": [
+                527,
+                637,
+                863,
+                655
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "This process continues until the “<EOT>” (End of Text) token is produced."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                659,
+                884,
+                692
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "After obtaining the generation, we verify if it begins with the L-Prefix and ends with the F-Suffix. If the generation does not adhere to these criteria, we classify the infilling endeavor as unsuccessful. Conversely, if the criteria are met, we eliminate the L-Prefix from the beginning and the F-Suffix from the end, considering the remaining text as the completed segment."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                692,
+                887,
+                822
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.3 Learning and Discussion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                831,
+                751,
+                847
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Training Details. We train our models using the StarCoder code corpus<sup>4</sup>, a carefully curated dataset sourced from The Stack, encompassing 92 languages. To ensure consistency, we exclude categories such as GitHub issues, GitHub commits, and Jupyter Notebooks, which possess distinct column structures. Additionally, we remove flags marking repositories, files, and stars to maintain a focus on the pure code content in the remaining files. After gathering the data, we process it using the previously described method with a 90% FIM rate, following the methodologies of existing studies (Bavarian et al., 2022; Allal et al., 2023; Rozière et al., 2023). It’s important to note that we exclusively employ the PSM format depicted in Figure 2, as the SPM variant used in prior research (Bavarian et al., 2022) lacks a separator between the prefix and middle, potentially leading to model confusion. We conduct experiments and give an experimental analysis in Section 5.3."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                857,
+                885,
+                890
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>4</sup>https://huggingface.co/datasets/bigcode/ starcoderdata"
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                895,
+                845,
+                920
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3257"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                492,
+                375
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Discussion. Compared to previous masked language modeling on encoder-only models and encoder-decoder models, our method excels in character-level infilling. While these traditional methods primarily concentrate on token-level infilling, this approach often falls short in numerous industry applications, as user text seldom forms complete tokens. Compared to vanilla FIM (Bavarian et al., 2022), our method also has the following two merits. Firstly, our method ensures that tokens following “<MID>” are complete, eliminating the need for sub-token predictions during inference and thereby mitigating the effects of the large perplexity of the model on sub-tokens. Secondly, our method transforms character-level infilling into line-level infilling. This unification of formats enhances transfer across different levels, significantly augmenting the efficacy of FIM training."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                380,
+                490,
+                673
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5 Experiments"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                682,
+                262,
+                699
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we construct experiments to demonstrate the effectiveness of our method. Due to space limitations, we have constructed more experiments in Appendix B."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                707,
+                490,
+                772
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.1 Experimental Setup"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                783,
+                319,
+                800
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Datasets. Following FIM (Bavarian et al., 2022), we use code to test our methods. Because we can use test suites to evaluate the correctness of samples in our tasks even when evaluating long samples from open-ended generations. Specifically, we use three levels of infilling benchmarks, namely random-span, single-line, and multi-line."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                809,
+                492,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "All of them are constructed from Humaneval benchmarks (Chen et al., 2021). Since other infilling benchmarks such as Return Type Prediction and Docstring Generation focus on token-level infilling, we do not use these benchmarks."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                84,
+                887,
+                166
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Implementation Details. We continually pre-train four models with our methods, i.e., StarCoder-1B, StarCoder-15B (Li et al., 2023), Code Llama 7B, and Code Llama 13B (Rozière et al., 2023). We employ AdamW (Loshchilov and Hutter, 2019) optimizer with "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\beta _ { 1 } = 0 . 9 , \\beta _ { 2 } = 0 . 9 5 , { \\epsilon } = 1 0 ^ { - 8 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and weight decay of 0.1. Following previous study (Gupta et al., 2023), we set the peak learning rate to "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "3 \\times 1 0 ^ { - 5 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and use a cosine schedule without warm-up. We use a batch size of 4M tokens which are presented as sequences of 8K tokens each for StarCoder and 16K tokens each for Code Llama. We train each model on 20B tokens in total. To efficiently train the computationally intensive models, we simultaneously employ DeepSpeed (Rajbhandari et al., 2020) and Flash Attention 2 (Dao, 2023). On 32 NVIDIA A800 80GB GPUs, StarCoder-1B, StarCoder-15B, Code Llama 7B, and Code Llama 13B take 14 hours, 140 hours, 75 hours, and 138 hours, respectively."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                171,
+                887,
+                494
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.2 Results"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                502,
+                616,
+                519
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Baselines. We compare FIM-SE with previous state-of-the-art methods, including InCoder (Fried et al., 2023), FIM (Bavarian et al., 2022), Codex (Chen et al., 2021), StarCoder (Li et al., 2023) and Code Llama (Rozière et al., 2023). For other code models such as CodeGeeX (Zheng et al., 2023) and OctoCoder (Muennighoff et al., 2023), we do not use them as baselines since they have not undergone infilling pre-training. Since we focus on character-level infilling, models focused on tokenlevel infilling also do not be considered baselines. Because these models cannot effectively handle the character-level infilling task (Bavarian et al., 2022)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                530,
+                887,
+                740
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Random-span. As shown in Table 2, our proposed method demonstrates notable improvements in random-span infilling tasks across four models, specifically achieving gains of 4.7%, 1.3%, 8.1%, and 8.8%. Notably, the enhancement in StarCoder-15B is comparatively modest. This could be attributed to the fact that StarCoder has undergone pre-training with four epochs on a total of 1TB tokens, in contrast to Code Llama’s pre-training on 500B tokens, resulting in a more refined model fit. Comparing StarCoder-15B with StarCoder-1B, the small model trained on the same tokens has more gain, suggesting that the consistent training approach of our method is particularly beneficial for smaller models in achieving better fit. Comparing StarCoder-15B with Code Llama 13B, the model with a similar size using fewer tokens achieves better results. This indicates that the consistent training approach of our method accelerates the fitting process in larger models."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                745,
+                889,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3258"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/be2e744f32ae55a3dc6a1dff390541a48bcf1ef0ee912a208a936450b69534fb.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 2: Pass@1 accuracy on Humaneval infilling datasets. Results evaluated on our end are marked with “*”, while those unavailable are left blank. Note that StarCoder was evaluated using a cleaned and smaller version of MBPP so we conducted a re-evaluation."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Model</td><td>Size</td><td>Training Methods</td><td>random-span</td><td>single-line</td><td>multi-line</td><td>Humaneval</td><td>MBPP</td></tr><tr><td rowspan=\"3\">InCoder FIM code-davinci-002</td><td>6B</td><td>Causal Masking</td><td></td><td>69.0</td><td>38.6</td><td>15.0</td><td>19.4</td></tr><tr><td>7B</td><td>FIM-SPM</td><td>55.1</td><td>75.1</td><td>44.1</td><td></td><td></td></tr><tr><td>175B</td><td></td><td>74.2</td><td>91.6</td><td>69.9</td><td>44.5</td><td>55.4</td></tr><tr><td rowspan=\"3\">StarCoder</td><td>1B</td><td>FIM-PSM FIM-SE-PSM</td><td>44.1* 48.8 (+4.7)</td><td>64.3* 72.6 (+8.3)</td><td>30.8* 37.1 (+6.3)</td><td>15.2 16.5</td><td>22.6* 25.6</td></tr><tr><td>15B</td><td>FIM-PSM FIM-SE-PSM</td><td>66.4* 67.7 (+1.3)</td><td>83.8* 85.8 (+2.0)</td><td>53.7*</td><td>30.4</td><td>43.2*</td></tr><tr><td>7B</td><td>FIM-SPM FIM-PSM FIM-SE-PSM</td><td>39.0 59.7 67.8 (+8.1)</td><td>83.3 74.1 84.9 (+10.8)</td><td>57.4 (+3.7) 50.8 48.2</td><td>30.5 33.5</td><td>44.6 41.4</td></tr><tr><td>Code Llama</td><td>13B</td><td>FIM-SPM FIM-PSM FIM-SE-PSM</td><td>41.9 63.6 72.4 (+8.8)</td><td>85.6 75.9 87.4 (+11.5)</td><td>57.2 (+9.0) 56.1 51.0 61.7 (+10.7)</td><td>30.5 36.0 37.2</td><td>41.4 47.0 50.2</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                122,
+                82,
+                875,
+                290
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                374,
+                489,
+                520
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Single-line and Multi-line. The proposed method demonstrates notable improvements in both singleline and multi-line infilling tasks. For instance, based on Code Llama 13B, our method surpasses FIM by 11.5% and 10.7% in single-line and multiline infilling tasks, respectively. This enhancement can be attributed to two key factors. Firstly, our method integrates character-level and line-level processing, significantly enhancing the model’s linelevel infilling capabilities. Secondly, it avoids the inclusion of any sub-tokens after the “<MID>” token, which sharpens the model’s accuracy in predicting the initial token. In contrast, in the standard FIM, the first token following “<MID>” is typically a sub-token during training, while the model is adopted to predict a complete token in the line-level infilling tasks during the inference stage. A comprehensive case study is provided in Appendix B.2 for further illustration."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                526,
+                490,
+                834
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Code Generation Task. We also report results on Humaneval (Chen et al., 2021) and MBPP (Austin et al., 2021). As shown in Table 2, our method has minimal impact on the model’s performance in the two code generation tasks (Note that we cannot reproduce the result of Code Llama 7B on Humaneval, just 29.9% in our environment). In summary, FIM-SE demonstrates a remarkable ability to improve infilling tasks without compromising code generation capabilities."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                841,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/c569c616c0e3f3bd315e96b2d3f4b46f39ddecaa13acb1a16774720db8ffc026.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 3: Effect of training loss on sub-tokens. The metric is Pass@1 accuracy. Here, LF-Loss denotes the loss for tokens in L-Prefix and F-Suffix."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Methods</td><td>FIM-SE</td><td>w/o LF-Loss</td></tr><tr><td>random-span</td><td>0.488</td><td>0.488</td></tr><tr><td>single-line</td><td>0.726</td><td>0.716</td></tr><tr><td>multi-line</td><td>0.371</td><td>0.369</td></tr><tr><td>Test loss</td><td>0.847</td><td>0.834</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                561,
+                372,
+                831,
+                445
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                526,
+                885,
+                608
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.3 Detail Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                620,
+                677,
+                637
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Impact of Inconsistent Labels. As mentioned in Section 1 and Section 3.2, we discussed how FIM leads to inconsistent labels during training at split points. This phenomenon results in large perplexity on sub-tokens, subsequently diminishing the model’s accuracy in generating sub-tokens. To investigate this effect, we conducted an experiment based on the StarCoder-1B. Specifically, we adjusted the temperature within the range of [0, 1.4] and compared the performance of models trained using both FIM-SE and FIM in generating 20 completions to estimate the Pass@1 rate. Figure 3 illustrates that the performance gap between the FIM-SE and FIM generators widens as the temperature increases, highlighting the larger perplexity associated with models trained using FIM."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                648,
+                887,
+                906
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Furthermore, we evaluate the impact of inconsistent labels on training. Specifically, we mask the loss for tokens in L-Prefix and F-Suffix, ensuring that only complete tokens contribute to loss calculations. As shown in table 3, computing losses for L-Prefix and F-Suffix led to a slightly higher test loss without significantly affecting performance. This could be attributed to the minimal proportion of sub-tokens, as the presence of up to four subtokens per sample had a negligible impact on the final test results. In summary, while the loss of sub-tokens in training scarcely affects performance, the presence of sub-tokens in prediction objectives markedly influences performance."
+                    }
+                ]
+            },
+            "bbox": [
+                527,
+                906,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3259"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/7b22691d50f0cd814664d5b3af7fceb9ae0e5db34ab9876b18cd9699e702bc97.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                121,
+                86,
+                484,
+                229
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/4202ce113b6b2e88c27fc671ca5bc66f7b474bcd2aef7dfc7b156c3a013597ab.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 3: Performance on Humaneval random-span infilling task with different temperatures. The line denotes the difference between FIM-SE and FIM. Note that when the temperature surpasses 1.4, both models output noisy text and show very low performance."
+                    },
+                    {
+                        "type": "text",
+                        "content": "Table 4: Comparison between different SPM format variants and FIM-SE. The metric is Pass@1 accuracy."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Methods</td><td>random-span</td><td>single-line</td><td>multi-line</td></tr><tr><td>FIM-SE</td><td>0.488</td><td>0.726</td><td>0.371</td></tr><tr><td>SPM v1</td><td>0.492</td><td>0.703</td><td>0.374</td></tr><tr><td>SPM v2</td><td>0.013</td><td>0.085</td><td>0.088</td></tr><tr><td>SPM v3</td><td>0.090</td><td>0.717</td><td>0.383</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                132,
+                329,
+                470,
+                404
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                468,
+                490,
+                677
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Comparison with SPM Mode. In previous studies, the Suffix-Prefix-Middle variant had better performance in most cases (Bavarian et al., 2022; Rozière et al., 2023). Here, we explore how to combine our method with SPM mode based on StarCoder-1B. Specifically, we designed the following three prompt formats for SPM mode. We train the model using these formats and the PSM mode, equally distributed across 20 billion tokens."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                682,
+                490,
+                828
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "(1) SPM v1: “<SUF> R-Suffix <PRE> R-Prefix <START> L-Prefix <END> F-Suffix <MID>”, which add the constraints before the middle to the vanilla SPM mode."
+                    }
+                ]
+            },
+            "bbox": [
+                121,
+                835,
+                489,
+                900
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "(2) SPM v2: “<PRE> <SUF> R-Suffix <START>"
+                    }
+                ]
+            },
+            "bbox": [
+                121,
+                906,
+                489,
+                921
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/d2311b56d37eb6fb22182168ba2f1fb7761717ea3f1dcf420a0828cbac29d25e.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(a) PCP Rate of FIM-SE."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                519,
+                83,
+                880,
+                235
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/08cae31fe7324dd7fc5fcb1b766c9b5c078577b5169dc1f8989e1b161dc09b6d.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(b) Pass@1 performance of FIM-SE and FIM."
+                    },
+                    {
+                        "type": "text",
+                        "content": "Figure 4: Statistics of length of L-Prefix and F-Suffix."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                515,
+                263,
+                860,
+                417
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "L-Prefix <END> F-Suffix <MID> R-Prefix”, which add the constraints before the middle to the variant SPM in FIM."
+                    }
+                ]
+            },
+            "bbox": [
+                544,
+                492,
+                884,
+                541
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "(3) SPM v3: “<PRE> <SUF> R-Suffix <MID> R-Prefix <START> L-Prefix <END> F-Suffix”, which add the constraints after prefix to the variant SPM in FIM."
+                    }
+                ]
+            },
+            "bbox": [
+                515,
+                548,
+                885,
+                612
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Table 4 presents all comparison results of the three variants. As we can see, SPM v2 and SPM v3 perform worse on random-span infilling tasks. This occurs because there is no separator between the prefix and the middle, leading to conflicts with the PSM mode, regardless of where the restriction is inserted. In contrast, SPM v1 and PSM perform almost the same because there is no conflict. To maintain consistency with the pre-trained models (Li et al., 2023; Rozière et al., 2023), we adopt the PSM mode."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                626,
+                887,
+                803
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Analysis of Post-Check during Inference. As we mentioned in Section 4.2, it’s essential to verify if the generation begins with the L-Prefix and ends with the F-Suffix. Here, we perform statistical analysis on the success rate of the model based on StarCoder-1B. We focus on the Post-Check Pass Rate (PCP Rate), which quantifies the percentage of model outputs complying with the post-check criteria, i.e., starting with the L-Prefix and ending with the F-Suffix. We then examine the correlation between the PCP Rate and the average length of the L-Prefix and F-Suffix. Additionally, we analyze the Pass@1 rates for FIM-SE and FIM across varying lengths of these prefixes and suffixes."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                809,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3260"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                929,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                110,
+                85,
+                489,
+                197
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "As shown in Figure 4, the PCP Rate increases with length, suggesting that longer L-Prefixes and F-Suffixes provide more guidance for the model’s text completion. Moreover, the Pass@1 metrics for both FIM-SE and FIM also support this, showing enhanced performance with extended L-Prefixes and F-Suffixes. Across all lengths, FIM-SE consistently outperforms the standard FIM, demonstrating the effectiveness of our approach."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                198,
+                489,
+                344
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "6 Conclusion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                355,
+                247,
+                372
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this paper, we showed that traditional infilling techniques struggle with managing the boundaries of prefixes and suffixes. To address this, we introduced a novel approach, referred to as FIM-SE. Our method transforms the random-span mode to multiline mode by removing the L-Prefix and F-Suffix. We further incorporated two special tokens to delineate the two incomplete lines, thereby guiding the generation. Extensive experiments reveal that our approach surpasses existing baselines with a clear edge. In future work, we plan to explore the adaptation of our method to the variant SPM mode, which holds the promise of even better performance."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                382,
+                490,
+                594
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "7 Limitations"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                605,
+                252,
+                621
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The primary limitation of this study is the inability of the proposed method to accommodate the variant SPM mode, previously established as superior by prior research. This challenge arises due to the absence of a distinct delimiter between the prefix and middle, impeding our capacity to guide the model on the commencement point for completion and to appropriately position the prompt that instructs the model to start with L-Prefix and end with F-Suffix. In future endeavors, we plan to explore adapting our method to the variant SPM mode, to achieve better performance. Another limitation of this paper is the probability that our proposed method fails to complete tasks when the generation neither starts with the L-Prefix nor ends with the F-Suffix. For example, the fail rates of StarCoder-1B and StarCoder-15B are 18.7% and 9.4%, respectively. This issue is a primary factor impacting model performance. Future work will concentrate on improving the post-check pass rate by developing more comprehensive prompts and refining constraint decoding."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                632,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                885,
+                149
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "8 Ethics Statement"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                161,
+                692,
+                178
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this paper, we utilized the StarCoder dataset (Li et al., 2023). This dataset has been made publicly available for academic purposes. The creators of the StarCoder dataset have transparently disclosed its derivation from The Stack v1.2 (Kocetkov et al., 2022). Importantly, The Stack v1.2 is compiled from a collection of GitHub repositories, all of which operate under permissive licenses. This ensures that the data’s utilization aligns with the original authors’ intentions and the legal frameworks governing open-source contributions. In conclusion, the application of the StarCoder dataset in our study complies with the ethical guidelines for research data usage, aligning with the broader principles of academic honesty and the responsible conduct of research."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                187,
+                887,
+                445
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Acknowledgment"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                457,
+                667,
+                474
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "This project is funded in part by National Key R&D Program of China Project 2022ZD0161100, by the Centre for Perceptual and Interactive Intelligence (CPII) Ltd under the Innovation and Technology Commission (ITC)’s InnoHK, by General Research Fund of Hong Kong RGC Project 14204021. Hongsheng Li is a PI of CPII under the InnoHK."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                483,
+                885,
+                598
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "References"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                624,
+                610,
+                639
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Armen Aghajanyan, Bernie Huang, Candace Ross, Vladimir Karpukhin, Hu Xu, Naman Goyal, Dmytro Okhonko, Mandar Joshi, Gargi Ghosh, Mike Lewis, and Luke Zettlemoyer. 2022. CM3: A causal masked multimodal model of the internet. CoRR, abs/2201.07520."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Loubna Ben Allal, Raymond Li, Denis Kocetkov, Chenghao Mou, Christopher Akiki, Carlos Muñoz Ferrandis, Niklas Muennighoff, Mayank Mishra, Alex Gu, Manan Dey, Logesh Kumar Umapathi, Carolyn Jane Anderson, Yangtian Zi, Joel Lamy-Poirier, Hailey Schoelkopf, Sergey Troshin, Dmitry Abulkhanov, Manuel Romero, Michael Lappert, Francesco De Toni, Bernardo García del Río, Qian Liu, Shamik Bose, Urvashi Bhattacharyya, Terry Yue Zhuo, Ian Yu, Paulo Villegas, Marco Zocca, Sourab Mangrulkar, David Lansky, Huu Nguyen, Danish Contractor, Luis Villa, Jia Li, Dzmitry Bahdanau, Yacine Jernite, Sean Hughes, Daniel Fried, Arjun Guha, Harm de Vries, and Leandro von Werra. 2023."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                512,
+                648,
+                885,
+                726
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3261"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                519,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Santacoder: don’t reach for the stars! CoRR, abs/2301.03988."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Rohan Anil, Sebastian Borgeaud, Yonghui Wu, Jean-Baptiste Alayrac, Jiahui Yu, Radu Soricut, Johan Schalkwyk, Andrew M. Dai, Anja Hauth, Katie Millican, David Silver, Slav Petrov, Melvin Johnson, Ioannis Antonoglou, Julian Schrittwieser, Amelia Glaese, Jilin Chen, Emily Pitler, Timothy P. Lillicrap, Angeliki Lazaridou, Orhan Firat, James Molloy, Michael Isard, Paul Ronald Barham, Tom Hennigan, Benjamin Lee, Fabio Viola, Malcolm Reynolds, Yuanzhong Xu, Ryan Doherty, Eli Collins, Clemens Meyer, Eliza Rutherford, Erica Moreira, Kareem Ayoub, Megha Goel, George Tucker, Enrique Piqueras, Maxim Krikun, Iain Barr, Nikolay Savinov, Ivo Danihelka, Becca Roelofs, Anaïs White, Anders Andreassen, Tamara von Glehn, Lakshman Yagati, Mehran Kazemi, Lucas Gonzalez, Misha Khalman, Jakub Sygnowski, and et al. 2023a. Gemini: A family of highly capable multimodal models. CoRR, abs/2312.11805."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Rohan Anil, Andrew M. Dai, Orhan Firat, Melvin Johnson, Dmitry Lepikhin, Alexandre Passos, Siamak Shakeri, Emanuel Taropa, Paige Bailey, Zhifeng Chen, Eric Chu, Jonathan H. Clark, Laurent El Shafey, Yanping Huang, Kathy Meier-Hellstern, Gaurav Mishra, Erica Moreira, Mark Omernick, Kevin Robinson, Sebastian Ruder, Yi Tay, Kefan Xiao, Yuanzhong Xu, Yujing Zhang, Gustavo Hernández Ábrego, Junwhan Ahn, Jacob Austin, Paul Barham, Jan A. Botha, James Bradbury, Siddhartha Brahma, Kevin Brooks, Michele Catasta, Yong Cheng, Colin Cherry, Christopher A. Choquette-Choo, Aakanksha Chowdhery, Clément Crepy, Shachi Dave, Mostafa Dehghani, Sunipa Dev, Jacob Devlin, Mark Díaz, Nan Du, Ethan Dyer, Vladimir Feinberg, Fangxiaoyu Feng, Vlad Fienber, Markus Freitag, Xavier Garcia, Sebastian Gehrmann, Lucas Gonzalez, and et al. 2023b. Palm 2 technical report. CoRR, abs/2305.10403."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Anthropic. 2024. The claude 3 model family: Opus, sonnet, haiku."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jacob Austin, Augustus Odena, Maxwell I. Nye, Maarten Bosma, Henryk Michalewski, David Dohan, Ellen Jiang, Carrie J. Cai, Michael Terry, Quoc V. Le, and Charles Sutton. 2021. Program synthesis with large language models. CoRR, abs/2108.07732."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jinze Bai, Shuai Bai, Yunfei Chu, Zeyu Cui, Kai Dang, Xiaodong Deng, Yang Fan, Wenbin Ge, Yu Han, Fei Huang, Binyuan Hui, Luo Ji, Mei Li, Junyang Lin, Runji Lin, Dayiheng Liu, Gao Liu, Chengqiang Lu, Keming Lu, Jianxin Ma, Rui Men, Xingzhang Ren, Xuancheng Ren, Chuanqi Tan, Sinan Tan, Jianhong Tu, Peng Wang, Shijie Wang, Wei Wang, Shengguang Wu, Benfeng Xu, Jin Xu, An Yang, Hao Yang, Jian Yang, Shusheng Yang, Yang Yao, Bowen Yu, Hongyi Yuan, Zheng Yuan, Jianwei Zhang, Xingxuan Zhang, Yichang Zhang, Zhenru Zhang, Chang Zhou, Jingren Zhou, Xiaohuan Zhou, and Tianhang Zhu. 2023. Qwen technical report. CoRR, abs/2309.16609."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Mohammad Bavarian, Heewoo Jun, Nikolas Tezak, John Schulman, Christine McLeavey, Jerry Tworek, and Mark Chen. 2022. Efficient training of language models to fill in the middle. CoRR, abs/2207.14255."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel M. Ziegler, Jeffrey Wu, Clemens Winter, Christopher Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. 2020. Language models are few-shot learners. In Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Pondé de Oliveira Pinto, Jared Kaplan, Harrison Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, Alex Ray, Raul Puri, Gretchen Krueger, Michael Petrov, Heidy Khlaaf, Girish Sastry, Pamela Mishkin, Brooke Chan, Scott Gray, Nick Ryder, Mikhail Pavlov, Alethea Power, Lukasz Kaiser, Mohammad Bavarian, Clemens Winter, Philippe Tillet, Felipe Petroski Such, Dave Cummings, Matthias Plappert, Fotios Chantzis, Elizabeth Barnes, Ariel Herbert-Voss, William Hebgen Guss, Alex Nichol, Alex Paino, Nikolas Tezak, Jie Tang, Igor Babuschkin, Suchir Balaji, Shantanu Jain, William Saunders, Christopher Hesse, Andrew N. Carr, Jan Leike, Joshua Achiam, Vedant Misra, Evan Morikawa, Alec Radford, Matthew Knight, Miles Brundage, Mira Murati, Katie Mayer, Peter Welinder, Bob McGrew, Dario Amodei, Sam McCandlish, Ilya Sutskever, and Wojciech Zaremba. 2021. Evaluating large language models trained on code. CoRR, abs/2107.03374."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, Parker Schuh, Kensen Shi, Sasha Tsvyashchenko, Joshua Maynez, Abhishek Rao, Parker Barnes, Yi Tay, Noam Shazeer, Vinodkumar Prabhakaran, Emily Reif, Nan Du, Ben Hutchinson, Reiner Pope, James Bradbury, Jacob Austin, Michael Isard, Guy Gur-Ari, Pengcheng Yin, Toju Duke, Anselm Levskaya, Sanjay Ghemawat, Sunipa Dev, Henryk Michalewski, Xavier Garcia, Vedant Misra, Kevin Robinson, Liam Fedus, Denny Zhou, Daphne Ippolito, David Luan, Hyeontaek Lim, Barret Zoph, Alexander Spiridonov, Ryan Sepassi, David Dohan, Shivani Agrawal, Mark Omernick, Andrew M. Dai, Thanumalayan Sankaranarayana Pillai, Marie Pellat, Aitor Lewkowycz, Erica Moreira, Rewon Child, Oleksandr Polozov, Katherine Lee, Zongwei Zhou, Xuezhi Wang, Brennan Saeta, Mark Diaz, Orhan Firat, Michele Catasta, Jason Wei, Kathy Meier-Hellstern, Douglas Eck, Jeff Dean, Slav Petrov,"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                132,
+                85,
+                489,
+                112
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3262"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "and Noah Fiedel. 2023. Palm: Scaling language modeling with pathways. J. Mach. Learn. Res., 24:240:1– 240:113."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yiming Cui, Wanxiang Che, Ting Liu, Bing Qin, and Ziqing Yang. 2021. Pre-training with whole word masking for chinese BERT. IEEE ACM Trans. Audio Speech Lang. Process., 29:3504–3514."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Tri Dao. 2023. Flashattention-2: Faster attention with better parallelism and work partitioning. CoRR, abs/2307.08691."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: pre-training of deep bidirectional transformers for language understanding. In Proceedings ofthe 2019 Conference of the North American Chapter ofthe Associationfor Computational Linguistics: Human Language Technologies, NAACL-HLT 2019, Minneapolis, MN, USA, June 2-7, 2019, Volume 1 (Long and Short Papers), pages 4171–4186. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zhengxiao Du, Yujie Qian, Xiao Liu, Ming Ding, Jiezhong Qiu, Zhilin Yang, and Jie Tang. 2022. GLM: general language model pretraining with autoregressive blank infilling. In Proceedings of the 60th Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), ACL 2022, Dublin, Ireland, May 22-27, 2022, pages 320–335. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Daniel Fried, Armen Aghajanyan, Jessy Lin, Sida Wang, Eric Wallace, Freda Shi, Ruiqi Zhong, Scott Yih, Luke Zettlemoyer, and Mike Lewis. 2023. Incoder: A generative model for code infilling and synthesis. In The Eleventh International Conference on Learning Representations, ICLR 2023, Kigali, Rwanda, May 1-5, 2023. OpenReview.net."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kshitij Gupta, Benjamin Thérien, Adam Ibrahim, Mats L. Richter, Quentin Anthony, Eugene Belilovsky, Irina Rish, and Timothée Lesort. 2023. Continual pre-training of large language models: How to (re)warm your model? CoRR, abs/2308.04014."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Albert Q. Jiang, Alexandre Sablayrolles, Arthur Mensch, Chris Bamford, Devendra Singh Chaplot, Diego de Las Casas, Florian Bressand, Gianna Lengyel, Guillaume Lample, Lucile Saulnier, Lélio Renard Lavaud, Marie-Anne Lachaux, Pierre Stock, Teven Le Scao, Thibaut Lavril, Thomas Wang, Timothée Lacroix, and William El Sayed. 2023. Mistral 7b. CoRR, abs/2310.06825."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Albert Q. Jiang, Alexandre Sablayrolles, Antoine Roux, Arthur Mensch, Blanche Savary, Chris Bamford, Devendra Singh Chaplot, Diego de Las Casas, Emma Bou Hanna, Florian Bressand, Gianna Lengyel, Guillaume Bour, Guillaume Lample, Lélio Renard Lavaud, Lucile Saulnier, Marie-Anne Lachaux, Pierre Stock, Sandeep Subramanian, Sophia Yang, Szymon Antoniak, Teven Le Scao,"
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Théophile Gervet, Thibaut Lavril, Thomas Wang, Timothée Lacroix, and William El Sayed. 2024. Mixtral of experts. CoRR, abs/2401.04088."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Mandar Joshi, Danqi Chen, Yinhan Liu, Daniel S. Weld, Luke Zettlemoyer, and Omer Levy. 2020. Spanbert: Improving pre-training by representing and predicting spans. Trans. Assoc. Comput. Linguistics, 8:64– 77."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Denis Kocetkov, Raymond Li, Loubna Ben Allal, Jia Li, Chenghao Mou, Carlos Muñoz Ferrandis, Yacine Jernite, Margaret Mitchell, Sean Hughes, Thomas Wolf, Dzmitry Bahdanau, Leandro von Werra, and Harm de Vries. 2022. The stack: 3 TB of permissively licensed source code. CoRR, abs/2211.15533."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Takeshi Kojima, Shixiang Shane Gu, Machel Reid, Yutaka Matsuo, and Yusuke Iwasawa. 2022. Large language models are zero-shot reasoners. In Advances in Neural Information Processing Systems 35: Annual Conference on Neural Information Processing Systems 2022, NeurIPS 2022, New Orleans, LA, USA, November 28 - December 9, 2022."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Taku Kudo and John Richardson. 2018. Sentencepiece: A simple and language independent subword tokenizer and detokenizer for neural text processing. In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing, EMNLP 2018: System Demonstrations, Brussels, Belgium, October 31 - November 4, 2018, pages 66–71. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Mike Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed, Omer Levy, Veselin Stoyanov, and Luke Zettlemoyer. 2020a. BART: denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, ACL 2020, Online, July 5-10, 2020, pages 7871–7880. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Patrick S. H. Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, Sebastian Riedel, and Douwe Kiela. 2020b. Retrieval-augmented generation for knowledge-intensive NLP tasks. In Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Raymond Li, Loubna Ben Allal, Yangtian Zi, Niklas Muennighoff, Denis Kocetkov, Chenghao Mou, Marc Marone, Christopher Akiki, Jia Li, Jenny Chim, Qian Liu, Evgenii Zheltonozhskii, Terry Yue Zhuo, Thomas Wang, Olivier Dehaene, Mishig Davaadorj, Joel Lamy-Poirier, João Monteiro, Oleh Shliazhko, Nicolas Gontier, Nicholas Meade, Armel Zebaze, Ming-Ho Yee, Logesh Kumar Umapathi, Jian Zhu, Benjamin Lipkin, Muhtasham Oblokulov, Zhiruo Wang, Rudra Murthy V, Jason Stillerman, Siva Sankalp Patel, Dmitry Abulkhanov, Marco"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                131,
+                85,
+                489,
+                126
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3263"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                929,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zocca, Manan Dey, Zhihan Zhang, Nour Moustafa-Fahmy, Urvashi Bhattacharyya, Wenhao Yu, Swayam Singh, Sasha Luccioni, Paulo Villegas, Maxim Kunakov, Fedor Zhdanov, Manuel Romero, Tony Lee, Nadav Timor, Jennifer Ding, Claire Schlesinger, Hailey Schoelkopf, Jan Ebert, Tri Dao, Mayank Mishra, Alex Gu, Jennifer Robinson, Carolyn Jane Anderson, Brendan Dolan-Gavitt, Danish Contractor, Siva Reddy, Daniel Fried, Dzmitry Bahdanau, Yacine Jernite, Carlos Muñoz Ferrandis, Sean Hughes, Thomas Wolf, Arjun Guha, Leandro von Werra, and Harm de Vries. 2023. Starcoder: may the source be with you! CoRR, abs/2305.06161."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A robustly optimized BERT pretraining approach. CoRR, abs/1907.11692."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ilya Loshchilov and Frank Hutter. 2019. Decoupled weight decay regularization. In 7th International Conference on Learning Representations, ICLR 2019, New Orleans, LA, USA, May 6-9, 2019. OpenReview.net."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Niklas Muennighoff, Qian Liu, Armel Zebaze, Qinkai Zheng, Binyuan Hui, Terry Yue Zhuo, Swayam Singh, Xiangru Tang, Leandro von Werra, and Shayne Longpre. 2023. Octopack: Instruction tuning code large language models. CoRR, abs/2308.07124."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Anh Nguyen, Nikos Karampatziakis, and Weizhu Chen. 2023. Meet in the middle: A new pre-training paradigm. In Advances in Neural Information Processing Systems 36: Annual Conference on Neural Information Processing Systems 2023, NeurIPS 2023, New Orleans, LA, USA, December 10 - 16, 2023."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "OpenAI. 2023. GPT-4 technical report. CoRR, abs/2303.08774."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul F. Christiano, Jan Leike, and Ryan Lowe. 2022. Training language models to follow instructions with human feedback. In NeurIPS."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Guilherme Penedo, Quentin Malartic, Daniel Hesslow, Ruxandra Cojocaru, Alessandro Cappelli, Hamza Alobeidli, Baptiste Pannier, Ebtesam Almazrouei, and Julien Launay. 2023. The refinedweb dataset for falcon LLM: outperforming curated corpora with web data, and web data only. CoRR, abs/2306.01116."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Alec Radford, Karthik Narasimhan, Tim Salimans, Ilya Sutskever, et al. 2018. Improving language understanding by generative pre-training. OpenAI."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al. 2019. Language models are unsupervised multitask learners. OpenAI blog, 1(8):9."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, and Peter J. Liu. 2020. Exploring the limits of transfer learning with a unified text-to-text transformer. J. Mach. Learn. Res., 21:140:1–140:67."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Samyam Rajbhandari, Jeff Rasley, Olatunji Ruwase, and Yuxiong He. 2020. Zero: memory optimizations toward training trillion parameter models. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis, SC 2020, Virtual Event / Atlanta, Georgia, USA, November 9-19, 2020, page 20. IEEE/ACM."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Baptiste Rozière, Jonas Gehring, Fabian Gloeckle, Sten Sootla, Itai Gat, Xiaoqing Ellen Tan, Yossi Adi, Jingyu Liu, Tal Remez, Jérémy Rapin, Artyom Kozhevnikov, Ivan Evtimov, Joanna Bitton, Manish Bhatt, Cristian Canton-Ferrer, Aaron Grattafiori, Wenhan Xiong, Alexandre Défossez, Jade Copet, Faisal Azhar, Hugo Touvron, Louis Martin, Nicolas Usunier, Thomas Scialom, and Gabriel Synnaeve. 2023. Code llama: Open foundation models for code. CoRR, abs/2308.12950."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kaitao Song, Xu Tan, Tao Qin, Jianfeng Lu, and Tie-Yan Liu. 2019. MASS: masked sequence to sequence pre-training for language generation. In Proceedings of the 36th International Conference on Machine Learning, ICML 2019, 9-15 June 2019, Long Beach, California, USA, volume 97 of Proceedings of Machine Learning Research, pages 5926–5936. PMLR."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Mitchell Stern, William Chan, Jamie Kiros, and Jakob Uszkoreit. 2019. Insertion transformer: Flexible sequence generation via insertion operations. In Proceedings ofthe 36th International Conference on Machine Learning, ICML 2019, 9-15 June 2019, Long Beach, California, USA, volume 97 of Proceedings of Machine Learning Research, pages 5976–5985. PMLR."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurélien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. 2023a. Llama: Open and efficient foundation language models. CoRR, abs/2302.13971."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton-Ferrer, Moya Chen, Guillem Cucurull, David Esiobu, Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller, Cynthia Gao, Vedanuj Goswami, Naman Goyal, Anthony Hartshorn, Saghar Hosseini, Rui Hou, Hakan Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa, Isabel Kloumann, Artem Korenev, Punit Singh Koura, Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Diana Liskovich, Yinghai Lu, Yuning Mao, Xavier Martinet, Todor Mihaylov, Pushkar Mishra, Igor Molybog, Yixin Nie, Andrew Poulton, Jeremy Reizenstein, Rashi Rungta, Kalyan Saladi, Alan Schelten,"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                131,
+                85,
+                489,
+                256
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3264"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                929,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ruan Silva, Eric Michael Smith, Ranjan Subramanian, Xiaoqing Ellen Tan, Binh Tang, Ross Taylor, Adina Williams, Jian Xiang Kuan, Puxin Xu, Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan, Melanie Kambadur, Sharan Narang, Aurélien Rodriguez, Robert Stojnic, Sergey Edunov, and Thomas Scialom. 2023b. Llama 2: Open foundation and fine-tuned chat models. CoRR, abs/2307.09288."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. In Advances in Neural Information Processing Systems 30: Annual Conference on Neural Information Processing Systems 2017, December 4-9, 2017, Long Beach, CA, USA, pages 5998–6008."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Wenhan Xiong, Jingyu Liu, Igor Molybog, Hejia Zhang, Prajjwal Bhargava, Rui Hou, Louis Martin, Rashi Rungta, Karthik Abinav Sankararaman, Barlas Oguz, Madian Khabsa, Han Fang, Yashar Mehdad, Sharan Narang, Kshitiz Malik, Angela Fan, Shruti Bhosale, Sergey Edunov, Mike Lewis, Sinong Wang, and Hao Ma. 2023. Effective long-context scaling of foundation models. CoRR, abs/2309.16039."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Aiyuan Yang, Bin Xiao, Bingning Wang, Borong Zhang, Ce Bian, Chao Yin, Chenxu Lv, Da Pan, Dian Wang, Dong Yan, Fan Yang, Fei Deng, Feng Wang, Feng Liu, Guangwei Ai, Guosheng Dong, Haizhou Zhao, Hang Xu, Haoze Sun, Hongda Zhang, Hui Liu, Jiaming Ji, Jian Xie, Juntao Dai, Kun Fang, Lei Su, Liang Song, Lifeng Liu, Liyun Ru, Luyao Ma, Mang Wang, Mickel Liu, MingAn Lin, Nuolan Nie, Peidong Guo, Ruiyang Sun, Tao Zhang, Tianpeng Li, Tianyu Li, Wei Cheng, Weipeng Chen, Xiangrong Zeng, Xiaochuan Wang, Xiaoxi Chen, Xin Men, Xin Yu, Xuehai Pan, Yanjun Shen, Yiding Wang, Yiyu Li, Youxin Jiang, Yuchen Gao, Yupeng Zhang, Zenan Zhou, and Zhiying Wu. 2023. Baichuan 2: Open large-scale language models. CoRR, abs/2309.10305."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Qinkai Zheng, Xiao Xia, Xu Zou, Yuxiao Dong, Shan Wang, Yufei Xue, Lei Shen, Zihan Wang, Andi Wang, Yang Li, Teng Su, Zhilin Yang, and Jie Tang. 2023. Codegeex: A pre-trained model for code generation with multilingual benchmarking on humaneval-x. In Proceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining, KDD 2023, Long Beach, CA, USA, August 6-10, 2023, pages 5673–5684. ACM."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                132,
+                85,
+                489,
+                191
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3265"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Appendix"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                84,
+                205,
+                101
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A Fill-In-the-Middle (FIM)"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                109,
+                369,
+                126
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In Section 3.1, We briefly introduced the prefixsuffix-middle (PSM) mode of FIM (Bavarian et al., 2022). Here, we give a detailed description of the suffix-prefix-middle (SPM) mode and a variant SPM mode."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                135,
+                490,
+                214
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "For the vanilla SPM mode, it just swaps the prefix and the suffix. Specifically, after splitting, it moves the suffix to the before:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                215,
+                490,
+                263
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathrm { d o c }  ( \\mathrm { p r e , m i d , s u f } )  ( \\mathrm { s u f , p r e , m i d } ) ,",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/207fade60143522d4b1392cffb071e6ff191f92cd3edcdb98ddaf7cad7a73205.jpg"
+                }
+            },
+            "bbox": [
+                147,
+                275,
+                452,
+                291
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "then concatenate the three pieces using special tokens as"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                303,
+                489,
+                335
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathrm { < S U F > s u f < P R E > p r e < M I D > m i d < E O T > } .",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/6301a18292d52094c41b811248d359fd7dcbae71c6832e4cba4b1efe90fc604a.jpg"
+                }
+            },
+            "bbox": [
+                132,
+                347,
+                467,
+                362
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To maximize transfer between PSM mode and SPM mode, FIM proposed a novel variant of SPM mode, which concatenates the prefix, the middle, and the suffix pieces as"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                375,
+                489,
+                439
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "< \\mathrm { P R E > < S U F > \\ s u f < M I D > p r e \\ m i d < E O T > } .",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/e61217a5da42e3bdc715bc7e0a34ff1faa5933adeaffd1f503851ae0b1d50f0b.jpg"
+                }
+            },
+            "bbox": [
+                132,
+                450,
+                468,
+                466
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The format occurs naturally as part of PSM training when the chosen prefix is empty. In this way, the two modes have a consistent format and they can transfer with each other in joint training and maximize the profits."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                478,
+                490,
+                560
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "B Additional Experiments"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                569,
+                361,
+                587
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "B.1 Comparison with Token Healing"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                595,
+                421,
+                611
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "As discussed in Section 2, token healing is proposed as an ideal solution for addressing tokenization that normally arise at the boundary between the end of a prompt and the beginning of a set of generated tokens. Here, we evaluate our approach against the token healing method based on StarCoder-1B. However, since token healing struggles with the split points at the end of generated tokens and the subsequent suffix, we integrate it with our method for a comprehensive solution. Specifically, we construct the prompt as “<PRE> R-Prefix <SUF> R-Suffix <START> L-Prefix <END> F-Suffix <MID> L-Prefix” and focus solely on verifying if the generated text ends with F-Suffix."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                617,
+                490,
+                841
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Table 5 presents the comparison results between our method and token healing. Surprisingly, token healing performs slightly worse than our method. Detailed analysis revealed that token healing struggles with complex scenarios, such as splitting the last token into two sub-tokens and merging the latter sub-token with the initial generated token."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                843,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/6966ac2071ead3970450e0b262fd794c7b1c3ebbaefd2e61944b2db8dfc29f94.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 5: Comparison with Token Healing."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Methods</td><td>random-span</td></tr><tr><td>FIM-SE</td><td>0.488</td></tr><tr><td>Token Healing</td><td>0.484</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                591,
+                82,
+                803,
+                134
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/52e2ab40806cbdd659f4e0809740bb1e040f5b9919aaf804fadeb1c0984a09e3.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "(a) A case can be solved by token healing."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Piece</td><td>Raw Text</td><td colspan=\"4\">Tokens</td></tr><tr><td>Prefix</td><td>def so</td><td>def 一 so</td><td></td><td></td><td></td></tr><tr><td>Output</td><td>def sort(arr)</td><td>def</td><td>sort (</td><td>arr</td><td>)</td></tr><tr><td>Label</td><td>def sort(arr)</td><td>def</td><td>sort (</td><td>arr</td><td></td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                527,
+                187,
+                867,
+                263
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/ae44d52e78f047a3365aa1c404e0b738275a6d885b2dc76db279926a62fe7d6a.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "(b) A case cannot be solved by token healing."
+                    },
+                    {
+                        "type": "text",
+                        "content": "Table 6: Case of token healing. The first case can be perfectly solved by token healing. The second case cannot be solved by token healing. Here, ‘_’ denotes blank."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Piece</td><td>Raw Text</td><td colspan=\"4\">Tokens</td></tr><tr><td>Prefix</td><td>r.add(delim</td><td>r delim</td><td></td><td>add</td><td>(</td></tr><tr><td>Output</td><td>r.add(delimter)</td><td>r delim</td><td>ter</td><td>add )</td><td>(</td></tr><tr><td>Label</td><td>r.add(delimeter)</td><td>r deli</td><td>meter</td><td>add )</td><td>(</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                517,
+                292,
+                877,
+                403
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                502,
+                885,
+                535
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Here, we provide an in-depth analysis of the situation. Token healing backs up the generation process by one or more tokens before the end of the prompt, then constrains the first tokens generated to have a prefix that matches the last token in the prompt. As illustrated in Table 5(a), if the last token in the prompt is \"so,\" token healing identifies a token that both matches this last token’s prefix and possesses the highest probability, such as \"sort.\" Consequently, the first generated token is seamlessly integrated, allowing the generation process to proceed smoothly."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                536,
+                885,
+                728
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "However, due to the consistent integrated intrinsic features of the SentencePiece (Kudo and Richardson, 2018) algorithm, it tends to merge the last sub-token with the preceding one if possible. For example, as illustrated in Table 5(b), the word \"delimiter\" is tokenized into \"deli\" and \"meter.\" If a prompt ends with \"delim\", the algorithm prefers tokenizing this as \"delim\" instead of splitting it into \"deli\" and \"m\". Token healing does not intervene, because there is no token starting with \"delim\". Consequently, when the last sub-token can be combined with the previous one, token healing is unable"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                730,
+                887,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3266"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                929,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "algorithm",
+            "content": {
+                "algorithm_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 7: A Case to show perplexity of models on the initial generated token. Here, ‘_’ denotes blank, and ‘\\n’ denotes newline."
+                    }
+                ],
+                "algorithm_content": [
+                    {
+                        "type": "text",
+                        "content": "Prefix def largest_prime_factor (n: int): \"\"\" Return the largest prime factor of n. Assume n > 1 and is not a prime . >>> largest_prime_factor (13195) 29 def is_prime (k): if k < 2: return False for i in range (2, k - 1): if k % i == 0: return False return True Suffix for j in range (2, n + 1): if n % j == 0 and is_prime (j): largest = max ( largest , j) return largest Target Middle largest = 1 The top five choices for the initial generated token on StarCoder-1B (FIM), along with their probabilities ‘\\n’: 0.463; ‘\\n_ _ _ ’: 0.225; ‘_ _ _ _’: 0.073; ‘<|endoftext|>’: 0.068; ‘_ _ _ _\\n_ _ _ ’: 0.061; The top five choices for the initial generated token on StarCoder-1B (FIM-SE), along with their probabilities ‘_ _ _ ’: 0.829; ‘\\n_ _ _ ’: 0.115; ‘_ _ _ _\\n_ _ _ ’: 0.037; ‘_ _ _ _’: 0.008; ‘_ _ _ _ _ _ _ _\\n_ _ _ ’ : 0.002;"
+                    }
+                ],
+                "algorithm_footnote": []
+            },
+            "bbox": [
+                137,
+                83,
+                860,
+                456
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "to rectify it effectively."
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                520,
+                287,
+                536
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To effectively resolve this issue, it is necessary to revert several tokens and subsequently engage in limited decoding, utilizing a Trie tree, until the regenerated text encompasses the previously rolledback tokens. Nonetheless, this approach is timeintensive as each decoding step requires traversing the Trie tree to identify all tokens corresponding to the given prefix. In contrast, our method only requires modifying the prompt and doing some postprocessing. In addition, our method can handle both boundaries between the prefix and middle as well as boundaries between the suffix and middle."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                537,
+                489,
+                731
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "B.2 Case Study"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                740,
+                255,
+                756
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Here, we present a case demonstrating the model’s large perplexity on the initial generated token based on StarCoder-1B. Table 7 illustrates that, despite being a single-line infilling scenario, the perplexity for the first token is remarkably large, significantly influencing the overall generation. This is primarily because the first token following “<MID>” tends to be a sub-token during training, varying across samples due to random character-level splitting. In contrast, our approach guarantees that no sub-token prediction is required, leading to lower perplexity and enhanced performance."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                760,
+                489,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                520,
+                882,
+                554
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Based on these concerns, we hypothesize that the superior performance of the variant SPM mode over the PSM mode, particularly evident in the single-line infilling task on Code Llama (Rozière et al., 2023) (85.6% vs. 75.9%), can be attributed to the specific processing format employed by Code Llama. In the format “<PRE> <SUF> suf <MID> pre mid <EOT>”, Code Llama initially merges the prefix and middle segments before tokenization. This approach ensures that, following the “<MID>” token, there are no sub-tokens except for the initial token. Consequently, this format also guarantees that no sub-token prediction is required when the prefix is not empty, contributing to the enhanced performance of the variant SPM mode. In contrast, FIM (Bavarian et al., 2022) adopts a different approach by tokenizing the prefix and the middle separately before concatenating them. This leads to the presence of sub-tokens amidst the tokens. Consequently, the performance gap between SPM and PSM modes in FIM is narrower (61.6% vs. 62.2%) compared to that in Code Llama."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                554,
+                887,
+                909
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3267"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ]
+]
