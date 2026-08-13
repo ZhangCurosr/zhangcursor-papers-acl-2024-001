@@ -1,0 +1,2653 @@
+[
+    {
+        "type": "text",
+        "text": "Leveraging Codebook Knowledge with NLI and ChatGPT for Zero-Shot Political Relation Classification",
+        "text_level": 1,
+        "bbox": [
+            124,
+            82,
+            873,
+            121
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Yibo Hu∗, Erick Skorupa Parolin†, Latifur Khan†, Patrick T. Brandt†, Javier Osorio‡, Vito J. D’Orazio§",
+        "bbox": [
+            198,
+            130,
+            805,
+            164
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "∗Georgia Institute of Technology, †The University of Texas at Dallas,",
+        "bbox": [
+            220,
+            165,
+            783,
+            181
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "‡The University of Arizona, §West Virginia University",
+        "bbox": [
+            278,
+            181,
+            724,
+            198
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "yibo.hu@gatech.edu, erickparolin@gmail.com, {lkhan,pbrandt}@utdallas.edu, josorio1@email.arizona.edu, vito.dorazio@mail.wvu.edu",
+        "bbox": [
+            141,
+            198,
+            858,
+            231
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            260,
+            252,
+            342,
+            268
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Is it possible accurately classify political relations within evolving event ontologies without extensive annotations? This study investigates zero-shot learning methods that use expert knowledge from existing annotation codebook, and evaluates the performance of advanced ChatGPT (GPT-3.5/4) and a natural language inference (NLI)-based model called ZSP. ChatGPT uses codebook’s labeled summaries as prompts, whereas ZSP breaks down the classification task into context, event mode, and class disambiguation to refine taskspecific hypotheses. This decomposition enhances interpretability, efficiency, and adaptability to schema changes. The experiments reveal ChatGPT’s strengths and limitations, and crucially show ZSP’s outperformance of dictionary-based methods and its competitive edge over some supervised models. These findings affirm the value of ZSP for validating event records and advancing ontology development. Our study underscores the efficacy of leveraging transfer learning and existing domain expertise to enhance research efficiency and scalability. The code is publicly available<sup>1</sup>.",
+        "bbox": [
+            141,
+            284,
+            462,
+            642
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            114,
+            657,
+            260,
+            673
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Event coding is a crucial task in political violence research for both academic and policy communities. It transforms unstructured text from news articles into structured event data, represented as source-action-target triplets, achieved through entity extraction and relation classification. It provides a structured record of interactions among political actors and serves as input for monitoring, understanding, and forecasting political conflicts and mediation processes worldwide (Schrodt and Gerner, 1996; Schrodt et al., 2003, 2004; Schrodt, 1997, 2006a, 2011; Shellman and Stewart, 2007; Shearer, 2007; Brandt et al., 2011, 2013, 2014).",
+        "bbox": [
+            112,
+            684,
+            490,
+            895
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "However, manually coding events from extensive datasets is labor-intensive.",
+        "bbox": [
+            507,
+            253,
+            884,
+            285
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "To streamline this, experts have developed event ontologies and knowledge bases (McClelland, 1978; Azar, 1980; Gerner et al., 2002; Bond et al., 2003; Schrodt, 2006b; Boschee et al., 2016; Lu and Roy, 2017; Osorio and Beltrán, 2020; Osorio et al., 2019). Yet, traditional pattern-matching models based on static dictionaries suffer from inflexibility, low recall, and high maintenance costs. Recent advancements in deep learning and pretrained language models (PLMs) offer promising supervised learning solutions (Glavaš et al., 2017; Büyüköz et al., 2020; Olsson et al., 2020; Örs et al., 2020; Parolin et al., 2020, 2021, 2022b; Hu et al., 2022a). Yet, their reliance on extensively annotated datasets introduces significant challenges, especially for in-depth and subnational studies requiring nuanced categorization and non-exclusive labeling within political event ontologies. Moreover, labeled datasets lack flexibility and may require frequent relabeling as ontologies evolve. Thus, much of the current PLM-based research in event coding targets broad, coarse-grained categorizations, often constrained by limited evaluation sets. Costs, time, and effort associated with developing training data have foiled the large-scale adoption and ready deployment of PLMs by government security agencies, researchers, and practitioners in need of monitoring and understanding rapidly-changing conflict processes around the world.",
+        "bbox": [
+            507,
+            287,
+            887,
+            756
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "In light of these challenges, we pose the following questions: (1) Is it possible to leverage existing expert knowledge to enhance the efficiency of event coding without extensive annotation of new data? (2) Is it possible to create an interpretable and adaptable system that easily accommodates ontology or schema changes?",
+        "bbox": [
+            507,
+            757,
+            887,
+            870
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "To tackle these questions, our paper focuses on relation classification, a key aspect of event coding. The goal is to categorize events in a sourcetarget pair following a predefined event ontology PLOVER (Open Event Data Alliance, 2018) without external labeled data. We achieved this by combining the transferred semantic knowledge of PLMs with expertise derived from annotation codebooks. The codebook, as depicted in Figure 2, contains label descriptions and guidelines for resolving confusing labels. To unlock this knowledge, we explore two zero-shot methods: the emerging Chat-GPT (GPT-3.5/4), and our proposed NLI-based model called ZSP (Zero-Shot fine-grained relation classification model for PLOVER ontology).",
+        "bbox": [
+            507,
+            872,
+            887,
+            921
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>1</sup>https://github.com/snowood1/Zero-Shot-PLOVER",
+        "bbox": [
+            136,
+            904,
+            482,
+            920
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "583",
+        "bbox": [
+            485,
+            928,
+            517,
+            941
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 583–603 August 11-16, 2024 ©2024 Association for Computational Linguistics",
+        "bbox": [
+            97,
+            946,
+            900,
+            973
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "table",
+        "img_path": "images/b813f572db2ab344940956b4becf380e85c29acde0f3b1c8bc29ddbe23d85aab.jpg",
+        "table_caption": [
+            "Table 1: CAMEO/PLOVER’s Rootcodes and Quadcodes (1-Verbal Cooperation, 2-Material Cooperation, 3-Verbal Conflict, and 4-Material Conflict)."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>CAMEO Root.</td><td>PLOVER Root.</td><td>Quad.</td></tr><tr><td>01- Make Public Statement</td><td>dropped</td><td></td></tr><tr><td>02- Appeal</td><td>dropped</td><td></td></tr><tr><td>03- Express Intent to Cooperate</td><td>AGREE</td><td>1. V-Coop.</td></tr><tr><td>04- Consult</td><td>CONSULT</td><td>1. V-Coop.</td></tr><tr><td>05- Engage in Diplomatic Cooperation</td><td>SUPPORT</td><td>1. V-Coop.</td></tr><tr><td>06- Engage in Material Cooperation</td><td>COOPERATE</td><td>2. M-Coop.</td></tr><tr><td>07- Provide Aid</td><td>AID</td><td>2. M-Coop.</td></tr><tr><td>08- Yield</td><td>YIELD</td><td>2. M-Coop.</td></tr><tr><td>09- Investigate</td><td>ACCUSE</td><td>3. V-Conf.</td></tr><tr><td>10- Demand</td><td>REQUEST</td><td>3. V-Conf.</td></tr><tr><td>11- Disapprove</td><td>ACCUSE</td><td>3. V-Conf.</td></tr><tr><td>12- Reject</td><td>REJECT</td><td>3. V-Conf.</td></tr><tr><td>13- Threaten</td><td>THREATEN</td><td>3. V-Conf.</td></tr><tr><td>14- Protest</td><td>PROTEST</td><td>4. M-Conf.</td></tr><tr><td>15- Exhibit Force Posture</td><td>MOBILIZE</td><td>4. M-Conf.</td></tr><tr><td>16- Reduce Relations</td><td>SANCTION</td><td>4. M-Conf.</td></tr><tr><td>17- Coerce</td><td>COERCE</td><td>4. M-Conf.</td></tr><tr><td>18- Assault</td><td>ASSAULT</td><td></td></tr><tr><td>20- Unconventional Mass Violence</td><td>ASSAULT</td><td>4. M-Conf.</td></tr><tr><td></td><td></td><td>4. M-Conf.</td></tr></table>",
+        "bbox": [
+            117,
+            82,
+            482,
+            322
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            404,
+            489,
+            596
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "While GPT-4 showcases notable improvements over GPT-3.5, it still exhibits instability in finegrained tasks, promising further enhancement. Conversely, ZSP, despite being built upon a smaller model, offers substantial advantages. It leverages easily constructed hypotheses from the codebook and employs a tree-query framework to capture nuanced semantics and mode distinctions within a focused set of hypotheses at each level. Additionally, ZSP’s adaptability allows straightforward updates by modifying the hypothesis table or class disambiguation rules to align with evolving ontologies. This approach proves more cost-effective than maintaining extensive dictionaries or re-labeling datasets for event record validation.",
+        "bbox": [
+            112,
+            598,
+            489,
+            839
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "In sum, the untapped potential of GPT-4 and the success of ZSP encourage experts to reevaluate the value of existing knowledge bases and inspire innovative uses of this knowledge to expedite research within the political science community.",
+        "bbox": [
+            112,
+            840,
+            490,
+            921
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "table",
+        "img_path": "images/c9a677da8b7401debdbd13a4e36e91c58fbea45cd9d359d72b1b85a96f54e87e.jpg",
+        "table_caption": [
+            "Figure 1: Event coding illustration: How event modes affect Rootcode and Quadcode labeling for sentences involving identical entities."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td colspan=\"3\"></td><td colspan=\"3\">Obama said he won&#x27;t provide military aid to Israel.</td></tr><tr><td>Source:</td><td></td><td>Obama-USAGOV</td><td>Target: 1222-Reject request for military aid</td><td>Israel-ISR</td></tr><tr><td>Action: Root.:</td><td></td><td>12- REJECT</td><td>Quad. :</td><td>3. V-Conf.</td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td>Other event modes --</td><td></td><td></td><td>Root. --</td><td>Quad. -</td></tr><tr><td></td><td></td><td></td><td>Obama halted military aid to Israel. SANCTION</td><td>4. M-Conf.</td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td>Obama provided military aid to Israel. AID</td><td></td><td>2. M-Coop.</td></tr><tr><td></td><td></td><td>Obama agreed to provide aid to Israel. AGREE</td><td></td><td>1. V-Coop.</td></tr></table>",
+        "bbox": [
+            509,
+            79,
+            885,
+            170
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Preliminaries",
+        "text_level": 2,
+        "bbox": [
+            509,
+            246,
+            662,
+            261
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2.1 Event Coding, Ontology, and Mode",
+        "text_level": 2,
+        "bbox": [
+            509,
+            272,
+            833,
+            288
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "The ontology of the event coding system defines how to code the actors (McClelland, 1978; Azar, 1980; Jones et al., 1996; Bond et al., 2003; Raleigh et al., 2010; Mitamura and Hovy, 2015; Boschee et al., 2016). One prominent schema is CAMEO (Gerner et al., 2002), which incorporates knowledge from the codebook<sup>2</sup>, action-pattern dictionaries, and actor dictionaries. It categorizes political interactions into 200+ fine-grained 4-digit codes (01XX–20XX). These are then aggregated into 20 more frequently utilized Rootcodes (01–20), and further into 4 high-level Quadcodes: 1-Verbal Cooperation, 2-Material Cooperation, 3-Verbal Conflict, and 4-Material Conflict. Later, the PLOVER scheme (Open Event Data Alliance, 2018) simplifies CAMEO by removing 4-digit codes, reducing Rootcodes to 16, and enhancing semantic clarity. Rootcode and Quadcode overviews of CAMEO/PLOVER are presented in Table 1, with a codebook snippet in Figure 2. Appendix Table 17 and the codebook present the Rootcode in detail.",
+        "bbox": [
+            507,
+            293,
+            887,
+            632
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Figure 1 illustrates an event coding scenario where the interaction between the source (Obama representing the USA government) and the target (Israel, coded as ISR) is classified using lowerlevel 4-digit codes as well as higher-level Rootcodes and Quadcodes. However, the classification is highly sensitive to subtle variations in what we term event mode—whether Obama has provided, plans to provide, has stopped, or intends to stop military aid—resulting in significant adjustments to Rootcodes and Quadcodes for identical entities. PLOVER’s codebook<sup>3</sup> suggested the concept of event mode through auxiliary modes—historical, future, hypothetical, or negated—to flexibly depict event statuses and assist in labeling. However, it did so without providing strict definitions or implementations. Inspired by this, we refine these event modes and integrate them into our NLI system to enhance classification accuracy. This refinement process and its impact on enhancing event coding precision are detailed in Section 3.2 and further elaborated in Appendix A.",
+        "bbox": [
+            507,
+            633,
+            887,
+            860
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>2</sup>https://eventdata.parusanalytics.com/cameo. dir/CAMEO.Manual.1.1b3.pdf",
+        "bbox": [
+            509,
+            869,
+            867,
+            894
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>3</sup>https://github.com/openeventdata/PLOVER/blob/ master/PLOVER\\_MANUAL.pdf",
+        "bbox": [
+            509,
+            894,
+            882,
+            920
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "584",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            214
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "The shift from the dictionary-based CAMEO to the more semantically friendly PLOVER aligns with the domain’s broader trend. Our focus on PLOVER is the result of careful consideration and validation with domain experts.",
+        "bbox": [
+            112,
+            217,
+            489,
+            299
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2.2 Related Work",
+        "text_level": 2,
+        "bbox": [
+            114,
+            321,
+            272,
+            336
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Relation or event extraction has been studied across various domains (Hendrickx et al., 2019; Zhang et al., 2017; Han et al., 2018; Du and Cardie, 2020; Luan et al., 2018; Riedel et al., 2010; Fincke et al., 2022), with some studies partially overlapping in entities or categorizations relevant to political science (Doddington et al., 2004; Ebner et al., 2020; Li et al., 2021). However, our work distinguishes itself by considering event modes, a dimension not fully explored in existing works.",
+        "bbox": [
+            112,
+            349,
+            489,
+            511
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Our work also relates to zero-shot learning across various schemes (Huang et al., 2018; Obamuyide and Vlachos, 2018; Yin et al., 2019; Meng et al., 2020; Geng et al., 2021; Lyu et al., 2021; Sainz et al., 2021), especially socio-political event classification (Hürriyetoglu et al.˘ , 2021; Radford, 2021; Barker et al., 2021; Haneczok et al., 2021; Halterman and Radford, 2021). However, many works focus on sentence-level classification rather than relations between multiple entity pairs. The others with complex templates cannot be adapted to our political ontology easily. Thus, we design our framework to efficiently integrate with the existing knowledge base.",
+        "bbox": [
+            112,
+            514,
+            490,
+            740
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Finally, recent large language models (LLMs) (Brown et al., 2020; Ouyang et al., 2022; OpenAI, 2022, 2023) have greatly advanced zero-shot learning in reasoning and text generation (Hu et al., 2022b; Halim et al., 2023; Jin et al., 2024). However, the application of ChatGPT for zero-shot event extraction remains underexplored and lags behind advanced supervised methods (Yuan et al., 2023; Cai and O’Connor, 2023; Li et al., 2023; Gao et al., 2023; Aiyappa et al., 2023). We will evaluate ChatGPT on PLOVER as part of our investigation.",
+        "bbox": [
+            112,
+            743,
+            490,
+            921
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3 Approach",
+        "text_level": 2,
+        "bbox": [
+            509,
+            84,
+            633,
+            101
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "We start by discussing the discovery of NLI as a potential solution and the construction process of the NLI-based ZSP framework, followed by the deployment of ChatGPT.",
+        "bbox": [
+            507,
+            109,
+            885,
+            175
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3.1 Limitations of NLI for Event Coding",
+        "text_level": 2,
+        "bbox": [
+            509,
+            185,
+            847,
+            202
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "NLI measures how likely a premise entails a hypothesis (Bowman et al., 2015; Williams et al., 2017). Initially, we explores the feasibility of using NLI to assign PLOVER codes by selecting the most probable entailed hypothesis from a set of candidates. We designed a tiny experiment with only 18 hypotheses derived from the Rootcode names<sup>4</sup>.",
+        "bbox": [
+            507,
+            206,
+            887,
+            319
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Table 2 illustrates three example hypotheses, where <S> and <T> denote the source (Indonesian students) and the target (President Suharto’s government), respectively. The labeled premise “THREATEN 3” indicates the intention to initiate protests. Notably, NLI accurately recognizes AID as contradictory and identifies REQUEST and PROTEST as entailments. Moreover, the tiny NLI model with only 18 hypotheses surpasses dictionary-based methods that rely on 81k verb patterns, with a remarkable macro F1 increase of 17.1% for Quadcode classification, thus comfirming the NLI potential as a valuable solution.",
+        "bbox": [
+            507,
+            321,
+            887,
+            530
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "However, upon closer examination, we find that NLI models measuring semantic entailment may not directly suit our classification task, as the best entailed hypotheses do not always match our desired labels. The adaptation raises two key issues:",
+        "bbox": [
+            507,
+            530,
+            885,
+            609
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "First, NLI disregards event mode. In Table 2, the premise labeled as THREATEN stands for a hypothetical, verbal protest event. NLI partially captures the event’s context (PROTEST) but fails to consider its mode. To address this, we incorporate mode information to enhance candidate precision.",
+        "bbox": [
+            507,
+            611,
+            885,
+            707
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Second, event category labels lack mutual exclusivity in semantics. In Table 2, the premise correctly entails both PROTEST and REQUEST with high scores from the semantic aspect. However, in CAMEO/PLOVER’s single-label schema, the context “demonstrate to demand reforms” aligns with PROTEST, a Material Conflict, rather than RE-QUEST, a Verbal Conflict. An easy solution is to prioritize “protest” over “request” when encountering “protest to request”, following the codebook’s disambiguation rules illustrated in Figure 2.",
+        "bbox": [
+            507,
+            708,
+            887,
+            885
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>4</sup>See more details about this “Tiny model” experiment in Section 4.4, and Rootcode names in Table 1).",
+        "bbox": [
+            509,
+            892,
+            884,
+            920
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "585",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "table",
+        "img_path": "images/fce7f81cae5a025b855e3060baf974d163e0478fc61083099a17497bd5200a91.jpg",
+        "table_caption": [
+            "Table 2: Entailment scores (%) for hypotheses on a sentence labeled as “THREATEN 3” (Rootcode text + Quadcode digit). Adding mode or class disambiguation to basic hypotheses improves prediction precision."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Premise: Thousands of Indonesian students said they would stage mass demonstrations Saturday, demanding political reforms from President Suharto&#x27;s government. Source &lt;S&gt;: Indonesian students Target &lt;T&gt;: President Suharto&#x27;s government Gold Label: THREATEN 3; threaten political dissent.</td><td></td></tr><tr><td>(a) Basic Hypotheses</td><td>Label Score</td></tr><tr><td>&lt;S&gt; requested &lt;T&gt;. &lt;S&gt; protested against &lt;T&gt;. &lt;S&gt; provided aid to &lt;T&gt;.</td><td>REQUEST 3 92.7 PROTEST 4 92.5 AID 2 0.8</td></tr><tr><td>(b) Adding Mode &lt;S&gt; threatened to protest against &lt;T&gt;.</td><td>√THREAT.3 97.3</td></tr><tr><td>(c) Adding Class Disambiguation Override REQUEST if PROTEST exists →REQUEST</td><td></td></tr></table>",
+        "bbox": [
+            117,
+            83,
+            484,
+            277
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "In summary, we identify three key dimensions to ensure accurate predictions: Context, Mode, and Class Disambiguation. Firstly, we narrow down predictions to the top candidates, PROTEST and REQUEST. Secondly, we incorporate mode information and identify the event as future, verbal, or hypothetical. Lastly, we apply the class disambiguation rule, giving precedence to PROTEST over REQUEST. By combining these dimensions, we achieve the final correct answer THREATEN. These findings motivate our NLI-based framework in Figure 2. Next, we provide detailed explanations for each component.",
+        "bbox": [
+            112,
+            372,
+            490,
+            582
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.2 Enabling NLI to Classify Event Mode",
+        "text_level": 2,
+        "bbox": [
+            112,
+            592,
+            457,
+            608
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "NLI’s inability to accurately determine the event mode often leads to misclassification. In Table 3, we present a sentence with reversed labels compared to another in Table 2. Although labeled as AGREE for Verbal Cooperation, indicating a willingness to mitigate dissent, it incorrectly scores high (76.4%) for the hypothesis “protested against”. Semantically, this isn’t entirely wrong, as “agreed to ease protests” implies prior protests, but it suggests cooperation rather than the implied conflict of the hypothesis.",
+        "bbox": [
+            112,
+            613,
+            490,
+            791
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "To address this, we introduce mode-aware hypotheses that incorporate four event modess, adapted from PLOVER’s guidelines: Past (P) for historical events or events that initiated or are ongoing, Future (F) for future, verbal, or hypothetical events, Contradict\\_Past (CP) and Contradict\\_Future (CF) for their respective contradictions. See examples in Table 3.",
+        "bbox": [
+            112,
+            791,
+            490,
+            921
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "table",
+        "img_path": "images/16df14dcd83edb293e495f055e232ec73635d1753e678a85114529ac756a8dab.jpg",
+        "table_caption": [
+            "Table 3: Entailment scores (%) for hypotheses on a sentence labeled as “AGREE 1” (Rootcode text + Quadcode digit). Adding Mode (P, F, CP, CF) improves prediction precision compared to mode exclusion (-)."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Mode Hypotheses for “Protest&quot;</td><td>Mode</td><td>Label</td><td>Score</td></tr><tr><td>&lt;S&gt; protested against &lt;T&gt;.</td><td>-</td><td>PROTEST 4</td><td>92.5</td></tr><tr><td>&lt;S&gt; increased protests against &lt;T&gt;.</td><td>P</td><td>PROTEST 4</td><td>0.1</td></tr><tr><td>&lt;S&gt; launched more protests against &lt;T&gt;.</td><td>P</td><td>PROTEST 4</td><td>0.0</td></tr><tr><td>&lt;S&gt; reduced protests against &lt;T&gt;.</td><td>CP</td><td>YIELD 2</td><td>95.2</td></tr><tr><td>&lt;S&gt; threatened to protest against &lt;T&gt;.</td><td>F</td><td>THREAT. 3</td><td>67.5</td></tr><tr><td>&lt;S&gt; promised to reduce protests against &lt;T&gt;.</td><td>CF</td><td>AGREE 1</td><td>97.1</td></tr><tr><td>&lt;S&gt; will reduce protests against &lt;T&gt;.</td><td>CF</td><td>AGREE 1 96.3</td><td></td></tr></table>",
+        "bbox": [
+            512,
+            154,
+            880,
+            256
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Labels for each mode are directly adopted from the codebook, requiring no new definitions. For example, PROTEST’s CF is labeled as AGREE, mirroring “03- EXPRESS INTENT TO COOPER-ATE” Rootcode, specifically item “0352- Express intent to ease popular dissent.” Likewise, the CP events like “reduced protests against” are labeled as YIELD, following CAMEO code 0833, which signifies yielding to demands.",
+        "bbox": [
+            507,
+            353,
+            885,
+            498
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "To facilitate this nuanced classification approach, we have assembled a mode mapping table (Table 7) that clarifies mode transitions and associated label modifications. This streamlined process not only simplifies the task of classification but also significantly reduces the complexity of navigating the codebook. For an in-depth exploration of these event modes, please see Appendix A.",
+        "bbox": [
+            507,
+            499,
+            885,
+            627
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "The mode-aware hypotheses in Table 3 enable NLI to accurately dismiss the Past hypotheses and correctly score the CF mode highest, underscoring its capability to discern semantic subtleties. Additionally, NLI’s semantic generalization avoids the need for exact word matching, unlike the complex dictionary-based methods. For example, similar hypotheses such as “increase” and “launch more protests” receive similar scores, and phrases like “promised to reduce” are considered similar to “will reduce”.",
+        "bbox": [
+            507,
+            629,
+            885,
+            806
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Our mode-aware NLI system leverages these insights, using the codebook to guide hypothesis construction. This approach enables easy conversion of present-tense label description into different modes or tenses, even for non-experts. The codebook also provides contrasting label examples, like “YIELD: ease protests” and “AGREE: agree to ease protests” for the CP and CF modes for PROTEST, significantly streamlining the engineering process. We only need to ensure hypotheses, especially in Past mode, clearly reflect event trends. For instance, in Table 3, “protested against” was rephrased to “increased/launched more protests against” for enhanced clarity. Likewise, “imposed bans” can be modified to “increased/imposed more bans”.",
+        "bbox": [
+            507,
+            807,
+            887,
+            921
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_number",
+        "text": "586",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "image",
+        "img_path": "images/d0243f74166a2f7df7f84ed036541aab71fe643dfbee7396cb0cd5a95c012dc9.jpg",
+        "image_caption": [
+            "Figure 2: Two zero-shot approaches for classifying relation labels (Rootcode and Quadcode) in a source - target pair. ChatGPT employs prompts designed from the codebook’s label summaries, while ZSP utilizes a pretrained NLI model and a tree-query system. Hypotheses and class disambiguation rules are derived from the codebook and enhanced with mode considerations (e.g., Past, Future). The tree-query framework reduces query time and improves precision by filtering candidates, determining modes, and eliminating ambiguity."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            115,
+            82,
+            880,
+            282
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            391,
+            490,
+            519
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "3.3 Class Disambiguation",
+        "text_level": 2,
+        "bbox": [
+            114,
+            529,
+            334,
+            544
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "To address the issue of class ambiguity and overlaps in CAMEO/PLOVER, experts have documented instructions and annotation rules in the codebook. Annotators frequently consult the codebook when faced with ambiguous cases. In contrast, we can integrate this information into our machine to reduce manual annotation and effectively handling boundary cases. Note that incorporating excessive rules goes against our goal of designing a simple and adaptable system. It can lead to overfitting and inflexibility, similar to the limitations found in traditional dictionary-based methods. Therefore, we’ve chosen to include only the most frequent rules explicitly outlined in the codebook, considering this step as supplementary to our system.",
+        "bbox": [
+            112,
+            549,
+            489,
+            791
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "One notable rule, referred to as the Conflict Override, is summarized from the codebook. This rule gives priority to labels in Material Conflict over Verbal Conflict, as depicted in Figure 2. If the top predictions include candidate labels in Material Conflict, the labels in Verbal Conflict will be overridden. For example, we label “protest to request” as material PROTEST other than verbal",
+        "bbox": [
+            112,
+            791,
+            489,
+            921
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "REQUEST, as explained in Section 3.1. Similarly, we label “convict and arrest” as material COERCE other than verbal ACCUSE, considering the more severe actions involved. These rules can be easily customized and expanded by users to accommodate changes in the schema or ontology. Additional discussions are provided in Appendix B and C.",
+        "bbox": [
+            507,
+            390,
+            885,
+            504
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "3.4 Tree-Query NLI Framework",
+        "text_level": 2,
+        "bbox": [
+            509,
+            513,
+            784,
+            529
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "We enhance precision and efficiency by integrating mode-aware NLI with class disambiguation into a tree-query framework, as shown in Figure 2. This contrasts with the “flat-query” method, where hypotheses are arranged at a single level, by organizing them hierarchically.",
+        "bbox": [
+            507,
+            533,
+            887,
+            630
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "At Level 1 Context, we compare 76 Past hypotheses ( 5 hypotheses per Rootcode) to classify the premise’s context. Using a customized threshold, such as selecting the top-3 candidates with scores higher than the maximum score minus 0.1, we narrow down the most probable candidates. In the example, this filtering yields two candidates related to REQUEST and PROTEST.",
+        "bbox": [
+            507,
+            631,
+            887,
+            758
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "At Level 2 Mode, we compare the hypotheses in other modes for the selected candidates to determine their mode. We focus on two types of modes in the experiments: Past and Future. For instance, PROTEST leads to two branches - the existing PROTEST and a new THREATEN (PROTEST+future). However, for certain Rootcodes like REQUEST, querying their Future variants is unnecessary since the labels remain the same from Past to Future (details in Table 7 and Appendix B). This reduces the number of Future hypotheses in Level 2 to 58, and only a subset requires querying per premise. In Figure 2, we collect all necessary scores for Level 2 analysis by querying just the new THREATEN hypothesis once.",
+        "bbox": [
+            507,
+            759,
+            887,
+            921
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_number",
+        "text": "587",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            165
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "At Level 3 Class Disambiguation, we apply specific rules, including the Conflict Override, to eliminate REQUEST since PROTEST already exists among the top predictions from Level 2.",
+        "bbox": [
+            112,
+            167,
+            489,
+            231
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "ZSP is interpretable, flexible, efficient, and precise. First, we split the complicated, ambiguous classification into a simple tree framework that both computer science and political science researchers can easily understand. Second, experts can quickly update ZSP by revising the hypothesis table or class disambiguation rules according to a evolving ontology, which is much cheaper than maintaining large dictionaries or relabeling a dataset (detailed in Appendix C). Third, it improves efficiency. For instance, we only query 76 times in Level 1 + one time in Level 2 without comparing all 134 hypotheses in Figure 2. Finally, NLI scores within ZSP accurately capture nuanced entailment relations within the limited scope of compared hypotheses at each level. This minimizes potential errors that can arise from mixed hypotheses in different contexts and modes. We will validate this in experiments.",
+        "bbox": [
+            110,
+            233,
+            490,
+            524
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "3.5 ChatGPT",
+        "text_level": 2,
+        "bbox": [
+            114,
+            537,
+            240,
+            552
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Besides our proposed NLI-based ZSP model, we explored the zero-shot performance of LLMs on this task. We focused on two versions of ChatGPT: GPT-3.5 and GPT-4. We used the OpenAI API and designed prompts that incorporate task descriptions and pre-defined label sets, building upon insights from previous research (Wei et al., 2023; Li et al., 2023). The label descriptions were summarized and refined from the PLOVER codebook’s comprehensive Rootcode descriptions. Further insights are available through exemplified input output instances in Appendix H.",
+        "bbox": [
+            112,
+            562,
+            490,
+            756
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4 Experiments",
+        "text_level": 2,
+        "bbox": [
+            114,
+            771,
+            260,
+            788
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.1 Datasets",
+        "text_level": 2,
+        "bbox": [
+            114,
+            800,
+            230,
+            815
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Since there were limited datasets with fine-grained annotation, we built a Rootcode-level PLV dataset from the CAMEO codebook and a balanced coarsegrained-labeled dataset (Parolin et al., 2022a), resulting in 1050 training examples and 1033 testing examples. We built three classification tasks with varying degrees of complexity: Binary (cooperation vs. conflict), Quadcode, and Rootcode.",
+        "bbox": [
+            112,
+            824,
+            490,
+            921
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            885,
+            117
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Besides the political science dataset PLV, we also explored how event ontology knowledge benefits and generalizes in other NLP datasets. Thus, we built a binary A/W dataset from ACE (Doddington et al., 2004) and WikiEvents (Li et al., 2021), which contain many conflict-related subjects that overlap the political ontologies. A/W consists of 802 training examples and 805 testing examples. See more details in Appendix D.",
+        "bbox": [
+            507,
+            118,
+            887,
+            263
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.2 Setup",
+        "text_level": 2,
+        "bbox": [
+            509,
+            274,
+            605,
+            291
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Regarding our proposed ZSP, we incorporated a finetuned NLI model<sup>5</sup> into our tree-query system. For ChatGPT, we used OpenAI’s Chat completions API to access GPT-3.5 and GPT-4. To assess the practical usefulness of these zero-shot models, we compared them with notable baselines, including Universal PETRARCH (UP) (Lu and Roy, 2017), a widely-used dictionary-based CAMEO event coder. We measured UP’s ideal performance on relation classification by considering incomplete triplets, as detailed in Appendix E.",
+        "bbox": [
+            507,
+            297,
+            887,
+            474
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Additionally, we examine the performance of various supervised learning models, including masking language models (MLM) like BERT-baseuncased (Devlin et al., 2018) and ConfliBERT-scruncased (CBERT) (Hu et al., 2022a). Notably, CBERT reports greater effectiveness in the political science domain. We also use text generation models, namely BART (Lewis et al., 2020) and T5 (Raffel et al., 2020), to generate original label texts for this classification task. We trained these supervised models on either the entire training set or sampled subsets of varying sizes using a single V-100 GPU with default hyperparameters. Subsequently, we evaluated them on the complete testing dataset. We ran each scenario with five different seeds and reported average results for reliability.",
+        "bbox": [
+            507,
+            474,
+            887,
+            734
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.3 Results and Analysis",
+        "text_level": 2,
+        "bbox": [
+            509,
+            744,
+            721,
+            760
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "We summarized the performance of dictionarybased and zero-shot models, as well as the supervised learning models trained on the entire training datasets, in Table 4. Additionally, in Figure 3, we compared ZSP with supervised learning models trained on varying limited datasets. UP and Chat-GPT were excluded from the analysis due to their significant performance gap compared to the other models, to maintain focus and relevance.",
+        "bbox": [
+            507,
+            766,
+            887,
+            896
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>5</sup>https://huggingface.co/roberta-large-mnli",
+        "bbox": [
+            531,
+            906,
+            853,
+            920
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "588",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "chart",
+        "img_path": "images/b2cdc60b4fa3a35eaa902ff3f2fa7b40ef4d04d3a6c6d966e2ca9b767e0752e7.jpg",
+        "content": "",
+        "chart_caption": [
+            "(a) PLV Binary"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            122,
+            96,
+            307,
+            216
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "chart",
+        "img_path": "images/843df0a2f2d691d5512a208458f2b1eb6308c5e240d7b6f183cb33a856acce01.jpg",
+        "content": "",
+        "chart_caption": [
+            "(b) PLV Quadcode"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            314,
+            97,
+            499,
+            216
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "chart",
+        "img_path": "images/4768cf88702ac5ef53df51d9983e91d939ad3a40d7291019f2f69317256fdd84.jpg",
+        "content": "",
+        "chart_caption": [
+            "(c) PLV Rootcode"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            507,
+            95,
+            692,
+            217
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "chart",
+        "img_path": "images/b1968b7f6beddca3ed52bda32d1fa6fa5e8833ba3f0ce27d3cb5048e77ce689f.jpg",
+        "content": "",
+        "chart_caption": [
+            "(d) A/W Binary"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            699,
+            93,
+            887,
+            216
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/8061a88c818b318a1dc1e5bdb011a0cbb4b3ab451cd19ee0145dd69439df9f25.jpg",
+        "table_caption": [
+            "Figure 3: Performance vs. varying sized training datasets.",
+            "Table 4: Macro F1 scores of models on diverse datasettask combinations and average results."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Type</td><td>Model</td><td>PLV Bin.</td><td>PLV Quad</td><td>PLV Root</td><td>A/W Bin.</td><td>Avg.</td></tr><tr><td>Dict. &amp; Zero-shot</td><td>UP GPT-3.5 GPT-4 ZSP</td><td>80.8 90.1 93.4 96.4</td><td>51.8 66.2 76.7 89.6</td><td>46.3 40.9 61.5 82.4</td><td>67.2 76.3 87.0 88.0</td><td>61.5 68.4 79.7 89.1</td></tr><tr><td>Super- vised</td><td>BERT CBERT T5 BART</td><td>96.6 98.4 97.8 97.9</td><td>94.6 96.3 94.7 95.9</td><td>84.0 86.7 81.6 83.7</td><td>87.4 89.3 87.2 89.6</td><td>90.7 92.7 90.3 91.8</td></tr></table>",
+        "bbox": [
+            121,
+            280,
+            480,
+            422
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            114,
+            491,
+            418,
+            506
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Supervised learning. Among supervised models, CBERT emerged as the top performer, surpassing BERT with less data required. BART closely trailed. It outperformed T5 by exhibiting less overfitting on small, imbalanced labeled datasets.",
+        "bbox": [
+            112,
+            519,
+            490,
+            601
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "ZSP. ZSP consistently outperformed UP and ChatGPT, and it achieved competitive results with supervised learning models in most tasks (Figures 3a, 3c, 3d). Notably, in these scenarios, ZSP matched BERT and T5, while the stronger models CBERT and BART still required 25%-50% of the training data to achieve a slight performance gap (less than 4.3%) over ZSP. The only exception was a notable 6.7% performance gap observed between CBERT and ZSP on PLV-Quadcode (Figure 3b). This difference can be attributed to the dataset’s balanced and coarser-grained nature, which favors supervised learning.",
+        "bbox": [
+            112,
+            612,
+            489,
+            824
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "However, supervised models experience a significant performance decline in more challenging fine-grained Rootcode classification (Figure 3c), emphasizing the need for sufficient and balanced annotation. Actually, our experience across multiple projects to develop event coding datasets with approximately 1,000 examples typically extends beyond several months. Creating evaluation datasets like PLV and AW, or even relabeling existing ones, proves to be far more time-consuming. In contrast, designing NLI prompts from the codebook for ZSP takes just a few days, greatly reducing annotation efforts and demonstrating clear advantages in real-world applications. Furthermore, ZSP’s lack of a training phase significantly cuts down on GPU resource needs, enhancing its adaptability and enabling efficient inference on both CPUs and GPUs. This efficiency starkly contrasts with supervised models, which rely heavily on costly GPU resources for training.",
+        "bbox": [
+            112,
+            824,
+            490,
+            921
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            284,
+            887,
+            508
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We further analyzed ZSP’s confusion matrix for Rootcode classification (see Figure 7 in Appendix F). The results reveal high ZSP accuracy by correctly classifying most Rootcodes, yet there are some misclassifications, particularly for AGREE, SUPPORT, AID, and YIELD labels. These labels have subtle semantic differences, with AGREE representing a future, verbal, or hypothetical version of the other three categories. For instance, consider the sentence labeled as diplomatic SUPPORT “... <S> had approved an agreement with <T> ...”, ZSP produces conflicting predictions, with a score of 96.9% for the hypothesis “SUPPORT: approved an agreement” and 97.0% for “AGREE: agreed to sign an agreement”. This discrepancy arises due to the fine distinction between these two labels, which even human annotators may find challenging.",
+        "bbox": [
+            507,
+            510,
+            887,
+            784
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "ChatGPT. We observed notable differences in the performance of GPT-3.5 and the latest GPT-4 models. Specifically, GPT-3.5 exhibited inconsistent results. Despite excelling in binary tasks, it struggles with more specific labels and even performs worse than UP in Rootcode classification. These challenges align with previous research in similar tasks (Yuan et al., 2023; Cai and O’Connor,",
+        "bbox": [
+            507,
+            791,
+            887,
+            921
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "589",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "2023; Li et al., 2023; Gao et al., 2023).",
+        "bbox": [
+            114,
+            84,
+            406,
+            99
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "One ongoing challenge is generating formatted results and avoiding random labels outside the predefined set. To address this, we found that instructing GPT-3.5 to output digits (01-15) instead of text labels (AGREE - ASSAULT) partially alleviates these challenges and improves recall scores.",
+        "bbox": [
+            112,
+            102,
+            490,
+            198
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Another difficulty lies in effectively incorporating complex task descriptions and predefined label information into GPT-3.5. While our ZSP model can utilize class disambiguation rules easily, GPT-3.5 struggles to retain large amounts of information and may forget relevant details after just one round of chatting. This limitation necessitates the repetitive input of essential information in every interaction, which reduces efficiency.",
+        "bbox": [
+            112,
+            200,
+            490,
+            346
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Furthermore, balancing the preservation of necessary information and the compression of prompts to accommodate actual questions proves challenging. Continuous refinement of the prompts does not consistently improve performance, and it is counterintuitive that longer label descriptions with more disambiguation instructions result in performance decline. The quest for an optimal prompt design remains an open question for future research.",
+        "bbox": [
+            112,
+            347,
+            489,
+            492
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "However, GPT-4 stands out as a significant improvement over GPT-3.5. It effectively reduces formatting errors, with few occasional issues lingering. The most significant enhancement is its ability to comprehend and process longer input tokens, allowing for better use of input information and finer class distinctions. Interestingly, class disambiguation notes were found to be effective for GPT-4 but not for GPT-3.5, further distinguishing the two models. The success of GPT-4 highlights the vast potential of LLMs. While extensive API queries can be costly, and precision may be slightly lower than ZSP, GPT-4’s effectiveness with fewer prompts and superior generalization are notable advantages for future applications.",
+        "bbox": [
+            110,
+            493,
+            490,
+            737
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "4.4 Ablation Study",
+        "text_level": 2,
+        "bbox": [
+            114,
+            750,
+            280,
+            766
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "We conducted an ablation study to address the following questions on ZSP: (1) Is a tree-query approach superior to a flat-query approach, which compares all hypotheses at single level simultaneously? (2) Does having more hypotheses guarantee better performance?",
+        "bbox": [
+            112,
+            774,
+            490,
+            870
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Table 5 displays the results of other zero-shot models, UP, GPT-3.5/4, and two variants of our ZSP models across multiple tasks. For the Flatquery approaches, the Tiny model uses 18 hypotheses derived from the Rootcode names (See Table 1). The Full model incorporates a complete list of 222 label descriptions from the codebook. The Tree-query approach consists of our ZSP model at different levels: $l _ { 1 } , l _ { 2 }$ , and $l _ { 3 }$",
+        "bbox": [
+            112,
+            872,
+            490,
+            920
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/4e5c4d99445c0c578d37ba48628e2e21687006bba3c6e44406ef7ed6af192e18.jpg",
+        "table_caption": [
+            "Table 5: Macro F1 scores% of ZSP with different settings vs. other zero-shot models in ablation study."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td colspan=\"2\">Model</td><td>PLV Bin.</td><td>PLV Quad</td><td>PLV Root</td><td>A/W Bin.</td><td>Avg.</td></tr><tr><td colspan=\"2\">UP</td><td>80.8</td><td>51.8</td><td>46.3</td><td>67.2</td><td>61.5</td></tr><tr><td colspan=\"2\">GPT-3.5</td><td>90.1</td><td>66.2</td><td>40.9</td><td>76.3</td><td>68.4</td></tr><tr><td colspan=\"2\">GPT-4</td><td>93.4</td><td>76.7</td><td>61.5</td><td>87.0</td><td>79.7</td></tr><tr><td colspan=\"2\">ZSP Tiny Flat Full</td><td>90.5 91.0</td><td>69.5 73.4</td><td>50.8 55.7</td><td>83.6 82.4</td><td>73.6 75.6</td></tr><tr><td colspan=\"2\"></td><td></td><td>85.8</td><td></td><td></td><td>87.0</td></tr><tr><td rowspan=\"3\">ZSP Tree</td><td> $l _ { 1 }$ </td><td>96.2</td><td>87.6</td><td>78.2 79.4</td><td>87.8</td><td>87.8</td></tr><tr><td> $l _ { 1 , 2 }$ </td><td>96.5 96.4</td><td></td><td>82.4</td><td>87.8</td><td></td></tr><tr><td> $l _ { 1 , 2 , 3 }$ </td><td></td><td>89.6</td><td></td><td>88.0</td><td>89.1</td></tr></table>",
+        "bbox": [
+            529,
+            82,
+            863,
+            230
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            297,
+            885,
+            393
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "The observation that the Tiny model with 18 hypotheses outperforms UP with 81k inflexible patterns, confirms the effectiveness of generalized PLM features. Furthermore, Tiny surpasses GPT-3.5, highlighting the unreliability of GPT-3.5 and emphasizing the significance of expert knowledge in achieving superior results.",
+        "bbox": [
+            507,
+            394,
+            885,
+            507
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Despite the Tiny model’s limited capacity to handle nuanced cases, adding more unorganized hypotheses does not consistently improve performance. The Full model’s improper mixing and comparison of hypotheses for verbal and material events at different levels result in arbitrary NLI scores, leading to poor performance on PLV and inferior results compared to the Tiny model on A/W.",
+        "bbox": [
+            507,
+            508,
+            887,
+            637
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "In contrast, the tree-query models outperform all flat-query models by a large margin at Level 1. Adding additional levels brings stable improvements, primarily for Quadcode and Rootcode. The tree-query framework effectively delimits the scope of candidate hypotheses and offers precise NLI scores that capture semantic differences. This ensures a more controllable and accurate result.",
+        "bbox": [
+            507,
+            638,
+            887,
+            766
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "5 Conclusion",
+        "text_level": 2,
+        "bbox": [
+            509,
+            780,
+            643,
+            796
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Future event coding tools should prioritize ease of interpretation and flexibility, making them more practical than annotating new datasets for blackbox supervised models. Therefore, we explored the potential of zero-shot relation classification using ChatGPT (GPT-3.5/4) and introduced our ZSP model. While GPT-3.5 struggled with fine-grained classification, GPT-4 showed promise in mitigating instability issues. Our ZSP offers an even more cheap, precise, and adaptable solution. The key is structuring the complex problem into an interpretable, three-level tree framework, integrating mode-aware NLI, and incorporating class disambiguation rules from the codebooks. Overall, our study highlights the value of integrating transferred knowledge with expert linguistic insights to streamline the process of verifying event records for the political science community.",
+        "bbox": [
+            507,
+            807,
+            887,
+            921
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "590",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            490,
+            263
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "6 Limitations",
+        "text_level": 2,
+        "bbox": [
+            114,
+            277,
+            250,
+            292
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Balancing generalization and specificity is a common challenge across many methods. ZSP was developed to address the complexities of annotation codebooks and the inefficiencies in training annotators. This led to streamlined annotation, such as labeling an event as PROTEST instead of DEMAND for a protest related to rights, aided by the Conflict Override rule which simplifies complex annotation notes into machine-understandable rules. To maintain a balance between complexity and adaptability, we included only the most frequently used rules from the codebook.",
+        "bbox": [
+            112,
+            306,
+            490,
+            499
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Our approach’s broader applicability, particularly in political science and related fields where codebooks are traditionally used to train annotators (Raleigh et al., 2010; Pavlick et al., 2016; Parolin et al., 2021), underscores the practicality of our method in streamlining data labeling. We are optimistic that combining established codebooks or knowledgebases with language models can extend to other domain-specific data. For instance, in legal studies, this approach can enhance the classification of legal documents by leveraging codified laws and regulations. In healthcare, it can aid in categorizing patient records and medical literature using clinical codebooks. In media studies and communication, it can support media content analysis by categorizing articles, broadcasts, and social media posts using thematic or sentiment-related codebooks.",
+        "bbox": [
+            112,
+            500,
+            490,
+            790
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "However, challenges persist in zero-shot models when classifying semantically non-mutually exclusive fine-grained labels due to the intensive hypothesis engineering required. We addressed these challenges through the codebook’s attainable expertise, but ZSP may struggle with tasks lacking accessible domain knowledge bases or those with overly nuanced and ambiguous labels. For example, classifying subcategories of ASSAULT (crime vs. attack vs. kidnap) or distinguishing peace protests from riots may require as many hypotheses as keywords (Barker et al., 2021; Radford, 2021). For such tasks, hybrid methods such as integrating ZSP or ChatGPT with few-shot learning, pattern-matching, or in-context learning could effectively address tasks of varying complexity, reducing human efforts. Future work will focus on exploring these hybrid methods.",
+        "bbox": [
+            112,
+            793,
+            490,
+            921
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            887,
+            247
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Our exploration of ChatGPT models highlights the trade-off between generalizability and precision. While ChatGPT can adapt to any task with its chat-style format, it may sacrifice precision compared to NLI models. Due to time constraints and cost considerations, we did not investigate multi-turn interactions to enhance ChatGPT’s precision, leaving this for future research. Nonetheless, both zero-shot models show promising potential to surpass traditional dictionary-based methods and annotation-driven supervised learning.",
+        "bbox": [
+            507,
+            250,
+            887,
+            429
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "In selecting comparative methods, we included the most pertinent and recent ones that meet the specific needs of our task. Political event coding differs significantly from NLP event extraction tasks, such as those using the popular ACE dataset, in the availability of directly comparable studies. The prevailing methodologies in ACE event extraction are predominantly supervised and don’t easily align with our unique ontology. Our investigation focuses on exploring the effectiveness of zero-shot models in event coding rather than achieving the highest accuracy through supervised approaches. Adapting existing zero-shot methods, designed with ACE contexts in mind, to our distinct requirements presents distinct challenges. Moving forward, we plan to expand our baseline comparisons in future studies.",
+        "bbox": [
+            507,
+            432,
+            887,
+            707
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "While we initially considered expanding experiments to include other ontologies, we chose to focus on CAMEO/PLOVER, deferring broader explorations to future studies. This decision was influenced by practical constraints such as time and API costs, as well as a desire to pioneer within less-explored research domains. Unlike many widely-studied ontologies that rely on manuallycreated NLI systems and lack mode considerations, CAMEO/PLOVER presents unique challenges and opportunities. Its integration of mode features and codebooks makes it an ideal candidate for exploring PLMs in complex areas like political event coding. By converting the complex expertise embedded in the codebooks into practical applications, we transcend the limits of conventional zero-shot modeling and showcase how PLMs like NLI and ChatGPT can be adapted to specialized domains.",
+        "bbox": [
+            507,
+            711,
+            889,
+            921
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "591",
+        "bbox": [
+            485,
+            928,
+            515,
+            942
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            166
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "7 Ethics Statement",
+        "text_level": 2,
+        "bbox": [
+            114,
+            178,
+            297,
+            193
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "The broad goal of producing accurate event data is to objectively measure and understand processes of political conflict and mediation around the world in order to prevent or mitigate their harm. We aim to produce a simple, flexible tool to serve this purpose. In particular, the zero-shot approach of this study largely reduces the costs, effort, and time to produce highly-quality event data on conflict, thus helping international and domestic government agencies, as well as researchers and practitioners to track, analyze, and mitigate the causes and effects of political violence. The project relied exclusively on news-story-like text as second-hand accounts of conflict events, but did not involve human research subjects.",
+        "bbox": [
+            112,
+            204,
+            490,
+            445
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "Acknowledgments",
+        "text_level": 2,
+        "bbox": [
+            114,
+            458,
+            277,
+            474
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "The research reported herein was supported in part by NIST Award # 60NANB23D007, NSF awards DMS-1737978, DGE-2039542, OAC-1828467, OAC-1931541, OAC-2311142, and DGE-1906630, ONR awards N00014-17-1-2995 and N00014-20- 1-2738, and the National Center for Transportation Cybersecurity and Resiliency (TraCR).",
+        "bbox": [
+            112,
+            483,
+            489,
+            598
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            114,
+            625,
+            215,
+            640
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Rachith Aiyappa, Jisun An, Haewoon Kwak, and Yong-Yeol Ahn. 2023. Can we trust the evaluation on chatgpt? arXiv preprint arXiv:2303.12767.",
+            "Edward E Azar. 1980. The conflict and peace data bank (copdab) project. Journal of Conflict Resolution, 24(1):143–152.",
+            "Ken Barker, Parul Awasthy, Jian Ni, and Radu Florian. 2021. IBM MNLP IE at CASE 2021 task 2: NLI reranking for zero-shot text classification. In Proceedings ofthe 4th Workshop on Challenges and Applications ofAutomated Extraction ofSocio-political Eventsfrom Text (CASE 2021), pages 193–202, Online. Association for Computational Linguistics.",
+            "Doug Bond, Joe Bond, Churl Oh, Craig J. Jenkins, and Charles L. Taylor. 2003. Integrated Data for Events Analysis (IDEA): An Event Typology for Automated Events Data Development. Journal of Peace Research, 40(6):733–745.",
+            "Elizabeth Boschee, Jennifer Lautenschlager, Sean O’Brien, Steve Shellman, James Starz, and Michael Ward. 2016. ICEWS Coded Event Data.",
+            "Samuel R. Bowman, Gabor Angeli, Christopher Potts, and Christopher D. Manning. 2015. A large annotated corpus for learning natural language inference. In Proceedings of the 2015 Conference on Empirical Methods in Natural Language Processing, pages 632–642, Lisbon, Portugal. Association for Computational Linguistics.",
+            "Patrick T Brandt, John R Freeman, Tse-min Lin, and Phillip A Schrodt. 2013. Forecasting conflict in the cross-straits: long term and short term predictions. In Annual Meeting ofthe American Political Science Association.",
+            "Patrick T Brandt, John R Freeman, and Philip A Schrodt. 2011. Real time, time series forecasting of inter-and intra-state political conflict. Conflict Management and Peace Science, 28(1):41–64.",
+            "Patrick T Brandt, John R Freeman, and Philip A Schrodt. 2014. Evaluating forecasts of political conflict dynamics. International Journal of Forecasting, 30(4):944–962.",
+            "Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. 2020. Language models are few-shot learners. Advances in neural information processing systems, 33:1877–1901.",
+            "Berfu Büyüköz, Ali Hürriyetoglu, and Arzucan Özgür.˘ 2020. Analyzing ELMo and DistilBERT on sociopolitical news classification. In Proceedings of the Workshop on Automated Extraction ofSocio-political Events from News 2020, pages 9–18, Marseille, France. European Language Resources Association (ELRA).",
+            "Erica Cai and Brendan O’Connor. 2023. A monte carlo language model pipeline for zero-shot sociopolitical event extraction. arXiv preprint arXiv:2305.15051.",
+            "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2018. Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805.",
+            "George Doddington, Alexis Mitchell, Mark Przybocki, Lance Ramshaw, Stephanie Strassel, and Ralph Weischedel. 2004. The automatic content extraction (ACE) program – tasks, data, and evaluation. In Proceedings of the Fourth International Conference on Language Resources and Evaluation (LREC’04), Lisbon, Portugal. European Language Resources Association (ELRA).",
+            "Xinya Du and Claire Cardie. 2020. Document-level event role filler extraction using multi-granularity contextualized encoding. In Proceedings ofthe 58th Annual Meeting of the Association for Computational Linguistics, pages 8010–8020, Online. Association for Computational Linguistics."
+        ],
+        "bbox": [
+            115,
+            649,
+            487,
+            688
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "592",
+        "bbox": [
+            485,
+            928,
+            517,
+            941
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Seth Ebner, Patrick Xia, Ryan Culkin, Kyle Rawlins, and Benjamin Van Durme. 2020. Multi-sentence argument linking. In Proceedings ofthe 58th Annual Meeting of the Association for Computational Linguistics, pages 8057–8077, Online. Association for Computational Linguistics.",
+            "Steven Fincke, Shantanu Agarwal, Scott Miller, and Elizabeth Boschee. 2022. Language model priming for cross-lingual event extraction. In Proceedings of the AAAI Conference on Artificial Intelligence, pages 10627–10635.",
+            "Jun Gao, Huan Zhao, Changlong Yu, and Ruifeng Xu. 2023. Exploring the feasibility of chatgpt for event extraction. arXiv preprint arXiv:2303.03836.",
+            "Yuxia Geng, Jiaoyan Chen, Zhuo Chen, Jeff Z Pan, Zhiquan Ye, Zonggang Yuan, Yantao Jia, and Huajun Chen. 2021. Ontozsl: Ontology-enhanced zero-shot learning. In Proceedings ofthe Web Conference 2021, pages 3325–3336.",
+            "Deborah J Gerner, Philip A Schrodt, Omür Yilmaz, and Rajaa Abu-Jabr. 2002. Conflict and mediation event observations (cameo): A new event data framework for the analysis of foreign policy interactions. International Studies Association, New Orleans.",
+            "Goran Glavaš, Federico Nanni, and Simone Paolo Ponzetto. 2017. Cross-lingual classification of topics in political texts. In Proceedings of the Second Workshop on NLP and Computational Social Science, pages 42–46, Vancouver, Canada. Association for Computational Linguistics.",
+            "Sadaf MD Halim, Saquib Irtiza, Yibo Hu, Latifur Khan, and Bhavani Thuraisingham. 2023. Wokegpt: Improving counterspeech generation against online hate speech by intelligently augmenting datasets using a novel metric. In 2023 International Joint Conference on Neural Networks (IJCNN), pages 1–10. IEEE.",
+            "Andrew Halterman and Benjamin J Radford. 2021. Fewshot upsampling for protest size detection. Findings of ACL.",
+            "Xu Han, Hao Zhu, Pengfei Yu, Ziyun Wang, Yuan Yao, Zhiyuan Liu, and Maosong Sun. 2018. FewRel: A large-scale supervised few-shot relation classification dataset with state-of-the-art evaluation. In Proceedings ofthe 2018 Conference on Empirical Methods in Natural Language Processing, pages 4803–4809, Brussels, Belgium. Association for Computational Linguistics.",
+            "Jacek Haneczok, Guillaume Jacquet, Jakub Piskorski, and Nicolas Stefanovitch. 2021. Fine-grained event classification in news-like text snippets-shared task 2, case 2021. In Proceedings of the 4th Workshop on Challenges and Applications ofAutomated Extraction of Socio-political Events from Text (CASE 2021), pages 179–192.",
+            "Iris Hendrickx, Su Nam Kim, Zornitsa Kozareva, Preslav Nakov, Diarmuid O Séaghdha, Sebastian Padó, Marco Pennacchiotti, Lorenza Romano, and Stan Szpakowicz. 2019. Semeval-2010 task 8: Multiway classification of semantic relations between pairs of nominals. arXiv preprint arXiv:1911.10422.",
+            "Yibo Hu, MohammadSaleh Hosseini, Erick Skorupa Parolin, Javier Osorio, Latifur Khan, Patrick Brandt, and Vito D’Orazio. 2022a. Conflibert: A pre-trained language model for political conflict and violence. In Proceedings ofthe 2022 Conference ofthe North American Chapter ofthe Association for Computational Linguistics: Human Language Technologies, pages 5469–5482.",
+            "Yibo Hu, Yu Lin, Erick Skorupa Parolin, Latifur Khan, and Kevin Hamlen. 2022b. Controllable fake document infilling for cyber deception. In Findings ofthe Associationfor Computational Linguistics: EMNLP 2022, pages 6505–6519, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics.",
+            "Lifu Huang, Heng Ji, Kyunghyun Cho, Ido Dagan, Sebastian Riedel, and Clare Voss. 2018. Zero-shot transfer learning for event extraction. In Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 2160–2170.",
+            "Ali Hürriyetoglu, Hristo Tanev, Vanni Zavarella, Jakub˘ Piskorski, Reyyan Yeniterzi, Deniz Yuret, and Aline Villavicencio. 2021. Challenges and applications of automated extraction of socio-political events from text (case 2021): Workshop and shared task report. In Proceedings of the 4th Workshop on Challenges and Applications of Automated Extraction of Sociopolitical Eventsfrom Text (CASE 2021), pages 1–9.",
+            "Yiqiao Jin, Mohit Chandra, Gaurav Verma, Yibo Hu, Munmun De Choudhury, and Srijan Kumar. 2024. Better to ask in english: Cross-lingual evaluation of large language models for healthcare queries. In Proceedings of the ACM on Web Conference 2024, pages 2627–2638.",
+            "Daniel M Jones, Stuart A Bremer, and J David Singer. 1996. Militarized interstate disputes, 1816–1992: Rationale, coding rules, and empirical patterns. Conflict Management and Peace Science, 15(2):163–213.",
+            "Mike Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed, Omer Levy, Veselin Stoyanov, and Luke Zettlemoyer. 2020. Bart: Denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension. pages 7871–7880.",
+            "Bo Li, Gexiang Fang, Yang Yang, Quansen Wang, Wei Ye, Wen Zhao, and Shikun Zhang. 2023. Evaluating chatgpt’s information extraction capabilities: An assessment of performance, explainability, calibration, and faithfulness. arXiv preprint arXiv:2304.11633."
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            166
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "593",
+        "bbox": [
+            485,
+            928,
+            517,
+            941
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Sha Li, Heng Ji, and Jiawei Han. 2021. Document-level event argument extraction by conditional generation. In Proceedings ofthe 2021 Conference ofthe North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 894–908, Online. Association for Computational Linguistics.",
+            "J. Lu and Joydeep Roy. 2017. Universal petrarch: Language-agnostic political event coding using universal dependencies. Available at https://github.com/openeventdata/ UniversalPetrarch (2020/05/22).",
+            "Yi Luan, Luheng He, Mari Ostendorf, and Hannaneh Hajishirzi. 2018. Multi-task identification of entities, relations, and coreference for scientific knowledge graph construction. In Conference on Empirical Methods in Natural Language Processing.",
+            "Qing Lyu, Hongming Zhang, Elior Sulem, and Dan Roth. 2021. Zero-shot event extraction via transfer learning: Challenges and insights. In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 2: Short Papers), pages 322–332.",
+            "Charles McClelland. 1978. World event/interaction survey, 1966-1978. WEIS Codebook ICPSR, 5211.",
+            "Yu Meng, Yunyi Zhang, Jiaxin Huang, Chenyan Xiong, Heng Ji, Chao Zhang, and Jiawei Han. 2020. Text classification using label names only: A language model self-training approach. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 9006–9017.",
+            "Teruko Mitamura and Eduard Hovy. 2015. Tac kbp event detection and coreference tasks for english.",
+            "Abiola Obamuyide and Andreas Vlachos. 2018. Zeroshot relation classification as textual entailment. In Proceedings of the First Workshop on Fact Extraction and VERification (FEVER), pages 72–78, Brussels, Belgium. Association for Computational Linguistics.",
+            "Fredrik Olsson, Magnus Sahlgren, Fehmi ben Abdesslem, Ariel Ekgren, and Kristine Eck. 2020. Text categorization for conflict event annotation. In Proceedings ofthe Workshop on Automated Extraction of Socio-political Events from News 2020, pages 19– 25, Marseille, France. European Language Resources Association (ELRA).",
+            "Open Event Data Alliance. 2018. Political language ontology for verifiable event records. https:// github.com/openeventdata/PLOVER. Accessed: 2022-10-01.",
+            "OpenAI. 2022. Introducing chatgpt. https://openai. com/blog/chatgpt.",
+            "OpenAI. 2023. Gpt-4 technical report.",
+            "Faik Kerem Örs, Süveyda Yeniterzi, and Reyyan Yeniterzi. 2020. Event clustering within news articles. In Proceedings of the Workshop on Automated Extraction of Socio-political Events from News 2020, pages 63–68, Marseille, France. European Language Resources Association (ELRA).",
+            "Javier Osorio and Alejandro Beltrán. 2020. Enhancing the Detection of Criminal Organizations in Mexico using ML and NLP. 2020 International Joint Conference on Neural Networks (IJCNN), pages 1–7. Glasgow, Scottland.",
+            "Javier Osorio, Mohamed Mohamed, Viveca Pavon, and Brewer-Osorio Susan. 2019. Mapping Violent Presence of Armed Actors. Advances in Cartography in GIScience of the International Cartographic Association, pages 1–16.",
+            "Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. 2022. Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems, 35:27730–27744.",
+            "Frank Robert Palmer. 2001. Mood and modality. Cambridge university press.",
+            "Erick Skorupa Parolin, MohammadSaleh Hosseini, Yibo Hu, Latifur Khan, Patrick T Brandt, Javier Osorio, and Vito D’Orazio. 2022a. Multi-coped: A multilingual multi-task approach for coding political event data on conflict and mediation domain. In Proceedings of the 2022 AAAI/ACM Conference on AI, Ethics, and Society, pages 700–711.",
+            "Erick Skorupa Parolin, Yibo Hu, Latifur Khan, Patrick T Brandt, Javier Osorio, and Vito D’Orazio. 2022b. Confli-t5: An autoprompt pipeline for conflict related text augmentation. In 2022 IEEE International Conference on Big Data (Big Data), pages 1906–1913. IEEE.",
+            "Erick Skorupa Parolin, Latifur Khan, Javier Osorio, Patrick T Brandt, Vito D’Orazio, and Jennifer Holmes. 2021. 3M-Transformers for Event Coding on Organized Crime Domain. In 2021 IEEE 8th International Conference on Data Science and Advanced Analytics (DSAA), pages 1–10. IEEE.",
+            "Erick Skorupa Parolin, Latifur Khan, Javier Osorio, Vito D’Orazio, Patrick T Brandt, and Jennifer Holmes. 2020. Hanke: Hierarchical attention networks for knowledge extraction in political science domain. In 2020 IEEE 7th International Conference on Data Science and Advanced Analytics (DSAA), pages 410– 419. IEEE.",
+            "Ellie Pavlick, Heng Ji, Xiaoman Pan, and Chris Callison-Burch. 2016. The gun violence database: A new task and data set for nlp. In Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing, pages 1018–1024."
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            178
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "page_number",
+        "text": "594",
+        "bbox": [
+            485,
+            929,
+            517,
+            941
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Valentina Pyatkin, Shoval Sadde, Aynat Rubinstein, Paul Portner, and Reut Tsarfaty. 2021. The possible, the plausible, and the desirable: Event-based modality detection for language processing. arXiv preprint arXiv:2106.08037.",
+            "Benjamin J. Radford. 2021. CASE 2021 task 2: Zero-shot classification of fine-grained sociopolitical events with transformer models. In Proceedings of the 4th Workshop on Challenges and Applications of Automated Extraction ofSocio-political Eventsfrom Text (CASE 2021), pages 203–207, Online. Association for Computational Linguistics.",
+            "Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, Peter J Liu, et al. 2020. Exploring the limits of transfer learning with a unified text-to-text transformer. J. Mach. Learn. Res., 21(140):1–67.",
+            "Clionadh Raleigh, Andrew Linke, Håvard Hegre, and Joakim Karlsen. 2010. Introducing acled: an armed conflict location and event dataset: special data feature. Journal ofpeace research, 47(5):651–660.",
+            "Sebastian Riedel, Limin Yao, and Andrew McCallum. 2010. Modeling relations and their mentions without labeled text. In Joint European Conference on Machine Learning and Knowledge Discovery in Databases, pages 148–163. Springer.",
+            "Rachel Rudinger, Aaron Steven White, and Benjamin Van Durme. 2018. Neural models of factuality. In Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers), pages 731–744.",
+            "Oscar Sainz, Oier Lopez de Lacalle, Gorka Labaka, Ander Barrena, and Eneko Agirre. 2021. Label verbalization and entailment for effective zero-and few-shot relation extraction. In Proceedings ofthe 2021 Conference on Empirical Methods in Natural Language Processing (EMNLP).",
+            "Roser Saurí and James Pustejovsky. 2009. Factbank: a corpus annotated with event factuality. Language resources and evaluation, 43(3):227–268.",
+            "Philip A Schrodt. 1997. Early warning of conflict in southern lebanon using hidden markov models. In American Political Science Association.",
+            "Philip A Schrodt. 2006a. Forecasting conflict in the balkans using hidden markov models. In Programmingfor peace, pages 161–184. Springer.",
+            "Philip A. Schrodt. 2006b. Twenty Years of the Kansas Event Data System Project. The Political Methodologist, 14(1):2–6.",
+            "Philip A Schrodt. 2011. Forecasting political conflict in asia using latent dirichlet allocation models. In Annual meeting of the European political science association, Dublin.",
+            "Philip A Schrodt and Deborah J Gerner. 1996. Using cluster analysis to derive early warning indicators for political change in the Middle East, 1979-1996. University of Kansas.",
+            "Philip A Schrodt, Deborah J Gerner, and Omur Yilmaz. 2004. Using event data to monitor contemporary conflict in the israel-palestine dyad. International Studies Association, Montreal, Quebec, Canada, pages 1–31.",
+            "Philip A Schrodt, Ömür Yilmaz, and Deborah J Gerner. 2003. Evaluating “ripeness” and “hurting stalemate” in mediated international conflicts: An event data study of the middle east, balkans, and west africa. In Annual Meeting ofthe International Studies Association, Portland, OR, February (eventdata. parusanalytics. com/papers. dir/Schrodt. etal. ISA03. pdf).",
+            "Robert Shearer. 2007. Forecasting israeli-palestinian conflict with hidden markov models. Military Operations Research, pages 5–15.",
+            "Stephen M Shellman and Brandon M Stewart. 2007. Predicting risk factors associated with forced migration: An early warning model of haitian flight. Civil Wars, 9(2):174–199.",
+            "Xiang Wei, Xingyu Cui, Ning Cheng, Xiaobin Wang, Xin Zhang, Shen Huang, Pengjun Xie, Jinan Xu, Yufeng Chen, Meishan Zhang, et al. 2023. Zeroshot information extraction via chatting with chatgpt. arXiv preprint arXiv:2302.10205.",
+            "Adina Williams, Nikita Nangia, and Samuel R. Bowman. 2017. A broad-coverage challenge corpus for sentence understanding through inference. In North American Chapter of the Association for Computational Linguistics.",
+            "Wenpeng Yin, Jamaal Hay, and Dan Roth. 2019. Benchmarking zero-shot text classification: Datasets, evaluation and entailment approach. pages 3914–3923.",
+            "Chenhan Yuan, Qianqian Xie, and Sophia Ananiadou. 2023. Zero-shot temporal relation extraction with chatgpt. arXiv preprint arXiv:2304.05454.",
+            "Yuhao Zhang, Victor Zhong, Danqi Chen, Gabor Angeli, and Christopher D Manning. 2017. Position-aware attention and supervised data improve slot filling. In Conference on Empirical Methods in Natural Language Processing."
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            152
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "page_number",
+        "text": "595",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "A Mode Design and Mapping",
+        "text_level": 2,
+        "bbox": [
+            114,
+            84,
+            389,
+            101
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "PLOVER suggests auxiliary modes to indicate whether a reported event is historical, futureoriented, hypothetical, or negated, as shown in Table 6. Some event types can theoretically combine with an auxiliary mode, such as AGREE becoming SUPPORT + future or THREATEN becoming ASSAULT + hypothetical. However, PLOVER’s guidance lacks concrete implementation for annotators, merely assuming that “the coding engine will be able to resolve these and put that information in the context.”",
+        "bbox": [
+            112,
+            111,
+            490,
+            288
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Moreover, while there are overlaps between PLOVER’s auxiliary modes and the field of linguistic modality in NLP (Palmer, 2001; Saurí and Pustejovsky, 2009; Rudinger et al., 2018; Pyatkin et al., 2021), notable differences exist. For instance, Pyatkin et al. (2021) explore modes like event plausibility, which partially echoes aspects of political actors’ intentions and event factuality in PLOVER. However, these explorations, though relevant, lack the precision and simplicity needed for direct application in PLOVER’s context. Our focus, therefore, is on a simplified, practical, and task-specific mode framework for PLOVER.",
+        "bbox": [
+            112,
+            290,
+            490,
+            498
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Our proposed mode for PLOVER only consider four types: Past (P), Future (F), Contradict\\_Past (CP), Contradict\\_Future (CF). These modes were derived from our examination of the CAMEO/PLOVER ontology and PLOVER’s auxiliary modes from the PLOVER codebook. Within this framework, we make a clear distinction between verbal, future or hypothetical events (Future) and historical or ongoing events (Past). And considering contradiction, we arrived at a simple 2x2 matrix with four modes outlined in Table 7. The table simplifies event coding and aids in accurately assigning Rootcode and Quadcode when an event’s mode changes.",
+        "bbox": [
+            112,
+            499,
+            490,
+            725
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Specifically, Past covers historically significant or ongoing events, often presented in past tense but not restricted to it. Future includes verbal, hypothetical or future events. We consolidate hypothetical and future auxiliary modes in Table 6 because their similar nature in transitions between material and verbal events. For instance, THREATEN (Verbal Conflict, e.g., threatening to attack) can be considered either hypothetical or future ASSAULT (Material Conflict). Contradict\\_Past and Contradict\\_Future encompass events contradicting Past or Future occurrences, respectively. As illustrated in Table 3, CF and CP may include words with contradictory meanings, not necessarily containing negation words like “do not.” Here, NLI’s ability to identify negation allows us to focus on positive hypotheses with contradictory meanings, aligning with PLOVER’s guideline to exclude negated events from datasets. Moreover, the codebook already provides mirrored hypotheses, eliminating the need for manual construction. For example, “YIELD: reduced protest against” is the CP of “PROTEST: protested against.”",
+        "bbox": [
+            131,
+            725,
+            487,
+            741
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/1f1bd494898fd7e95a5c2b221ad85c2ce0d4c5553aea7dd58b6cd2c9122238c5.jpg",
+        "table_caption": [
+            "Table 6: Examples of PLOVER’s auxiliary modes."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Mode</td><td>Example</td></tr><tr><td>Historical</td><td>During the decolonization struggle, Angolan forces...</td></tr><tr><td>Future</td><td>Members of the G-7 will meet in Ottawa next month...</td></tr><tr><td></td><td>Hypothetical If Russian forces were to cross the border, that would represent a major...</td></tr><tr><td>Negation</td><td>Thus far, fighting has not re-emerged in the tense region.</td></tr></table>",
+        "bbox": [
+            119,
+            762,
+            485,
+            889
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/e04bc0e0ba94ba042602d3f8063a3a7cf5832d139388a6f2244fe2102fd8587e.jpg",
+        "table_caption": [
+            "Table 7: PLOVER’s labels (Rootcode text + Quadcode digits) w.r.t. our proposed modes: Past (P), Future (F), Contradict\\_Past (CP), Contradict\\_Future (CF)."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>P</td><td>F</td><td>CP</td><td>CF</td></tr><tr><td>AGREE CONSULT 1</td><td>AGREE 1</td><td>REJECT 3 REJECT 3</td><td></td></tr><tr><td>SUPPORT COOPERATE AID 2</td><td></td><td>AGREE 1 SANCTION 4 REJECT 3</td><td></td></tr><tr><td>YIELD ACCUSE</td><td>ACCUSE</td><td></td><td></td></tr><tr><td>DEMAND 3 REJECT</td><td>DEMAND 3 REJECT</td><td></td><td>AGREE 1 AGREE 1</td></tr><tr><td>THREATEN PROTEST</td><td>THREATEN</td><td></td><td></td></tr><tr><td>MOBILIZE SANCTION 4 THREATEN 3 COERCE</td><td></td><td></td><td>YIELD 2 AGREE 1</td></tr></table>",
+        "bbox": [
+            526,
+            80,
+            868,
+            273
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            355,
+            887,
+            709
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "An additional observation in Table 7 is that verbal actions remain classified as verbal regardless of mode. In contrast, material actions are categorized differently based on their contradictory forms. For instance, the contradiction or negation of AGREE (e.g., “didn’t agree to help”) is always REJECT, Verbal Conflict. However, for material actions (e.g., “provided aid to”), its CP form (e.g., “stopped providing aid to”) is SANCTION, Material Conflict, but its CF form (e.g., “would stop aid to”) is RE-JECT, Verbal Conflict.",
+        "bbox": [
+            507,
+            711,
+            887,
+            887
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "In sum, our task-specific mode concept aligns with PLOVER’s auxiliary modes but enhances",
+        "bbox": [
+            509,
+            889,
+            885,
+            920
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_number",
+        "text": "596",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/57c8e653b6016d988146e49e863d8e5d0458a728385c3acf33883af49bca1bed.jpg",
+        "table_caption": [
+            "Table 8: Examples of class disambiguation: We override forces if top predictions contain peace forces."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Hypothesis</td><td>Label</td></tr><tr><td>&lt;S&gt; increased forces in &lt;T&gt;. ↑override</td><td>MOBILIZE 4</td></tr><tr><td>&lt;S&gt; increased peace forces in &lt;T&gt;.</td><td>AID 2</td></tr><tr><td>&lt;S&gt; retreated forces from &lt;T&gt;. ↑override</td><td>YIELD 2</td></tr><tr><td>&lt;S&gt; retreated peace forces from &lt;T&gt;.</td><td>SANCTION 4</td></tr></table>",
+        "bbox": [
+            121,
+            82,
+            480,
+            187
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "PLOVER’s functionality, providing a practical, clear, and unambiguous approach to event coding.",
+        "bbox": [
+            112,
+            253,
+            489,
+            286
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "B ZSP’s Hypotheses and Class Disambiguation Rules",
+        "text_level": 2,
+        "bbox": [
+            114,
+            297,
+            396,
+            331
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Table 16 shows the mode-aware hypotheses used in our experiments. We selected a subset of label descriptions in different Rootcode and Quadcode from the CAMEO codebook and converted these sentences to Past and Future modes. Some of them do not need Future variants as their labels from Past to Future remain the same, following Table 7.",
+        "bbox": [
+            112,
+            340,
+            489,
+            453
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Crafting disambiguation rules is a smaller part of our work compared to developing broad event modes. Event modes have resolved many cases, with custom rules providing fine-tuning. Our primary goal is to maintain a simple and generalizable model. Therefore, we only add commonly encountered rules like Conflict Override, which is prevalent in the CAMEO codebook and affects the coding for all conflict events.",
+        "bbox": [
+            112,
+            453,
+            490,
+            598
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Peace Override. As the second frequent case, classes related to “forces” vary according to actions and entities. For example, sending peacekeeping forces/workers/observers indicates cooperation, while sending forces to attack/occupy stands for conflict. Thus, we add hypotheses with “peace forces” distinct from normal “forces”, as shown in Table 8. Predictions with “peace forces” have higher priority. I.e., we override “forces” if the top predictions contain “peace forces” because the latter one is more specified and infrequent. This simple rule ensures high recall for general forces and high precision for peace forces.",
+        "bbox": [
+            112,
+            598,
+            490,
+            807
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Consult Penalty. Another common issue found in CAMEO/PLOVER is the overly general CON-SULT class (e.g., consult/talk/meet/visit). Many actions (e.g., sending forces, attacks, and investigations) entail that the source visited the target. Likewise, an accusation or threat indicates that the source talked or met with the target. One simple solution is to deduct the Consult Penalty, denoted as c (e.g., 2%), which penalizes the predicted entailment scores for the Rootcode “CONSULT”.",
+        "bbox": [
+            112,
+            807,
+            490,
+            921
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "table",
+        "img_path": "images/36496875c5015231aa1951df7e5565531c66294c5fa2da21efd63c9bedc3dc39.jpg",
+        "table_caption": [
+            "Table 9: Supplementary ablation study for Table 5. Macro F1 scores% of ZSP with (+c) or without ( c) Consult Penalty in different configurations."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td colspan=\"2\">Model</td><td>PLV Bin.</td><td>PLV Quad</td><td>PLV Root</td><td>A/W Bin.</td><td>Avg.</td></tr><tr><td rowspan=\"3\">ZSP Flat</td><td>Tiny-c</td><td>89.7</td><td>68.9</td><td>49.5</td><td>81.0</td><td>72.3</td></tr><tr><td>Tiny+c</td><td>90.5</td><td>69.5</td><td>50.8</td><td>83.6</td><td>73.6</td></tr><tr><td>Full-c Full+c</td><td>89.4 91.0</td><td>70.8 73.4</td><td>53.1 55.7</td><td>75.9 82.4</td><td>72.3 75.6</td></tr><tr><td rowspan=\"5\">ZSP Tree</td><td> $l _ { 1 } { - } c$ </td><td>95.6</td><td>85.1</td><td>77.3</td><td>85.4</td><td>85.9</td></tr><tr><td> $l _ { 1 } { + } c$ </td><td>96.2</td><td>85.8</td><td>78.2</td><td>87.8</td><td>87.0</td></tr><tr><td> $l _ { 1 , 2 ^ { - C } }$ </td><td>96.0</td><td>87.0</td><td>78.7</td><td>85.5</td><td>86.8</td></tr><tr><td> $l _ { 1 , 2 } { + } c$ </td><td>96.5</td><td>87.6</td><td>79.4</td><td>87.8</td><td>87.8</td></tr><tr><td> $l _ { 1 , 2 , 3 ^ { - C } }$   $l _ { 1 , 2 , 3 + c }$ </td><td>95.9 96.4</td><td>89.0 89.6</td><td>81.8 82.4</td><td>85.5 88.0</td><td>88.1 89.1</td></tr></table>",
+        "bbox": [
+            510,
+            82,
+            882,
+            246
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            329,
+            885,
+            376
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "We analyze the impact of c at every level in Table 9, with (+c) indicating results with the penalty and ( c) showing results without it. The effect of c is evident, with an average increase of 1.6% in macro F1 for all the tasks. For deeper levels, c ensures the accuracy of Level 1 predictions to avoid error propagation. These findings confirm the importance of preventing overly general and ambiguous hypotheses. Incorporating c provides a simple solution to alleviate manual efforts in curating alternative hypotheses.",
+        "bbox": [
+            507,
+            378,
+            887,
+            555
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Besides the three main disambiguation rules, users can easily add or tailor less-important rules for their specific study purposes, as discussed in Appendix C.",
+        "bbox": [
+            507,
+            555,
+            885,
+            620
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "C Flexibility",
+        "text_level": 2,
+        "bbox": [
+            509,
+            633,
+            638,
+            651
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "The ZSP framework is notably flexible, easily accommodating changes in ontology or schema. Experts can swiftly update the ZSP method by modifying the hypothesis table or adjusting the class disambiguation rules to align with an evolving ontology. For example, if political scientists reclassify \"arresting someone\" from ACCUSE to COERCE (Table 7), they need only update the hypothesis label for “<S> arrested person of <T>”. Similarly, introducing sub-categories within YIELD involves simple updates to the hypothesis labels.",
+        "bbox": [
+            507,
+            662,
+            887,
+            839
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Disambiguation rules, such as the Conflict Override rule, which prioritizes PROTEST over RE-QUEST in certain contexts, can also be refined. Transitioning to a multi-label approach is straightforward by eliminating the Conflict Override rule to acknowledge both PROTEST and REQUEST as valid labels.",
+        "bbox": [
+            507,
+            840,
+            889,
+            921
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_number",
+        "text": "597",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "image",
+        "img_path": "images/bbb864e459b14b19b37efc58ce1f6d0cc724e55e3756d1a741725d559cb977fd.jpg",
+        "image_caption": [
+            "Table 10: Examples of CAMEO classes with nuanced differences. Customized rules can differentiate these classes based on the actors involved."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            117,
+            80,
+            484,
+            252
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            330,
+            487,
+            362
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "When should users write their own disambiguation rules? The need for custom rules depends on specific user requirements and the balance between manual effort and system precision and recall. Custom rules can be particularly beneficial for fine-grained analysis. For example, the CAMEO codebook includes similar classes “COERCE- Impose blockade” and “PROTEST- Obstruct passage/ blockade”, as shown in Table 10. The key difference is whether the source is armed forces or protestors.",
+        "bbox": [
+            112,
+            363,
+            490,
+            541
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "For researchers focusing on in-depth civil protest studies<sup>6</sup>, distinguishing between codes 144 (civilian protests) and 191 (military blockades) is crucial for accurate classification. Thus, they can define a simple rule, Blockade Override, without additional cost: remove the hypothesis “COERCE-Impose blockade” if the top predictions contain PROTEST, indicating that the source is more likely protestors rather than armed forces. This adaptability showcases the model’s flexibility and customizability in complex political scenarios.",
+        "bbox": [
+            112,
+            541,
+            490,
+            718
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "While ChatGPT can be generalized to any task with their chat-style format, they may sacrifice precision compared with the ZSP model. Yet, both zero-shot models show promising applicability to surpass traditional dictionary-based methods or annotation-driven supervised learning methods.",
+        "bbox": [
+            112,
+            718,
+            490,
+            816
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "D Building PLV and A/W Datasets",
+        "text_level": 2,
+        "bbox": [
+            112,
+            827,
+            433,
+            844
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "We extended existing resources to build our datasets, which is more efficient and effective than creating a new dataset from scratch. Table 11 summarizes the two datasets’ detailed train and test split statistics. PLV is constructed from two resources. First, we outlined 335 examples (unique source-target pairs) with PLOVER Rootcode from the CAMEO codebook, and the PLOVER repository. Then we preprocessed a coarse-grainedlabeled dataset from CoPED (Parolin et al., 2022a) and manually extended its Quadcode labels to 15 Rootcode in the new PLOVER schema. The major modification can be seen in Table 1. However, given that the current PLOVER codebook is in development, we leave YIELD without splitting it to CONCEDE and RETREAT. Finally, Figure 5 visualizes our final dataset’s label distribution.",
+        "bbox": [
+            112,
+            853,
+            489,
+            885
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/c1efe9414dd280aa0ed3cf1d4499ce332780a2f7aa174a3d94cafb4df2d04bef.jpg",
+        "table_caption": [
+            "Table 11: Statistics of the datasets: subsets, No. of documents and source-target pairs, and train/test splits."
+        ],
+        "table_footnote": [
+            "Conflict.attack: <arg1:attacker> attacked <arg2:target> using <arg3:instrument> at <arg4:place> place. Justice.arrest: <arg1:jailer> arrested <arg2:detainee> for <arg3:crime> crime at <arg4:place> place.",
+            "Figure 4: Examples of templates in the A/W’s original ontology (Li et al., 2021)."
+        ],
+        "table_body": "<table><tr><td>Dataset</td><td>Subset</td><td># Docs</td><td># S-T pairs</td><td>Tasks</td></tr><tr><td>PLV</td><td>CoPED Codebook Total</td><td></td><td>1043/698 0/335 1050/1033</td><td>Binary, Quadcode, Rootcode</td></tr><tr><td>A/W</td><td>WikiEvents</td><td>ACE 337/338 91/92 Total 428/430</td><td>432/451 370/434 802/805</td><td>Binary</td></tr></table>",
+        "bbox": [
+            515,
+            82,
+            877,
+            187
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            353,
+            887,
+            594
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "We built the A/W dataset from the ACE and WikiEvents datasets. First, the repository of (Li et al., 2021) provides templates for each event subtype of their ontology, enabling us to convert between different ontologies. For example, Figure 4 shows two frequent event types defined in the ontology. In both instances, argument 1 is equivalent to the source/actor, while argument 2 represents the target/recipient entities. Besides, the event type attack and arrest can be approximately mapped to ASSAULT and COERCE in PLOVER, respectively, as shown in Table 12.",
+        "bbox": [
+            507,
+            595,
+            887,
+            789
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Therefore, we built labeled source-target pairs from ACE and WikiEvents. We extracted major sentences that contained the labeled entities from each long document in WikiEvents. We also removed entities that only consist of pronouns. Finally, we got 1258 valid sentences with 1687 labeled Source-Target pairs. To prevent label leaking, we split the dataset by document IDs, ensuring distinct name entities for training and testing. Figure 6 shows the distribution of the original event types and the mapped binary class.",
+        "bbox": [
+            507,
+            791,
+            887,
+            921
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>6</sup>https://github.com/emerging-welfare/ glocongold.",
+        "bbox": [
+            114,
+            894,
+            420,
+            920
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_number",
+        "text": "598",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "chart",
+        "img_path": "images/8b6fa3ab3609361ac26df9938f2b94860163bc95d8ab39378b54537e39f0b351.jpg",
+        "content": "",
+        "chart_caption": [
+            "(a) Quadcode"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            137,
+            104,
+            268,
+            200
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "chart",
+        "img_path": "images/882ce462825c203c9d73089efef5085bffa2a67eefd075d93e63be1a9e40c7a6.jpg",
+        "content": "",
+        "chart_caption": [
+            "(b) Rootcode"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            295,
+            92,
+            465,
+            200
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "chart",
+        "img_path": "images/2b62124a941c52dd90c93a870917cd2cb34425804b10fcf80f0a064de55231a2.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 5: Extending PLV-Quadcode to Rootcode level.",
+            "(a) Event types statistics"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            131,
+            265,
+            373,
+            347
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "chart",
+        "img_path": "images/768dbe8a2405e2c8ea30712bf8f023edf8d7cd7a26b08340afb6279f8d98a598.jpg",
+        "content": "",
+        "chart_caption": [
+            "(b) Binary class",
+            "Figure 6: A/W dataset’s original event types and its relabeled binary category."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            378,
+            267,
+            472,
+            344
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            429,
+            489,
+            478
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "The nuanced differences between the two domains necessitate that event types be only “approximately” mapped to PLOVER Rootcodes. And extensive manual verification is needed to ensure accuracy. This complexity is rooted in the distinct focuses of NLP, which emphasizes predicates or topic-centric events, and Political Science, which concentrates on event status or mode. For instance, examples in Tables 2 (planned protest) and Table 3 (agreement to suspend protests) are both categorized as Conflict.Demonstrate in A/W, but in PLOVER, they are distinctly classified as THREATEN (verbal conflict) and AGREE (verbal cooperation), respectively. The binary labels even switch from conflict to cooperation in the second case. Thus, manual checking remains crucial even at the binary level.",
+        "bbox": [
+            112,
+            478,
+            490,
+            751
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "The annotation process was carried out by two authors, achieving a Kappa score of 0.76, with discrepancies resolved through discussion.",
+        "bbox": [
+            112,
+            752,
+            489,
+            801
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "E UP Experiment Setup",
+        "text_level": 2,
+        "bbox": [
+            114,
+            813,
+            342,
+            831
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Universal Petrarch (UP) is a popular dictionarybased event coder (Lu and Roy, 2017). We adapted UP into our task of relation classification with gold source and target, i.e., source-target-action triplets. We found that UP is too strict and often results in incomplete or empty triplets. Thus, we reported the best possible result by the following methods. First, we used UP for each sentence to extract all possible events. Then we ranked the extracted triplets by the number of matched entities with gold sources and targets to decide the event code. We also counted the valid event code when there were no matched entities but only matched trigger action verbs. Even so, there are still 10% and 27% invalid event code results on PLV and A/W datasets, respectively. Finally, we mapped its output four-digit code to PLOVER Rootcode and Quadcode (similar to Figure 1).",
+        "bbox": [
+            112,
+            839,
+            490,
+            921
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "table",
+        "img_path": "images/435b09bd16ffdf1a93339f092d7632870851292a5a750c16f130da8b8e3296f2.jpg",
+        "table_caption": [
+            "Table 12: Mapping A/W’s event types to PLOVER’s approximate Rootcode and binary class."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>A/W Event Types</td><td>Approx. Root. Binary</td><td></td></tr><tr><td>Life.Die/Injure Conflict.Attack Conflict.Demonstrate Justice Personnel.EndPosition</td><td>ASSAULT ASSAULT PROTEST ACCUSE or COERCE</td><td>Confli.</td></tr><tr><td>Contact Transaction</td><td>YIELD CONSULT COOPERATE or AID</td><td rowspan=\"2\">Coop.</td></tr><tr><td>Business.Merge-Org</td><td>COOPERATE</td></tr></table>",
+        "bbox": [
+            519,
+            82,
+            873,
+            210
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            279,
+            887,
+            489
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "F ZSP’s Detailed Results Analysis",
+        "text_level": 2,
+        "bbox": [
+            509,
+            502,
+            821,
+            520
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "We examined the confusion matrix for ZSP on Binary (Figure 8), Quadcode (Figure 9), and Rootcode (Figure 7) classifications. The results show that ZSP perfectly classifies most contexts, with a slight degradation in differentiating mode (verbal vs. material).",
+        "bbox": [
+            507,
+            531,
+            887,
+            627
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "In-depth class reports for PLV on Quadcode (Table 14) and Rootcode (Table 15) reveal that ZSP outperforms UP in nearly all metrics, except in the precision of the Verb-Conflict class (85.5%). However, UP’s lower recall impacts its overall F1 score, showcasing the superiority of PLM’s generalized knowledge over rigid pattern-matching approaches. Additionally, we noticed a performance trade-off when using overrides from Level 2 to Level 3. For instance, recall improves in Material-Conflict but decreases in Verbal-Conflict. Nevertheless, Level 3 significantly enhances overall F1 scores.",
+        "bbox": [
+            507,
+            629,
+            887,
+            824
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Further, we expand on the ablation study (Section 4.4), emphasizing why the tree-query approach, with fewer hypotheses, surpasses the “Full” model, which utilizes 222 flat hypotheses. Figure 10 illustrates the confusion matrix for the Full model’s Rootcode classification. A comparison between this matrix (Figure 10) and the default ZSP model using tree-query (Figure 7) reveals significant differences. The variable nature of NLI scores is a key factor in these differences. The tree-query model’s focused approach on controlled hypothesis groups with consistent entities and predicates, but varying modes, leads to more accurate hypothesis identification. In contrast, the Full model’s flat amalgamation of diverse hypotheses results in unpredictable outcomes and struggles with accurate mode classification, evident in frequent misclassifications between categories such as AGREE vs. SUPPORT, YIELD vs. AGREE, and REJECT vs. SANCTION or ASSAULT.",
+        "bbox": [
+            507,
+            824,
+            889,
+            921
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "page_number",
+        "text": "599",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "chart",
+        "img_path": "images/0a50da6a24c428e073205cf2853bbfc2f31c30de4e61ced6a96657c3fac4caa9.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 7: Confusion matrix for ZSP on PLV Rootcode."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            117,
+            83,
+            485,
+            334
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "chart",
+        "img_path": "images/7ccf0ae63d51e62f295af75d8a17bd716203b65344857b204bc0855145af83bd.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            136,
+            386,
+            258,
+            457
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "chart",
+        "img_path": "images/7b35bca5873665e0d63294a03964bed875a7738098c084c490fbfcdfe04faeca.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 8: Confusion matrix for ZSP on PLV Binary code.",
+            "Figure 9: Confusion matrix for ZSP on PLV Quadcode."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            300,
+            374,
+            484,
+            485
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            552,
+            490,
+            778
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "G NLI Model Selection",
+        "text_level": 2,
+        "bbox": [
+            114,
+            790,
+            334,
+            807
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "We selected RoBERTa-Large-MNLI<sup>7</sup> for its extensive usage in NLI research, with comparable alternatives like BART-Large-MNLI<sup>8</sup> also showing favorable results. Employing smaller-sized base models for zero-shot tasks is less common, primarily due to the significant drop in performance. Consequently, there are limited models specifically designed and widely accepted for zero-shot classification tasks.",
+        "bbox": [
+            112,
+            816,
+            490,
+            883
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "chart",
+        "img_path": "images/762fcbe78378170e3766930ff7b1a183350a27aba58e23720009a3b87dda4b11.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 10: Confusion matrix on PLV Rootcode using the “Full” model in Section 4.4 Ablation Study."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            514,
+            80,
+            882,
+            337
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "table",
+        "img_path": "images/9a9679993fb58a85cbd59d95724e05962765160fbf984160fe224d9d37763523.jpg",
+        "table_caption": [
+            "Table 13: Macro F1 scores of ZSP models with different sized RoBERTa NLI models."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Model</td><td>Size</td><td>PLV Bin.</td><td>PLV Quad</td><td>PLV Root</td><td>A/W Bin.</td><td>Avg.</td></tr><tr><td>base</td><td>125M</td><td>95.2</td><td>83.0</td><td>68.4</td><td>81.1</td><td>81.9</td></tr><tr><td>large</td><td>355M</td><td>96.4</td><td>89.6</td><td>82.4</td><td>88.0</td><td>89.1</td></tr></table>",
+        "bbox": [
+            519,
+            391,
+            872,
+            454
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            521,
+            887,
+            601
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "From an efficiency perspective, employing large models for zero-shot tasks proves efficient as they are only required during the inference phase. Conversely, training supervise large models can be relatively expensive. Besides, one of our chosen baselines, CBERT (Hu et al., 2022a), only has a base version. Therefore, we conducted supervised experiments using base models while reserving large models exclusively for zero-shot tasks. This approach ensures a relatively fair and meaningful comparison between the two model types.",
+        "bbox": [
+            507,
+            602,
+            887,
+            780
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "However, we also considered the possibility that a more rigorous comparison could have strengthened our hypotheses, particularly in demonstrating the effectiveness of smaller base models for handling fine-grained tasks in zero-shot scenarios. To explore this, we conducted experiments using an existing RoBERTa base model<sup>9</sup>. The results are presented in Table 13, offering valuable additional insights alongside the findings presented in Table 4. While we observed that base models can effectively classify context or topics, they encountered challenges in distinguishing nuanced differences in mode. This distinction can lead to a drop in performance compared to larger models.",
+        "bbox": [
+            507,
+            781,
+            887,
+            895
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>7</sup>https://huggingface.co/roberta-large-mnli",
+        "bbox": [
+            134,
+            892,
+            400,
+            907
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>8</sup>https://huggingface.co/facebook/bart-large-mnli",
+        "bbox": [
+            134,
+            906,
+            438,
+            921
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>9</sup>https://huggingface.co/cross-encoder/nli-roberta-base",
+        "bbox": [
+            531,
+            904,
+            865,
+            920
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_number",
+        "text": "600",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "table",
+        "img_path": "images/7b08b6664e1746a5224bbc16f7cfa085be0dec82cf31410e6c493b5994b18b20.jpg",
+        "table_caption": [
+            "Table 14: PLV Quadcode performance analysis."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">Class</td><td rowspan=\"2\">No.</td><td rowspan=\"2\">Metrics</td><td rowspan=\"2\">UP</td><td colspan=\"3\">ZSP</td></tr><tr><td> $l _ { 1 }$ </td><td> $l _ { 1 , 2 }$ </td><td>l1,2,3</td></tr><tr><td>V-Coop.</td><td>216</td><td>Precison Recall Macro F1</td><td>63.1 68.1 65.5</td><td>82.9 83.3 83.1</td><td>82.9 92.1 87.3</td><td>82.6 92.1 87.1</td></tr><tr><td>M-Coop.</td><td>200</td><td>Precison Recall Macro F1</td><td>52.4 60.5 56.1</td><td>84.1 84.5 84.3</td><td>91.7 83.0 87.1</td><td>91.3 83.5 87.2</td></tr><tr><td>V-Conf.</td><td>341</td><td>Precison Recall Macro F1</td><td>85.5 51.9 64.6</td><td>85.9 94.4 89.9</td><td>85.9 94.4 89.9</td><td>92.9 92.7 92.8</td></tr><tr><td>M-Conf.</td><td>276</td><td>Precison Recall Macro F1</td><td>75.7 69.9 72.7</td><td>92.1 80.1 85.7</td><td>93.2 80.1 86.2</td><td>92.6 90.2 91.4</td></tr><tr><td>macro avg.</td><td>1033</td><td>Precison Recall Macro F1</td><td>55.3 50.1 51.8</td><td>86.2 85.6 85.8</td><td>88.4 87.4 87.6</td><td>89.8 89.6 89.6</td></tr></table>",
+        "bbox": [
+            124,
+            82,
+            477,
+            325
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            379,
+            489,
+            494
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "H ChatGPT Experiment Setup",
+        "text_level": 2,
+        "bbox": [
+            114,
+            505,
+            401,
+            524
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "Table 17 exemplifies inputs for relation classification tasks. Our task is characterized by challenging fine-grained classification that demands a substantial amount of input information. Due to token limitations and API costs, inputting one example at a time with a lengthy prompt is inefficient and costly. Instead, we used a long prompt followed by a list of input sentences to stay within the maximum token limits and obtain a list of predicted labels. More specifically, the inputs comprise the task and label description, a sentence list (usually limited to less than 50 sentences due to word constraints), and the task requirements. The anticipated output from the model is the predicted labels. Despite our repeated emphasis on ChatGPT generating only predefined labels, certain issues remain. To mitigate these, we use numerical codes (01-15) instead of text labels (AGREE - ASSAULT), reducing ChatGPT’s generation of labels outside the predefined set. Additionally, we’ve noticed that ChatGPT tends to forget the task description and predefined label information, necessitating their input each time. Finally, refining the task and label description doesn’t yield improved results. This",
+        "bbox": [
+            112,
+            533,
+            492,
+            921
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "table",
+        "img_path": "images/32e8359b80060c27accb456dca07803fb9d5938730e37db22ea60a443309a4a2.jpg",
+        "table_caption": [
+            "Table 15: PLV Rootcode performance analysis."
+        ],
+        "table_footnote": [
+            "underscores the complexity of the task, involving semantically non-mutually exclusive fine-grained labels, which proves challenging for ChatGPT."
+        ],
+        "table_body": "<table><tr><td>Class</td><td>Precision</td><td>Recall</td><td>Macro F1</td><td>No.</td></tr><tr><td>AGREE</td><td>73.6</td><td>82.9</td><td>78.0</td><td>111</td></tr><tr><td>CONSULT</td><td>70.0</td><td>85.4</td><td>76.9</td><td>41</td></tr><tr><td>SUPPORT</td><td>84.8</td><td>87.5</td><td>86.2</td><td>64</td></tr><tr><td>COOPERATE</td><td>68.2</td><td>75.0</td><td>71.4</td><td>20</td></tr><tr><td>AID</td><td>82.2</td><td>62.7</td><td>71.2</td><td>59</td></tr><tr><td>YIELD</td><td>89.7</td><td>86.0</td><td>87.8</td><td>121</td></tr><tr><td>ACCUSE</td><td>82.1</td><td>85.7</td><td>83.9</td><td>91</td></tr><tr><td>REQUEST</td><td>96.8</td><td>84.7</td><td>90.4</td><td>72</td></tr><tr><td>REJECT</td><td>90.8</td><td>90.0</td><td>90.4</td><td>120</td></tr><tr><td>THREATEN</td><td>71.4</td><td>77.6</td><td>74.4</td><td>58</td></tr><tr><td>PROTEST</td><td>88.2</td><td>90.9</td><td>89.6</td><td>33</td></tr><tr><td>MOBILIZE</td><td>66.7</td><td>85.7</td><td>75.0</td><td>14</td></tr><tr><td>SANCTION</td><td>86.1</td><td>93.9</td><td>89.9</td><td>33</td></tr><tr><td>COERCE</td><td>82.4</td><td>80.6</td><td>81.5</td><td>93</td></tr><tr><td>ASSAULT</td><td>96.7</td><td>84.5</td><td>90.2</td><td>103</td></tr><tr><td>accuracy</td><td></td><td></td><td>83.8</td><td>1033</td></tr><tr><td>macro-avg.</td><td>82.0</td><td>83.5</td><td>82.4</td><td>1033</td></tr></table>",
+        "bbox": [
+            522,
+            83,
+            872,
+            317
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_number",
+        "text": "601",
+        "bbox": [
+            485,
+            929,
+            515,
+            942
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "table",
+        "img_path": "images/6b00abcb0a3e0541b7fdb37f9e5f83653e7285b59f44ea8171e37fc7688972c8.jpg",
+        "table_caption": [
+            "Table 16: The mode-aware hypothesis table considering Past and Future modes. <S> and <T> represent the source and the target entities in practical examples. Some hypotheses do not require Future variants as their labels (Rootcode and Quadcode) remain unchanged from Past to Future, as indicated in Table 7."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Root.</td><td>Quad.</td><td>Past</td><td>Future</td></tr><tr><td>AGREE</td><td>V-Coop.</td><td>&lt;S&gt; agreed to do something for &lt;T&gt;</td><td>None</td></tr><tr><td>AGREE</td><td>V-Coop.</td><td>&lt;S&gt; promised to do something for &lt;T&gt;</td><td>None</td></tr><tr><td>CONSULT</td><td>V-Coop.</td><td>&lt;S&gt; held a talk with &lt;T&gt;</td><td>&lt;S&gt; agreed to hold a talk with &lt;T&gt;</td></tr><tr><td>CONSULT</td><td>V-Coop.</td><td>&lt;S&gt; met with &lt;T&gt;</td><td>&lt;S&gt; agreed to meet with &lt;T&gt;</td></tr><tr><td>CONSULT</td><td>V-Coop.</td><td>&lt;S&gt; undertook more negotiation with &lt;T&gt;</td><td>&lt;S&gt; agreed to undertake negotiation with &lt;T&gt;</td></tr><tr><td></td><td>V-Coop.</td><td>&lt;S&gt; apologized to &lt;T&gt;</td><td>&lt;S&gt; agreed to apologize to &lt;T&gt;</td></tr><tr><td>SUPPORT</td><td></td><td></td><td>&lt;S&gt; agreed to support &lt;T&gt;</td></tr><tr><td>SUPPORT</td><td>V-Coop.</td><td>&lt;S&gt; expressed support for &lt;T&gt;</td><td>&lt;S&gt; agreed to grant diplomatic recognition of &lt;T&gt;</td></tr><tr><td>SUPPORT</td><td>V-Coop.</td><td>&lt;S&gt; granted diplomatic recognition of &lt;T&gt;</td><td>&lt;S&gt; agreed to improve diplomatic cooperation with &lt;T&gt;</td></tr><tr><td>SUPPORT</td><td>V-Coop.</td><td>&lt;S&gt; improved diplomatic cooperation with &lt;T&gt;</td><td>&lt;S&gt; agreed to sign an agreement with &lt;T&gt;</td></tr><tr><td>SUPPORT</td><td>V-Coop.</td><td>&lt;S&gt; signed an agreement with &lt;T&gt; &lt;S&gt; added aid to &lt;T&gt;</td><td>&lt;S&gt; agreed to provide aid to &lt;T&gt;</td></tr><tr><td>AID</td><td>M-Coop.</td><td>&lt;S&gt; added money to &lt;T&gt;</td><td>&lt;S&gt; agreed to add money to &lt;T&gt;</td></tr><tr><td>AID</td><td>M-Coop.</td><td>&lt;S&gt; granted asylum to &lt;T&gt;</td><td>&lt;S&gt; agreed to grant asylum to &lt;T&gt;</td></tr><tr><td>AID</td><td>M-Coop.</td><td>&lt;S&gt; increased peace forces in &lt;T&gt;</td><td>&lt;S&gt; agreed to increase peace forces in &lt;T&gt;</td></tr><tr><td>AID</td><td>M-Coop.</td><td>&lt;S&gt; cooperated with &lt;T&gt;</td><td>&lt;S&gt; agreed to cooperate with &lt;T&gt;</td></tr><tr><td>COOPERATE</td><td>M-Coop.</td><td></td><td>&lt;S&gt; agreed to extradite person to &lt;T&gt;</td></tr><tr><td>COOPERATE COOPERATE</td><td>M-Coop.</td><td>&lt;S&gt; extradited person to &lt;T&gt; &lt;S&gt; shared information with &lt;T&gt;</td><td>&lt;S&gt; agreed to share information with &lt;T&gt;</td></tr><tr><td>YIELD</td><td>M-Coop.</td><td></td><td>&lt;S&gt; promised to accept demands of &lt;T&gt;</td></tr><tr><td>YIELD</td><td>M-Coop.</td><td>&lt;S&gt; accepted demands of &lt;T&gt; &lt;S&gt; allowed entry of &lt;T&gt;</td><td>&lt;S&gt; promised to allow entry of &lt;T&gt;</td></tr><tr><td></td><td>M-Coop.</td><td></td><td>&lt;S&gt; promised to a ceasefire with &lt;T&gt;</td></tr><tr><td>YIELD</td><td>M-Coop.</td><td>&lt;S&gt; declared a ceasefire with &lt;T&gt;</td><td>&lt;S&gt; promised to ease restrictions on &lt;T&gt;</td></tr><tr><td>YIELD</td><td>M-Coop.</td><td>&lt;S&gt; eased restrictions on &lt;T&gt;</td><td>&lt;S&gt; promised to provide rights to &lt;T&gt;</td></tr><tr><td>YIELD</td><td>M-Coop.</td><td>&lt;S&gt; provided rights to &lt;T&gt;</td><td>&lt;S&gt; promised to reduce protest for &lt;T&gt;</td></tr><tr><td>YIELD</td><td>M-Coop.</td><td>&lt;S&gt; reduced protest against &lt;T&gt; &lt;S&gt; released person of &lt;T&gt;</td><td>&lt;S&gt; promised to release person of &lt;T&gt;</td></tr><tr><td>YIELD</td><td>M-Coop.</td><td></td><td>&lt;S&gt; promised to resign from the position in &lt;T&gt;</td></tr><tr><td>YIELD</td><td>M-Coop.</td><td>&lt;S&gt; resigned from the position in &lt;T&gt;</td><td>&lt;S&gt; promised to retreat forces from &lt;T&gt;</td></tr><tr><td>YIELD</td><td>M-Coop.</td><td>&lt;S&gt; retreated forces from &lt;T&gt;</td><td>&lt;S&gt; promised to return property of &lt;T&gt;</td></tr><tr><td>YIELD</td><td>M-Coop.</td><td>&lt;S&gt; returned property of &lt;T&gt;</td><td>&lt;S&gt; promised to surrender to &lt;T&gt;</td></tr><tr><td>YIELD</td><td>M-Coop.</td><td>&lt;S&gt; surrendered to &lt;T&gt;</td><td></td></tr><tr><td>YIELD</td><td>M-Coop.</td><td>&lt;S&gt; undertook reform in &lt;T&gt;</td><td>&lt;S&gt; promised to undertake reform in &lt;T&gt; None</td></tr><tr><td>ACCUSE</td><td>V-Conf.</td><td>&lt;S&gt; accused &lt;T&gt; of something</td><td>None</td></tr><tr><td>ACCUSE</td><td>V-Conf.</td><td>&lt;S&gt; brought lawsuit against &lt;T&gt;</td><td>None</td></tr><tr><td>ACCUSE</td><td>V-Conf.</td><td>&lt;S&gt; expressed complaints of &lt;T&gt;</td><td></td></tr><tr><td>REQUEST</td><td>V-Conf.</td><td>&lt;S&gt; demanded something from &lt;T&gt;</td><td>None</td></tr><tr><td>INVESTIGATE</td><td>V-Conf.</td><td>&lt;S&gt; investigated something of &lt;T&gt;</td><td>&lt;S&gt; planned to investigate something of &lt;T&gt;</td></tr><tr><td>INVESTIGATE</td><td>V-Conf.</td><td>&lt;S&gt; sent people to investigate &lt;T&gt;</td><td>&lt;S&gt; planned to send people to investigate &lt;T&gt; None</td></tr><tr><td>REJECT</td><td>V-Conf.</td><td>&lt;S&gt; defied laws of &lt;T&gt;</td><td>None</td></tr><tr><td>REJECT</td><td>V-Conf.</td><td>&lt;S&gt; rejected proposals of &lt;T&gt;</td><td>None</td></tr><tr><td>REJECT</td><td>V-Conf.</td><td>&lt;S&gt; rejected cooperation with &lt;T&gt;</td><td>None</td></tr><tr><td>REJECT</td><td>V-Conf.</td><td>&lt;S&gt; rejected to do something for &lt;T&gt;</td><td>None</td></tr><tr><td>REJECT</td><td>V-Conf.</td><td>&lt;S&gt; rejected to stop something against &lt;T&gt;</td><td>None</td></tr><tr><td>REJECT</td><td>V-Conf.</td><td>&lt;S&gt; rejected to consult with &lt;T&gt; &lt;S&gt; rejected to yield to &lt;T&gt;</td><td>None</td></tr><tr><td>REJECT</td><td>V-Conf.</td><td>&lt;S&gt; issued a ultimatum to &lt;T&gt;</td><td>None</td></tr><tr><td>THREATEN</td><td>V-Conf.</td><td>&lt;S&gt; threatened something against &lt;T&gt;</td><td>None</td></tr><tr><td>THREATEN</td><td>V-Conf.</td><td>&lt;S&gt; arrested person of &lt;T&gt;</td><td>&lt;S&gt; threatened to arrest person of &lt;T&gt;</td></tr><tr><td>COERCE</td><td>M-Conf.</td><td>&lt;S&gt; attacked &lt;T&gt; cybernetically</td><td>&lt;S&gt; threatened to attack &lt;T&gt; cybernetically</td></tr><tr><td>COERCE COERCE</td><td>M-Conf.</td><td>&lt;S&gt; deported person of &lt;T&gt;</td><td>&lt;S&gt; threatened to deport person of &lt;T&gt;</td></tr><tr><td>COERCE</td><td>M-Conf.</td><td>&lt;S&gt; detained person of &lt;T&gt;</td><td>&lt;S&gt; threatened to detain person of &lt;T&gt;</td></tr><tr><td>COERCE</td><td>M-Conf.</td><td>&lt;S&gt; imposed blockades in &lt;T&gt;</td><td>&lt;S&gt; threatened to impose blockades in &lt;T&gt;</td></tr><tr><td>COERCE</td><td>M-Conf.</td><td>&lt;S&gt; imposed state of emergency in &lt;T&gt;</td><td>&lt;S&gt; threatened to impose state of emergency in &lt;T&gt;</td></tr><tr><td>COERCE</td><td>M-Conf.</td><td>&lt;S&gt; imposed more restrictions on &lt;T&gt;</td><td>&lt;S&gt; threatened to impose restrictions on &lt;T&gt;</td></tr><tr><td>COERCE</td><td>M-Conf.</td><td>&lt;S&gt; repressed person of &lt;T&gt;</td><td>&lt;S&gt; threatened to repress person of &lt;T&gt;</td></tr><tr><td>COERCE</td><td>M-Conf. M-Conf.</td><td>&lt;S&gt; seized property of &lt;T&gt;</td><td>&lt;S&gt; threatened to seize property of &lt;T&gt;</td></tr><tr><td>ASSAULT</td><td>M-Conf.</td><td>&lt;S&gt; seized territory of &lt;T&gt;</td><td>&lt;S&gt; threatened to seize territory of &lt;T&gt;</td></tr><tr><td>ASSAULT</td><td>M-Conf.</td><td>&lt;S&gt; assaulted person of &lt;T&gt;</td><td>&lt;S&gt; threatened to assault person of &lt;T&gt;</td></tr><tr><td>ASSAULT</td><td>M-Conf.</td><td>&lt;S&gt; destropyed property of &lt;T&gt;</td><td>&lt;S&gt; threatened to destropy property of &lt;T&gt;</td></tr><tr><td>ASSAULT</td><td>M-Conf.</td><td>&lt;S&gt; killed person of &lt;T&gt;</td><td>&lt;S&gt; threatened to kill person of &lt;T&gt;</td></tr><tr><td>ASSAULT</td><td>M-Conf.</td><td>&lt;S&gt; launched military strikes against &lt;T&gt;</td><td>&lt;S&gt; threatened to launch military strikes against &lt;T&gt;</td></tr><tr><td>ASSAULT</td><td>M-Conf.</td><td>&lt;S&gt; violated ceasefire with &lt;T&gt;</td><td>&lt;S&gt; threatened to violate ceasefire with &lt;T&gt;</td></tr><tr><td>FIGHT</td><td>M-Conf.</td><td>&lt;S&gt; attempted to assassinate &lt;T&gt;</td><td>None</td></tr><tr><td>FIGHT</td><td>M-Conf.</td><td>&lt;S&gt; used person of &lt;T&gt; as human shield</td><td>None</td></tr><tr><td>FIGHT</td><td>M-Conf.</td><td>Explosives in &lt;S&gt; attacked &lt;T&gt;</td><td>None</td></tr><tr><td>MOBILIZE</td><td>M-Conf.</td><td>&lt;S&gt; increased forces in &lt;T&gt;</td><td>&lt;S&gt; threatened to increase forces in &lt;T&gt;</td></tr><tr><td>MOBILIZE</td><td>M-Conf.</td><td>&lt;S&gt; kept alert in &lt;T&gt;</td><td>&lt;S&gt; threatened to keep alert in &lt;T&gt;</td></tr><tr><td>MOBILIZE</td><td>M-Conf.</td><td>&lt;S&gt; prepared forces against &lt;T&gt;</td><td>&lt;S&gt; threatened to prepare forces against &lt;T&gt;</td></tr><tr><td>PROTEST</td><td>M-Conf.</td><td>&lt;S&gt; launched protests against &lt;T&gt;</td><td>&lt;S&gt; threatened to launch protests against &lt;T&gt;</td></tr><tr><td>PROTEST</td><td>M-Conf.</td><td>&lt;S&gt; launched protests in &lt;T&gt;</td><td>&lt;S&gt; threatened to launch protests in &lt;T&gt;</td></tr><tr><td>PROTEST</td><td>M-Conf.</td><td>&lt;S&gt; protestors obstructed roads against &lt;T&gt;</td><td>&lt;S&gt; protestors threatened to obstruct roads against &lt;T&gt;</td></tr><tr><td></td><td></td><td></td><td>&lt;S&gt; threatened to undertake boycott against &lt;T&gt;</td></tr><tr><td>PROTEST</td><td>M-Conf.</td><td>&lt;S&gt; undertook boycotts against &lt;T&gt;</td><td></td></tr><tr><td>SANCTION</td><td>M-Conf.</td><td>&lt;S&gt; discontinued cooperation with &lt;T&gt;</td><td>&lt;S&gt; threatened to discontinue cooperation with &lt;T&gt;</td></tr><tr><td>SANCTION</td><td>M-Conf.</td><td>&lt;S&gt; expelled diplomatic people of &lt;T&gt;</td><td>&lt;S&gt; threatened to expel diplomatic people of &lt;T&gt;</td></tr><tr><td>SANCTION</td><td>M-Conf.</td><td>&lt;S&gt; expelled organizations of &lt;T&gt;</td><td>&lt;S&gt; threatened to expel organizations of &lt;T&gt;</td></tr><tr><td>SANCTION</td><td>M-Conf.</td><td>&lt;S&gt; expelled peacekeepers of &lt;T&gt;</td><td>&lt;S&gt; threatened to expel peacekeepers of &lt;T&gt;</td></tr><tr><td>SANCTION</td><td>M-Conf.</td><td>&lt;S&gt; halted negotiations with &lt;T&gt;</td><td>&lt;S&gt; threatened to halt negotiate with &lt;T&gt;</td></tr><tr><td>SANCTION</td><td>M-Conf.</td><td>&lt;S&gt; reduced aid to &lt;T&gt;</td><td>&lt;S&gt; threatened to reduce aid to &lt;T&gt;</td></tr><tr><td>SANCTION</td><td>M-Conf.</td><td>&lt;S&gt; retreated peace forces from &lt;T&gt;</td><td>&lt;S&gt; threatened to retreat peace forces from &lt;T&gt;</td></tr></table>",
+        "bbox": [
+            183,
+            90,
+            815,
+            853
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "page_number",
+        "text": "602",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "image",
+        "img_path": "images/c9e279b1976960788ac2cf7e5b83d014333a2d95b0a7edb0b21486464e4c9f2e.jpg",
+        "image_caption": [
+            "Table 17: Input and Output of ChatGPT."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            119,
+            96,
+            897,
+            868
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "page_number",
+        "text": "603",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 20
+    }
+]

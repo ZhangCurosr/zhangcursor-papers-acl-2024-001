@@ -1,0 +1,3704 @@
+[
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Hyper-CL: Conditioning Sentence Representations with Hypernetworks"
+                    }
+                ],
+                "level": 1
+            },
+            "bbox": [
+                126,
+                89,
+                872,
+                111
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Young Hyun Yoo†, Jii Cha†, Changhyeon Kim, Taeuk Kim∗ Hanyang University, Seoul, Republic of Korea {somebodil,skchajie,livex,kimtaeuk}@hanyang.ac.kr"
+                    }
+                ]
+            },
+            "bbox": [
+                243,
+                145,
+                754,
+                196
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Abstract"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                260,
+                260,
+                342,
+                277
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "While the introduction of contrastive learning frameworks in sentence representation learning has significantly contributed to advancements in the field, it still remains unclear whether state-of-the-art sentence embeddings can capture the fine-grained semantics of sentences, particularly when conditioned on specific perspectives. In this paper, we introduce Hyper-CL, an efficient methodology that integrates hypernetworks with contrastive learning to compute conditioned sentence representations. In our proposed approach, the hypernetwork is responsible for transforming pre-computed condition embeddings into corresponding projection layers. This enables the same sentence embeddings to be projected differently according to various conditions. Evaluation of two representative conditioning benchmarks, namely conditional semantic text similarity and knowledge graph completion, demonstrates that Hyper-CL is effective in flexibly conditioning sentence representations, showcasing its computational efficiency at the same time. We also provide a comprehensive analysis of the inner workings of our approach, leading to a better interpretation of its mechanisms. Our code is available at https://github.com/HYU-NLP/Hyper-CL."
+                    }
+                ]
+            },
+            "bbox": [
+                141,
+                288,
+                462,
+                675
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "1 Introduction"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                115,
+                696,
+                260,
+                712
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Building upon the established correlation between language model performance and computational capacity (Kaplan et al., 2020), there has emerged an undeniable trend towards the adoption of everlarger language models across a diverse range of NLP applications. This trend is also evident in the computation of sentence or text representations. Despite the ongoing popularity of compact encoders such as BERT (Devlin et al., 2019) and RoBERTa (Liu et al., 2019), there is a growing inclination to leverage the capabilities of recent, larger language models, e.g., LLaMA-2 (Touvron et al., 2023), even breaking from the conventional roles of encoders and decoders. Consequently, the enduring challenge of finding a balance between performance and computational cost—a persistent issue in sentence representation learning (Reimers and Gurevych, 2019)—continues to be elusive."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                722,
+                489,
+                901
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/388e4b3c1cecb933368412634c8267608464590cb04601b599548e8a3315480d.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 1: Illustration of our approach dubbed Hyper-CL. In the example, two sentences are provided along with two distinct conditions, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { h i g h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { l o w } ."
+                    },
+                    {
+                        "type": "text",
+                        "content": "Specifically, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { h i g h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "(orange) denotes a condition that results in the sentences being interpreted more similarly, whereas "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { l o w }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "(blue) leads to a perspective in which the two sentences are understood as being relatively more distinct. The identical pair of sentences are projected into different subspaces that reflect the provided conditions."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                514,
+                260,
+                873,
+                530
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                707,
+                885,
+                821
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In recent years, there has been a marked improvement in the quality of sentence embeddings, a progress primarily driven by the advent of contrastive learning frameworks (Kim et al., 2021; Gao et al., 2021; Chuang et al., 2022; inter alia). However, since the performance of these embeddings is generally evaluated based on their ability to encapsulate the overall meaning of the corresponding sentences—as measured by benchmarks like STS-B (Agirre et al., 2012; Cer et al., 2017) and MTEB (Muennighoff et al., 2023), it remains uncertain whether they adequately capture information relating to the various aspects of the source sentences."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                826,
+                887,
+                922
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>†</sup>Equal contribution. ∗Corresponding author."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                907,
+                410,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "700"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                941
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 700–711 August 11-16, 2024 ©2024 Association for Computational Linguistics"
+                    }
+                ]
+            },
+            "bbox": [
+                97,
+                945,
+                900,
+                973
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/93f48cfe7f68c87a8fd47081a50346b059f92af697508662a366d02e9b67323d.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 2: Four different types of architectures applicable for conditioning tasks. They utilize the [CLS] token embeddings from the encoder as representations of inputs. From left to right: the cross-encoder architecture encodes a triplet containing two sentences "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( s _ { 1 } , s _ { 2 } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and a condition (c) as a whole. In the bi-encoder setting, two sentencecondition pairs "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( s _ { 1 } , c )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( s _ { 2 } , c )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are processed individually. The tri-encoder configuration regard s , s , and c as independent and encode them separately, followed by extra merging operations (e.g., Hadamard product). Finally, Hyper-CL resembles the tri-encoder, but innovatively incorporates a hypernetwork responsible for constructing projection matrices to condition sentences s<sub>1</sub> and s<sub>2</sub>, based on the embedding of the condition c."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                144,
+                80,
+                855,
+                253
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                388,
+                490,
+                501
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "For instance, consider the sentences (1) “A cyclist pedals along a scenic mountain trail, surrounded by lush greenery” and (2) “A hiker navigates through a dense forest on a winding path, enveloped by the tranquility of nature”. In terms of “The mode oftransportation”, these sentences should be perceived as similar since both depict individuals engaging in outdoor activities, traversing natural landscapes. However, regarding “The speed of travel”, they should be differentiated, as cycling generally entails a faster pace than hiking. Deshpande et al. (2023) reported that current models for sentence embeddings face challenges in recognizing the fine-grained semantics within sentences. In other words, the existing models struggle to accurately detect the subtle shifts in sentence nuances that occur when conditioned on specific criteria."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                502,
+                490,
+                777
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In the literature, three prevalent approaches have been established for constructing conditioned representations (Deshpande et al., 2023), particularly in estimating their similarity (see Figure 2). The first is the cross-encoder approach, which encodes the concatenation of a pair of sentences (s<sub>1</sub>, s<sub>2</sub>) with a condition (c), i.e., "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "[ s _ { 1 } ; s _ { 2 } ; c ]"
+                    },
+                    {
+                        "type": "text",
+                        "content": ".<sup>1</sup> The second method is the bi-encoder architecture, computing separate representations of sentences s<sub>1</sub> and s<sub>2</sub> with the condition c—[s ; c] and [s ; c]. Despite their simplicity, both approaches share a notable limitation: the representation must be computed for every unique combination of sentences plus a condition."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                780,
+                489,
+                892
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                388,
+                885,
+                485
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "On the other hand, the tri-encoder architecture utilizes pre-computed embeddings of sentences s and s along with the condition c. It then employs a separate composition function responsible for merging the semantics of the sentence and condition. Considering that the embeddings for each component can be cached and reused, this approach offers enhanced long-term efficiency. The tri-encoder architecture, despite its potential, falls short in performance compared to the bi-encoder. This is primarily due to its inherent limitation, which is the inability to model explicit interactions between sentences and conditions during the representation construction process. Therefore, there is a need to propose a revised version of the tri-encoder architecture that improves its functionality without substantially sacrificing its efficiency."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                487,
+                887,
+                760
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this work, we present Hyper-CL, a method that integrates Hypernetworks (Ha et al., 2017) with Contrastive Learning to efficiently compute conditioned sentence representations and their similarity. As illustrated in Figure 2d, our proposed approach is derived from the tri-encoder architecture. It introduces an additional hypernetwork tasked with constructing a condition-sensitive network on the fly. This network projects the original sentence embeddings into a specific condition subspace. Figure 1 illustrates the effectiveness of Hyper-CL in dynamically conditioning pre-computed sentence representations according to different perspectives."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                762,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>1</sup>[ ; ] represents the concatenation operation."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                907,
+                410,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "701"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                515,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                489,
+                134
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We demonstrate the effectiveness of Hyper-CL by significantly reducing the performance gap with the bi-encoder architecture in the Conditional Semantic Textual Similarity (C-STS) and Knowledge Graph Completion (KGC) tasks. In particular, for C-STS, Hyper-CL demonstrates an improvement of up to 7.25 points in Spearman correlation compared to the original tri-encoder architecture. Furthermore, compared to the bi-encoder approach, our method shows superior efficiency by reducing the running time by approximately 40% on the C-STS dataset and 57% on the WN18RR dataset."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                134,
+                490,
+                328
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2 Background and Related Work"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                343,
+                418,
+                360
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this paper, conditioning refers to the presence of two or more signals, each represented as a natural language expression c. These signals impact the interpretation of a sentence "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "s ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": "highlighting a specific aspect of the sentence (Galanti and Wolf, 2020). Here, we describe two representative tasks that involve conditioning, along with an introduction to the concept of hypernetworks."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                372,
+                489,
+                500
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Conditional Semantic Textual Similarity (C-STS) (Deshpande et al., 2023) is a task composed of four elements in one quadruplet: two sentences "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "s _ { 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "s _ { 2 } ."
+                    },
+                    {
+                        "type": "text",
+                        "content": ", a condition c to consider when calculating the similarity between the two sentences, and a similarity score "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "y ."
+                    },
+                    {
+                        "type": "text",
+                        "content": "Unlike the original Semantic Textual Similarity (STS) dataset (Agirre et al., 2012; Cer et al., 2017), C-STS computes similarity scores for the same sentence pair "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "s _ { 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "s _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "under two distinct conditions "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { h i g h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { l o w }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The similarity scores of the conditioned sentences are expected to be high for "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { h i g h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and low for "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { l o w }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Therefore, a model for this task is required to compute distinct representations for the same sentence under two different viewpoints. To this end, a few basic architectures illustrated in Figure 2 have been proposed by Deshpande et al. (2023). Our objective is to present a revision to the previous methods, pursuing the balance between performance and computational efficiency."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                502,
+                490,
+                825
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Knowledge Graph Completion (KGC) is the task focused on automatically inferring missing relationships or entities in a knowledge graph. The knowledge graph is represented as a set of triplets "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( h , r , t )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", consisting of a head entity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": "a relation "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "^ { r , }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and a tail entity t. Link prediction, a subtask in"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                826,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "KGC,<sup>2</sup> aims to uncover unestablished yet plausible and novel relationships between entities (Bordes et al., 2013; Toutanova and Chen, 2015). When given a head entity and a relation, the task of identifying the most suitable tail entity is known as head entity prediction. Conversely, the task of determining the appropriate head entity when a tail entity and relation are provided is termed tail entity prediction."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                84,
+                885,
+                229
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "While two types of methodologies are generally available for KGC—embedding-based methods and text-based methods—our primary focus is on text-based methods that rely on the processing of textual information by language models. We further categorize them into three types: cross-encoder, encoder-decoder, and bi-encoder architectures. Approaches such as KG-BERT (Yao et al., 2019) and MTL-KGC (Kim et al., 2020), which concatenate all triple elements (i.e., "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\left[ h ; r ; t \\right] )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", are classified as cross-encoder. Methods like StAR (Wang et al., 2021) and SimKGC (Wang et al., 2022), which separately embed "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "[ h ; r ]"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and t in tail prediction tasks, are classified as bi-encoder. Lastly, GenKGC (Xie et al., 2022) and KG-S2S (Chen et al., 2022), which directly generate tail entity text based on the remaining [h; r], are classified as encoder-decoder."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                230,
+                887,
+                504
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "On the other hand, hypernetworks refer to a type of neural network that generates the weights or parameters for another neural network, known as the primary network (Ha et al., 2017; Chauhan et al., 2023; Majumdar et al., 2023). In essence, a hypernetwork enables the dynamic construction of the primary network, allowing its function to adapt flexibly based on the input or condition. For instance, Galanti and Wolf (2020) demonstrate that, even with a compact primary network, hypernetworks can effectively learn and apply diverse functions for various inputs, provided the hypernetwork itself is sufficiently large. In our settings, we also endeavor to harness the advantages of hypernetworks, ensuring that conditioned sentence representations are dynamically computed and adapted in response to changing conditions."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                505,
+                887,
+                780
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3 Proposed Method: Hyper-CL"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                790,
+                798,
+                808
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.1 Motivation"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                816,
+                645,
+                832
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "As briefly mentioned in §1, current approaches to sentence conditioning demonstrate a clear trade-off between performance and computational efficiency."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                838,
+                885,
+                888
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>2</sup>While this work focuses solely on link prediction, note that other relevant tasks exist within the domain of KGC."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                895,
+                884,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "702"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/57f2c20c980601908ce2c19064896483732cfe7b3230662327438a16522cd0f9.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 3: Training procedure of Hyper-CL. It introduces a hypernetwork q to construct the weights of multi-layer perceptrons (MLPs), i.e., g, based on the condition. The MLPs are then used to project sentence embeddings onto subspaces, resulting in condition-aware sentence embeddings. Hyper-CL is trained with a contrastive objective, utilizing pairs of condition-aware sentence embeddings, one with a high condition "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { h i g h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and the other with a low condition "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { l o w }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Note that every embedding is the output of the same encoder "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "f ."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                124,
+                82,
+                468,
+                300
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Approaches that enable direct interaction between a sentence and a condition within encoders—the cross-encoder and bi-encoder architectures—gain enhanced performance but at the cost of reduced efficiency. In contrast, the tri-encoder architecture, while enabling efficient conditioning with pre-computed sentence and condition embeddings, tends to have inferior performance compared to its counterparts. Note that this trade-off becomes more pronounced as the number of sentences and conditions to be processed increases."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                487,
+                489,
+                664
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Formally, consider a computationally intensive language model-based encoder "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "f ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and a less demanding composition network "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "g _ { \\colon }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "which is required in the case of the tri-encoder architecture. In terms of the bi-encoder, obtaining the set of every possible conditioned embedding "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { H } = \\{ h _ { s c } | \\forall s \\forall c , s \\in"
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\cal { S } , c \\in { \\mathcal { C } } \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": "necessitates "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "| S | \\times | C |"
+                    },
+                    {
+                        "type": "text",
+                        "content": "repetitions of the heavy operation imposed by "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "f ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": "where  denotes the total number of sentences and  represents the total number of possible conditions. In contrast, the tri-encoder architecture only requires heavy operations by f for each sentence s and condition "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c"
+                    },
+                    {
+                        "type": "text",
+                        "content": "just once. This implies that only + heavy operations are needed, followed by "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "| S | \\times | C |"
+                    },
+                    {
+                        "type": "text",
+                        "content": "lightweight operations by g to obtain the conditioned embeddings. As a result, the tri-encoder and its variants become more efficient if the cost of computing g is markedly lower than that of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "f"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", thereby amortizing the cost for computing "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { H }"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                665,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                509,
+                85,
+                882,
+                133
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this work, we aim to develop a new architecture for sentence conditioning that inherits the efficiency merits of the tri-encoder architecture, while simultaneously outperforming the original in terms of performance. To achieve this, we propose the use of hypernetworks to implement "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "g _ { \\colon }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", facilitating the dynamic construction of conditioning networks while maintaining reasonable cost-efficiency."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                133,
+                885,
+                263
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.2 Framework and Training Procedure"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                272,
+                842,
+                287
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The framework of Hyper-CL and its training procedure are listed as follows (also see Figure 3):"
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                292,
+                885,
+                325
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "1. First, it computes the embeddings of a sentence s and a condition c using the same embedding model "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "f \\colon h _ { s } = f ( s )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { c } = f ( c )"
+                    }
+                ]
+            },
+            "bbox": [
+                524,
+                335,
+                885,
+                385
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "2. Given the condition embedding "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { c } ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": "a hypernetwork "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "q : \\mathbb { R } ^ { N _ { h } }  \\mathbb { R } ^ { N _ { h } \\times N _ { h } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "outputs a linear transformation matrix "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "for conditioning: "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c } = q ( h _ { c } ) . ^ { 3 }"
+                    }
+                ]
+            },
+            "bbox": [
+                524,
+                393,
+                885,
+                458
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "3. We encode the condition-aware sentence embedding "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { s c }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "based on the matrix "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and the sentence embedding "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { s } \\colon h _ { s c } = W _ { c } \\cdot h _ { s }"
+                    }
+                ]
+            },
+            "bbox": [
+                524,
+                468,
+                884,
+                517
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "4. For training, we perform contrastive learning with the conditional sentence embeddings "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { s c } ."
+                    },
+                    {
+                        "type": "text",
+                        "content": "whose details are explained in the following."
+                    }
+                ]
+            },
+            "bbox": [
+                524,
+                526,
+                884,
+                575
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.3 Contrastive Learning in Subspaces"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                585,
+                830,
+                600
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The conditioning network composed of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is a linear neural network. In other words, it can be interpreted as a linear transformation function "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "g"
+                    },
+                    {
+                        "type": "text",
+                        "content": ": "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbb { R } ^ { N _ { h } } \\xrightarrow { ^ { - } } \\mathbb { R } ^ { N _ { h } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", mapping from the original semantic space of sentence embeddings to a specialized condition subspace. We demonstrate that conducting contrastive learning within the subspace of specific viewpoints yields greater effectiveness compared to performing the same process in the general space. We apply separate task-oriented contrastive learning objectives for the tasks, C-STS and KGC."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                605,
+                885,
+                783
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "C-STS The C-STS task entails providing conditions "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { h i g h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { l o w }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "for two sentences, s and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "s _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "This setup induces different interpretations of the relationship between the two sentences—one being more similar under "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { h i g h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and the other more dissimilar under "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { l o w }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". In a given instance from the dataset,"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                791,
+                885,
+                889
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>3</sup>N<sub>h</sub>: The dimensionality of sentence embeddings, which is equal to the size of the hidden states of an encoder model."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                895,
+                882,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "703"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                515,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Hyper-CL generates two pairs of conditioned sentence embeddings, i.e., "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( h _ { s _ { 1 } c _ { h i g h } } , h _ { s _ { 2 } c _ { h i g h } } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( h _ { s _ { 1 } c _ { l o w } } , h _ { s _ { 2 } c _ { l o w } } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Since these pairs correspond to positive and negative pairs in the contrastive objective, we directly utilize them for training."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                84,
+                489,
+                165
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Considering that the C-STS dataset already contains gold-standard similarity values for the two sentences under each condition, it seems reasonable to employ the Mean Squared Error (MSE) objective in conjunction with contrastive learning. However, as training progresses, we can speculate that MSE objectives that utilize labels will provide relatively more fine-grained granularity compared to contrastive objectives that do not. Therefore, to mitigate the relatively strong impact of the contrastive objective, we apply the InfoNCE (Oord et al., 2018) loss with high temperature, as follows:"
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                165,
+                490,
+                361
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\begin{array} { r } { L _ { C L } = - \\log \\frac { e ^ { \\phi ( h _ { s _ { 1 } c _ { h i g h } } , h _ { s _ { 2 } c _ { h i g h } } ) / \\tau } } { e ^ { \\phi ( h _ { s _ { 1 } c _ { h i g h } } , h _ { s _ { 2 } c _ { h i g h } } ) / \\tau } + e ^ { \\phi ( h _ { s _ { 1 } c _ { l o w } } , h _ { s _ { 2 } c _ { l o w } } ) / \\tau } } , } \\end{array}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/5f86a9a640057c3adb13a6289e4882eb365daeb72e23d2c4976568514b90c6b9.jpg"
+                }
+            },
+            "bbox": [
+                117,
+                381,
+                485,
+                409
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\phi"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the cosine similarity function and τ is a temperature hyperparameter. The MSE objective is as follows:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                417,
+                489,
+                464
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "L _ { M S E } = \\| \\phi ( h _ { s _ { 1 } c } , h _ { s _ { 2 } c } ) - y \\| _ { 2 } ^ { 2 } ,",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/5bbffd1c07fa30db1a6255bb1f7acb275485b1280172558f0b576da593905300.jpg"
+                }
+            },
+            "bbox": [
+                181,
+                474,
+                420,
+                493
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where c can be either "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { h i g h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "or "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { l o w }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". By combining the two above formulas, the final form of our training objective for C-STS becomes:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                505,
+                489,
+                552
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "{ \\cal L } = { \\cal L } _ { M S E } + { \\cal L } _ { C L } .",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/cec093b842302ea02111716fc2e2aec275c72d866da7836f5d4b8c39facb0ec1.jpg"
+                }
+            },
+            "bbox": [
+                223,
+                563,
+                379,
+                580
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Note that L is averaged over data instances in the training set."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                590,
+                487,
+                624
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "KGC We follow the setting of SimKGC (Wang et al., 2022), except that we leverage Hyper-CL instead of the bi-encoder architecture. For each triplet of head entity, relation, and tail entity (h, r, t), we treat entities as sentences and relations as conditions, framing KGC as a conditioning task. Furthermore, given that Hyper-CL is simple and flexible enough to adopt various techniques from SimKGC, such as the use of self-negative, pre-batch negatives, and in-batch negatives, we decide to apply these tricks to our method as well. In conclusion, the final training objective for KGC is as follows (refer to Wang et al. (2022) for more details):"
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                631,
+                490,
+                841
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\begin{array} { r } { L _ { C L } = - \\log \\frac { e ^ { ( \\phi ( h _ { h r } , h _ { t } ) - \\gamma ) / \\tau } } { e ^ { ( \\phi ( h _ { h r } , h _ { t } ) - \\gamma ) / \\tau } + \\sum _ { j = 1 } ^ { N } e ^ { \\phi ( h _ { h r } , h _ { t ^ { \\prime } } ) / \\tau } } } \\end{array}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/98661986c5427d2de4b8c5bf707529011840079e172f1b60ab33e616dbd53714.jpg"
+                }
+            },
+            "bbox": [
+                119,
+                850,
+                485,
+                881
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { h r } , h _ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { t } ^ { \\prime }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are the relation-aware head embedding, tail embedding, random embedding (i.e., self-negative, pre-batch negative, and in-batch negative), respectively. The relation-aware head embedding corresponds to a conditional sentence embedding. γ is an additive margin, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\phi"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the cosine similarity, and τ is a learnable parameter."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                890,
+                487,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                84,
+                885,
+                166
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.4 Optimization of Hypernetworks"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                507,
+                177,
+                810,
+                192
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In the original formulation presented in §3.2, the number of parameters for the hypernetwork "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "q :"
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbb { R } ^ { N _ { h } }  \\mathbb { R } ^ { \\hat { N _ { h } } \\times N _ { h } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the cube of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "N _ { h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", which could lead to cost inefficiency. To address this issue, we propose decomposing the network into two lowrank matrices, drawing inspiration from low-rank approximation (Yu et al., 2017; Hu et al., 2021). In particular, we introduce two smaller hypernetworks of the same size: "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "q _ { 1 } : \\mathbb { R } ^ { N _ { h } }  \\mathbb { R } ^ { N _ { h } \\times \\hat { N } _ { K } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "q _ { 2 } : \\mathbb { R } ^ { N _ { h } }  \\mathbb { R } ^ { N _ { h } \\times N _ { K } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "to generate two low-rank matrices "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c _ { 1 } } = q _ { 1 } ( h _ { c } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c _ { 2 } } = q _ { 2 } ( h _ { c } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "N _ { k }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is much smaller than "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "N _ { h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". We then obtain the final matrix through their product: "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "{ \\cal W } _ { c } = { \\cal W } _ { c 1 } { \\cal W } _ { c 2 } ^ { T } . ^ { 4 }"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                197,
+                887,
+                409
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.5 Caching Conditioning Networks"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                418,
+                811,
+                435
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In the tri-encoder architecture, once computed, the sentence and condition embeddings "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { s }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { c }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "can be cached and subsequently reused whenever conditioned embeddings related to them need to be computed. Hyper-CL, building upon the tri-encoder framework, not only inherits this advantage but also further improves time efficiency by caching the parameters of the entire conditioning networks "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c } = q ( h _ { c } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "generated by the hypernetwork. It is important to note that this approach is viable because the computation of the matrix "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "depends solely on "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { c } ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": "without requiring any other inputs."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                439,
+                885,
+                634
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4 Experiments"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                507,
+                645,
+                657,
+                663
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We apply Hyper-CL to various embedding models (i.e., encoders) and fine-tune them on the target task, denoting the resulting models with the subscript hyper-cl. If the rank of the hypernetwork "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( N _ { k } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is different from "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "N _ { h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", we denote this value as hyperK-cl. We set K as 64 and 85, for the base and large models respectively. A detailed explanation for the selection of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "K"
+                    },
+                    {
+                        "type": "text",
+                        "content": "can be found in the appendix B. We show the effectiveness of Hyper-CL by evaluating it on two downstream tasks."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                671,
+                887,
+                834
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.1 Conditional Semantic Textual Similarity"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                507,
+                845,
+                873,
+                860
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We use DiffCSE (Chuang et al., 2022) and SimCSE (Gao et al., 2021), adaptations of RoBERTa (Liu et al., 2019), for the embedding model f. Note that the key difference between the original tri-encoder architecture and Hyper-CL lies in the composition network, g. The original uses the simple Hadamard product, while Hyper-CL employs hypernetworks to learn linear layers for this composition."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                866,
+                885,
+                898
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>4</sup>A similar method was proposed in Majumdar et al. (2023)."
+                    }
+                ]
+            },
+            "bbox": [
+                529,
+                907,
+                882,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "704"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/9ed0b401114676a88d22a57b1785b3a0ccfac2305c171e0777460e41b0f4826e.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 1: Performance on C-STS measured by Spearman and Pearson correlation coefficients. The best results are in bold for each section. *: indicates the results of Hyper-CL. : denotes results from Deshpande et al. (2023)."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Method</td><td># Params</td><td>Spearman</td><td>Pearson</td></tr><tr><td>tri-encoder architectures</td><td></td><td></td><td></td></tr><tr><td> $\\mathrm { D i f f C S E } _ { b a s e } ^ { \\dagger }$ </td><td>125M</td><td> $2 8 . 9 _ { 0 . 8 }$ </td><td> $2 7 . 8 _ { 1 . 2 }$ </td></tr><tr><td> $\\boldsymbol { * } \\mathrm { D i f f } \\mathrm { C S E } _ { b a s e + h y p e r 6 4 - c l }$ </td><td>200M</td><td> $3 3 . 1 0 _ { 0 . 2 }$ </td><td> $3 1 . 6 8 _ { 0 . 6 }$ </td></tr><tr><td> $\\boldsymbol { * } \\mathrm { D i f f } \\mathrm { C S E } _ { b a s e + h y p e r - c l }$ </td><td>578M</td><td> $3 3 . 8 2 _ { 0 . 1 }$ </td><td> $3 3 . 1 0 _ { 0 . 3 }$ </td></tr><tr><td> $\\mathrm { S i m C S E } _ { b a } ^ { \\dagger }$ </td><td>125M</td><td> $3 1 . 5 _ { 0 . 5 }$ </td><td> $3 1 . 0 \\mathrm { _ { 0 . 5 } }$ </td></tr><tr><td>base  $* \\mathrm { S i m C S E } _ { b a s e + h y p e r 6 4 - c l }$ </td><td>200M</td><td> $3 8 . 3 6 _ { 0 . 1 }$ </td><td> $3 7 . 5 3 \\mathrm { _ { 0 . 0 4 } }$ </td></tr><tr><td> $\\ast \\mathrm { S i m C S E } _ { b a s e + h y p e r - c l }$ </td><td>578M</td><td> $3 8 . 7 5 _ { 0 . 3 }$ </td><td> $3 8 . 3 8 _ { 0 . 3 }$ </td></tr><tr><td> $\\mathrm { S i m C S E } _ { l a r g e } ^ { \\dagger }$ </td><td>355M</td><td> $3 5 . 3 \\mathrm { _ { 1 . 0 } }$ </td><td> $3 5 . 6 \\phantom { 0 } _ { 0 . 9 }$ </td></tr><tr><td> $* \\mathrm { S i m } { \\mathrm { C S E } } _ { l a r g e + h y p e r 8 5 - c l }$ </td><td>534M</td><td> $3 8 . 1 2 _ { 1 . 4 }$ </td><td> $3 7 . 4 7 _ { 1 . 4 }$ </td></tr><tr><td> $* \\mathrm { S i m C S E } _ { l a r g e + h y p e r - c l }$ </td><td>1431M</td><td> $3 9 . 6 0 _ { 0 . 2 }$ </td><td> $3 9 . 9 6 _ { 0 . 3 }$ </td></tr><tr><td colspan=\"4\">bi-encoder architectures</td></tr><tr><td> $\\mathrm { D i f f C S E } _ { b a s e } ^ { \\dagger }$ </td><td>125M</td><td> $4 3 . 4 _ { 0 . 2 }$ </td><td> $4 3 . 5 _ { 0 . 2 }$ </td></tr><tr><td> $\\mathrm { S i m C S E } _ { b a s e } ^ { \\dagger }$ </td><td>125M</td><td> $4 4 . 8 \\phantom { 0 } _ { 0 . 3 }$ </td><td> $4 4 . 9 _ { 0 . 3 }$ </td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td> $\\mathrm { S i m C S E } _ { l a r g e } ^ { \\dagger }$ </td><td>355M</td><td> $4 7 . 5 _ { 0 . 1 }$ </td><td> $4 7 . 6 _ { 0 . 1 }$ </td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                287,
+                80,
+                712,
+                322
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                393,
+                489,
+                491
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Table 1 summarizes the results of Hyper-CL in addition to baselines on C-STS. Compared to the tri-encoder baselines, Hyper-CL demonstrates improvements with up to a 7.25-point increase in Pearson correlation when based on "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { S i m C S E } _ { b a s e }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "This reduces the performance gap between the biencoder and tri-encoder from 13.3 to 6.05 points."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                492,
+                489,
+                605
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In addition, even when Hyper-CL is developed with low-rank approximation (i.e., hyper64-cl, hyper85-cl), its performance remains consistent. This indicates that the memory usage of hypernetworks can be effectively controlled, while both performance and time efficiency are maintained."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                606,
+                489,
+                705
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.2 Knowledge Graph Completion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                719,
+                403,
+                736
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In KGC, the link prediction task entails computing relation-aware embeddings for head or tail entities and subsequently retrieving the top-K embeddings based on their similarity scores. We consider two datasets for KGC: WN18RR (Bordes et al., 2013) and FB15k-237 (Toutanova and Chen, 2015)."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                743,
+                489,
+                840
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We employ text-based KGC models as baselines for evaluation. Specifically, we use the SimKGC model that leverages all negatives (i.e., in-batch negative, pre-batch negative, and self-negative), which is also true when applying Hyper-CL to"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                841,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "SimKGC. We consider an extra baseline of applying the tri-encoder architecture to SimKGC with different "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "g { - }  { - } ( 1 )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Hadamard: performs the Hadamard product between the representations of a condition c and a sentence s: "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "g _ { 1 } ( h _ { c } , h _ { s } ) = h _ { c } \\odot h _ { s }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "(2) Concatenation: merge the two vectors, apply a dropout function, and halve the dimension using a linear layer: "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "g _ { 2 } ( h _ { c } , h _ { s } ) = W \\cdot d ( [ h _ { c } ; h _ { s } ] )"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                393,
+                885,
+                524
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Table 2 presents the outcomes of our method and baselines on KGC, measured by MRR (Mean Reciprocal Rank) and Hits@K. "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "3 \\mathrm { E R T } _ { b a s e }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is leveraged for the embedding model f. As a result, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { S i m K G C } _ { h y p e r - c l }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", representing the application of Hyper-CL to SimKGC, shows that there is no significant difference in performance compared to the original SimKGC, especially in terms of Hits@10. Even for "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { S i m K G C } _ { h y p e r 6 4 - c l } ."
+                    },
+                    {
+                        "type": "text",
+                        "content": ", while there is a slight decrease in performance, it still yields competitive results and does not significantly trail behind other baselines. Moreover, the performance of other methods in the tri-encoder architecture falls significantly short of Hyper-CL’s. It is worth noting that our implementation is based on the tri-encoder architecture, which guarantees significantly more efficiency in running time compared to the original SimKGC. The details of this analysis are in §5.1."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                523,
+                887,
+                814
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5 Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                826,
+                621,
+                843
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.1 Efficiency Comparison between Bi-Encoder and Tri-Encoder"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                852,
+                806,
+                884
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To assess the running time efficiency of Hyper-CL, enabled by its caching capability, we compare the execution time of our method with that of the biencoder and tri-encoder architectures. We measure execution time, cache hit rate, and memory usage in scenarios with caching enabled. Initially, the cache is empty, and embeddings are added to the cache upon each cache miss."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                890,
+                885,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "705"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/130ef92a236256b6aca52d5e992b4370b92efe04733bcce2721a831af454c1d5.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 2: Results on the WN18RR and FB15K-237 datasets for KGC, measured by MRR and Hits@K. The best results are highlighted in bold, while the next best results are underlined for each column. *: indicates the results of applying Hyper-CL. : denotes results from Chen et al. (2022). : denotes results from Wang et al. (2022). Other results are implemented and evaluated by the authors."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=\"2\">Method</td><td colspan=\"4\">WN18RR</td><td colspan=\"4\">FB15K-237</td></tr><tr><td>MRR</td><td>Hits@1</td><td>Hits@3</td><td>Hits@10</td><td>MRR</td><td>Hits@1</td><td>Hits@3</td><td>Hits@10</td></tr><tr><td colspan=\"9\">cross-encoder architectures</td></tr><tr><td>KG-BERT†</td><td>0.216</td><td>0.041</td><td>0.302</td><td>0.524</td><td></td><td></td><td></td><td>0.420</td></tr><tr><td>MTL-KGC†</td><td>0.331</td><td>0.203</td><td>0.383</td><td>0.597</td><td>0.267</td><td>0.172</td><td>0.298</td><td>0.458</td></tr><tr><td colspan=\"9\">encoder-decoder architectures</td></tr><tr><td>GenKGC†</td><td></td><td>0.287</td><td>0.403</td><td>0.535</td><td></td><td>0.192</td><td>0.355</td><td>0.439</td></tr><tr><td>KG-S2S†</td><td>0.574</td><td>0.531</td><td>0.595</td><td>0.661</td><td>0.336</td><td>0.257</td><td>0.373</td><td>0.498</td></tr><tr><td colspan=\"9\">bi-encoder architectures</td></tr><tr><td>StAR†</td><td>0.401</td><td>0.243</td><td>0.491</td><td>0.709</td><td>0.296</td><td>0.205</td><td>0.322</td><td>0.482</td></tr><tr><td>SimKGC‡</td><td>0.666</td><td>0.587</td><td>0.717</td><td>0.800</td><td>0.336</td><td>0.249</td><td>0.362</td><td>0.511</td></tr><tr><td colspan=\"9\">tri-encoder architectures</td></tr><tr><td>SimKGChadamard-product</td><td>0.164</td><td>0.004</td><td>0.243</td><td>0.481</td><td>0.153</td><td>0.092</td><td>0.162</td><td>0.274</td></tr><tr><td>SimKGCconcatenation</td><td>0.335</td><td>0.226</td><td>0.382</td><td>0.550</td><td>0.271</td><td>0.193</td><td>0.292</td><td>0.430</td></tr><tr><td> $\\mathrm { \\mathrm { } } ^ { \\ast } \\mathrm { S i m K G C } _ { h y p e r - c l }$ </td><td>0.616</td><td>0.506</td><td>0.690</td><td>0.810</td><td>0.318</td><td>0.231</td><td>0.344</td><td>0.496</td></tr><tr><td> $\\mathrm { ^ { * } S i m K G C } _ { h y p e r 6 4 - c l }$ </td><td>0.548</td><td>0.427</td><td>0.626</td><td>0.770</td><td>0.305</td><td>0.219</td><td>0.331</td><td>0.479</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                144,
+                80,
+                852,
+                349
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                450,
+                489,
+                546
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Specifically, we estimate the inference time required for the C-STS and WN18RR datasets. To simulate a realistic scenario where the number of data samples to be processed is substantial, we utilize all dataset splits (training, validation, and test) from the datasets. For the C-STS dataset, we also evaluate the results of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { S i m C S E } _ { h y p e r 6 4 - c l }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "as a solution for cases with large cache sizes. For Hyper-CL, the transformation matrix "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is saved instead of embeddings. We set the batch size as 1 to minimize the overhead of cache storage and retrieval."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                548,
+                490,
+                725
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "As observed in Table 3 and 4, Hyper-CL reduces the running time by approximately 40% on the C-STS dataset and 57% on the WN18RR dataset than the bi-encoder architecture. Compared to the naïve tri-encoder architecture, Hyper-CL requires slightly more time, but we believe this is acceptable given its significantly improved performance."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                727,
+                489,
+                841
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In terms of cache hit rate, the tri-encoder architecture, including Hyper-CL, achieves a much higher rate as it embeds each input separately, whereas the bi-encoder architecture has a lower rate because both the sentence and condition combination must match to result in a cache hit. Considering the significant gap in cache hit ratio between the bi-encoder and tri-encoder architectures, we expect that the efficiency of Hyper-CL will be more pronounced when deployed to process real-time streaming data from a large pool of users. In such scenarios, the diversity of input sentences and their conditions (relations) would be much higher than in our experimental settings, implying that the efficiency gap between the bi-encoder and tri-encoder architectures will be more severe.<sup>5</sup>"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                843,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                450,
+                887,
+                627
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.2 Analysis of Embedding Clusters"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                639,
+                810,
+                655
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this subsection, we explore the impact of Hyper-CL on generating conditioned sentence representations by visualizing the computed embeddings and analyzing them using clustering tools."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                661,
+                885,
+                725
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We visualize the vector space of sentence embeddings before and after transformation by "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", which is the weight of a linear layer from the Hyper-CL’s hypernetwork. This helps us observe if embeddings based on the same condition cluster after transformation, indicating proper differentiation based on conditions. For this analysis, we choose three sets of 20 random sentences from the C-STS validation dataset, with sentences within each group sharing the same conditions. The three conditions we select are: ‘The number of people’, ‘The sport’, and ‘The name of the object’. As expected, Figure 4 shows that sentence embeddings transformed with the same "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c _ { i } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "form clusters, meaning each embedding has projected to respective subspaces."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                726,
+                887,
+                839
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>5</sup>The ratio of the number of unique items required to be cached by the tri- and bi-encoder architectures, i.e., ( + )/( ), will approach close to 0 if  and  become very large. This implies that in practice, it is infeasible to utilize caching techniques for the bi-encoder architecture if the sentences and conditions of interest are sufficiently diverse."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                847,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "706"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/49aae27386e3775d348aab28dffba1ab25cf457cd8c3c0c5483da43ff04a5124.jpg"
+                },
+                "table_caption": [],
+                "table_footnote": [],
+                "html": "<table><tr><td>Method</td><td>Time</td><td>HitRate</td><td>Cache</td></tr><tr><td colspan=\"4\">bi-encoder architectures</td></tr><tr><td> $\\mathrm { S i m C S E } _ { b a s e }$ </td><td>791.71s</td><td>1.46%</td><td>110.87MB</td></tr><tr><td> $\\mathrm { S i m C S E } _ { l a r g e }$ </td><td>1498.65s</td><td>1.46%</td><td>147.26MB</td></tr><tr><td colspan=\"4\">tri-encoder architectures</td></tr><tr><td> $\\mathrm { S i m C S E } _ { b a s e }$ </td><td>441.17s</td><td>64.11%</td><td>60.57MB</td></tr><tr><td>SimCSEbase+hyper64-cl</td><td>525.62s</td><td>64.11%</td><td>2.17GB</td></tr><tr><td>SimCSEbase+hyper-cl</td><td>541.55s</td><td>64.11%</td><td>12.81GB</td></tr><tr><td> $\\mathrm { S i m C S E } _ { l a r g e }$ </td><td>832.19s</td><td>64.11%</td><td>80.45MB</td></tr><tr><td>SimCSElarge+hyper64-cl  $\\mathrm { S i m C S E } _ { l a r g e + h y p e r - c l }$ </td><td>990.94s 960.84s</td><td>64.11% 64.11%</td><td>3.82GB 22.75GB</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                126,
+                82,
+                475,
+                256
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/7c4a19f22737c23bbe1332af6f92b5b2f7b129bf2c4347d02438d2dbc7aba29a.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 3: Analysis of inference time, cache hit rate, and memory usage for different architectures and methods on the entire C-STS dataset."
+                    },
+                    {
+                        "type": "text",
+                        "content": "Table 4: Analysis of inference time, cache hit rate, and memory usage for different architectures and methods on the entire WN18RR dataset."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Method</td><td>Time</td><td>HitRate</td><td>Cache</td></tr><tr><td>bi-encoder architectures</td><td></td><td></td><td></td></tr><tr><td> $\\mathrm { S i m K G C } _ { b a s e }$ </td><td>994.41s 46.65%</td><td></td><td>295.29MB</td></tr><tr><td> $\\mathrm { S i m K G C } _ { l a r g e }$ </td><td>1806.18s46.65%</td><td></td><td>392.2MB</td></tr><tr><td>tri-encoder architectures</td><td></td><td></td><td></td></tr><tr><td>SimKGCbase+hadamard</td><td>435.571s85.32%121.86MB</td><td></td><td></td></tr><tr><td>SimKGCbase+concatenation</td><td>449.46s 85.32% 121.86MB</td><td></td><td></td></tr><tr><td>SimKGCbase+hyper-cl</td><td>448.955s85.32%146.57MB</td><td></td><td></td></tr><tr><td>SimKGClarge+hadamard</td><td></td><td></td><td></td></tr><tr><td></td><td></td><td>781.45s 85.32%161.85MB</td><td></td></tr><tr><td>SimKGClarge+concatenation  $\\mathrm { S i m K G C } _ { l a r g e + h y p e r - c l }$ </td><td>774.41s 85.32%205.81MB</td><td>783.228s 85.32% 161.85MB</td><td></td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                114,
+                330,
+                490,
+                505
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                110,
+                590,
+                489,
+                720
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We complement the visual analysis with a quantitative evaluation. We perform K-means clustering on the sentence embeddings before and after transformation.<sup>6</sup> Following the clustering, we compute the average impurity (entropy) of each sentence group, where a lower value suggests better conditioning of sentence embeddings. Formally, the impurity I based on the entropy of each (conditional) sentence group "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "E ( i )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is given by:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                720,
+                490,
+                866
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\begin{array} { r } { I = \\sum _ { i } \\frac { | C _ { i } | } { | S | } E ( i ) = - \\sum _ { i } \\frac { | C _ { i } | } { | S | } \\sum _ { j } \\frac { | L _ { i j } | } { | C _ { i } | } \\log \\frac { | L _ { i j } | } { | C _ { i } | } , } \\end{array}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/e02efdffb302a3848be9a6f4abb00f52f8a46e331060b7fe79221d8ca2b0a209.jpg"
+                }
+            },
+            "bbox": [
+                117,
+                873,
+                487,
+                901
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/8ea433d0a07e5b142e516acb0df86c7d2eb1c65c5020c73ceec2c6f3b2c46574.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                549,
+                84,
+                842,
+                235
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/363ca6867de7f1c2f80670b82cbe6523b6d734bfb09d1e84ae877e9ea4b8ec73.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 4: Visualization of the clusters of sentence embeddings before (top) and after (bottom) projection onto condition subspaces by Hyper-CL."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                549,
+                236,
+                842,
+                387
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where S is the total number of sentences, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "| C _ { i } |"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the number of sentences that should be labeled as condition i, and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "| L _ { i j } |"
+                    },
+                    {
+                        "type": "text",
+                        "content": "represents the number of examples clustered as j by K-means clustering within the "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "i ^ { t h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "(conditional) sentence group. We discover that after projection done by Hyper-CL, I changes from 0.739 to 0.270, indicating that Hyper-CL effectively projects sentence embeddings into distinct subspaces based on different conditions."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                476,
+                887,
+                623
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.3 Generalization Capabilities of Hyper-CL"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                634,
+                878,
+                652
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We examine the generalization capabilities of Hyper-CL, focusing on its ability to generalize to unseen conditions during training. This enables a fine-grained evaluation of the conditioning ability and confirms its feasibility in realistic settings."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                658,
+                885,
+                739
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "For the targeted study, we define two separate subsets of the C-STS validation set.<sup>7</sup> The first category is referred to as the ‘unseen’ dataset, which consists only of data instances with conditions not present during training. The second is named the ‘seen’ dataset, which comprises data instances with conditions already seen in the training phase. Statistically, the number of data instances for the ‘unseen portion is 731 (25.79% of the overall dataset), and for the ‘seen’ portion, it is 2,103."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                740,
+                885,
+                837
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>6</sup>K is set to 3, same as the number of chosen conditions."
+                    }
+                ]
+            },
+            "bbox": [
+                134,
+                907,
+                482,
+                921
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>7</sup>Due to the absence of publicly available gold-standard labels for the C-STS test set, we use the validation set for evaluation purposes. Additionally, we partition the C-STS training data in a 9:1 ratio to establish a new validation set. Note also that we concentrate on C-STS in this section, as WN18RR and FB15K-237 do not provide ‘unseen’ conditions."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                847,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "707"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/9fa889963c31e9da57ff81dd04e72c4c9a7ec67313aac38a544ed2172bac91c6.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 5: Generalization capabilities of Hyper-CL on the C-STS validation set. We compare the tri-encoder baseline and Hyper-CL in both ‘unseen’ and ‘seen’ settings, using Spearman’s correlation as the evaluation metric."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td colspan=\"3\">Method (Metric: Spearman) Overall Unseen Seen</td></tr><tr><td> $\\mathrm { S i m C S E } _ { l a r g e }$ </td><td>32.13</td><td>13.93 25.02</td></tr><tr><td> $\\mathrm { S i m C S E } _ { l a r g e + h y p e r - c l }$ </td><td>38.59</td><td>36.25 41.14</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                131,
+                83,
+                470,
+                134
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                235,
+                489,
+                298
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Experimental results on the ‘overall’, ‘unseen’, and ‘seen’ datasets are listed in Table 5. For the embedding model "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "f ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": "we employed "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { S i m C S E } _ { l a r g e }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Compared to the original tri-encoder (the first row), Hyper-CL shows a clear performance improvement of 16-22 points in both ‘seen’ and ‘unseen’ settings, with particularly superior performance in the ‘unseen’ setting. These findings highlight the superior generalization capabilities of Hyper-CL, enabling it to excel at handling unseen data."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                299,
+                490,
+                461
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.4 Ablation Study on Contrastive Learning"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                470,
+                478,
+                487
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In §3.3, we argued that the joint utilization of hypernetworks and contrastive learning yields the best performance among the available options. To verify this, we evaluate four different variations of the tri-encoder architecture on C-STS, whose details are as follows: (1) "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { S i m C S E } _ { b a s e } \\colon"
+                    },
+                    {
+                        "type": "text",
+                        "content": "the tri-encoder architecture trained only with "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "L _ { M S E } ; ( 2 )"
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { S i m C S E } _ { b a s e + c l } ;"
+                    },
+                    {
+                        "type": "text",
+                        "content": "the tri-encoder trained with both "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "L _ { M S E }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "L _ { C L }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "but hypernetworks excluded; (3) "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { S i m C S E } _ { b a s e + h y p e r 6 4 } \\mathrm { : }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "a variant of Hyper-CL (K=64) but trained only with "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "L _ { M S E } ; ( 4 )"
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { S i m C S E } _ { b a s e + h y p e r 6 4 - c l } \\colon"
+                    },
+                    {
+                        "type": "text",
+                        "content": "a normal Hyper-CL with low-rank approximation "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( K { = } 6 4 )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". For a fair comparison, we ensure that the total number of parameters for each variant remains consistent, guaranteeing equal expressive power."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                492,
+                490,
+                750
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Table 6 shows that the contrastive learning objective "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( L _ { C L } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is more effective when combined with hypernetworks. This trend is clearly observed when comparing the performance increase from SimCSE<sub>base+hyper64</sub> to SimCSE<sub>base+hyper64-cl</sub> and that from "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { S i m C S E } _ { b a s e }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "to "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { S i m C S E } _ { b a s e + c l } ."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                750,
+                489,
+                847
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.4.1 Why is Contrastive Learning More Effective with Hypernetworks?"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                854,
+                450,
+                887
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The weight matrix "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c } = q ( h _ { c } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", generated by the hypernetworks of Hyper-CL, is responsible for a linear transformation of a sentence embedding. On the other hand, the Hadamard product of a sentence embedding and a condition embedding, which is computed in the original tri-encoder architecture, can also be considered as a linear transformation, formulating the condition embedding "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { c }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "as a diagonal matrix "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c ^ { \\prime } } = d i a g ( h _ { c } )"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                890,
+                487,
+                923
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/6b472fe14e673f396c5f78c3e47fc24ef083491828d4b49a3ed198346f2be117.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 6: Ablation study on the effectiveness of contrastive learning in condition subspaces. The results are from the C-STS validation set."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Method</td><td>Spearman</td></tr><tr><td> $\\mathrm { S i m C S E } _ { b a s e + h y p e r 6 4 - c l }$ </td><td>37.96</td></tr><tr><td> $\\mathrm { S i m C S E } _ { b a s e + h y p e r 6 4 }$ </td><td>35.38</td></tr><tr><td> $\\mathrm { S i m C S E } _ { b a s e + c l }$ </td><td>36.13</td></tr><tr><td> $\\mathrm { S i m C S E } _ { b a s e }$ </td><td>35.47</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                571,
+                82,
+                823,
+                159
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                252,
+                885,
+                365
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To gauge the expressiveness of the two different transformations induced by "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c ^ { \\prime } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", we calculate the variance of the Frobenius norm of these matrices during inference on a subset of the C-STS validation set. For matrices with varying valid element counts "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( \\mathrm { i } . \\mathrm { e } . , W _ { c }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "W _ { c ^ { \\prime } } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", we normalize their Frobenius norm by dividing by the square root of the number of valid elements. Experimental results show that the variance of the Frobenius norm, a measure of the matrices’ expressive power, is significantly higher (0.0248) for Hyper-CL’s transformations (W<sub>c</sub>) compared to the Hadamard product "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( 0 . 0 0 1 ; W _ { c ^ { \\prime } } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". These findings imply that hypernetworks endow the transformation with enhanced expressive power. Consequently, it is reasonable to expect that the contrastive learning process that leverages hypernetworks would also exhibit greater effectiveness."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                367,
+                887,
+                658
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "6 Conclusion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                680,
+                643,
+                696
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We propose Hyper-CL, a method that combines hypernetworks with contrastive learning to generate conditioned sentence representations. In two representative tasks requiring conditioning on specific perspectives, our approach successfully narrows the performance gap with the bi-encoder architecture while maintaining the time efficiency characteristic of the tri-encoder approach. We further validate the inner workings of Hyper-CL by presenting intuitive analyses, such as visualizations of the embeddings projected by Hyper-CL. In future work, we plan to explore a broader range of applications for Hyper-CL and to investigate its refinement."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                713,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "708"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Limitations"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                84,
+                220,
+                99
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We have only explored applying our approach to encoder models, leaving room for applications on decoder models. Additionally, despite the variety of existing contrastive learning methodologies, we adhere to utilizing the contrastive learning objectives provided by the tasks."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                112,
+                489,
+                210
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Ethics Statement"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                225,
+                267,
+                241
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this study, we utilized models and datasets publicly available from Huggingface. All datasets for evaluation are open-source and comply with data usage policies. However, some datasets (e.g., FB15k-237) are derived from Freebase, a large collaborative online collection that may contain inherently unethical information. We conducted a thorough inspection to check if our dataset contained any unethical content. No harmful information or offensive topics were identified during the human inspection process."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                254,
+                489,
+                431
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Acknowledgements"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                447,
+                287,
+                463
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "This work was supported by Institute of Information & communications Technology Planning & Evaluation (IITP) grant funded by the Korea government(MSIT) (No.RS-2020-II201373, Artificial Intelligence Graduate School Program(Hanyang University)). This work was supported by Institute of Information & communications Technology Planning & Evaluation (IITP) under the artificial intelligence semiconductor support program to nurture the best talents (IITP-2024-RS-2023- 00253914) grant funded by the Korea government(MSIT). This work was supported by the National Research Foundation of Korea(NRF) grant funded by the Korea government(*MSIT) (No.2018R1A5A7059549). *Ministry of Science and ICT."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                476,
+                490,
+                733
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "References"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                764,
+                215,
+                780
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Eneko Agirre, Daniel Cer, Mona Diab, and Aitor Gonzalez-Agirre. 2012. SemEval-2012 task 6: A pilot on semantic textual similarity. In *SEM 2012: The First Joint Conference on Lexical and Computational Semantics – Volume 1: Proceedings of the main conference and the shared task, and Volume 2: Proceedings of the Sixth International Workshop on Semantic Evaluation (SemEval 2012), pages 385–393, Montréal, Canada. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Antoine Bordes, Nicolas Usunier, Alberto Garcia-Duran, Jason Weston, and Oksana Yakhnenko. 2013. Translating embeddings for modeling multirelational data. Advances in neural information processing systems, 26."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Daniel Cer, Mona Diab, Eneko Agirre, Iñigo Lopez-Gazpio, and Lucia Specia. 2017. SemEval-2017 task 1: Semantic textual similarity multilingual and crosslingual focused evaluation. In Proceedings of the 11th International Workshop on Semantic Evaluation (SemEval-2017), pages 1–14, Vancouver, Canada. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Vinod Kumar Chauhan, Jiandong Zhou, Ping Lu, Soheila Molaei, and David A Clifton. 2023. A brief review of hypernetworks in deep learning. arXiv preprint arXiv:2306.06955."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Chen Chen, Yufei Wang, Bing Li, and Kwok-Yan Lam. 2022. Knowledge is flat: A Seq2Seq generative framework for various knowledge graph completion. In Proceedings ofthe 29th International Conference on Computational Linguistics, pages 4005– 4017, Gyeongju, Republic of Korea. International Committee on Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yung-Sung Chuang, Rumen Dangovski, Hongyin Luo, Yang Zhang, Shiyu Chang, Marin Soljacic, Shang-Wen Li, Scott Yih, Yoon Kim, and James Glass. 2022. DiffCSE: Difference-based contrastive learning for sentence embeddings. In Proceedings of the 2022 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 4207–4218, Seattle, United States. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ameet Deshpande, Carlos Jimenez, Howard Chen, Vishvak Murahari, Victoria Graf, Tanmay Rajpurohit, Ashwin Kalyan, Danqi Chen, and Karthik Narasimhan. 2023. C-STS: Conditional semantic textual similarity. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 5669–5690, Singapore. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: Pre-training of deep bidirectional transformers for language understanding. In Proceedings ofthe 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers), pages 4171–4186, Minneapolis, Minnesota. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Tomer Galanti and Lior Wolf. 2020. On the modularity of hypernetworks. Advances in Neural Information Processing Systems, 33:10409–10419."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Tianyu Gao, Xingcheng Yao, and Danqi Chen. 2021. SimCSE: Simple contrastive learning of sentence embeddings. In Proceedings of the 2021 Conference"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                789,
+                489,
+                920
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "709"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                941
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "on Empirical Methods in Natural Language Processing, pages 6894–6910, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "David Ha, Andrew M. Dai, and Quoc V. Le. 2017. Hypernetworks. In International Conference on Learning Representations."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. 2021. Lora: Low-rank adaptation of large language models. arXiv preprint arXiv:2106.09685."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B Brown, Benjamin Chess, Rewon Child, Scott Gray, Alec Radford, Jeffrey Wu, and Dario Amodei. 2020. Scaling laws for neural language models. arXiv preprint arXiv:2001.08361."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Bosung Kim, Taesuk Hong, Youngjoong Ko, and Jungyun Seo. 2020. Multi-task learning for knowledge graph completion with pre-trained language models. In Proceedings of the 28th International Conference on Computational Linguistics, pages 1737–1743, Barcelona, Spain (Online). International Committee on Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Taeuk Kim, Kang Min Yoo, and Sang-goo Lee. 2021. Self-guided contrastive learning for BERT sentence representations. In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers), pages 2528–2540, Online. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ritam Majumdar, Vishal Jadhav, Anirudh Deodhar, Shirish Karande, Lovekesh Vig, and Venkataramana Runkana. 2023. Hyperlora for pdes. arXiv preprint arXiv:2308.09290."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Niklas Muennighoff, Nouamane Tazi, Loic Magne, and Nils Reimers. 2023. MTEB: Massive text embedding benchmark. In Proceedings of the 17th Conference ofthe European Chapter ofthe Associationfor Computational Linguistics, pages 2014–2037, Dubrovnik, Croatia. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Aaron van den Oord, Yazhe Li, and Oriol Vinyals. 2018. Representation learning with contrastive predictive coding. arXiv preprint arXiv:1807.03748."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Nils Reimers and Iryna Gurevych. 2019. Sentence-BERT: Sentence embeddings using Siamese BERTnetworks. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), pages"
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "3982–3992, Hong Kong, China. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kristina Toutanova and Danqi Chen. 2015. Observed versus latent features for knowledge base and text inference. In Proceedings of the 3rd workshop on continuous vector space models and their compositionality, pages 57–66."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. 2023. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Bo Wang, Tao Shen, Guodong Long, Tianyi Zhou, Ying Wang, and Yi Chang. 2021. Structure-augmented text representation learning for efficient knowledge graph completion. In Proceedings of the Web Conference 2021, pages 1737–1748."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Liang Wang, Wei Zhao, Zhuoyu Wei, and Jingming Liu. 2022. SimKGC: Simple contrastive knowledge graph completion with pre-trained language models. In Proceedings of the 60th Annual Meeting of the Associationfor Computational Linguistics (Volume 1: Long Papers), pages 4281–4294, Dublin, Ireland. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Thomas Wolf, Lysandre Debut, Victor Sanh, Julien Chaumond, Clement Delangue, Anthony Moi, Pierric Cistac, Tim Rault, Remi Louf, Morgan Funtowicz, Joe Davison, Sam Shleifer, Patrick von Platen, Clara Ma, Yacine Jernite, Julien Plu, Canwen Xu, Teven Le Scao, Sylvain Gugger, Mariama Drame, Quentin Lhoest, and Alexander Rush. 2020. Transformers: State-of-the-art natural language processing. In Proceedings ofthe 2020 Conference on Empirical Methods in Natural Language Processing: System Demonstrations, pages 38–45, Online. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xin Xie, Ningyu Zhang, Zhoubo Li, Shumin Deng, Hui Chen, Feiyu Xiong, Mosha Chen, and Huajun Chen. 2022. From discrimination to generation: Knowledge graph completion with generative transformer. In Companion Proceedings of the Web Conference 2022, pages 162–165."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Liang Yao, Chengsheng Mao, and Yuan Luo. 2019. Kgbert: Bert for knowledge graph completion. arXiv preprint arXiv:1909.03193."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xiyu Yu, Tongliang Liu, Xinchao Wang, and Dacheng Tao. 2017. On compressing deep models by low rank and sparse decomposition. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 7370–7379."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                131,
+                85,
+                489,
+                140
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "710"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A Training Details"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                83,
+                294,
+                101
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we describe the hyperparameters used for training Hyper-CL on the two evaluation tasks employed in this paper. We implemented Hyper-CL using the Transformers package (Wolf et al., 2020). For both tasks, Hyper-CL utilized the [CLS] token embedding computed by an encoder model as a sentence representation."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                110,
+                489,
+                223
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Conditional Semantic Textual Similarity (C-STS): We conducted a hyperparameter search over learning rates "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\in \\ \\{ 1 e { - } 5 , 2 e { - } 5 , 3 e { - } 5 \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", weight decays  0.0, 0.1 , and temperatures "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\{ 1 . 0 , 1 . 5 , 1 . 7 , 1 . 9 \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The hyperparameter set yielding the best scores on the C-STS validation set with three random seeds was used for the final evaluation of the test set. As a result, we adopted the hyperparameters as shown in Table 7."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                223,
+                490,
+                369
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/8777fd55d7cd902c371a9322a7f0872f6c55d97c57dc47e69efede7e16ed936d.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 7: Hyperparameters determined for the C-STS task. The abbreviations LR, WD, Temp stands for learning rate, weight decay, and temperature, respectively."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Method</td><td>LR</td><td>WD</td><td>Temp</td></tr><tr><td>DiffCSEbase+hyper-cl</td><td>3e-5</td><td>0.1</td><td>1.5</td></tr><tr><td>DiffCSEbase+hyper64-cl</td><td>1e-5</td><td>0.0</td><td>1.5</td></tr><tr><td>SimCSEbase+hyper-cl</td><td>3e-5</td><td>0.1</td><td>1.9</td></tr><tr><td>SimCSEbase+hyper64-cl</td><td>2e-5</td><td>0.1</td><td>1.7</td></tr><tr><td>SimCSElarge+hyper-cl</td><td>2e-5</td><td>0.1</td><td>1.5</td></tr><tr><td> $\\mathrm { S i m C S E } _ { l a r g e + h y p e r 8 5 - c l }$ </td><td>1e-5</td><td>0.1</td><td>1.9</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                151,
+                381,
+                452,
+                481
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Knowledge Graph Completion (KGC): We utilized the same set of hyperparameters proposed in SimKGC (Wang et al., 2022)."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                558,
+                489,
+                608
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/02ee1c3c56a962ce0a95f3cc937d11aba6e7102d83f390764e906b590a70b977.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 8: Ablation study of different ranks (K)."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Method</td><td>Rank (K)</td><td>Spearman</td></tr><tr><td rowspan=\"2\"> $\\mathrm { D i f f C S E } _ { b a s e + h y p e r K - c l }$ </td><td>768 (=768/1) 192 (=768/4)</td><td>33.82 34.73</td></tr><tr><td>96 (=768/8) 64 (=768/12)</td><td>34.16</td></tr><tr><td> $\\mathrm { S i m C S E } _ { b a s e + h y p e r K - c l }$ </td><td>48 (=768/16) 32 (=768/24) 768 (=768/1) 192 (=768/4) 96 (=768/8)</td><td>33.31 31.68 38.75 38.66 35.69</td></tr><tr><td> $\\mathrm { S i m C S E } _ { l a r g e + h y p e r K - c l }$ </td><td>64 (=768/12) 48 (=768/16) 32 (=768/24) 1024 (1024/1) 256 (=1024/4) 128 (=1024/8) 85 (=1024/12)</td><td>38.36 37.02 36.92 39.60 38.76 38.19 38.12</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                117,
+                630,
+                484,
+                885
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "B Ablation Study on the Selection of K"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                83,
+                863,
+                99
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The selection of K for constructing lightweight hypernetworks is closely related to the size of sentence embeddings. We empirically evaluated the validation set to determine suitable values for K by dividing the embedding sizes of the base (768) and large (1024) encoder embeddings with various divisors (1, 4, 8, 12, 16, 24). According to Table 8, we observed that for "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { S i m C S E } _ { l a r g e }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", the performance difference between K=128 and K=85 is just 0.07 points, while trainable parameters increase 1.5x. In conclusion, we found that setting the divisor to 12 (resulting in K values of 64 and 85 for the base and large models, respectively) achieves an optimal balance between performance and efficiency."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                109,
+                885,
+                336
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "711"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                515,
+                942
+            ]
+        }
+    ]
+]

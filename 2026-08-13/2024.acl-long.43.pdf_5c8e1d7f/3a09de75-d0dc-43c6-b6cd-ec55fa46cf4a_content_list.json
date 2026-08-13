@@ -1,0 +1,2983 @@
+[
+    {
+        "type": "text",
+        "text": "ABEX: Data Augmentation for Low-Resource NLU via Expanding Abstract Descriptions",
+        "text_level": 1,
+        "bbox": [
+            152,
+            89,
+            843,
+            129
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Sreyan Ghosh<sup>\\*</sup>, Utkarsh Tyagi<sup>\\*</sup>, Sonal Kumar, Chandra Kiran Reddy Evuru, S Ramaneswaran, S Sakshi , Dinesh Manocha",
+        "bbox": [
+            166,
+            152,
+            840,
+            185
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "University of Maryland, College Park, USA",
+        "bbox": [
+            322,
+            186,
+            682,
+            203
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "{sreyang,utkarsht,sonalkum,ckevuru,ramans,fsakshi,dmanocha}@umd.edu",
+        "bbox": [
+            161,
+            203,
+            842,
+            219
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            262,
+            260,
+            342,
+            277
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "We present ABEX, a novel and effective generative data augmentation methodology for low-resource Natural Language Understanding (NLU) tasks. ABEX is based on ABstractand-EXpand, a novel paradigm for generating diverse forms of an input document – we first convert a document into its concise, abstract description and then generate new documents based on expanding the resultant abstraction. To learn the task of expanding abstract descriptions, we first train BART on a largescale synthetic dataset with abstract-document pairs. Next, to generate abstract descriptions for a document, we propose a simple, controllable, and training-free method based on editing AMR graphs. ABEX brings the best of both worlds: by expanding from abstract representations, it preserves the original semantic properties of the documents, like style and meaning, thereby maintaining alignment with the orig inal label and data distribution. At the same time, the fundamental process of elaborating on abstract descriptions facilitates diverse generations. We demonstrate the effectiveness of ABEX on 4 NLU tasks spanning 12 datasets and 4 low-resource settings. ABEX outperforms all our baselines qualitatively with improvements of 0.04% - 38.8%. Qualitatively, ABEX outperforms all prior methods from literature in terms of context and length diversity <sup>1</sup>.",
+        "bbox": [
+            141,
+            288,
+            462,
+            718
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            114,
+            749,
+            260,
+            765
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Improving the performance of deep learning models on downstream Natural Language Understanding (NLU) tasks requires sufficient good-quality training data. However, data annotation is an expensive, time-consuming, and noisy task (Abad and Moschitti, 2016). Data augmentation has proven to be an effective approach for overcoming the data scarcity issue in low-resource NLU tasks with limited training samples (Chen et al., 2023). The two major categories of study in data augmentation include online data augmentation by interpolation in the latent space (Guo et al., 2019; Ng et al., 2020a; Sun et al., 2020; Kumar et al., 2020; Guo, 2020; Sawhney et al., 2021) and offline data augmentation that expands an existing small-scale dataset by generating additional synthetic data (Wei and Zou, 2019; Kumar et al., 2020; Zhou et al., 2021; Kim et al., 2022; Guo et al., 2022). Owing to advancements in generative models that facilitate the creation of high-quality synthetic data, the latter is gaining traction (Yu et al., 2023).",
+        "bbox": [
+            112,
+            774,
+            490,
+            889
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "table",
+        "img_path": "images/7335186a9b9212d7f38dc47d886572bfd0b2582a67559c263f41cd022aab377e.jpg",
+        "table_caption": [
+            "Table 1: Comparison of augmentations generated using ABEX and our baselines on a randomly chosen document from HuffPost. (1. Politics, 2. Entertainment). ABEX moves beyond simple text-editing or rephrasing and generates diverse augmentations by introducing a new context. Augmentations by ABEX are also more coherent and label-consistent."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=1>Method</td><td rowspan=1 colspan=1>Original 1: Usually, the two of us don&#x27;t agree on anything about politics.Original 2: The pop superstar said she was &quot;completely inspired&quot; byRoem&#x27;s victory.</td></tr><tr><td rowspan=1 colspan=1>EDA(Wei and Zou)</td><td rowspan=1 colspan=1>1. The two of us dont on about politics2. Bulge the pop superstar said she was completely inspired by roemsvictory</td></tr><tr><td rowspan=1 colspan=1>AEDA(Karimi et al.)</td><td rowspan=1 colspan=1>1. Usually, the two of us ? don&#x27;t agree ; on anything ! about : politics.2. The pop superstar ; said she was &quot;&quot;completely inspired&quot;&quot; by Roem&#x27;svictory.</td></tr><tr><td rowspan=1 colspan=1>SSMBA(Ng et al.)</td><td rowspan=1 colspan=1>1. Usually, the two of us don&#x27;t agree about anything involving politics.2. The pop superstar said she felt was completely inspired &quot;&quot; by roemśvictory!</td></tr><tr><td rowspan=1 colspan=1>AMR-DA(Shou et al.)</td><td rowspan=1 colspan=1>1. We usually don&#x27;t agree on anything.2. Pop superstars say that a complete victory for Roem and superstarswill inspire them .</td></tr><tr><td rowspan=1 colspan=1>GENIUS(Guo et al.)</td><td rowspan=1 colspan=1>1. It about politics. It about everything.2. The pop superstar. The singer. The songwriter.</td></tr><tr><td rowspan=1 colspan=1>LLaMA-213B(Touvron et al.)</td><td rowspan=1 colspan=1>1. Political disagreement is the norm between the two of us.2. The pop star also noted that Roem&#x27;s triumph had inspired her owncreative process.</td></tr><tr><td rowspan=1 colspan=1>ZeroGen(Ye et al.)</td><td rowspan=1 colspan=1>1. The two of us may disagree on anything, but we do not agree on it.point at hand.2. The pop icon expressed being tremendously inspired by Roem.</td></tr><tr><td rowspan=1 colspan=1>ABEX (ours)</td><td rowspan=1 colspan=1>1. President Obama has failed to reach an agreement on any politicalissues, including the Iran nuclear deal, and there is no consensus onthe next steps.2. Cristiano Ronaldo is inspired by Roem&#x27;s victory over ManchesterUnited, according to the Portuguese superstar.</td></tr></table>",
+        "bbox": [
+            510,
+            260,
+            878,
+            562
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            677,
+            887,
+            903
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "However, generative data augmentation faces two major challenges: diversity in generated augmentations (Geiping et al., 2023) and consistency with the underlying data distribution (Chen et al., 2023). It is crucial to strike a balance between these two aspects, as overemphasizing one at the expense of the other can lead to poor downstream performance. Current augmentation methods based on text-infilling (Ghosh et al., 2023c; Guo et al., 2022; Wang et al., 2022), where the primary task is to generate a new sentence constrained with keywords, are prone to replicate biases and overfit specific linguistic patterns in the low-resource training data, thereby hurting diversity. Additionally, we show that keyword-constrained free-form generation is unable to maintain the core semantic properties of the document, like style, which proves to be critical for specific tasks (e.g., question style document for intent classification. See example in Table 3). Diversity also proves to be an issue with token-level editing methods (Wei and Zou, 2019; Shou et al., 2022) that rarely introduce novel entities or contexts and often randomly edits important tokens. Finally, prompt-based methods that employ Large Language Models (LLMs) require well-curated attributes selected from the data to control the distribution of the generated data (Yoo et al., 2021; Sahu et al., 2023; Yu et al., 2023).",
+        "bbox": [
+            527,
+            906,
+            884,
+            922
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>1</sup>Code and data: https://github.com/Sreyan88/ABEX ∗Equal Technical Contribution.",
+        "bbox": [
+            136,
+            895,
+            458,
+            921
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "726",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 726–748 August 11-16, 2024 ©2024 Association for Computational Linguistics",
+        "bbox": [
+            97,
+            946,
+            900,
+            973
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            492,
+            521
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Main Contributions. In this paper, we propose ABEX, a novel data augmentation methodology based on a novel paradigm - Abstract-and-Expand. We first convert an input document into a concise, abstract description of itself and then generate augmentations by expanding the resultant abstraction. The task emulates human language perception and processing: the abstraction phase mirrors how humans distill core ideas from text, focusing on essential meanings, while the expansion phase reflects human creativity in generating varied narratives from a single abstract concept, akin to human extrapolation of ideas into diverse discussions. Our proposed Abstract-and-Expand task, which differs from all tasks proposed in prior art, generates augmentations that are both more consistent and diverse. To learn the task of expanding abstract descriptions, we first synthesize a large-scale synthetic dataset by prompting LLMs and then train an Encoder-Decoder Pre-trained Lan guage Model (BART (Lewis et al., 2019)) on the dataset. Next, we propose a simple and controllable algorithm to generate abstract descriptions for training instances in any given downstream lowresource dataset. Our proposed algorithm leverages AMR-to-Text and Text-to-AMR and generates abstract descriptions by editing Abstract Meaning Representation (AMR) graphs (Banarescu et al., 2013). Inspired by the success of mixup in data augmentation (Zhang et al., 2018), we also optionally mix AMR graphs of two sentences to boost the diversity of abstract descriptions. Finally, we synthesize diverse augmentations using the fine-tuned model and synthesized abstract descriptions. To summarize, our main contributions are:",
+        "bbox": [
+            112,
+            536,
+            490,
+            923
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            887,
+            263
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. We propose ABEX, a novel and effective generative data augmentation methodology for low-resource NLP. We employ a novel Abstract-and-Expand task and fine-tune an Enc-Dec PLM to learn the task. ABEX differs from all prior work in its motivation and methodology and closely mimics the human perception and processing of language.",
+        "bbox": [
+            524,
+            273,
+            885,
+            404
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. We propose a simple, controllable, and training-free method for generating abstract descriptions of source documents from downstream NLU datasets. Our proposed methodology provides explicit control in the documentto-abstract generation process and overcomes the contained generation issue that LLMs face in abstract generation.",
+        "bbox": [
+            522,
+            412,
+            885,
+            542
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. To evaluate the efficacy of ABEX augmentations, we experiment on 12 datasets across 4 NLU tasks under 4 low-resource settings and show that ABEX outperforms most prior works quantitatively by 0.04% - 38.8%. Additionally, generations by ABEX are superior to prior work in terms of context, token (including entity), and length diversity.",
+        "bbox": [
+            524,
+            551,
+            887,
+            682
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "4. We also contribute the large-scale synthetic dataset with 0.2 million abstract-expansion pairs to promote further research in this space.",
+        "bbox": [
+            524,
+            690,
+            885,
+            740
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Background and Related Work",
+        "text_level": 2,
+        "bbox": [
+            509,
+            750,
+            815,
+            766
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Definition of abstract description. An abstract description is a concise summary of a text, distilling it to its key concepts and themes while omitting non-essential details, effectively retaining the text’s core message. Examples can be seen in Table 13. Difference between an abstract description and an (abstract) summary. A summary provides a concise overview of the main points or themes of a text, maintaining the original structure and order of ideas. In contrast, an abstract description distills the essence or core concept of the text, often rephrasing or reorganizing the content to capture its fundamental meaning in a more generalized form. In the case of summary generation, while including entities and primary events in the text is incentivized, abstract descriptions should only describe the broad semantic meaning of the text. Contrasting examples are in Tables 13 and 14.",
+        "bbox": [
+            507,
+            776,
+            885,
+            923
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "727",
+        "bbox": [
+            485,
+            928,
+            515,
+            942
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            230
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Background on AMR graphs. An AMR graph (Banarescu et al., 2013) is a linguistic representation of a sentence that captures the meaning of a document in a structured manner. Formally put, an AMR graph can be represented as $\\mathcal { G } = ( \\nu , \\mathcal { E } )$ where each vertex represents a concept, and each edge  represents a relationship between concepts.",
+        "bbox": [
+            112,
+            231,
+            489,
+            346
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Generative Data Augmentation for NLP. Generative data augmentation for low-resource NLP can be broken down into 4 main categories: (1) Textinfilling: Given a source text, the task is to corrupt parts of the text and infill the corrupted parts using a Pre-trained Language Model (PLM). The task is generally completed by conditioning the corrupted text (also framed as keyword conditioning by some prior work) to an auto-regressive model (Zhou et al., 2021; Guo et al., 2022; Ghosh et al., 2023c,a,b). The parts of the input text to be corrupted are either chosen randomly (Kumar et al., 2020) or algorithmically (Guo et al., 2022; Ghosh et al., 2023c). (2) Text-editing: Given a source sentence, the task is to edit parts of the sentence (Wei and Zou, 2019; Shou et al., 2022). (3) Prompting: The task is to prompt LMs to generate novel training sentences (Ye et al., 2022; Sahu et al., 2023). The prompt may be further conditioned on attributes extracted from the training data, exemplars, or constraints extracted from the training data. (4) Style conversion: The task is to rephrase or change the style of the source sentence (Chen et al., 2022; Sharma et al., 2022). Chen et al. (2023) perform a large-scale evaluation comparing several augmentation methods.",
+        "bbox": [
+            110,
+            347,
+            490,
+            751
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3 Methodology",
+        "text_level": 2,
+        "bbox": [
+            114,
+            766,
+            263,
+            783
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Overview. Fig. 1 illustrates the entire workflow of generating augmentations with ABEX. The workflow has 2 major steps: (1) We first learn the task of expanding abstract descriptions by fine-tuning BART on a large-scale synthetic dataset. To accomplish this, we first synthesize a dataset $\\mathcal { D } _ { a b }$ with abstract-document pairs $( x _ { i } ^ { a b } , y _ { i } ^ { a b } )$ by prompting LLMs on a large unlabeled dataset $\\mathcal { D } _ { u }$ . (2)",
+        "bbox": [
+            112,
+            793,
+            490,
+            923
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "We then generate synthetic augmentations for a downstream NLU dataset $\\mathcal { D } _ { d o w n }$ with documentlabel pairs $( x _ { i } ^ { d o w n } , y _ { i } ^ { d o w n } )$ by first converting the documents into abstract descriptions and then employing the fine-tuned BART to generate multiple diverse expansions. Directly prompting LLMs for abstraction and expansion affects controllability, and we also show that it underperforms ABEX.",
+        "bbox": [
+            507,
+            85,
+            887,
+            215
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3.1 Learning to Expand Abstract Descriptions",
+        "text_level": 2,
+        "bbox": [
+            509,
+            230,
+            884,
+            247
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "In this subsection, we provide an overview of the upper half in Fig. 1. We describe how we synthesize the synthetic dataset $\\mathcal { D } _ { a b }$ and fine-tune BART on this dataset to obtain a model capable of expanding abstract descriptions.",
+        "bbox": [
+            507,
+            255,
+            885,
+            336
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "(1) Generating a synthetic dataset $( \\mathcal { D } _ { a b } )$ . Due to the lack of open-source datasets available for the task, we generate high-quality synthetic data for learning this task by prompting LLMs. We prompt an LLM with documents from $\\mathcal { D } _ { u }$ and ask it to generate an abstract description of them. However, the primary challenge in the proposed generation process is the choice of seed unlabeled datasets. Largescale open-source datasets consist of long documents, in contrast to the nature of instances in the majority of downstream fine-tuning datasets that are made of much shorter documents. Mismatch in the length of training and inference datasets have been shown to degrade performance in various tasks in prior art (Rogers et al., 2021; Ghosh et al., 2023a). The other alternative is to select individual sentences from these long documents. However, this creates an informativeness mismatch as individual and context-less sentences from these documents are rarely self-contained, unlike sentences in downstream datasets. Thus, to overcome these issues, we follow a two-step prompting strategy: (i) We first generate summaries of the original long documents in $\\mathcal { D } _ { u }$ (ii) We then generate abstract descriptions of each summary. We denote our final synthetic dataset by $\\mathcal { D } _ { a b }$ , and $\\mathcal { D } _ { a b }$ is made of abstract-document pairs $( a , d )$ where a is the final output of the LLM from step (ii) and d is the output from step (i). An example can be seen in Fig. 1, and more examples are available in Tables 13 and 14. We employ LLaMA-2 13B (Touvron et al., 2023) for this task and generate 0.2 million abstractdocument pairs for fine-tuning. Prompts are listed in Appendix B.",
+        "bbox": [
+            507,
+            338,
+            887,
+            888
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "(2) Fine-tuning BART on $\\mathcal { D } _ { a b } .$ . After generating paired data, we fine-tune BART on $\\mathcal { D } _ { a b }$ to learn the task of expanding abstract descriptions. The abstract a and the document d serve as the input and target, respectively.",
+        "bbox": [
+            507,
+            890,
+            884,
+            922
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "728",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/6746f4ff33749ff4739e97eb05ac45796a0a441c05077119265e0d8ef48338c9.jpg",
+        "image_caption": [
+            "Figure 1: Illustration of our proposed augmentation methodology. Top: Learning to Expand Abstract Descriptions. 1 We synthesize a large-scale synthetic dataset $\\mathcal { D } _ { a b }$ with abstract-document pairs by prompting LLMs with unlabeled documents from $\\mathcal { D } _ { a b } . ~ \\textcircled { 2 }$ We pre-train BART on this dataset with abstract as input and document as the target for learning to expand abstract descriptions. Bottom: Data Augmentation. 1 We convert the document into its AMR graph representation using a Text-to-AMR Parser. $\\textcircled{2} \\mathcal { G } _ { i }$ then goes through multiple steps of deletion to obtain $\\hat { \\mathcal { G } } _ { i }$ 3 We optionally retrieve a semantically similar document from $\\mathcal { D } _ { d o w n }$ , obtain its AMR graph $\\mathcal { G } _ { k } .$ , and replace subtrees in $\\hat { \\mathcal { G } } _ { i }$ with similar subtrees in $\\hat { \\mathcal { G } } _ { i } . \\textcircled { 4 } \\hat { \\mathcal { G } } _ { i }$ is then converted back to text (which is now an abstract description) using an AMR-to-Text generator. $\\textcircled{5}$ This abstract description is then passed to the fine-tuned BART for generating augmentations. 6 We optionally fine-tune the fine-tuned BART (from the 1st step) on abstract-document pairs from $\\bar { \\mathcal { D } } _ { d o w n } .$"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            136,
+            85,
+            863,
+            331
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            485,
+            489,
+            535
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.2 Data Augmentation using ABEX",
+        "text_level": 2,
+        "bbox": [
+            114,
+            546,
+            416,
+            563
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "This section provides an overview of the lower half in Fig. 1. The primary aim is to generate multiple diverse augmentations of every source document in the downstream task dataset $\\mathcal { D } _ { d o w n }$ , which can then be added to $\\mathcal { D } _ { d o w n }$ to improve downstream task performance. We first generate abstract descriptions for each instance in $\\mathcal { D } _ { d o w n }$ in a controlled manner using our proposed method (described next), followed by employing fine-tuned BART from step (1) to generate multiple expansions of the abstractions. These expansions then act as augmentations.",
+        "bbox": [
+            112,
+            568,
+            489,
+            746
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.2.1 Controllable Generation of Abstract descriptions for $\\mathcal { D } _ { d o w n }$",
+        "text_level": 2,
+        "bbox": [
+            114,
+            756,
+            460,
+            788
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Primary Motivation. The most straightforward method to generate abstract descriptions for each instance $x _ { i } ^ { d o w n }$ in $\\mathcal { D } _ { d o w n }$ would have been to employ an LLM with the same prompt discussed in Section 3.1. However, there are 2 major challenges with this approach:",
+        "bbox": [
+            112,
+            791,
+            489,
+            888
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "(1) Maintaining Label Consistency. A key requirement of effective augmentations is that they maintain label consistency with the underlying Gold-only training instance. For example, a synthetic augmentation of an instance from a sequence classification dataset with a label: positive sentiment should also be of positive sentiment. Prior data augmentation methods based on text-infilling usually retain target-related information (TRI) (or phrases relevant to the label) in the corrupted sentence, followed by infilling text around the TRI to generate augmentations (Guo et al., 2022; Ghosh et al., 2023a,c). Inspired by this, our primary motive is to generate an abstract description of $x _ { i } ^ { d o w n }$ that retains the TRI corresponding to its label $y _ { i } ^ { d o w n }$ . Doing this would also ensure that the expansion (or augmentations) would be label-consistent. Accomplishing this using the prompting method discussed in Section 3.1 would require the LLM to be effective at constrained generation. Recent studies, such as the work by Lu et al. (2023) and Sun et al. (2023), suggest that while constrained generation can make prompts more complex, it may also present challenges for LLMs in consistently adhering to the constraints mentioned in prompts.",
+        "bbox": [
+            112,
+            890,
+            489,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            485,
+            887,
+            857
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "(2) Controlling the degree of abstraction. The degree of abstraction for generating abstract descriptions affects the final augmentations in terms of diversity and label consistency. These factors, in turn, affect downstream performance, and the optimal degree of abstraction varies from task to task. Similar to the above, controlling the degree of abstractions proves to be difficult for LLMs. Additionally, the nature of TRIs differs from task to task, which increases the complexity of the prompts significantly.",
+        "bbox": [
+            507,
+            858,
+            887,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_number",
+        "text": "729",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            198
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Proposed Solution. To overcome the controlled generation bottleneck in LLMs, we propose a simple yet controllable and effective method for generating abstract descriptions. Based on AMR editing, our proposed method is training-free and essentially performs text-editing, so there is no need to learn a model for every dataset. Additionally, it is flexible and can easily cater to a wide range of tasks without significant algorithmic changes.",
+        "bbox": [
+            112,
+            200,
+            490,
+            347
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "(1) Text - to - AMR. Our first step is to convert a document into its AMR graph. To perform this step, we employ text-to-AMR AMR-BART (Bai et al., 2022), which is built on BART and trained to generate AMR graphs from text.",
+        "bbox": [
+            112,
+            349,
+            489,
+            431
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "(2) Editing the AMR. Following the definition of abstract descriptions and AMRs in Section 2, editing AMR graphs provides a feasible way to generate an abstract description by deleting nodes corresponding to specific, non-central details and keeping the ones that capture the meaning and essence. The editing operations are designed such that the edited AMR graph, once converted back to text, results in an abstract description of the original document. We first linearize the AMR graph generated in Step 1 into a sequence (Bai et al., 2022) to achieve this. However, before editing, we want to ensure we retain the original TRI for the document in the AMR. Thus, inspired by Ghosh et al. (2023a) and Guo et al. (2022), we first extract top-k keywords in the document by measuring the similarity between n-grams from the document and the document label. Once extracted, we ensure these keywords are not edited in the AMR. Note that TRI extraction differs from task to task, and we request that our readers refer to our code for more details.",
+        "bbox": [
+            112,
+            435,
+            490,
+            775
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Next, we perform multiple rounds of deletion operation on the AMR graph. First, we remove certain pre-defined types of attributes from the AMR. Some examples of these types are : value, : wiki, : mod and : quant. We list all such attributes that serve as our candidates for the deletion operation in Appendix F.1. After attribute deletion, we then delete sub-graphs in the AMR graph. A sub-graph can be seen as a broader conceptual unit describing a specific idea entailed to a concept or entity. Deleting a sub-graph leads to a higher level of abstraction, thereby leading to more diverse sentences (ablation in A.1). We select our candidate subgraphs for deletion based on a metric we define as the depth-ratio. To calculate the depth ratio, we calculate the ratio of the depth of the sub-graph to the entire graph. We define depth as measuring the distance between the root node and the farthest leaf node. Specifically, it captures the vertical span and the nesting level within an AMR graph. We select a sub-graph as an eligible candidate for deletion only if its depth ratio is less than a given threshold α. The maintenance of a depth ratio enables us to regulate the size of the removed graph, thereby determining the level of abstraction. We then sample a deletion rate ε from a Gaussian distribution ${ \\mathcal { N } } ( \\mu , \\sigma ^ { 2 } )$ and dynamically delete ε% sub-graphs among eligible candidates.",
+        "bbox": [
+            112,
+            777,
+            490,
+            923
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            887,
+            392
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "(3) Mixing AMR graphs of 2 documents. Mixing samples in the training data to generate new data with concepts from both samples has been a successful augmentation approach across modalities (Zhang et al., 2018; Sahu et al., 2023). The method, also commonly known as mixup, improves the diversity of generated data through semantic interpolation, which in turn leads to more generalized models. To perform mixup in the ABEX framework, we can generate abstract descriptions with mixed concepts from a pair of training instances and then employ $\\boldsymbol { B }$ for diverse expansions. Formally, let $x _ { i } ^ { d o w n }$ be the source document and $x _ { k } ^ { d o w n }$ be another retrieved sentence that is semantically similar to $i _ { n }$ . We retrieve $x _ { k } ^ { d o w n }$ using cosine similarity with SentenceBERT (Reimers and Gurevych, 2019). After editing the AMR graphs, $\\mathcal { G } _ { i }$ and $\\mathcal { G } _ { k }$ of documents $x _ { i } ^ { d o w n }$ and $x _ { k } ^ { d o w n }$ respectively, we first extract all their possible sub-graphs from both AMR graphs. Each sub-graph intuitively represents an individual concept in an AMR graph. We denote the set of sub-graphs as $S ^ { i }$ and $S ^ { k }$ , where $S ^ { i } = \\{ s _ { 0 } ^ { i } , \\cdots , s _ { n } ^ { i } \\}$ and n is the total number of sub-graphs (similar for $S ^ { k } )$ . We now calculate the sub-graph similarity between each pair of subgraphs in $S ^ { i }$ and $S ^ { k }$ and append the top-k subgraphs in $S ^ { k }$ to their most similar to sub-graphs $S ^ { i }$ . To calculate sub-graph similarity, we employ SMATCH++ (Opitz, 2023) at the sub-graph level (details on SMATCH++ in Appendix F.2). The resultant AMR graph $\\hat { \\mathcal { G } _ { i _ { n } } }$ is then used in Step 4. For generating R augmentations of $x _ { i } ^ { d o w n }$ , we do not apply this step on all rounds R but sample a probability $\\gamma$ from a Gaussian distribution ${ \\mathcal { N } } ( \\mu , \\sigma ^ { 2 } )$ and only apply this if $\\gamma$ crosses a set threshold $\\beta .$",
+        "bbox": [
+            507,
+            406,
+            887,
+            925
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_number",
+        "text": "730",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            134
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "(4) AMR - to - Text. To convert the edited graph back to text, we employ AMR-to-text AMR-BART (Bai et al., 2022). For our experiments, we employ pre-trained checkpoints provided by the authors in their code release.",
+        "bbox": [
+            112,
+            135,
+            489,
+            216
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "3.2.2 Augmentation Generation",
+        "text_level": 2,
+        "bbox": [
+            114,
+            225,
+            381,
+            241
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Optional Fine-tuning on $\\mathcal { D } _ { d o w n }$ . We optionally fine-tune the fine-tuned BART (from the 1st step) on the low-resource downstream dataset for domain adaptation. To obtain abstract-document pairs for this step, we employ the methodology defined in Section 3.2.1 to generate abstracts for each document in the downstream dataset but skip Step (3) (note that mixing AMR graphs of 2 sentences in Step (3) voids the relationship of the abstract with the original document).",
+        "bbox": [
+            112,
+            244,
+            489,
+            407
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Generation. After optional fine-tuning, we feed the generated abstracts from $\\mathcal { D } _ { d o w n }$ to the finetuned BART capable of expanding abstract descriptions and generating diverse expansions that serve as augmentations. To boost diversity, during autoregressive generation, we perform random multinomial sampling and sample the next word from the top-k most probable words and choose the most probable sequence with beam search. For generating R synthetic data, we repeat this process for R rounds and add the synthetic augmentations with the Gold-only data for training the downstream NLU model. Note that post fine-tuning BART on $\\mathcal { D } _ { a b } ,$ , ABEX can be considered as a training-free data augmentation method, i.e., ABEX does not require fine-tuning for specific downstream datasets. Fine-tuning on $\\mathcal { D } _ { d o w n }$ is optional, and generating abstracts only requires pre-trained models.",
+        "bbox": [
+            112,
+            409,
+            490,
+            699
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4 Experimental Setup",
+        "text_level": 2,
+        "bbox": [
+            114,
+            711,
+            322,
+            728
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.1 Tasks and Datasets",
+        "text_level": 2,
+        "bbox": [
+            114,
+            738,
+            312,
+            753
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Upstream Fine-tuning Dataset. For learning to expand abstract descriptions, we employ $\\mathcal { D } _ { a b }$ which consists of 0.2 million unique abstractdocument pairs.",
+        "bbox": [
+            112,
+            759,
+            489,
+            824
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Downstream Fine-tuning Datasets. To evaluate the efficacy of ABEX augmentations on downstream low-resource NLU tasks, we are largely inspired by the evaluation setup followed by a wealth of prior work in data augmentation (Sahu et al., 2023; Wang et al., 2022; Guo et al., 2022; Ye et al.,",
+        "bbox": [
+            112,
+            826,
+            490,
+            922
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "2022). We additionally evaluate ABEX on the NER task, which prior work does not. Specifically, we evaluate 12 challenging datasets across 4 NLU tasks under 4 low-resource settings as follows:",
+        "bbox": [
+            507,
+            85,
+            885,
+            148
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "For Sequence Classification (SC) task, we employ Huffpost (Misra and Grover, 2021) (news category classification), IMDB (Maas et al., 2011) and Yahoo!(Zhang et al., 2015) (answer topic classification), and ATIS (Coucke et al., 2018) and Massive (FitzGerald et al., 2022) (intent classification).",
+        "bbox": [
+            507,
+            149,
+            887,
+            246
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "For NER, we employ ConLL-2003 (Tjong Kim Sang and De Meulder, 2003), OntoNotes-5.0 (Pradhan et al., 2013) and MultiCoNER (Malmasi et al., 2022) datasets, where all have a common set of tags and some unique tags.",
+        "bbox": [
+            507,
+            246,
+            887,
+            326
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "For the Question Answering (QA), we employ SQuAD (Rajpurkar et al., 2016) and NewsQA (Trischler et al., 2017).",
+        "bbox": [
+            507,
+            326,
+            885,
+            374
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "For the Sentence Similarity (SS), we employ MRPC (Dolan and Brockett, 2005) and the Quora Question Pairs (QQP) dataset.",
+        "bbox": [
+            507,
+            375,
+            885,
+            423
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Finally, to show that ABEX does not replicate spurious correlations from the training data in the generated augmentations, we employ SNLI (Bowman et al., 2015) and MNLI (Williams et al., 2018). These two datasets are known to have spurious correlations. We evaluate on the hard subsets of the test set in a setting similar to Wu et al. (2022). Appendix D provides more details and statistics about these datasets.",
+        "bbox": [
+            507,
+            424,
+            887,
+            568
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.2 Hyper-parameters",
+        "text_level": 2,
+        "bbox": [
+            509,
+            580,
+            704,
+            595
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "We employ $\\mathbf { B A R T _ { l a r g e } }$ for learning to expand abstract descriptions. Our choice is motivated by the popularity of $\\mathbf { B A R T _ { l a r g e } }$ in data augmentation literature (Ghosh et al., $2 0 2 3 \\mathrm { a } , \\mathrm { c } ;$ Wang et al., 2022). We train it 15 epochs using Adam optimizer with a fixed learning rate of $5 . 6 e ^ { - 5 }$ For downstream NLU fine-tuning, we employ $\\mathbf { B E R T _ { b a s e - c a s e d } }$ (Chalkidis\\* et al., 2023). We finetune for 100 epochs with a batch size of 4,8 for 100 and 200 splits and 16 for 500 and 1000 splits. For SC and QA, we use Adam optimizer with a fixed learning rate of $1 e ^ { - 5 }$ . For NER, we employ FLAIR (Akbik et al., 2019) with a starting lr of $1 e ^ { - 5 }$ and constant decay. For AMR editing, we set $\\mu , \\sigma ^ { 2 }$ , and $\\alpha$ to be 0.5, 0.1, and 0.35, respectively. For AMR mixing, we set $\\mu , \\sigma ^ { 2 }$ , and $\\beta$ to be 0.5, 0.1, and 0.6, respectively. Appendix A provides hyperparameter tuning experiments. For low-resource experiments, we perform iterative stratified sampling over the dataset across four low-resource settings: 100, 200, 500, and 1000. We generate R=5 augmentations for all baselines and ABEX for all our experiments. We downsample the development set accordingly. We report the micro-average $\\mathrm { F _ { 1 } }$ score averaged across 3 runs for 3 random seeds. We provide model results on hyper-parameter tuning in Appendix A.",
+        "bbox": [
+            507,
+            600,
+            887,
+            922
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "731",
+        "bbox": [
+            485,
+            929,
+            515,
+            942
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "table",
+        "img_path": "images/f7304f40a3b3c56cedc639db242d424a651920bf3d540ce981be83719478cbe6.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">Model</td><td rowspan=\"2\">100</td><td colspan=\"2\">Huffpost</td><td colspan=\"6\">Yahoo</td><td colspan=\"4\">IMDB</td><td colspan=\"4\">ATIS</td><td colspan=\"3\">MASSIVE</td></tr><tr><td>200</td><td>500</td><td>1000</td><td>100</td><td>200</td><td>500</td><td>1000</td><td>100</td><td>200</td><td>500</td><td>1000</td><td>100</td><td>200</td><td>500</td><td>1000</td><td>100</td><td>200</td><td>500</td><td>1000</td></tr><tr><td>Gold</td><td>76.80</td><td>77.96</td><td>80.51</td><td>82.41</td><td>42.50</td><td>49.50</td><td>55.47</td><td>56.62</td><td>83.36</td><td>88.59</td><td>88.15</td><td>89.47</td><td>85.13</td><td>89.97</td><td>94.7</td><td>97.29</td><td>31.70</td><td>56.48</td><td>73.47</td><td>79.15</td></tr><tr><td>BackTrans</td><td>75.87</td><td>76.21</td><td>79.20</td><td>80.20</td><td>44.85</td><td>50.86</td><td>54.19</td><td>55.77</td><td>84.38</td><td>86.12</td><td>86.72</td><td>87.53</td><td>89.86</td><td>92.34</td><td>94.36</td><td>97.07</td><td>53.56</td><td>64.52</td><td>73.13</td><td>78.48</td></tr><tr><td>EDA</td><td>75.49</td><td>77.64</td><td>79.14</td><td>80.71</td><td>47.13</td><td>50.15</td><td>53.39</td><td>56.04</td><td>75.3</td><td>88.07</td><td>88.39</td><td>88.92</td><td>90.20</td><td>92.11</td><td>94.93</td><td>96.62</td><td>47.00</td><td>64.15</td><td>73.53</td><td>78.24</td></tr><tr><td>AEDA</td><td>77.65</td><td>76.88</td><td>80.31</td><td>81.10</td><td>45.61</td><td>51.52</td><td>54.22</td><td>56.02</td><td>82.30</td><td>88.25</td><td>86.95</td><td>89.33</td><td>89.07</td><td>91.89</td><td>96.73</td><td>97.63</td><td>51.04</td><td>66.81</td><td>75.15</td><td>79.11</td></tr><tr><td>AMR-DA</td><td>77.49</td><td>76.32</td><td>77.93</td><td>79.64</td><td>48.80</td><td>52.37</td><td>54.68</td><td>55.01</td><td>84.26</td><td>88.04</td><td>88.92</td><td>89.20</td><td>93.69</td><td>94.03</td><td>96.28</td><td>96.39</td><td>52.82</td><td>64.02</td><td>72.09</td><td>76.96</td></tr><tr><td>SSMBA</td><td>76.64</td><td>77.40</td><td>79.85</td><td>81.11</td><td>46.95</td><td>50.53</td><td>53.97</td><td>54.68</td><td>82.09</td><td>86.57</td><td>87.94</td><td>88.8</td><td>90.31</td><td>89.75</td><td>93.69</td><td>95.94</td><td>47.07</td><td>60.99</td><td>70.24</td><td>77.16</td></tr><tr><td>GENIUS</td><td>77.52</td><td>77.71</td><td>78.35</td><td>80.07</td><td>51.9</td><td>51.69</td><td>51.46</td><td>54.15</td><td>78.58</td><td>82.50</td><td>84.90</td><td>86.18</td><td>93.58</td><td>94.14</td><td>96.73</td><td>97.18</td><td>51.76</td><td>65.34</td><td>73.17</td><td>77.04</td></tr><tr><td>PromDA</td><td>77.83</td><td>77.90</td><td>77.65</td><td>81.06</td><td>52.61</td><td>52.13</td><td>53.40</td><td>56.27</td><td>84.21</td><td>88.24</td><td>88.30</td><td>88.65</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>PromptMix</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>92.68</td><td>94.25</td><td>94.81</td><td>96.95</td><td>52.60</td><td>64.53</td><td>74.26</td><td>76.87</td></tr><tr><td>ZeroĠen</td><td>73.84</td><td>75.66</td><td>76.30</td><td>76.49</td><td>41.47</td><td>49.21</td><td>54.55</td><td>55.04</td><td>76.99</td><td>80.61</td><td>82.31</td><td>83.10</td><td>81.24</td><td>83.95</td><td>85.63</td><td>90.88</td><td>28.20</td><td>47.02</td><td>67.80</td><td>70.94</td></tr><tr><td>LLaMA-213B</td><td>73.59</td><td>75.19</td><td>76.82</td><td>77.94</td><td>40.37</td><td>46.25</td><td>52.14</td><td>53.62</td><td>80.72</td><td>83.59</td><td>85.62</td><td>85.81</td><td>82.80</td><td>81.72</td><td>89.11</td><td>91.05</td><td>30.88</td><td>49.19</td><td>70.52</td><td>71.80</td></tr><tr><td>GPT3Mix</td><td>57.87</td><td>61.80</td><td>66.12</td><td>69.46</td><td>31.60</td><td>32.98</td><td>50.33</td><td>52.93</td><td>81.04</td><td>84.14</td><td>86.27</td><td>87.69</td><td>76.91</td><td>81.75</td><td>85.36</td><td>85.36</td><td>25.91</td><td>46.72</td><td>68.99</td><td>72.57</td></tr><tr><td>ABEX-Abs</td><td>73.62 74.61</td><td>74.58</td><td>76.27</td><td>78.42</td><td>35.87</td><td>37.93</td><td>48.47</td><td>50.36</td><td>74.69</td><td>80.28</td><td>82.66</td><td>82.51</td><td>78.53</td><td>80.27</td><td>-83.54</td><td>86.49</td><td>30.71</td><td>51.62</td><td>68.88</td><td>75.26 76.25</td></tr><tr><td>ABEX-stage-2</td><td>77.45</td><td>77.26 79.24</td><td>78.17</td><td>80.28</td><td>49.81</td><td>50.02</td><td>51.62</td><td>53.74</td><td>82.69</td><td>85.36</td><td>87.22</td><td>87.45</td><td>90.71</td><td>92.36</td><td>96.75</td><td>96.68</td><td>50.47</td><td>65.38</td><td>73.29</td><td>79.41</td></tr><tr><td>ABEX-stage-1 ABEX (ours)</td><td>78.66</td><td>79.30</td><td>81.63 81.82</td><td>83.58 84.03</td><td>52.46 53.20</td><td>53.26 53.52</td><td>54.77 54.81</td><td>57.13 57.11</td><td>84.35 85.18</td><td>88.16 88.72</td><td>88.30 89.05</td><td>89.17 89.28</td><td>91.66 94.28</td><td>94.83 95.71</td><td>96.79 97.33</td><td>96.45 97.92</td><td>52.51 55.03</td><td>65.63 66.85</td><td>73.94 75.44</td><td>80.36</td></tr><tr><td></td><td>±0.72</td><td>±0.05</td><td></td><td>±0.42</td><td>±0.56</td><td>±0.24</td><td>±0.51</td><td>±0.01</td><td>±0.73</td><td>±0.12</td><td>±0.10</td><td>±0.12</td><td>±0.54</td><td>±0.78</td><td>±0.45</td><td>±0.24</td><td>±1.34</td><td>±0.02</td><td></td><td></td></tr><tr><td></td><td></td><td></td><td>±0.13</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>±0.24</td><td>±0.85</td></tr></table>",
+        "bbox": [
+            115,
+            82,
+            882,
+            244
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/f48013762e507aa4a10dda687bca3faa5e14d2fb3780d11a4b3c7f26f840a39f.jpg",
+        "table_caption": [
+            "Table 2: Result comparison on Sequence Classification. ABEX outperforms prior methods by 0.04% - 29.12%.",
+            "Table 3: Result comparison on Sentence Similarity. ABEX outperforms our baselines by 0.48% - 11.22%."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">Model</td><td colspan=\"4\">MRPC</td><td colspan=\"4\">QQP</td></tr><tr><td>100</td><td>200</td><td>500</td><td>1000</td><td>100</td><td>200</td><td>500</td><td>1000</td></tr><tr><td>Gold-only</td><td>66.47</td><td>73.25</td><td>77.55</td><td>77.49</td><td>69.23</td><td>72.00</td><td>75.27</td><td>76.15</td></tr><tr><td>BackTrans</td><td>64.86</td><td>71.01</td><td>69.85</td><td>69.68</td><td>67.21</td><td>69.44</td><td>71.43</td><td>72.34</td></tr><tr><td>EDA</td><td>65.56</td><td>72.28</td><td>74.55</td><td>76.23</td><td>69.22</td><td>69.51</td><td>70.64</td><td>73.02</td></tr><tr><td>AEDA</td><td>62.43</td><td>71.59</td><td>74.84</td><td>77.44</td><td>69.45</td><td>68.81</td><td>72.54</td><td>76.32</td></tr><tr><td>SSMBA</td><td>64.96</td><td>70.82</td><td>73.60</td><td>75.23</td><td>66.51</td><td>63.10</td><td>69.60</td><td>70.73</td></tr><tr><td>AMR-DA</td><td>65.78</td><td>73.10</td><td>75.62</td><td>77.02</td><td>69.58</td><td>70.63</td><td>72.31</td><td>73.66</td></tr><tr><td>LLaMA-213B ABEX-Abs</td><td>66.21</td><td>72.55</td><td>76.72</td><td>77.78</td><td>70.35</td><td>73.57</td><td>74.39</td><td>74.81</td></tr><tr><td>ABEX-stage-2</td><td>63.52</td><td>70.71</td><td>75.46</td><td>76.21</td><td>68.31</td><td>70.44</td><td>72.30</td><td>73.08</td></tr><tr><td>ABEX-stage-1</td><td>66.59</td><td>73.88</td><td>77.24</td><td>77.58</td><td>70.24</td><td>71.68</td><td>74.57</td><td>74.89</td></tr><tr><td></td><td>68.17</td><td>74.36</td><td>77.92</td><td>78.04</td><td>71.60</td><td>74.02</td><td>76.49</td><td>76.73</td></tr><tr><td>ABEX (ours)</td><td>68.36</td><td>74.29</td><td>78.11</td><td>78.36</td><td>72.13</td><td>74.32</td><td>76.53</td><td>76.81</td></tr><tr><td></td><td>±0.37 ±0.32</td><td></td><td>±0.73 ±0.21</td><td></td><td></td><td>±0.55 ±0.28 ±0.86 ±0.62</td><td></td><td></td></tr></table>",
+        "bbox": [
+            121,
+            284,
+            499,
+            432
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            494,
+            489,
+            608
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4.3 Baselines",
+        "text_level": 2,
+        "bbox": [
+            112,
+            620,
+            236,
+            636
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Gold-only. Gold-only refers to training our model only on the low-resource gold training data.",
+        "bbox": [
+            112,
+            643,
+            487,
+            675
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "SC Baselines. For SC, we compare ABEX with text editing baselines: EDA (Wei and Zou, 2019), AEDA (Karimi et al., 2021), and AMR-DA (Shou et al., 2022), learning-based infilling baselines: SSMBA (Ng et al., 2020b), GENIUS(- ft version from the original paper) (Guo et al., 2022), PromDA (Wang et al., 2022), LLM-based prompting baselines: ZeroGen (Ye et al., 2022), GPT3Mix (Yoo et al., 2021) and rephrasing baselines: BackTrans (Yu et al., 2018).",
+        "bbox": [
+            112,
+            676,
+            490,
+            837
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "IC Baselines. For SC’s IC task subset, we add PromptMix (Sahu et al., 2023) as another LLMbased prompting baseline.",
+        "bbox": [
+            112,
+            839,
+            490,
+            888
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "NER Baselines. For NER, we compare with LwTR (Dai and Adel, 2020), DAGA (Ding et al., 2020),",
+        "bbox": [
+            112,
+            890,
+            489,
+            922
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/9686ce1a6bda053d3d4c57ec295503f74118ea225cf15fba111a5ce4c6ce719b.jpg",
+        "table_caption": [
+            "Table 4: Result comparison on QA. ABEX outperforms all our baselines by 4.05% - 38.8%."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">Model</td><td colspan=\"4\">SQuAD</td><td colspan=\"4\">NewsQA</td></tr><tr><td>100</td><td>200</td><td>500</td><td>1000</td><td>100</td><td>200</td><td>500</td><td>1000</td></tr><tr><td>Gold-only</td><td>11.64</td><td>19.71</td><td>26.32</td><td>31.52</td><td>22.45</td><td>30.14</td><td>45.65</td><td>58.83</td></tr><tr><td>BackTrans</td><td>17.47</td><td>22.60</td><td>29.07</td><td>32.60</td><td>27.32</td><td>34.98</td><td>47.21</td><td>60.21</td></tr><tr><td>EDA</td><td>17.07</td><td>22.39</td><td>28.98</td><td>32.40</td><td>29.31</td><td>35.81</td><td>49.90</td><td>61.01</td></tr><tr><td>AEDA</td><td>17.95</td><td>23.50</td><td>29.20</td><td>32.68</td><td>29.87</td><td>36.80</td><td>50.24</td><td>61.78</td></tr><tr><td>SSMBA</td><td>16.97</td><td>22.27</td><td>28.51</td><td>32.01</td><td>28.89</td><td>33.27</td><td>47.56</td><td>60.34</td></tr><tr><td>GENIUS</td><td>33.15</td><td>42.65</td><td>56.52</td><td>65.62</td><td>38.88</td><td>47.36</td><td>57.32</td><td>69.36</td></tr><tr><td>LLaMA-213B</td><td>34.62</td><td>42.58</td><td>58.92</td><td>65.71</td><td>40.86</td><td>50.24</td><td>56.58</td><td>68.97</td></tr><tr><td>ABEX-Abs ABEX-stage-2</td><td>22.16</td><td>25.77</td><td>31.85</td><td>42.63</td><td>32.09</td><td>38.71</td><td>46.29</td><td>60.11</td></tr><tr><td></td><td>35.67</td><td>45.34</td><td>58.79</td><td>66.23</td><td>41.78</td><td>49.82</td><td>57.38</td><td>71.63</td></tr><tr><td>ABEX-stage-1</td><td>37.92</td><td>48.32</td><td>61.02</td><td>67.99</td><td>43.65</td><td>52.83</td><td>59.28</td><td>72.45</td></tr><tr><td>ABEX (ours)</td><td>38.34</td><td>49.87</td><td>63.46</td><td>70.32</td><td>45.75</td><td>54.67</td><td>61.43</td><td>73.41</td></tr><tr><td></td><td>±0.21 ±0.19 ±0.70 ±0.34</td><td></td><td></td><td></td><td>±0.44 ±0.18 ±0.56 ±0.42</td><td></td><td></td><td></td></tr></table>",
+        "bbox": [
+            519,
+            284,
+            899,
+            432
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "MulDA (Liu et al., 2021), MELM (Zhou et al., 2021) and PromDA (Wang et al., 2022).",
+        "bbox": [
+            507,
+            495,
+            885,
+            527
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "QA Baselines. For QA, we compare it with Zero-Gen, BackTrans, GENIUS, EDA, and AEDA. For SS, we use BackTrans, EDA, AEDA, SSMBA, and AMR-DA.",
+        "bbox": [
+            507,
+            535,
+            887,
+            599
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Additional Details. For all LLM-based baselines (ZeroGen, GPT3Mix, and PromptMix), we employ LLaMa-13B for a fair comparison. Additionally, for all baselines, we generate 5 synthetic augmentations for a fair comparison. The working of all baselines is detailed in Appendix E. In all our result tables, ABEX refers to a model trained on synthetic data with optional fine-tuning after training. Finally, we also employ $\\mathrm { L L a M A } – 2 _ { 1 3 \\mathrm { B } }$ as a baseline, where we prompt the LLM to first abstract and then expand. For abstraction, we employ the same prompt in Section 3.1. For expansion, we provide the prompt in Appendix B.",
+        "bbox": [
+            507,
+            606,
+            887,
+            819
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Ablations. As ABEX ablations, we compare our model with ABEX-stage-2, which does include the fine-tuning on $\\mathcal { D } _ { a b } .$ , ABEX-stage-1, which does not include optional fine-tuning on $\\mathcal { D } _ { d o w n }$ and ABEX-Abs, which does not include the expansion stage and only trains on abstracts as augmentations.",
+        "bbox": [
+            507,
+            826,
+            887,
+            922
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "732",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/a3930802a87b06ca80281426718908ce2889a5dea9f6dba1f7e5ef1b2c13dea5.jpg",
+        "table_caption": [
+            "Table 5: Result comparison on NER. ABEX outperforms all our baselines by 0.33% - 36.82%."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">Model</td><td colspan=\"4\">CoNLL-2003</td><td colspan=\"4\">MultiCoNER</td><td colspan=\"4\">OntoNotes</td></tr><tr><td>100</td><td>200</td><td>500</td><td>1000</td><td>100</td><td>200</td><td>500</td><td>1000</td><td>100</td><td>200</td><td>500</td><td>1000</td></tr><tr><td>Gold-only</td><td>52.89</td><td>66.53</td><td>70.43</td><td>80.15</td><td>15.86</td><td>24.91</td><td>52.69</td><td>57.03</td><td>16.37</td><td>27.7</td><td>61.46</td><td>61.82</td></tr><tr><td>LwTR</td><td>65.48</td><td>73.24</td><td>81.45</td><td>83.74</td><td>42.23</td><td>50.22</td><td>51.0</td><td>54.67</td><td>46.18</td><td>51.47</td><td>54.87</td><td>62.67</td></tr><tr><td>DAGA</td><td>53.91</td><td>51.63</td><td>54.68</td><td>82.05</td><td>19.11</td><td>36.71</td><td>31.39</td><td>42.13</td><td>33.29</td><td>43.07</td><td>54.64</td><td>61.15</td></tr><tr><td>MELM</td><td>56.89</td><td>62.23</td><td>79.05</td><td>81.90</td><td>16.62</td><td>30.96</td><td>46.27</td><td>49.01</td><td>11.94</td><td>31.55</td><td>45.68</td><td>54.97</td></tr><tr><td>GENIUS</td><td>67.85</td><td>58.2</td><td>80.36</td><td>76.87</td><td>42.33</td><td>47.77</td><td>55.70</td><td>51.06</td><td>45.44</td><td>48.69</td><td>52.27</td><td>56.59</td></tr><tr><td>PromDA</td><td>66.30</td><td>70.95</td><td>76.38</td><td>82.14</td><td>41.40</td><td>48.93</td><td>55.02</td><td>53.55</td><td>46.34</td><td>50.83</td><td>54.81</td><td>57.64</td></tr><tr><td>LLaMA-213B</td><td>53.39</td><td>68.71</td><td>73.95</td><td>79.22</td><td>39.82</td><td>45.36</td><td>50.60</td><td>55.68</td><td>40.61</td><td>43.29</td><td>53.72</td><td>57.88</td></tr><tr><td>GPT-NER</td><td>54.61</td><td>68.25</td><td>78.17</td><td>80.60</td><td>40.81</td><td>46.37</td><td>52.19</td><td>55.92</td><td>42.37</td><td>44.82</td><td>55.20</td><td>58.62</td></tr><tr><td>ABEX-Abs</td><td>54.18</td><td>65.52</td><td>72.36</td><td>79.40</td><td>24.62</td><td>35.28</td><td>44.71</td><td>47.90</td><td>30.76</td><td>35.26</td><td>43.28</td><td>50.60</td></tr><tr><td>ABEX-stage-2</td><td>68.22</td><td>71.15</td><td>77.02</td><td>82.41</td><td>41.25</td><td>48.73</td><td>54.14</td><td>54.36</td><td>45.85</td><td>47.92</td><td>55.88</td><td>57.62</td></tr><tr><td>ABEX-stage-1</td><td>68.74</td><td>72.09</td><td>78.51</td><td>83.22</td><td>41.28</td><td>49.44</td><td>54.73</td><td>55.60</td><td>46.82</td><td>45.71</td><td>56.63</td><td>59.25</td></tr><tr><td>ABEX (ours)</td><td>70.16</td><td>73.67</td><td>83.58</td><td>84.20</td><td>43.05</td><td>51.75</td><td>56.03</td><td>58.41</td><td>48.76</td><td>51.38</td><td>61.85</td><td>63.14</td></tr><tr><td></td><td>±0.86</td><td>±0.37</td><td>±1.27</td><td>±0.31</td><td>±0.67</td><td>±1.32</td><td>±0.24</td><td>±1.24</td><td>±1.23</td><td>±0.06</td><td>±0.26</td><td>±0.35</td></tr></table>",
+        "bbox": [
+            115,
+            83,
+            878,
+            269
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "5 Results and Analysis",
+        "text_level": 2,
+        "bbox": [
+            114,
+            321,
+            329,
+            337
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Quantitative Results. Table 2 compares ABEX on the SC task with our baselines. ABEX outperforms all our baselines by 0.04% - 29.12% except on IMDB on the 1000 low-resource setting, where the downstream model overfits the train distribution post data augmentation. Table 5 compares ABEX on the NER task where ABEX outperforms all our baselines by 0.33% - 36.82%. Table 3 compares ABEX on the SS task where ABEX outperforms most of our baselines by 0.48% - 11.22%. Finally, Table 4 compares performance on the QA task, where ABEX outperforms all our baselines by 4.05% - 38.8%. Text-editing baselines like EDA and LwTR are most competitive to ABEX, while generative ones like DAGA and GENIUS lag behind by considerable margins.",
+        "bbox": [
+            112,
+            346,
+            490,
+            604
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Robustness against Spurious Correlations. Data augmentation methods often amplify spurious correlations in the training set (Evuru et al., 2024). ABEX strikes a better balance between consistency and diversity, which would prove to be beneficial in OOD scenarios. Table 6 further compares ABEX performance on SNLI and MNLI with spurious correlations.",
+        "bbox": [
+            112,
+            606,
+            490,
+            734
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/ac3c5ea812ba0e3d6c27c00e1d88041bfb425db6ea3cac12b4289419b495f44e.jpg",
+        "table_caption": [
+            "Table 6: Result comparison for datasets with known biases."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>SNLI</td><td>MNLI</td></tr><tr><td>Gold-only</td><td>80.34</td><td>75.75</td></tr><tr><td>EDA</td><td>72.68</td><td>70.90</td></tr><tr><td>Genius</td><td>74.64</td><td>71.26</td></tr><tr><td>ABEX (ours)</td><td>82.88</td><td>78.25</td></tr></table>",
+        "bbox": [
+            208,
+            744,
+            391,
+            812
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Qualitative Results. Table 7 compares the generation quality of ABEX with all our baselines (averaged baseline-wise across all tasks and splits) on the measures of perplexity (Jelinek et al., 1977), diversity (average percentage of new tokens introduced in R augmentations relative to the total tokens in the original document) and length diversity (average absolute difference in length of source and R augmentations). ABEX outperforms all our baselines in all settings.",
+        "bbox": [
+            112,
+            858,
+            490,
+            922
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/f3e9845c4a4b9cfb7d23273f4bd110fce65fcc2fc890e20c582d489ae951e428.jpg",
+        "table_caption": [
+            "Table 7: Quantitative evaluation of generation quality on the measures of perplexity (P), token diversity (D), and length diversity (D-L). ABEX outperforms all our baselines."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Method</td><td>P(↓)</td><td>D(↑)</td><td>D-L(↑)</td><td>P(↓)</td><td>D(↑)</td><td>D-L(↑)</td></tr><tr><td></td><td colspan=\"3\">100</td><td colspan=\"3\">500</td></tr><tr><td>EDA</td><td>135.12</td><td>103.49</td><td>10.63</td><td>147.06</td><td>120.69</td><td>12.07</td></tr><tr><td>SSMBA</td><td>86.13</td><td>126.66</td><td>17.58</td><td>103.92</td><td>134.44</td><td>19.12</td></tr><tr><td>AEDA</td><td>105.92</td><td>49.72</td><td>6.55</td><td>106.87</td><td>50.56</td><td>6.99</td></tr><tr><td>BackTrans</td><td>77.17</td><td>34.02</td><td>19.39</td><td>74.98</td><td>47.22</td><td>20.91</td></tr><tr><td>GPT3-Mix</td><td>90.50</td><td>124.02</td><td>23.55</td><td>85.49</td><td>134.08</td><td>26.98</td></tr><tr><td>GENIUS</td><td>32.88</td><td>156.50</td><td>27.95</td><td>32.71</td><td>159.49</td><td>28.13</td></tr><tr><td>AMR-DA</td><td>68.22</td><td>68.73</td><td>2.58</td><td>64.95</td><td>75.15</td><td>2.92</td></tr><tr><td>LWTR</td><td>152.69</td><td>101.95</td><td>11.39</td><td>137.03</td><td>109.02</td><td>11.64</td></tr><tr><td>DAGA</td><td>66.46</td><td>54.59</td><td>14.91</td><td>120.74</td><td>69.32</td><td>10.74</td></tr><tr><td>MELM</td><td>69.13</td><td>113.39</td><td>12.91</td><td>83.43</td><td>116.59</td><td>11.30</td></tr><tr><td>ABEX-stage-1 (ours)</td><td>27.46</td><td>190.87</td><td>27.74</td><td>26.48</td><td>217.29</td><td>17.88</td></tr><tr><td>ABEX (ours)</td><td>28.05</td><td>124.91</td><td>29.73</td><td>27.09</td><td>130.25</td><td>31.37</td></tr></table>",
+        "bbox": [
+            510,
+            321,
+            882,
+            470
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            550,
+            887,
+            646
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Figure 2 compares ABEX augmentations with our baselines on MultiCoNER (Malmasi et al., 2022), a dataset with relatively complex semantics. We define Coherence as the quality of the generated augmentation to be linguistically coherent. We define Label Consistency as the quality of the generated augmentation to maintain the same label as the original sample from which the augmentation was generated. Finally, we define Context Diversity as the quality of the generated augmentation to generate a context around the TRI that is diverse and unique compared to the original document. For all 3 criteria, we provide a red cross if it doesn’t meet them and a green tick if it does. ABEX consistently generates augmentations that are coherent, diverse, and label-consistent. The augmentations demonstrate significantly higher degrees of context, entity, and length diversity. Additional examples can be found in Fig. 3, 4, and 6, where we also demonstrate that ABEX maintains key syntactic features of the document, such as its style. This is particularly beneficial for tasks like IC, where other methods often alter the style from a question to a statement, negatively impacting performance.",
+        "bbox": [
+            507,
+            649,
+            887,
+            923
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "733",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/22e41e9d31ecc7bdf4e11efea26078ee68dea51cca6c1d82b5a3ee8a6be17c9a.jpg",
+        "table_caption": [
+            "Figure 2: Comparison of augmentations on the MultiCoNER dataset (500 setting). ABEX not only introduces novel contexts of varying lengths around existing NEs but also introduces new NEs. More examples in Fig. 3, 4, and 6."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Original</td><td>Both countries are full members of the european unionGRp and natoGRP</td><td>Coherence</td><td>Context Diversity</td><td>Label Consistency</td></tr><tr><td>LwTR</td><td>1. Both countries are full 1856 of the european union and colorado. 2. Both countries are full members of the european historic and nato inspired</td><td>X</td><td>X</td><td>X</td></tr><tr><td>DAGA</td><td>1. It is by as european is three rubber singer age her. 2. he also of a and european to.</td><td>X</td><td>X</td><td>X</td></tr><tr><td>MELM</td><td>1. Both countries are full members of the national socialist and international 2. Both countries are full members of the national states and international.</td><td>√</td><td>X</td><td>√</td></tr><tr><td>GENIUS</td><td>1. The european union, nato, paul getty museum and metropolitan museum of art 2. The european union is in trouble. nato, the EU is in the crosshairs.</td><td>X</td><td>X</td><td>√</td></tr><tr><td>PromDA</td><td>1. European union and nato resisted invasions of their countries. 2. They are also members of the european nato and european union &amp;&amp;.</td><td>X</td><td>√</td><td>√</td></tr><tr><td>Abstract Description</td><td colspan=\"4\">Countries in unions and military members.</td></tr><tr><td>ABEX-ft</td><td>1. 23 countries are a part of the european union and nato military. 2. The groups and militaries were the only equivalents of nato, one of whom were under the political influence</td><td>√</td><td>√</td><td>√</td></tr><tr><td>ABEX-pt</td><td>1. European UnionGRp member states such as RomaniaLoc, Serbia  $\\therefore c c \\cdot$  and SpainLoc are part of the european unionGRP with the natoGRp military, but may not join the union due to a lack of agreement and their ability to compete in the union. 2. Nine member states of the european unionGRp are part of the country&#x27;s natoGRp military force, with participation restricted to minor groups and no restrictions on freedom of</td><td>√</td><td></td><td></td></tr><tr><td>ABEX (ours)</td><td>NetherlandsLoc is also a member of natoGRP with an observer status. 2. The european unionGRp is composed of 12 countries, with the majority of them being members of the  $\\mathrm { n a t o } _ { \\mathrm { G R P } } ,$  and the union&#x27;s member states.</td><td>√</td><td>√</td><td>√</td></tr></table>",
+        "bbox": [
+            122,
+            83,
+            873,
+            395
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            460,
+            489,
+            573
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "6 Conclusion",
+        "text_level": 2,
+        "bbox": [
+            114,
+            585,
+            247,
+            601
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "This paper proposes ABEX, a novel data augmentation framework based on a novel paradigm – Abstract-and-Expand. Abstract-and-Expand involves first abstracting a given document and then expanding it. To achieve this, we fine-tune BART on a large-scale synthetic dataset to learn expanding abstract descriptions and then propose a controllable and training-free method to generate abstract descriptions for downstream dataset documents by editing AMR graphs. ABEX outperforms all our baselines, quantitatively and qualitatively, on various downstream datasets and tasks.",
+        "bbox": [
+            110,
+            612,
+            492,
+            806
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Limitations and Future Work",
+        "text_level": 2,
+        "bbox": [
+            114,
+            819,
+            376,
+            835
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "In this section, we list down some potential limitations of ABEX:",
+        "bbox": [
+            112,
+            845,
+            490,
+            877
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "1. Sentences generated by ABEX may lack factuality. Though factuality is not a requirement for generated synthetic data that serve as augmentations, and most data augmentation methods from literature don’t guarantee (Ghosh et al., 2023a), we would like to explore ways to overcome this in future work by methods like knowledge-graph grounded decoding.",
+        "bbox": [
+            129,
+            890,
+            490,
+            923
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            544,
+            460,
+            885,
+            557
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "2. Due to its propensity for creating augmentations that are not factually accurate, ABEX is unsuitable for generative tasks such as instruction tuning or generative question answering. Generative natural language understanding (NLU) tasks acquire new knowledge during training, and the introduction of non-factual augmentations by ABEX could negatively impact this knowledge acquisition. The core mechanism of ABEX involves introducing additional augmentations centered around Targeted Reference Information (TRI), which is beneficial primarily for discriminative tasks like sequence classification, named entity recognition (NER), question answering (QA), and others. This is because the model in these tasks focuses on identifying patterns in the data rather than acquiring new information. The introduction of varied contexts by ABEX enhances the model’s ability to learn these discriminative patterns more efficiently and adapt to new, unseen data distributions. Consequently, in alignment with previous methodologies, our evaluation of ABEX is limited to discriminative NLU tasks, excluding generative tasks.",
+        "bbox": [
+            522,
+            568,
+            887,
+            923
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "734",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            149,
+            85,
+            489,
+            148
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "3. ABEX depends on pre-trained AMR-to-Text and Text-to-AMR models for controllable abstract generation. However, AMR parsing is not a solved problem; these models often make errors. Therefore, as part of future work, we would like to explore better methods for controllable abstract generation.",
+        "bbox": [
+            127,
+            161,
+            490,
+            274
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            114,
+            313,
+            215,
+            329
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Azad Abad and Alessandro Moschitti. 2016. Taking the best from the crowd:learning question passage classification from noisy data. In Proceedings of the Fifth Joint Conference on Lexical and Computational Semantics, pages 136–141, Berlin, Germany. Association for Computational Linguistics.",
+            "Alan Akbik, Tanja Bergmann, Duncan Blythe, Kashif Rasul, Stefan Schweter, and Roland Vollgraf. 2019. FLAIR: An easy-to-use framework for state-of-theart NLP. In NAACL 2019, 2019 Annual Conference ofthe North American Chapter ofthe Associationfor Computational Linguistics (Demonstrations), pages 54–59.",
+            "Xuefeng Bai, Yulong Chen, and Yue Zhang. 2022. Graph pre-training for AMR parsing and generation. In Proceedings of the 60th Annual Meeting of the Associationfor Computational Linguistics (Volume 1: Long Papers), pages 6001–6015, Dublin, Ireland. Association for Computational Linguistics.",
+            "Laura Banarescu, Claire Bonial, Shu Cai, Madalina Georgescu, Kira Griffitt, Ulf Hermjakob, Kevin Knight, Philipp Koehn, Martha Palmer, and Nathan Schneider. 2013. Abstract meaning representation for sembanking. In Proceedings of the 7th linguistic annotation workshop and interoperability with discourse, pages 178–186.",
+            "Samuel R. Bowman, Gabor Angeli, Christopher Potts, and Christopher D. Manning. 2015. A large annotated corpus for learning natural language inference. In Proceedings of the 2015 Conference on Empirical Methods in Natural Language Processing, pages 632–642, Lisbon, Portugal. Association for Computational Linguistics.",
+            "Jiong Cai, Shen Huang, Yong Jiang, Zeqi Tan, Pengjun Xie, and Kewei Tu. 2023. Graph propagation based data augmentation for named entity recognition. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers), pages 110–118, Toronto, Canada. Association for Computational Linguistics.",
+            "Ilias Chalkidis\\*, Nicolas Garneau\\*, Catalina Goanta, Daniel Martin Katz, and Anders Søgaard. 2023. LeX-Files and LegalLAMA: Facilitating English Multinational Legal Language Model Development. In Proceedings ofthe 61st Annual Meeting ofthe Associationfor Computational Linguistics, Toronto, Canada. Association for Computational Linguistics.",
+            "Jiaao Chen, Derek Tam, Colin Raffel, Mohit Bansal, and Diyi Yang. 2023. An empirical survey of data augmentation for limited data learning in nlp. Transactions ofthe Associationfor Computational Linguistics, 11:191–211.",
+            "Shuguang Chen, Leonardo Neves, and Thamar Solorio. 2022. Style transfer as data augmentation: A case study on named entity recognition. In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing, pages 1827–1841, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics.",
+            "Alice Coucke, Alaa Saade, Adrien Ball, Théodore Bluche, Alexandre Caulier, David Leroy, Clément Doumouro, Thibault Gisselbrecht, Francesco Caltagirone, Thibaut Lavril, et al. 2018. Snips voice platform: an embedded spoken language understanding system for private-by-design voice interfaces. arXiv preprint arXiv:1805.10190.",
+            "Xiang Dai and Heike Adel. 2020. An analysis of simple data augmentation for named entity recognition. In Proceedings of the 28th International Conference on Computational Linguistics, pages 3861–3867, Barcelona, Spain (Online). International Committee on Computational Linguistics.",
+            "Bosheng Ding, Linlin Liu, Lidong Bing, Canasai Kruengkrai, Thien Hai Nguyen, Shafiq Joty, Luo Si, and Chunyan Miao. 2020. DAGA: Data augmentation with a generation approach for low-resource tagging tasks. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 6045–6057, Online. Association for Computational Linguistics.",
+            "Bill Dolan and Chris Brockett. 2005. Automatically constructing a corpus of sentential paraphrases. In Third International Workshop on Paraphrasing (IWP2005).",
+            "DataCanary et al. 2017. Quora question pairs.",
+            "Chandra Kiran Reddy Evuru, Sreyan Ghosh, Sonal Kumar, Ramaneswaran S, Utkarsh Tyagi, and Dinesh Manocha. 2024. Coda: Constrained generation based data augmentation for low-resource NLP. In 2024 Annual Conference of the North American Chapter of the Association for Computational Linguistics.",
+            "Jack FitzGerald, Christopher Hench, Charith Peris, Scott Mackie, Kay Rottmann, Ana Sanchez, Aaron Nash, Liam Urbach, Vishesh Kakarala, Richa Singh, Swetha Ranganath, Laurie Crist, Misha Britan,"
+        ],
+        "bbox": [
+            115,
+            338,
+            489,
+            417
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "735",
+        "bbox": [
+            485,
+            928,
+            515,
+            942
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Wouter Leeuwis, Gokhan Tur, and Prem Natarajan. 2022. Massive: A 1m-example multilingual natural language understanding dataset with 51 typologically-diverse languages.",
+            "Jonas Geiping, Micah Goldblum, Gowthami Somepalli, Ravid Shwartz-Ziv, Tom Goldstein, and Andrew Gordon Wilson. 2023. How much data are augmentations worth? an investigation into scaling laws, invariance, and implicit regularization. In The Eleventh International Conference on Learning Representations.",
+            "Sreyan Ghosh, Chandra Kiran Evuru, Sonal Kumar, S Ramaneswaran, S Sakshi, Utkarsh Tyagi, and Dinesh Manocha. 2023a. Dale: Generative data augmentation for low-resource legal nlp. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, Sentosa, Singapore.",
+            "Sreyan Ghosh, Utkarsh Tyagi, Sonal Kumar, and Dinesh Manocha. 2023b. Bioaug: Conditional generation based data augmentation for low-resource biomedical ner. In Proceedings ofthe 46th International ACM SIGIR Conference on Research and Development in Information Retrieval, SIGIR ’23, page 1853–1858, New York, NY, USA. Association for Computing Machinery.",
+            "Sreyan Ghosh, Utkarsh Tyagi, Manan Suri, Sonal Kumar, S Ramaneswaran, and Dinesh Manocha. 2023c. Aclm: A selective-denoising based generative data augmentation approach for low-resource complex ner. In Proceedings of the 61st Annual Meeting of the Associationfor Computational Linguistics (Volume 1: Long Papers), Toronto, Canada. Association for Computational Linguistics.",
+            "Biyang Guo, Yeyun Gong, Yelong Shen, Songqiao Han, Hailiang Huang, Nan Duan, and Weizhu Chen. 2022. Genius: Sketch-based language model pre-training via extreme and selective masking for text generation and augmentation. arXiv preprint arXiv:2211.10330.",
+            "Hongyu Guo. 2020. Nonlinear mixup: Out-of-manifold data augmentation for text classification. In Proceedings ofthe AAAI Conference on Artificial Intelligence, volume 34, pages 4044–4051.",
+            "Hongyu Guo, Yongyi Mao, and Richong Zhang. 2019. Augmenting data with mixup for sentence classification: An empirical study. arXiv preprint arXiv:1905.08941.",
+            "Xuming Hu, Yong Jiang, Aiwei Liu, Zhongqiang Huang, Pengjun Xie, Fei Huang, Lijie Wen, and Philip S. Yu. 2023. Entity-to-text based data augmentation for various named entity recognition tasks.",
+            "Fred Jelinek, Robert L Mercer, Lalit R Bahl, and James K Baker. 1977. Perplexity—a measure of the difficulty of speech recognition tasks. The Journal of the Acoustical Society of America, 62(S1):S63–S63.",
+            "Akbar Karimi, Leonardo Rossi, and Andrea Prati. 2021. AEDA: An easier data augmentation technique for",
+            "text classification. In Findings of the Association for Computational Linguistics: EMNLP 2021, pages 2748–2754, Punta Cana, Dominican Republic. Association for Computational Linguistics.",
+            "Hazel H Kim, Daecheol Woo, Seong Joon Oh, Jeong-Won Cha, and Yo-Sub Han. 2022. Alp: Data augmentation using lexicalized pcfgs for few-shot text classification. In Proceedings of the AAAI Conference on Artificial Intelligence, volume 36, pages 10894– 10902.",
+            "Varun Kumar, Ashutosh Choudhary, and Eunah Cho. 2020. Data augmentation using pre-trained transformer models. In AACL 2020 Workshop on Lifelong Learningfor Spoken Language Systems.",
+            "Mike Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed, Omer Levy, Ves Stoyanov, and Luke Zettlemoyer. 2019. Bart: Denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension. arXiv preprint arXiv:1910.13461.",
+            "Linlin Liu, Bosheng Ding, Lidong Bing, Shafiq Joty, Luo Si, and Chunyan Miao. 2021. Mulda: A multilingual data augmentation framework for low-resource cross-lingual ner. In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers), pages 5834–5846.",
+            "Albert Lu, Hongxin Zhang, Yanzhe Zhang, Xuezhi Wang, and Diyi Yang. 2023. Bounding the capabilities of large language models in open text generation with prompt constraints.",
+            "Andrew L. Maas, Raymond E. Daly, Peter T. Pham, Dan Huang, Andrew Y. Ng, and Christopher Potts. 2011. Learning word vectors for sentiment analysis. In Proceedings of the 49th Annual Meeting of the Associationfor Computational Linguistics: Human Language Technologies, pages 142–150, Portland, Oregon, USA. Association for Computational Linguistics.",
+            "Shervin Malmasi, Anjie Fang, Besnik Fetahu, Sudipta Kar, and Oleg Rokhlenko. 2022. MultiCoNER: A large-scale multilingual dataset for complex named entity recognition. In Proceedings of the 29th International Conference on Computational Linguistics, pages 3798–3809, Gyeongju, Republic of Korea. International Committee on Computational Linguistics.",
+            "Microsoft. 2023. Cntk: Language understanding/atis/data. Available at: https: //github.com/Microsoft/CNTK/tree/master/ Examples/LanguageUnderstanding/ATIS/Data.",
+            "Rishabh Misra and Jigyasa Grover. 2021. Sculpting Datafor ML: Thefirst act ofMachine Learning.",
+            "Nathan Ng, Kyunghyun Cho, and Marzyeh Ghassemi. 2020a. Ssmba: Self-supervised manifold based data augmentation for improving out-of-domain robustness. arXiv preprint arXiv:2009.10195."
+        ],
+        "bbox": [
+            131,
+            85,
+            489,
+            140
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "736",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Nathan Ng, Kyunghyun Cho, and Marzyeh Ghassemi. 2020b. SSMBA: Self-supervised manifold based data augmentation for improving out-of-domain robustness. In Proceedings ofthe 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 1268–1283, Online. Association for Computational Linguistics.",
+            "Juri Opitz. 2023. SMATCH++: Standardized and extended evaluation of semantic graphs. In Findings of the Association for Computational Linguistics: EACL 2023, pages 1595–1607, Dubrovnik, Croatia. Association for Computational Linguistics.",
+            "Sameer Pradhan, Alessandro Moschitti, Nianwen Xue, Hwee Tou Ng, Anders Björkelund, Olga Uryupina, Yuchen Zhang, and Zhi Zhong. 2013. Towards robust linguistic analysis using ontonotes. In Proceedings ofthe Seventeenth Conference on Computational Natural Language Learning, pages 143–152.",
+            "Adir Rahamim, Guy Uziel, Esther Goldbraich, and Ateret Anaby Tavor. 2023. Text augmentation using dataset reconstruction for low-resource classification. In Findings of the Association for Computational Linguistics: ACL 2023, pages 7389–7402, Toronto, Canada. Association for Computational Linguistics.",
+            "Pranav Rajpurkar, Jian Zhang, Konstantin Lopyrev, and Percy Liang. 2016. Squad: 100,000+ questions for machine comprehension of text. arXiv preprint arXiv:1606.05250.",
+            "Nils Reimers and Iryna Gurevych. 2019. Sentence-bert: Sentence embeddings using siamese bert-networks. arXiv preprint arXiv:1908.10084.",
+            "Anna Rogers, Olga Kovaleva, and Anna Rumshisky. 2021. A primer in bertology: What we know about how bert works. Transactions ofthe Associationfor Computational Linguistics, 8:842–866.",
+            "Gaurav Sahu, Olga Vechtomova, Dzmitry Bahdanau, and Issam H Laradji. 2023. Promptmix: A class boundary augmentation method for large language model distillation. arXiv preprint arXiv:2310.14192.",
+            "Ramit Sawhney, Megh Thakkar, Shivam Agarwal, Di Jin, Diyi Yang, and Lucie Flek. 2021. Hypmix: hyperbolic interpolative data augmentation. In Proceedings of the 2021 conference on empirical methods in natural language processing, pages 9858– 9868.",
+            "Saket Sharma, Aviral Joshi, Namrata Mukhija, Yiyun Zhao, Hanoz Bhathena, Prateek Singh, Sashank Santhanam, and Pritam Biswas. 2022. Systematic review of effect of data augmentation using paraphrasing on named entity recognition. In NeurIPS 2022 Workshop on Synthetic Data for Empowering ML Research.",
+            "Ziyi Shou, Yuxin Jiang, and Fangzhen Lin. 2022. AMR-DA: Data augmentation by Abstract Meaning Representation. In Findings ofthe Associationfor Computational Linguistics: ACL 2022, pages 3082–3098,",
+            "Dublin, Ireland. Association for Computational Linguistics.",
+            "Jiao Sun, Yufei Tian, Wangchunshu Zhou, Nan Xu, Qian Hu, Rahul Gupta, John Wieting, Nanyun Peng, and Xuezhe Ma. 2023. Evaluating large language models on controlled generation tasks. In Proceedings ofthe 2023 Conference on Empirical Methods in Natural Language Processing, pages 3155–3168, Singapore. Association for Computational Linguistics.",
+            "Lichao Sun, Congying Xia, Wenpeng Yin, Tingting Liang, Philip S Yu, and Lifang He. 2020. Mixuptransformer: dynamic data augmentation for nlp tasks. arXiv preprint arXiv:2010.02394.",
+            "Erik F. Tjong Kim Sang and Fien De Meulder. 2003. Introduction to the CoNLL-2003 shared task: Language-independent named entity recognition. In Proceedings of the Seventh Conference on Natural Language Learning at HLT-NAACL 2003, pages 142– 147.",
+            "Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. 2023. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288.",
+            "Adam Trischler, Tong Wang, Xingdi Yuan, Justin Harris, Alessandro Sordoni, Philip Bachman, and Kaheer Suleman. 2017. NewsQA: A machine comprehension dataset. In Proceedings of the 2nd Workshop on Representation Learningfor NLP, pages 191–200, Vancouver, Canada. Association for Computational Linguistics.",
+            "Yufei Wang, Can Xu, Qingfeng Sun, Huang Hu, Chongyang Tao, Xiubo Geng, and Daxin Jiang. 2022. PromDA: Prompt-based data augmentation for lowresource NLU tasks. In Proceedings ofthe 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 4242– 4255, Dublin, Ireland. Association for Computational Linguistics.",
+            "Jason Wei and Kai Zou. 2019. Eda: Easy data augmentation techniques for boosting performance on text classification tasks. arXiv preprint arXiv:1901.11196.",
+            "Adina Williams, Nikita Nangia, and Samuel Bowman. 2018. A broad-coverage challenge corpus for sentence understanding through inference. In Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers), pages 1112–1122, New Orleans, Louisiana. Association for Computational Linguistics.",
+            "Yuxiang Wu, Matt Gardner, Pontus Stenetorp, and Pradeep Dasigi. 2022. Generating data to mitigate spurious correlations in natural language inference datasets. In Proceedings of the 60th Annual Meeting ofthe Associationfor Computational Linguistics"
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            178
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "page_number",
+        "text": "737",
+        "bbox": [
+            485,
+            929,
+            515,
+            942
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "(Volume 1: Long Papers), pages 2660–2676, Dublin, Ireland. Association for Computational Linguistics.",
+            "Jiacheng Ye, Jiahui Gao, Qintong Li, Hang Xu, Jiangtao Feng, Zhiyong Wu, Tao Yu, and Lingpeng Kong. 2022. ZeroGen: Efficient zero-shot learning via dataset generation. In Proceedings ofthe 2022 Conference on Empirical Methods in Natural Language Processing, pages 11653–11669, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics.",
+            "Kang Min Yoo, Dongju Park, Jaewook Kang, Sang-Woo Lee, and Woomyoung Park. 2021. GPT3Mix: Leveraging large-scale language models for text augmentation. In Findings of the Association for Computational Linguistics: EMNLP 2021, pages 2225–2239, Punta Cana, Dominican Republic. Association for Computational Linguistics.",
+            "Adams Wei Yu, David Dohan, Minh-Thang Luong, Rui Zhao, Kai Chen, Mohammad Norouzi, and Quoc V Le. 2018. Qanet: Combining local convolution with global self-attention for reading comprehension. arXiv preprint arXiv:1804.09541.",
+            "Yue Yu, Yuchen Zhuang, Jieyu Zhang, Yu Meng, Alexander Ratner, Ranjay Krishna, Jiaming Shen, and Chao Zhang. 2023. Large language model as attributed training data generator: A tale of diversity and bias. In Thirty-Seventh Conference on Neural Information Processing Systems Datasets and Benchmarks Track.",
+            "Hongyi Zhang, Moustapha Cisse, Yann N. Dauphin, and David Lopez-Paz. 2018. mixup: Beyond empirical risk minimization. In International Conference on Learning Representations.",
+            "Xiang Zhang, Junbo Zhao, and Yann LeCun. 2015. Character-level convolutional networks for text classification. Advances in neural information processing systems, 28.",
+            "Jing Zhou, Yanan Zheng, Jie Tang, Li Jian, and Zhilin Yang. 2022. FlipDA: Effective and robust data augmentation for few-shot learning. In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 8646–8665, Dublin, Ireland. Association for Computational Linguistics.",
+            "Ran Zhou, Xin Li, Ruidan He, Lidong Bing, Erik Cambria, Luo Si, and Chunyan Miao. 2021. Melm: Data augmentation with masked entity language modeling for low-resource ner. arXiv preprint arXiv:2108.13655."
+        ],
+        "bbox": [
+            131,
+            85,
+            489,
+            114
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "A Hyper-parameter Tuning",
+        "text_level": 2,
+        "bbox": [
+            114,
+            827,
+            373,
+            845
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "A.1 Effect of $\\mu$ on the diversity of generations Table 8 compares the performance and the diversity of augmentations generated by ABEX at different values of $\\mu .$ . The parameter $\\mu$ plays a crucial role in controlling the deletion rate ε during the editing of the AMR graph. By increasing the mean of the Gaussian distribution, we observe a corresponding increase in the average deletion rate, leading to a higher level of abstraction. Consequently, this strategy enhances the performance and diversity of generated augmentations, reaching a peak value before exhibiting a decline.",
+        "bbox": [
+            110,
+            853,
+            489,
+            923
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            885,
+            214
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "table",
+        "img_path": "images/f10049703d99c564fe637869332490383afc27f416e7b7c25a79b0c782e740b5.jpg",
+        "table_caption": [
+            "Table 8: F1 and diversity metrics for various settings of µ. All values are averaged across all datasets for all low-resource settings."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>µ</td><td>0.2</td><td>0.3</td><td>0.4</td><td>0.5</td><td>0.6</td><td>0.7</td></tr><tr><td>F1</td><td>65.41</td><td>65.76</td><td>67.83</td><td>69.99</td><td>67.60</td><td>67.37</td></tr><tr><td>Diversity</td><td>192.73</td><td>195.61</td><td>198.27</td><td>201.63</td><td>195.76</td><td>193.28</td></tr><tr><td>Diversity-L</td><td>28.09</td><td>28.82</td><td>29.33</td><td>30.17</td><td>29.63</td><td>28.29</td></tr></table>",
+        "bbox": [
+            512,
+            224,
+            878,
+            265
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "A.2 Effect of augmentation rounds R",
+        "text_level": 2,
+        "bbox": [
+            509,
+            346,
+            820,
+            362
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Table 9 compares the performance of ABEX at different values of R. Augmenting the training dataset with several augmentation rounds R proves effective until the model overfits to the training data. The observation is similar to prior work in data augmentation for NLU tasks (Zhou et al., 2021; Ghosh et al., 2023c).",
+        "bbox": [
+            507,
+            367,
+            885,
+            480
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "table",
+        "img_path": "images/8474cafa5331a435782443e2f7418f8c380926b9bd807fb8c07eb6bd7e2a4b4b.jpg",
+        "table_caption": [
+            "Table 9: F1 for various settings of R. All values are averaged across all datasets for all low-resource settings."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>R</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr><tr><td>F1</td><td>67.65</td><td>67.99</td><td>69.06</td><td>69.64</td><td>69.99</td><td>69.71</td><td>69.22</td></tr></table>",
+        "bbox": [
+            512,
+            489,
+            878,
+            516
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "A.3 Effect of α",
+        "text_level": 2,
+        "bbox": [
+            509,
+            582,
+            645,
+            598
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Table 10 compares the performance of ABEX at different values of α. While a lower α leads to deleting smaller sub-graphs which would effectively decrease abstraction, a higher α leads to deleting bigger sub-graphs and thus higher abstraction. Similar to our finding in Section A.1, training and inferring with highly abstract sentences leads the model to generate sentences that do not match the underlying data distribution and, thus, sub-optimal performance.",
+        "bbox": [
+            507,
+            604,
+            887,
+            765
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "table",
+        "img_path": "images/0bb3a4aa03a71065c15159db02f87bfbf4bf5ee50cc75b0d4cca46d1e389db25.jpg",
+        "table_caption": [
+            "Table 10: F1 for various settings of α. All values are averaged across all datasets and all low-resource settings."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>α</td><td>0.25</td><td>0.30</td><td>0.35</td><td>0.40</td><td>0.45</td><td>0.5</td></tr><tr><td>F1</td><td>65.63</td><td>68.89</td><td>69.99</td><td>69.97</td><td>68.11</td><td>68.90</td></tr></table>",
+        "bbox": [
+            546,
+            776,
+            847,
+            802
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "A.4 Effect of β",
+        "text_level": 2,
+        "bbox": [
+            509,
+            869,
+            645,
+            884
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Table 11 compares the performance of ABEX augmentations at different values of $\\beta .$ A lower $\\beta$ leads to less diverse sentences (as a result of lesser augmentations generated using mixed abstracts), and a higher $\\beta$ leads to more diverse sentences (as a result of more sentences generated using mixed abstracts). While token diversity in augmentations improves performance, too much might lead to sub-optimal performance.",
+        "bbox": [
+            507,
+            890,
+            887,
+            922
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "page_number",
+        "text": "738",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            198
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/ea7f77023d7ce84d72946bedfbe852494c7277046aecf15553a4e16b81e91062.jpg",
+        "table_caption": [
+            "Table 11: F1 for various settings of β. All values are averaged across all datasets and all low-resource settings."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>β</td><td>0</td><td>0.2</td><td>0.4</td><td>0.6</td><td>0.8</td><td>1</td></tr><tr><td>F1</td><td>69.90</td><td>69.77</td><td>69.93</td><td>69.99</td><td>68.86</td><td>68.21</td></tr></table>",
+        "bbox": [
+            152,
+            208,
+            448,
+            231
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "B Prompts",
+        "text_level": 2,
+        "bbox": [
+            114,
+            299,
+            228,
+            316
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Document - to - Summary For summarizing a document from $\\mathcal { D } _ { u }$ with LLaMA-2, we use the following prompt: Write me a summary of the article in one line. Don’t include entities; write the summary just describing key events and concepts in the article. Here is the article:.",
+        "bbox": [
+            112,
+            324,
+            489,
+            420
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Summary - to - Abstract For generating an abstract from the summary of a document in $\\mathcal { D } _ { u }$ with LLaMA-2 we use the following prompt: I will provide you with a small document. You need to return a short and abstract description ofit. Don’t mention named entities, andjust describe the key message ofthe document in afew words. Here are some examples: Input 1: Shatrughan Sinha, a Congress candidate and actor-politician, will run against Union Law Minister Ravi Shankar Prasad, a BJP candidate, in the Patna Sahib seat. Sinha has dismissed BJP’s claim that the seat is their stronghold and has expressed his confidence in winning the election. He has also criticized the BJP’s decision to field Prasad, a four-term Rajya Sabha member, in the seat. Sinha has served two terms in the Rajya Sabha and has been a member ofthe union council of ministers. He has also defended his record, citing his spending of 106% of his MPLAD fund, which is available on the net. Output 1: A political competition between two candidates from major parties for a significant electoral seat, involving critique ofthe opposition’s choice and defense of personal achievements. Input 2: Said Baalbaki, a Palestinian artist, has curated an exhibition featuring 50 of Abbo’s sketches, etchings, and objects, along with texts from Baalbaki’s personal collection, showcasing the elusive sculptor’s work and life. Output 2: An exhibition curated by an artist, displaying sketches, etchings, and objects from a lesser-known sculptor, accompanied by personal texts, highlighting the sculptor’s work and life. Here is the input document:. The exemplars are human written.",
+        "bbox": [
+            110,
+            424,
+            492,
+            923
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            885,
+            133
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Abstract - to - Expansion (for LLaMA-13B baseline) I will provide you with an abstract version of a document. You need to understand the abstract and return an expanded version of the document from the abstract. The expansion can be diverse and can add new context and entities. However, it should follow the following constraints while expanding: 1) It should be semantically similar to the abstract, i.e., retain the key points and the message in the abstract. 2) It should retain thefollowing keywords or phrases: [TRI extractedfrom Section 3.1] 3) The generated sentence should be of the label [Ground-truth document label]. Here is an example ofa sentencefrom the label [Randomly retrieved sentence with the same label]. Here are some examples: [2 Human written exemplars of the process]",
+        "bbox": [
+            507,
+            135,
+            887,
+            409
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "C Algorithm",
+        "text_level": 2,
+        "bbox": [
+            509,
+            423,
+            640,
+            439
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "We show the Algorithm for ABEX in Algorithm 1.",
+        "bbox": [
+            507,
+            450,
+            885,
+            467
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "D Dataset Details",
+        "text_level": 2,
+        "bbox": [
+            509,
+            482,
+            680,
+            498
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "D.1 Classification",
+        "text_level": 2,
+        "bbox": [
+            509,
+            510,
+            667,
+            525
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "HuffPost. The HuffPost dataset (Misra and Grover, 2021) is a popular multiclass classification dataset in NLP. It is a collection of news articles from the HuffPost website, covering a wide range of topics, including politics, business, entertainment, and more. For multiclass classification, the HuffPost dataset is labeled with a diverse set of categories and for our experiments, we take sentences from five categories, including politics, sports, entertainment, tech, and business. Dataset statistics can be found in Table 12.",
+        "bbox": [
+            507,
+            532,
+            887,
+            711
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Yahoo. The Yahoo Answers topic classification dataset (Zhang et al., 2015) is a widely used dataset for multi-class text classification tasks. It is derived from the Yahoo Answers community-driven question-answering platform, where users ask questions on various topics, and community members provide answers. The dataset contains a large number of question-and-answer pairs covering a wide range of categories or topics. Each question in the dataset is associated with one primary category. The primary categories span diverse subjects, including Society & Culture, Science & Mathematics, Health, Education & Reference, Computers & Internet, Sports, Business & Finance, Entertainment & Music, Family & Relationships, Politics & Government, Travel, Cars & Transportation, Food & Drink, Games & Recreation, Home & Garden, Local Businesses, News & Events, Pets, Beauty & Style and Pregnancy & Parenting. Dataset statistics can be found in Table 12.",
+        "bbox": [
+            507,
+            713,
+            887,
+            922
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_number",
+        "text": "739",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/a3711b57ab63b55a494c0d53430687321163a155643c9b2b58b0c31865626884.jpg",
+        "table_caption": [
+            "Table 12: Statistics for each downstream NLU datasets used in our experiments. As described in Section 4.1, we derive low-resource splits from these original datasets for our experiments."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Dataset</td><td>Source</td><td>Sub-domain</td><td>Task Type</td><td>Training/Dev/Test Instances</td><td>Classes</td></tr><tr><td>HuffPost</td><td>Misra and Grover (2021)</td><td>HuffPost website</td><td>Multi-class classification</td><td>67490/16891/16891</td><td>5</td></tr><tr><td>Yahoo</td><td>Zhang et al. (2015)</td><td>Yahoo Answers</td><td>Multi-class classification</td><td>1375404/58966/58966</td><td>10</td></tr><tr><td>IMDB</td><td>(Maas et al., 2011)</td><td>IMDB Reviews</td><td>Multi-class classification</td><td>25000/-/25000</td><td>2</td></tr><tr><td>CoNLL-2003</td><td>Tjong Kim Sang and De Meulder (2003)</td><td>English news articles</td><td>Named Entity Recognition</td><td>14041/3250/3453</td><td>4</td></tr><tr><td>MultiCoNER</td><td>Malmasi et al. (2022)</td><td>Search Queries</td><td>Named Entity Recognition</td><td>15300/800/217818</td><td>6</td></tr><tr><td>OntoNotes-5.0</td><td>Pradhan et al. (2013)</td><td>Diverse</td><td>Named Entity Recognition</td><td>115812/15680/12217</td><td>36</td></tr><tr><td>ATIS</td><td>Microsoft (2023)</td><td>Travel enquiry</td><td>Intent Classification</td><td>4972/888/888</td><td>17</td></tr><tr><td>MASSIVE</td><td>FitzGerald et al. (2022)</td><td>Multidomain</td><td>Intent Classification</td><td>11500/2030/2970</td><td>60</td></tr><tr><td>MRPC</td><td>Dolan and Brockett (2005)</td><td>English news articles</td><td>Sentence Similarity</td><td>3668/408/1725</td><td>2</td></tr><tr><td>QQP</td><td>et al. (2017)</td><td>Quora questions</td><td>Sentence Similarity</td><td>363846/40430/40430</td><td>2</td></tr><tr><td>SQuAD</td><td>Rajpurkar et al. (2016)</td><td>Wikipedia Articles</td><td>Question Answering</td><td>87600/10600/-</td><td></td></tr><tr><td>NewsQA</td><td>Trischler et al. (2017)</td><td>CNN Articles</td><td>Question Answering</td><td>92549/5126/5166</td><td></td></tr><tr><td>SNLI</td><td>(Bowman et al., 2015)</td><td>Human Written Sentences</td><td>Natural Language Inference</td><td>550000/10000/-</td><td>3</td></tr><tr><td>MNLI</td><td>(Williams et al., 2018)</td><td>CNN Articles</td><td>Question Answering</td><td>393000/19650/-</td><td>3</td></tr></table>",
+        "bbox": [
+            119,
+            82,
+            878,
+            243
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            287,
+            490,
+            401
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "code",
+        "sub_type": "algorithm",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "Algorithm 1 ABEX: Our proposed augmentation framework   \nABEX Pre-training   \nGiven an instruction-tuned LLM, unlabelled dataset D<sub>u</sub>, and pre-trained   \nBART   \nSynthesize D<sub>ab</sub> with abstract-document pairs by prompting the LLM on   \nD<sub>u</sub>   \nTrain BART on D   \nData Augmentation with pre-trained BART   \nGiven training set Ddown, and pre-trained BART on Du   \nDab , Daug   \nfor X, Y   Dtrain do ▷Training Loop   \nt<sub>amr</sub> TEXTTOAMR(X)   \n<sup>t′</sup>amr ← <sup>FILTERATTR(t</sup>amr<sup>)</sup> ▷Remove Attributes   \n<sup>t′</sup>amr ← <sup>DELETESUBTREE(t′</sup>amr<sup>),</sup> <sup>if</sup> <sup>depth-ratio</sup> <sup><</sup> <sup>α</sup>   \n<sup>X˜</sup> ← <sup>AMRTOTEXT(t′ )</sup>   \nDabstract Dabstract X, Y <sup>˜</sup>   \nend for   \nfor X, Y<sup>˜</sup> D do   \nBART FINETUNE(BART, X<sup>˜</sup>) ▷Fine-tune BART   \nend for   \nfor X, Y   Ddown do ▷Generation Loop   \nrepeat  times:   \nt<sub>amr</sub> TEXTTOAMR(X)   \nFILTERATTR(t<sub>amr</sub>) ▷Remove Attributes   \n<sup>t′</sup>amr ← <sup>DELETESUBTREE(t′</sup>amr<sup>),</sup> <sup>if</sup> <sup>depth-ratio</sup> <sup><</sup> <sup>α</sup>   \n<sub>X</sub>′  S<sub>IMILAR(X)</sub> ▷Semantically similar sentence   \nST SUBTREEPAIRS(X, X<sup>′</sup> )   \n(x<sub>1</sub>, x<sub>2</sub>) ST,   \nt ARGMAX(SMATCH++(x , x ))   \n<sub>t</sub>′ <sub>=</sub> <sub>t</sub>′ <sub>+</sub> <sub>tsim</sub> ▷Append similar subtree   \n<sup>X˜</sup> ← <sup>AMRTOTEXT(t′</sup>amr<sup>)</sup>   \n<sup>X˜</sup>mix ← <sup>AMRTOTEXT(t′</sup>mix<sup>)</sup>   \nX<sub>aug</sub> BART<sub>finetune</sub>(X<sup>˜</sup>), if γ < β   \n<sup>X</sup>mix ← <sup>BART</sup>finetune<sup>(X˜</sup>mix<sup>),</sup> <sup>if</sup> <sup>γ</sup> <sup>></sup> <sup>β</sup>   \n<sup>D</sup>aug ← <sup>D</sup>aug ∪ {<sup>X</sup>aug<sup>,</sup> <sup>Y</sup> } ∪ {<sup>X</sup>mix<sup>,</sup> <sup>Y</sup> }   \nend for   \nDaug POSTPROCESS(Daug) ▷Post-processing   \n<sup>return</sup> <sup>D</sup>train ∪ <sup>D</sup>aug",
+        "bbox": [
+            114,
+            412,
+            489,
+            825
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D.2 Named Entity Recognition",
+        "text_level": 2,
+        "bbox": [
+            114,
+            853,
+            374,
+            869
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "CoNLL-2003. The CoNLL-2003 dataset (Tjong Kim Sang and De Meulder, 2003) is a widely used benchmark dataset for Named Entity Recognition (NER) tasks in NLP. It was created for the Conference on Computational Natural Language Learning (CoNLL) shared task in 2003. The dataset consists of news articles from the Reuters Corpus, a collection of English news articles. It is annotated with four named entities: person, organization, location, and miscellaneous entities (such as dates and percentages). The annotations indicate the boundaries of the named entities within the text. Dataset statistics can be found in Table 12.",
+        "bbox": [
+            112,
+            873,
+            489,
+            922
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            287,
+            887,
+            450
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "MultiCoNER. MultiCoNER (Malmasi et al., 2022) is large multilingual dataset for complex NER. MultiCoNER covers 3 domains, including Wiki sentences, questions, and search queries, across 11 distinct languages. The dataset represents contemporary challenges in NER and is labeled with six distinct types of entities: person, location, corporation, groups (political party names such as indian national congress), product (consumer products such as apple iPhone 6), and creative work (movie/song/book titles such as on the beach). Dataset statistics can be found in Table 12.",
+        "bbox": [
+            507,
+            460,
+            887,
+            655
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Ontonotes 5.0. Ontonotes 5.0 Pradhan et al. (2013) is a widely used dataset in the field of Natural Language Processing (NLP) and specifically for Named Entity Recognition (NER) tasks. It is a large-scale corpus that provides annotations for a variety of linguistic phenomena, including named entities, across multiple languages. The dataset contains a diverse range of text genres, including news articles, conversational data, and web data, making it suitable for training and evaluating NER models in different domains. It covers three languages: English, Chinese, and Arabic. The dataset is annotated with 11 categories: Person, Organization, Location, Date, Time, Money, Percent, Quantity, Ordinal and Miscellaneous. Dataset statistics can be found in Table 12.",
+        "bbox": [
+            507,
+            664,
+            887,
+            922
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_number",
+        "text": "740",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D.3 Intent Classification",
+        "text_level": 2,
+        "bbox": [
+            114,
+            84,
+            324,
+            99
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "ATIS. The ATIS (Airline Travel Information System) dataset<sup>2</sup> is a widely used benchmark dataset for intent classification in the field of NLU. It was developed to address understanding user intents in the context of airline travel information. The dataset consists of queries or utterances that users might input when interacting with a flight reservation system. Each query is labeled with an intent representing the user’s intention or purpose behind the query. The dataset is labeled with intents that are: Flight-Booking, Flight-Status, Flight-Information, Ground-Service, Airfare, Airport-Information, Travel-Preferences, Flight-Cancellation, and None/No-Intent. Dataset statistics can be found in Table 12.",
+        "bbox": [
+            110,
+            105,
+            490,
+            347
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "MASSIVE. The MASSIVE (Multilingual Amazon Slu resource package for Slot-filling) FitzGerald et al. (2022) dataset is a widely used benchmark dataset for intent classification in the field of NLU. It contains 1M realistic, parallel, labeled virtual assistant utterances spanning 51 languages, 18 domains, 60 intents, and 55 slots. The dataset is labeled with intents some of which are: Alarm set, Play music, Audio volume mute, Weather query, Takeaway order and General joke etc. Dataset statistics can be found in Table 12.",
+        "bbox": [
+            112,
+            348,
+            490,
+            526
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "D.4 Sentence Similarity",
+        "text_level": 2,
+        "bbox": [
+            112,
+            536,
+            319,
+            551
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "MRPC. The Microsoft Research Paraphrase Corpus (MRPC) dataset (Dolan and Brockett, 2005) is a benchmark for paraphrase identification and semantic similarity tasks. It was developed by Microsoft Research to support research in natural language processing (NLP) and machine learning. The MRPC dataset consists of pairs of sentences manually annotated as either paraphrases (sentences with similar meanings) or non-paraphrases (sentences with different meanings). The sentences cover various domains and topics, including news, fiction, and general web data. Dataset statistics can be found in Table 12.",
+        "bbox": [
+            112,
+            556,
+            490,
+            766
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "QQP. The Quora Question Pairs (QQP) dataset<sup>3</sup> is a widely used benchmark dataset in the field of natural language processing (NLP). It was created by Quora, a popular question-and-answer platform, and released for research. The QQP dataset consists of pairs of questions collected from the Quora platform. Each question pair is labeled as duplicate or non-duplicate, indicating whether the two questions have the same meaning. The dataset contains many question pairs covering diverse topics, allowing for the exploration of semantic similarity and question-matching tasks. Dataset statistics can be found in Table 12.",
+        "bbox": [
+            112,
+            766,
+            490,
+            865
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            887,
+            198
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "D.5 Question Answering",
+        "text_level": 2,
+        "bbox": [
+            509,
+            212,
+            722,
+            229
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "SQUAD. The SQUAD (Stanford Question Answering Dataset) (Rajpurkar et al., 2016) is a reading comprehension dataset, consisting of questions posed by crowdworkers on a set of Wikipedia articles, where the answer to every question is a segment of text, or span, from the corresponding reading passage, or the question might be unanswerable. Dataset statistics can be found in Table 12.",
+        "bbox": [
+            507,
+            235,
+            887,
+            365
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "NEWSQA. NewsQA (News Question Answering) (Trischler et al., 2017) is a challenging machine comprehension dataset of over 100,000 humangenerated question-answer pairs. Crowdworkers supply questions and answers based on a set of over 10,000 news articles from CNN, with answers consisting of spans of text from the corresponding articles. Dataset statistics can be found in Table 12.",
+        "bbox": [
+            507,
+            367,
+            887,
+            498
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "D.6 Bias Testing",
+        "text_level": 2,
+        "bbox": [
+            509,
+            511,
+            658,
+            527
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "SNLI. The SNLI (Stanford Natural Language Inference) (Bowman et al., 2015) corpus is a collection of 570k human-written English sentence pairs manually labeled for balanced classification with the labels entailment, contradiction, and neutral, supporting the task of natural language inference (NLI), also known as recognizing textual entailment (RTE). Dataset statistics can be found in Table 12.",
+        "bbox": [
+            507,
+            535,
+            887,
+            680
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "MNLI. The MNLI (Multi-Genre Natural Language Inference) (Williams et al., 2018) corpus is a crowdsourced collection of 433k sentence pairs annotated with textual entailment information. The corpus covers a range of genres of spoken and written text, and supports a distinctive cross-genre generalization evaluation. Dataset statistics can be found in Table 12.",
+        "bbox": [
+            507,
+            683,
+            887,
+            812
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "E Baseline Details",
+        "text_level": 2,
+        "bbox": [
+            509,
+            829,
+            685,
+            846
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "SSMBA. SSMBA (Ng et al., 2020b) generates synthetic training examples by using a pair of corruption and reconstruction functions to move randomly on a data manifold.",
+        "bbox": [
+            507,
+            858,
+            887,
+            921
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>2</sup>https://github.com/howl-anderson/ATIS\\_ dataset/tree/master",
+        "bbox": [
+            112,
+            870,
+            436,
+            896
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>3</sup>https://quoradata.quora.com/",
+        "bbox": [
+            134,
+            896,
+            361,
+            909
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_footnote",
+        "text": "First-Quora-Dataset-Release-Question-Pairs",
+        "bbox": [
+            114,
+            908,
+            442,
+            921
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_number",
+        "text": "741",
+        "bbox": [
+            485,
+            929,
+            515,
+            942
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "AEDA. AEDA (Karimi et al., 2021) is similar to EDA but only employs random insertion of punctuation marks in the original text to generate synthetic augmentations.",
+        "bbox": [
+            112,
+            85,
+            489,
+            149
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "GENIUS. GENIUS (Guo et al., 2022), pre-trains and optionally fine-tunes BART (Lewis et al., 2019) on a denoising objective using sketches generated with an extreme masking algorithm. The extreme masking algorithm just preserves keywords in a sentence and masks everything else.",
+        "bbox": [
+            112,
+            152,
+            489,
+            249
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "MELM. MELM (Zhou et al., 2021), which stands for Masked Entity Language Modeling, suggests the fine-tuning of a transformer-encoder-based PLM on linearized labeled sequences through masked language modeling. In low-resource scenarios, MELM surpasses all other baselines and prior techniques on the CoNLL 2003 NER dataset across four languages, including mono-lingual, cross-lingual, and multi-lingual settings.",
+        "bbox": [
+            112,
+            252,
+            490,
+            397
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "DAGA. DAGA (Ding et al., 2020), short for Data Augmentation with a Generation Approach, suggests the training of a one-layer LSTM-based recurrent neural network language model (RNNLM) by maximizing the probability of predicting the next token using linearized sentences. For sentence generation, they employ random sampling to create entirely new sentences, with the model being fed only the [BOS] token.",
+        "bbox": [
+            112,
+            399,
+            489,
+            545
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "LwTR. LwTR (Dai and Adel, 2020) replaces a token in a sentence with another token of the same label; the token is randomly selected from the training set.",
+        "bbox": [
+            112,
+            546,
+            489,
+            612
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "PromDA. PromDA (Wang et al., 2022) proposes a data augmentation framework based on T5 that trains soft prompts using a novel keyword-tosentence algorithm.",
+        "bbox": [
+            112,
+            613,
+            489,
+            676
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "AMR-DA. AMR-DA (Shou et al., 2022) converts a sample document from a dataset to an AMR graph, modifies the graph according to various data augmentation policies, and then generates augmentations from graphs. The method combines both sentence-level techniques like back translation and token-level techniques like EDA.",
+        "bbox": [
+            112,
+            678,
+            490,
+            791
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "PromptMix. PromptMix (Sahu et al., 2023) PromptMix prompts instruction-tuned LLMs to generate augmentations for text classification tasks that are close to the class boundary.",
+        "bbox": [
+            112,
+            793,
+            489,
+            857
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "ZeroGen. ZeroGen (Ye et al., 2022), similar to PromptMix, generates data using LLMs but in a zero-shot manner without any Gold-only data. It prompts pre-trained LLMs (not instruction finetuned) for data synthesis.",
+        "bbox": [
+            112,
+            858,
+            489,
+            923
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            509,
+            85,
+            699,
+            99
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Baselines not considered. We do not consider more recent baselines provided by Cai et al. (2023), Hu et al. (2023) and Rahamim et al. (2023) as the code for the same was not available at the time of writing the paper. Additionally, we do not consider Zhou et al. (2022) as label flipping is not applicable for our paper for all tasks considered, and Chen et al. (2022) as style transfer is better suited for cross-domain tasks and applying it to single domain tasks is not trivial. Finally, we do not consider Yu et al. (2023) as it requires manual human intervention for attribute extraction for a dataset.",
+        "bbox": [
+            507,
+            102,
+            887,
+            296
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "F Additional Details",
+        "text_level": 2,
+        "bbox": [
+            509,
+            306,
+            705,
+            322
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "F.1 AMR Attributes",
+        "text_level": 2,
+        "bbox": [
+            509,
+            332,
+            687,
+            348
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "In Section 3.2.1, we describe the removal of a predefined set of attributes from the AMR graph. These sentence-specific attributes are deemed nonessential to the underlying semantics of the sentence and are thus removed. The targeted attributes for removal include: :mod, :wiki, :quant, :value and :op. This process ensures that the resulting AMR graph primarily captures the essential semantic information relevant to the sentence, improving the clarity and conciseness of the abstract description.",
+        "bbox": [
+            507,
+            354,
+            887,
+            531
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "F.2 Similar Sentence Retrieval",
+        "text_level": 2,
+        "bbox": [
+            509,
+            542,
+            768,
+            558
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "We employ semantic retrieval to mix AMR graphs of 2 semantically similar sentences and generate a single abstract description covering the contents of both sentences. Note that the retrieval uses the original sentence, not the AMR graph of the sentence. Specifically, we calculate the cosine similarity sim(.) between embeddings e(a) and e(b) as follows:",
+        "bbox": [
+            507,
+            564,
+            887,
+            692
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "img_path": "images/a2976fb4563b76ba5bc508819487f5b20350c96ee773d0e93cc666037af5b344.jpg",
+        "text": "$$\n\\mathrm { { s i m } ( a , b ) = \\frac { e ( a ) \\cdot e ( b ) } { \\| e ( a ) \\| \\| e ( b ) \\| } }\\tag{1}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            591,
+            703,
+            798,
+            740
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "where $\\mathrm { e } ( . )$ is a sentence-encoder (Sentence-BERT in our case) and $^ { a , }$ and b are text sentences. We take b as the corpus sentence with the highest cosine similarity to a.",
+        "bbox": [
+            507,
+            745,
+            885,
+            809
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "F.3 SMATCH++",
+        "text_level": 2,
+        "bbox": [
+            509,
+            820,
+            658,
+            835
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "SMATCH (Semantic Matching of Nodes Anchored on Trees) is a graph-matching algorithm designed to evaluate the semantic similarity between structured data, such as parse trees or semantic graphs. It is commonly used in NLP and information retrieval tasks. The SMATCH algorithm considers two input graphs and measures their similarity based on the common structure and semantic alignment between nodes. It operates by recursively matching nodes in a top-down manner, considering both the nodes’ syntactic relationships and semantic properties. The key idea behind SMATCH is to find the best alignment between nodes of the two input graphs, aiming to maximize the matching score while minimizing structural and semantic inconsistencies. It assigns similarity scores to matched nodes based on their attribute values and relationships and calculates the overall graph similarity as the weighted average of node similarity scores.",
+        "bbox": [
+            507,
+            841,
+            885,
+            922
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "page_number",
+        "text": "742",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            85,
+            490,
+            310
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "The output of the SMATCH algorithm is a similarity score that quantifies the semantic similarity between the two input graphs. Higher scores indicate greater similarity, while lower scores indicate dissimilarity.",
+        "bbox": [
+            112,
+            310,
+            490,
+            391
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "SMATCH aims to measure the structural similarity of graphs via the number of triples shared by $\\mathcal { G } _ { A }$ and $\\mathcal { G } _ { B }$ . To obtain a meaningful score, it leverages an alignment map: var $s ( a )  v a r s ( b )$ that tells it how to map a variable in the first MR to a variable in the second MR. In this alignment, at maximum, every variable from a can have one partner in b (and vice versa). Let an application of a map to a graph a be denoted as $a ^ { m a p } : = \\{ t ^ { m a p } ; t \\in a \\}$ where $t ^ { m a p }$ of a triple t = <x, :rel, y> is set to t<sup>map</sup> = <map(x), :rel, map(y)> for binary triples, and $t ^ { m a p } = < \\mathsf { m a p } ( \\mathsf { x } ) , \\mathsf { \\Omega } : \\mathsf { r e l }$ , c> for unary triples. Under any alignment map, we can calculate an overlap score $f .$ In original smatch, $f$ is the size of the triple overlap of a and b:",
+        "bbox": [
+            110,
+            391,
+            489,
+            633
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "img_path": "images/a170093c2c6c659fac7d891fb3aae91250b534e1cdff696ab37d445e24a0e887.jpg",
+        "text": "$$\nf ( a , b , m a p ) = | a ^ { m a p } \\cap b | .\\tag{2}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            196,
+            644,
+            403,
+            662
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "The primary aim is to find $F$ as follows:",
+        "bbox": [
+            131,
+            690,
+            433,
+            707
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "img_path": "images/be562a1e0d0678d0841cca16f6fdd9723db7a11bdd432bc9f59e5ee43bb4c39c.jpg",
+        "text": "$$\nF = \\operatorname* { m a x } _ { m a p } f ( a , b , m a p ) ,\\tag{3}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            208,
+            721,
+            391,
+            745
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Finding a maximizer map<sup>⋆</sup> lies at the heart of SMATCH. For now, we assume that we have $m a p ^ { \\star }$ at our disposal. Therefore, we can calculate precision (P) and recall (R):",
+        "bbox": [
+            112,
+            751,
+            490,
+            816
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "img_path": "images/fae935311230ea0abe40f8387c8d018aaeca43b7fbd0cf80c37cbe6ed2193812.jpg",
+        "text": "$$\nP = | a | ^ { - 1 } F , \\quad \\quad R = | b | ^ { - 1 } F ,\\tag{4}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            184,
+            843,
+            416,
+            862
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "to obtain a final F1 evaluation score: $2 P R / ( P + R )$ With such a score, we can assess the similarity of MRs, and compare and select parsing systems.",
+        "bbox": [
+            112,
+            873,
+            489,
+            922
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "SMATCH++ (Opitz, 2023) improves over SMATCH by proposing a standardized and extended metric calculation of fine-grained sub-graph meaning aspects, making it more suitable for our task. Specifically, they show the feasibility of optimal alignment in a standard evaluation setup and develop a lossless graph compression method that shrinks the search space and significantly increases efficiency. We request our readers to refer to the original paper for more details.",
+        "bbox": [
+            505,
+            84,
+            887,
+            247
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "G Extra Details",
+        "text_level": 2,
+        "bbox": [
+            509,
+            260,
+            667,
+            275
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Model Parameters: $\\mathrm { B A R T _ { l a r g e } \\approx }$ has 680M parameters with 12 layers of encoder, 12 layers of decoder, 1024-hidden-state, and 16-heads. $\\mathrm { B E R T _ { b a s e } }$ has 110M 12-layers of encoder, 768-hiddenstate, 2048 feed-forward hidden-state, and 8-heads.",
+        "bbox": [
+            507,
+            286,
+            887,
+            369
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Compute Infrastructure: All our experiments are conducted on a single NVIDIA A100 GPU. An entire ABEX training pipeline takes $\\approx 2$ hours.",
+        "bbox": [
+            507,
+            388,
+            885,
+            437
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Implementation Software and Packages: We implement all our models in PyTorch <sup>4</sup> and use the HuggingFace <sup>5</sup> implementations of $\\mathbf { B E R T _ { b a s e } }$ and $\\mathbf { B A R T _ { l a r g e } } .$",
+        "bbox": [
+            507,
+            441,
+            887,
+            506
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "We also use the following repositories for running the baselines: BackTrans (Yu et al., 2018), EDA<sup>6</sup>(Wei and Zou, 2019), AEDA<sup>7</sup> (Karimi et al., 2021), AMR-DA<sup>8</sup> (Shou et al., 2022), SSMBA<sup>9</sup> (Ng et al., 2020b), GENIUS(-ft)<sup>10</sup> (Guo et al., 2022), PromDA<sup>11</sup> (Wang et al., 2022), PromptMix<sup>12</sup> (Sahu et al., 2023), ZeroGen<sup>13</sup> (Ye et al., 2022), GPT3Mix<sup>14</sup> (Yoo et al., 2021), $\\mathrm { L w T R } ^ { 1 5 }$ (Dai and Adel, 2020), $\\mathrm { D A G A } ^ { 1 6 }$ (Ding et al., 2020)(Ding et al., 2020) and MELM<sup>17</sup> (Zhou et al., 2021). All the baseline repositories are covered under the MIT License.",
+        "bbox": [
+            507,
+            506,
+            887,
+            699
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "We use the following datasets to evaluate: Huffpost<sup>18</sup> (Misra and Grover, 2021), Yahoo<sup>19</sup> (Zhang et al., 2015), IMDB<sup>20</sup> (Maas et al., 2011), Massive<sup>21</sup> (FitzGerald et al., 2022), $\\mathrm { A T I S } ^ { 2 2 }$ (Coucke et al., 2018), ConLL-2003<sup>23</sup> (Tjong Kim Sang and De Meulder, 2003), OntoNotes-5.0<sup>24</sup> (Pradhan et al., 2013), MultiCoNER<sup>25</sup>(Malmasi et al., 2022), MRPC<sup>26</sup>(Dolan and Brockett, 2005) and the Quora Question Pairs (QQP) <sup>27</sup>, SQuAD<sup>28</sup> (Rajpurkar et al., 2016), NewsQA<sup>29</sup> (Trischler et al., 2017), SNLI<sup>30</sup> (Bowman et al., 2015) and MNLI<sup>31</sup> (Williams et al., 2018). All the datasets have been released under various licenses for research purposes.",
+        "bbox": [
+            526,
+            700,
+            887,
+            717
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>4</sup>https://pytorch.org/",
+        "bbox": [
+            529,
+            727,
+            697,
+            741
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>5</sup>https://huggingface.co/",
+        "bbox": [
+            529,
+            740,
+            719,
+            756
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>6</sup>https://github.com/jasonwei20/eda\\_nlp",
+        "bbox": [
+            531,
+            755,
+            781,
+            769
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>7</sup>https://github.com/akkarimi/aeda\\_nlp",
+        "bbox": [
+            531,
+            766,
+            773,
+            782
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>8</sup>https://github.com/zzshou/amr-data-augmentation",
+        "bbox": [
+            529,
+            780,
+            845,
+            794
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>9</sup>https://github.com/nng555/ssmba",
+        "bbox": [
+            529,
+            793,
+            749,
+            807
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>10</sup>https://github.com/beyondguo/genius",
+        "bbox": [
+            527,
+            804,
+            771,
+            820
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>11</sup>https://github.com/GaryYufei/PromDA",
+        "bbox": [
+            526,
+            818,
+            779,
+            833
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>12</sup>https://github.com/servicenow/promptmix-emnlp-2023",
+        "bbox": [
+            526,
+            831,
+            875,
+            846
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>13</sup>https://github.com/jiacheng-ye/ZeroGen",
+        "bbox": [
+            526,
+            844,
+            788,
+            858
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>14</sup>https://github.com/naver-ai/hypermix",
+        "bbox": [
+            526,
+            857,
+            771,
+            872
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>15</sup>https://github.com/boschresearch/data-augmentationcoling2020",
+        "bbox": [
+            509,
+            870,
+            872,
+            895
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>16</sup>https://github.com/ntunlp/daga",
+        "bbox": [
+            526,
+            894,
+            731,
+            909
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>17</sup>https://github.com/randyzhouran/melm",
+        "bbox": [
+            526,
+            907,
+            779,
+            922
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_number",
+        "text": "743",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            83,
+            492,
+            294
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "Potential Risks: Generative models learn from vast amounts of textual data, including biased or prejudiced content present on the internet. As a result, there is a risk of bias amplification, where the models unintentionally perpetuate or reinforce existing biases. Also, generative models can generate highly coherent and contextually plausible text, raising concerns regarding the potential for generating misinformation or disinformation.",
+        "bbox": [
+            112,
+            297,
+            490,
+            444
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "H Augmentation Examples",
+        "text_level": 2,
+        "bbox": [
+            114,
+            456,
+            368,
+            474
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "Figure 3, Figure 4 and Figure 6 compare augmentations generated by ABEX with all our baselines. The figures show generations from the ATIS (Microsoft, 2023), Yahoo (Zhang et al., 2015) and MRPC (Dolan and Brockett, 2005) datasets. In addition, we assess the augmentations on their coherence, ability to include diverse contexts and maintain label consistency. Notably, all baselines demonstrate the ability to generate augmentations with label consistency. However, they fall short of introducing new contextual information within the sentences. Conversely, augmentations generated by AMR-DA and Backtrans. consistently exhibit coherence, while those produced by AEDA and SSMBA often lack coherence. The generations from ABEX excel in all three evaluated areas.",
+        "bbox": [
+            112,
+            481,
+            492,
+            675
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            84,
+            885,
+            149
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "us/download/details.aspx?id=52398",
+        "bbox": [
+            114,
+            819,
+            341,
+            834
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>18</sup>https://www.kaggle.com/datasets/rmisra/news-categorydataset",
+        "bbox": [
+            114,
+            680,
+            490,
+            706
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>19</sup>https://huggingface.co/datasets/yahoo\\_answers\\_topics",
+        "bbox": [
+            131,
+            706,
+            477,
+            720
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>20</sup>https://ai.stanford.edu/ amaas/data/sentiment/",
+        "bbox": [
+            129,
+            718,
+            426,
+            733
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>21</sup>https://huggingface.co/datasets/AmazonScience/massive/viewer/en-US",
+        "bbox": [
+            114,
+            731,
+            547,
+            756
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>22</sup>https://github.com/howl-anderson/ATIS\\_dataset",
+        "bbox": [
+            129,
+            756,
+            440,
+            770
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>23</sup>https://huggingface.co/datasets/conll2003",
+        "bbox": [
+            129,
+            768,
+            401,
+            783
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>24</sup>https://catalog.ldc.upenn.edu/LDC2013T19",
+        "bbox": [
+            129,
+            782,
+            413,
+            796
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>25</sup>https://registry.opendata.aws/multiconer/",
+        "bbox": [
+            129,
+            795,
+            398,
+            809
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>26</sup>https://www.microsoft.com/en-",
+        "bbox": [
+            126,
+            808,
+            342,
+            821
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>27</sup>https://quoradata.quora.com/First-Quora-Dataset-Release-Question-Pairs",
+        "bbox": [
+            114,
+            832,
+            453,
+            857
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>28</sup>https://rajpurkar.github.io/SQuAD-explorer",
+        "bbox": [
+            129,
+            857,
+            411,
+            872
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>29</sup>https://www.microsoft.com/enus/research/project/newsqa-dataset/download/",
+        "bbox": [
+            114,
+            870,
+            401,
+            895
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>30</sup>https://nlp.stanford.edu/projects/snli/",
+        "bbox": [
+            131,
+            894,
+            373,
+            909
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>31</sup>https://cims.nyu.edu/ sbowman/multinli/",
+        "bbox": [
+            129,
+            907,
+            394,
+            922
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_number",
+        "text": "744",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "table",
+        "img_path": "images/cb10473ddff4051f855d457e092dab9916037907725f7327f06580097f8a9d18.jpg",
+        "table_caption": [
+            "Table 13: Example instances from $\\mathcal { D } _ { a b }$ . The 1st-step and the 2nd-step abstract denote the outputs of both prompts employed in constructing $\\dot { \\mathcal { D } _ { a b } } .$ Additionally, we compare the abstract with a naive summary generated using the same LLM to show the745 difference between the two."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Raw document</td><td></td><td>1st-step summary 2nd-step abstract</td><td>Naive Summary</td></tr><tr><td>Health authorities in New Zealand said that about 200 passengers on the Dawn Princess ship became infected with the norovirus. The ship was sched- uled to leave for Australia on Monday. The last time there was a norovirus outbreak on the ship was back in 2012. According to Yahoo, health officials con- ducted a series of tests, and they confirmed that the illness was norovirus, but the outbreak does seem to be going away. The norovirus usually lasts for and confirm the one to three days, and those infected may experi-</td><td>Approximately 200 passengers on the Dawn Princess ship were infected with the norovirus, prompting health authorities conduct tests</td><td>A sudden outbreak of a viral infection, norovirus, affects a significant number of passengers on a ship, prompting to immediate health has experienced a norovirus outbreak.</td><td>Approximately 200 passengers on the Dawn Princess ship were infected with the norovirus, according to health au- thorities in New Zealand. The ship was set to depart for Australia on Mon- day. This is not the first time the ship</td></tr><tr><td>outbreak, ence stomach pains, vomiting, diarrhea and nausea. infected individu- Princess Cruises released a statement saying that those who were infected were isolated in their cab- ins. They remained there until they were considered not contagious. The statement continued to say that crew members disinfected door handles, railings, el- evator buttons and so forth. The cruise operator also said that passengers were encouraged to wash their hands properly and that they should use sanitizing gels. About a month ago, another cruise ship, the Crown Princess, had an outbreak of the norovirus. In that incident more than 150 crew members and passengers came down with the norovirus. That</td><td>als, and implement disinfection mea- sures to contain the [spread of the virus.</td><td></td><td>as a similar incident occurred in 2012. Health officials conducted tests and confirmed the illness was norovirus, but the outbreak appears to be sub- siding. Those infected may experi- ence stomach pains, vomiting, diar- rhea, and nausea for one to three days. Princess Cruises stated that infected passengers were isolated in their cab- ins until they were no longer conta- gious. Crew members also disinfected surfaces and encouraged passengers to wash their hands properly and use san-</td></tr><tr><td>ship was also operated by Princess Cruises.</td><td></td><td></td><td>ship, the Crown Princess, experienced a norovirus outbreak last month, infect- ing over 150 crew members and pas- sengers.</td></tr><tr><td></td><td>Vergilius, Bishop</td><td>A religious leader&#x27;s</td><td>Vergilius was appointed Bishop of</td></tr><tr><td>After the martyrdom of St. Boniface, Vergilius was made Bishop of Salzburg (766 or 767) and laboured</td><td>of Salzburg, spread</td><td>efforts to spread</td><td>Salzburg in 766 or 767 after the mar-</td></tr><tr><td></td><td></td><td></td><td>tyrdom of St. Boniface. He worked</td></tr><tr><td>successfully for the upbuilding of his diocese as</td><td></td><td>the faith and build</td><td></td></tr><tr><td></td><td>the faith and built</td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td>well as for the spread of the Faith in neighbour-</td><td></td><td></td><td></td></tr><tr><td></td><td>his diocese, and his</td><td>his diocese, accom-</td><td>to strengthen his diocese and spread</td></tr><tr><td>ing heathen countries, especially in Carinthia. He</td><td>teachings on the</td><td>panied by teach-</td><td>Christianity to nearby pagan countries,</td></tr><tr><td>died at Salzburg, 27 November, 789. In 1233 he</td><td>earth&#x27;s shape were</td><td></td><td></td></tr><tr><td></td><td></td><td>ings on the earth&#x27;s</td><td>particularly Carinthia. He died on</td></tr><tr><td>was canonized by Gregory IX. His doctrine that the</td><td>influenced by an-</td><td>shape inspired by</td><td>November 27, 789, and was canon-</td></tr><tr><td>earth is a sphere was derived from the teaching of</td><td>cient geographers</td><td>ancient sources and</td><td></td></tr><tr><td></td><td>and Irish voyagers.</td><td>travelers&#x27; accounts.</td><td>ized by Gregory IX in 1233. Vergilius</td></tr><tr><td>ancient geographers, and his belief in the existence</td><td></td><td></td><td>believed in the spherical shape of the</td></tr><tr><td>of the antipodes was probably influenced by the</td><td></td><td></td><td>earth and the existence of antipodes.</td></tr><tr><td>accounts which the ancient Irish voyagers gave of</td><td></td><td></td><td>ideas influenced by ancient geogra-</td></tr><tr><td>their journeys. This, at least, is the opinion of Ret-</td><td></td><td></td><td>phers and Irish voyagers&#x27; accounts of</td></tr><tr><td>tberg (&quot;Kirchengesch. Deutschlands&quot;, II, 236)</td><td></td><td></td><td>their journeys.</td></tr><tr><td></td><td>A blind man in his</td><td>A blind man</td><td>A blind man named Mike Wyatt is</td></tr><tr><td></td><td>60s is searching for</td><td>searching for</td><td>searching for a young man who saved</td></tr><tr><td>A blind man in his 60s is searching for the young</td><td>a young man who</td><td></td><td>is his life by pulling him back from an</td></tr><tr><td>man who pulled him back from an approaching</td><td></td><td></td><td>a</td></tr><tr><td>train and saved his life last Thursday, Nov. 9. Mike</td><td></td><td></td><td></td></tr><tr><td></td><td></td><td>young hero who</td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td>Wyatt stood at the stairs to the Peoria train station</td><td>saved his life by</td><td>saved his life from</td><td>approaching train in Aurora, Colorado.</td></tr><tr><td>in Aurora, Colorado, on Monday, looking for the</td><td>pulling him back</td><td>a train, hoping to</td><td>Wyatt was unaware of the train&#x27;s ap-</td></tr><tr><td>young man who saved his life days earlier. Wyatt</td><td>from an approach-</td><td>express gratitude.</td><td>proach and was about to cross the</td></tr><tr><td>was heading back home after visiting friends in</td><td></td><td></td><td>tracks when the young man intervened.</td></tr><tr><td>Longmont, and was about to cross the tracks to</td><td>ing train, and is hoping to find him</td><td></td><td>Despite not being able to find the man</td></tr><tr><td>transfer to another train, unaware that a train was</td><td>[to express his grati-</td><td></td><td>yet, Wyatt is grateful for his kindness</td></tr><tr><td>approaching. Seconds before the train pulled up, a</td><td>tude.</td><td></td><td>and plans to continue searching for</td></tr><tr><td>man can be seen on security camera footage pulling</td><td></td><td></td><td>him. A witness named Miranda was</td></tr><tr><td>him back with both arms. “I am so stoked right now</td><td></td><td></td><td>inspired by the act of kindness and Wy-</td></tr><tr><td>thinking that guy is going to come down that ramp</td><td></td><td></td><td>att is thankful for the opportunity to be</td></tr><tr><td>[from the platform],&quot; Wyatt told 9 News. In the</td><td></td><td></td><td>part of his grandchildren&#x27;s lives.</td></tr><tr><td>video by 9 News, he can be seen talking to passersby</td><td></td><td></td><td></td></tr><tr><td>in hopes that they have some info about the man,</td><td></td><td></td><td></td></tr><tr><td>Although he hasn&#x27;t yet found him, 9 News did find</td><td></td><td></td><td></td></tr><tr><td>a woman who saw the incident. She said she felt</td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td>inspired by it. “People are good,&quot; said Miranda,</td><td></td><td></td><td></td></tr><tr><td>one of the witnesses. 9News writes that Wyatt is</td><td></td><td></td><td></td></tr><tr><td>thankful because the man has made it possible for</td><td></td><td></td><td></td></tr><tr><td>Wyatt to be part of his grandchildren&#x27;s lives as they</td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td>grow up. Wyatt told 9 News he will come to the</td><td></td><td></td><td></td></tr><tr><td>station one more day to look for the man. “I will be</td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td>always remembering this man and his kindness,&quot; he</td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td>said.</td><td></td><td></td><td></td></tr></table>",
+        "bbox": [
+            114,
+            85,
+            909,
+            906
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "table",
+        "img_path": "images/5701fcad773808d448af29e657b530053006f63bcc397c5a5429f635e39097a5.jpg",
+        "table_caption": [
+            "Table 14: Example instances from $\\mathcal { D } _ { a b } .$ . The 1st-step and the 2nd-step abstract denote the outputs of both prompts employed in constructing $\\mathcal { D } _ { a b } { } ^ { \\bar { } }$ . Additionally, we also compare the abstract with a naive summary generated using the same LLM to show the746 difference between the both."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=7>Raw document                 1st-step summary 2nd-step abstract           Naive Summary</td></tr><tr><td rowspan=6 colspan=2>After Kevin&#x27;s horrific leg injury, everyone is asking:will he ever play basketball again? Dr. Glashow,co-chief of sports medicine at Mount Sinai Medi-cal Center, tells HollywoodLife.com exclusively ifKevin will ever be back on the court. Read on for de-tails! After Louisville sophomore Kevin Ware brokehis right leg during a game against Duke University,the basketball player was rushed to the hospital andunderwent emergency surgery. After a successfulsurgery, Kevin is now focused on healing, but whatdoes the future for his career hold? Kevin Ware&#x27;sBasketball Career: Will He Ever Play Again? Dr.Glashow, the co-chief of sports medicine at MountSinai Medical Center, tells HollywoodLife.com ex-clusively that not only will Kevin play basketballagain, but he could be healed in time for next sea-son! Although Kevin will be able to play basketballagain, he has a long road to recovery ahead of himbefore he&#x27;ll be back on the court.</td><td rowspan=1 colspan=3>Dr.  Glashow, asports medicine ex-</td><td rowspan=1 colspan=1>A sports medicineexpert predicts a</td><td rowspan=6 colspan=1>The article discusses the possibility ofKevin Ware, a Louisville sophomorebasketball player, returning to the courtafter a horrific leg injury. Dr. Glashow,a sports medicine specialist, tells Hol-lywoodLife.com that Kevin will likelyplay basketball again, possibly evennext season, but he has a long roadto recovery ahead of him. The articlealso mentions that Kevin will undergophysical therapy as part of his recoveryprocess. The public is then asked tovote on whether they think Kevin willplay basketball again.</td></tr><tr><td rowspan=1 colspan=3>pert, predicts thatKevin Ware will beable to play bas-</td><td rowspan=5 colspan=1>basketball player&#x27;srecovery     andpotential return tothe game followingsurgery and physi-cal therapy.</td></tr><tr><td rowspan=2 colspan=3>ketball again, po-tentially as soon asnext season, fol-</td></tr><tr><td rowspan=1 colspan=1>next</td></tr><tr><td rowspan=1 colspan=1>ery. After a successful</td><td rowspan=2 colspan=3>lowing a success-ful surgery and along road of phys-ical therapy and re-covery.</td><td rowspan=1 colspan=1>lowin</td></tr><tr><td rowspan=1 colspan=2></td></tr><tr><td rowspan=2 colspan=2>Karl Kispert, principal of cyber and informationsecurity, has more than 28 years of experience inselling, managing and delivering information riskmanagement, internal audit, regulatory and compli-ance programs, and information security and tech-nology risk management. A former chief informa-tion security officer, Kispert has helped design andimplement cybersecurity programs for many firms,according to the firm. “By adding this new serviceline, and bringing someone with Karl&#x27;s expertise tothe firm, we can service yet another important as-pect of our clients’ and prospects&#x27; businesses, ensur-ing their continued success,&quot; CEO Louis Grassi saidin a written statement. Services will include fullsecurity programs, compliance, third party vendorrisk assessment, threat management, and managedsecurity services</td><td rowspan=2 colspan=3>Thearticledis-cusses the additionof a new cyberse-curity service lineat a company, ledby  experiencedprincipal    KarlKispert,   whichwill offer variousservices includingfull security pro-grams, compliance,third-party vendorrisk  assessmentand threatman-agement to helpclients ensure theircontinued success.</td><td rowspan=1 colspan=1>A company expands its servicesto include cyber-security, led byan  experiencedprincipal, offeringvarious services tohelp clients protect</td><td rowspan=2 colspan=1>The article announces that a companyhas hired Karl Kispert, a seasoned pro-fessional with over 28 years of ex-perience in cybersecurity and infor-mation risk management, as the prin-cipal of cyber and information secu-rity. Kispert has helped design andimplement cybersecurity programs formany firms and will now lead the com-pany&#x27;s new cybersecurity service line.The service line will offer a range ofservices, including full security pro-grams, compliance, third-party vendorrisk assessment, threat management,and managed security services, to helpclients ensure their continued success.The CEO, Louis Grassi, believes thatKispert&#x27;s expertise will enable the com-pany to provide an additional impor-tant service to its clients and prospects.</td></tr><tr><td rowspan=1 colspan=1>their success.</td></tr><tr><td rowspan=4 colspan=2>A version of this article appeared in the print edi-tion of The Daily Star on July 12, 2018, on page16. Assembled by Palestinian artist Said Baalbaki.the exhibition presents 50 of Abbo&#x27;s sketches, etchings and object, as well as texts – all taken fromBaalbaki&#x27;s personal collection of work from, andpublications on, the elusive sculptor. Baalbaki hasno work of his own in this show. Born in Safad,northern Palestine, around 1888-1890, Abbo was afarmer and fisherman who later took up carpentryand stone masonry. It was not until he moved toBerlin in 1911 to study sculpture that his artisticcareer took shape. Baalbaki has spent the last fouryears finding, ând determining attribution for, 70artworks and 100 texts mentioning the artist. Baal-baki says many of Abbo&#x27;s sculptures didn&#x27;t surviveWorld War I. He believes those that were originallyexhibited in museums in Germany were taken dur-ing the war and melted down to make weapons.Alongside Abbo&#x27;s artworks are vintage photos ofplaces he&#x27;d been or postcards from that time period,which Baalbaki says is to give an overall look atthe life he led, in today&#x27;s age of media and imageryBaalbaki intends to continue his research and tracking down Abbo&#x27;s works.</td><td rowspan=4 colspan=3>The article dis-cussesanexhibition of works bythe elusive sculptorAbbo,    curatedby    PalestinianartistSaid Baal-baki, featuring 50sketches, etchings,objects, and textsfrom Baalbaki&#x27;spersonal collection,with afocus onAbbo&#x27;slife andcareer, includinghis time in Berlinand the impact ofWorld War I on hisart.</td><td rowspan=2 colspan=1>An     exhibitionshowcasing   thework and life of anobscure sculptor,Abbo, curated bySaid    Baalbaki,featuring various</td><td rowspan=4 colspan=1>The article discusses an exhibition ofworks by the elusive sculptor, Abbo,held at the Palestinian artist Said Baal-baki&#x27;s studio. The exhibition features50 of Abbo&#x27;s sketches, etchings, andobjects, as well as texts from Baal-baki&#x27;s personal collection. Baalbakihas spent four vears researching andtracking down Abbo&#x27;s works, and be-lieves that many of his sculptures didnot survive World War I. The exhibi-tion also includes vintage photos andpostcards to provide context on Abbo&#x27;slife. Baalbaki plans to continue hisresearch and tracking down more ofAbbo&#x27;s works.</td></tr><tr><td rowspan=1 colspan=1>[baki's </td></tr><tr><td rowspan=1 colspan=1>artworks     and</td><td rowspan=1 colspan=1>has</td></tr><tr><td rowspan=1 colspan=1>personal texts.</td></tr></table>",
+        "bbox": [
+            114,
+            83,
+            909,
+            906
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "table",
+        "img_path": "images/cd9aa409cb1047ea9467f29851b4141ce4f98e904a5566e49a4128039650ce0f.jpg",
+        "table_caption": [
+            "Figure 3: Augmentation examples on the ATIS dataset. All generations are produced in a low-resource setting (500 training examples)."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Original</td><td>What is the first class fare for a round trip dallas to denver?AIRFARE</td><td>Coherence</td><td>Context Diversity</td><td>Label Consistency</td></tr><tr><td>EDA</td><td>1. Class is the first what fare for a round trip dallas to denver 2. What is the first class for a round trip dallas to denver</td><td>X</td><td>X</td><td>√</td></tr><tr><td>AEDA</td><td>1. What is the latest ; first class ? flight of the day leaving dallas for san francisco 2. What is the ? latest first class ? flight of . the day leaving dallas for san francisco</td><td>X</td><td>X</td><td>√</td></tr><tr><td>Backtrans</td><td>1. What is the first class tariff for a round trip from dallas to denver? 2. What is the first class fare for a round trip dallas to denver?</td><td>√</td><td>X</td><td>√</td></tr><tr><td>SSMBA</td><td>1. What is called first class fare for a round from dallas to denver? 2. This is the lowest class fare, a round, dallas to denver</td><td>X</td><td>×</td><td>√</td></tr><tr><td>AMRDA</td><td>1. What is the first - class fare for a round - trip Dallas - DENVER fare ? 2. How much is the first class fare for a Dallas - DENVER trip ?</td><td>√</td><td>X</td><td>√</td></tr><tr><td>GENIUS</td><td>1. What first class fare for you? What do you think? 2. How to Denver it. What to do with it.</td><td>X</td><td>√</td><td>X</td></tr><tr><td>Abstract Description</td><td>What is the fare for a Dallas - Denver trip?</td><td></td><td></td><td></td></tr><tr><td>ABEX-ft</td><td>1. Can it be more convenient to travel to Denver from Dallas? 2. What are the cost classes in the trip from dallas to Denver and Denver to Baltimore?</td><td>√</td><td>√</td><td>√</td></tr><tr><td>ABEX-pt</td><td>1. Denver city to Dallas offers a one way trip cost of almost $500 per day, but how does it compare to a round trip trip to Dallas? 2. Denver-Dallas is a metropolitan metropolitan area with 821 miles of road leading to various cities, but is the one way trip fare worth it?</td><td>√</td><td>√</td><td>√</td></tr><tr><td>ABEX (ours)</td><td>1. Can a one way trip between Denver city and Dallas be worth the long 5 hour flight? 2. If you have the choice between the Denver city and Dallas, which one way trip to the city is likely worth the extra cost?</td><td>√</td><td>√</td><td>√</td></tr></table>",
+        "bbox": [
+            115,
+            99,
+            880,
+            395
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "table",
+        "img_path": "images/82af010f6a79acbda0b6add3778932a5d3f5ee7b4ff5cc892b1990922eb89bee.jpg",
+        "table_caption": [
+            "Figure 4: Augmentation examples on the MRPC dataset. All generations are produced in a low-resource setting (500 training examples)."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Original</td><td>Nearly all of Ford 's second-quarter profit came from Ford Credit, which earned a net $ 401 million , up 21.5 percent.</td><td>Coherence</td><td>Context Diversity</td><td>Label Consistency</td></tr><tr><td>EDA</td><td>1. nearly all of ford after part s second quarter profit came from ford credit which earned a net million up percent 2. nearly all of ford s second a profit came from ford credit which earned quarter net million up percent</td><td>X</td><td>X</td><td>√</td></tr><tr><td>AEDA</td><td>1. ? Nearly all ? of Ford 's second-quarter profit came from Ford ; Credit , which earned ! a : net ; $ 401 million , up 21.5 percent . 2. Nearly all of Ford 's second-quarter ; profit came from Ford . Credit ! , which earned a , net $ 401 ; million , up 21.5 . percent .</td><td>X</td><td>X</td><td>√</td></tr><tr><td>Backtrans</td><td>1. Almost all of Ford's second-quarter profit came from Ford Credit, which netted $401 million, up 21.5 percent. 2. Most of Ford's second-quarter profits came from Ford Credit, which netted $401 million, up 21.5 percent.</td><td>√</td><td>X</td><td>√</td></tr><tr><td>SSMBA</td><td>1. Nearly all of Ford 's second-quarter profit came from its Ford Credit finance arm , which earned $ 401 million , up 21.5 percent. 2. Nearly all of ford, s next sixth quarter comes are from ford credit, which had a net. 401 million, up 21. 5 percent.</td><td>√</td><td>X</td><td>√</td></tr><tr><td>AMRDA</td><td>1. Nearly all of Ford 's second quarter profits came from Ford Credit , which earned a net dollar of 40 million dollars , up 21 . 5 % . 2. Nearly all of Ford 's second quarter profits came from Ford Credit , which earned 40 million dollars up a percentage .</td><td>√</td><td>X</td><td>√</td></tr><tr><td>Abstract Description</td><td>Almost all of Ford's second-quarter profit came from Ford Credit.</td><td></td><td></td><td></td></tr><tr><td>ABEX-ft</td><td>1. Ford's second-quarter profit was $3.2 billion, primarily due to Ford Credit. 2. Ford Credit contributed to all of the company's second-quarter profit.</td><td>√</td><td>√</td><td>√</td></tr><tr><td>ABEX-pt</td><td>1. Ford Credit, a subsidiary of Ford Motor Co., was the primary source of all Ford's second-quarter profit, with all profits coming from there. 2. Ford Credit, a leading division of Ford, contributed to all of Ford's second-quarter profit, with the bank accounting for 95% of the company's net income.</td><td>√</td><td>√</td><td>√</td></tr><tr><td>ABEX (ours)</td><td>1. Ford reported a second-quarter profit of $1.2 billion, with Ford Credit accounting for a significant portion of the earnings. 2. All Ford's second-quarter profit came from Ford Credit, with the majority coming from the company's own business in the United States.</td><td>√</td><td>√</td><td>√</td></tr><tr><td>Original</td><td>When did Beyonce leave Destiny's Child and become a solo singer?</td><td>Coherence</td><td>Context Diversity</td><td>Label Consistency</td></tr><tr><td>EDA</td><td>1. when did beyonce leave destinys child solo become a and singer 2. when did beyonce shaver leave destinys child and become a solo singer</td><td>X</td><td>X</td><td>√</td></tr><tr><td>AEDA</td><td>1. When did Beyonce leave Destiny's : Child and become a ! solo ? singer? 2. When ! did Beyonce leave Destiny's Child ! and ? become a solo . singer?</td><td>X</td><td>X</td><td>√</td></tr><tr><td>Backtrans</td><td>1. Since when did Beyonce leave Destiny's Child and become a solo artist? 2. when did Beyonce leave Destiny's Child to become a solo artist?</td><td>√</td><td>X</td><td>√</td></tr><tr><td>SSMBA</td><td>1. when should beyonce start becoming solo? 2. did then beyonce leave destiny's child and be a solo singer?</td><td>X</td><td>X</td><td>√</td></tr><tr><td>GENIUS</td><td>1. Who managed the Destiny's Child group? 2. After leaving, what other entertainment venture did Beyonce explore?</td><td>√</td><td>√</td><td>X</td></tr><tr><td>Abstract Description</td><td>When did Beyonce go from Destiny's Child to a solo career?</td><td></td><td></td><td></td></tr><tr><td>ABEX-ft</td><td>1. What year did Beyonce depart Destiny's Child to go solo? 2. What was the timeframe when Beyonce separated from Destiny's Child for individual success?</td><td>√</td><td>√</td><td>√</td></tr><tr><td>ABEX-pt</td><td>1. In what era did the multi-talented Beyonce make her departure from the popular music collective Destiny's Child to venture into a solo career? 2. At what point in time did the musical artist Beyonce depart from the group known as Destiny's Child to pursue a career as an individual performer?</td><td>√</td><td>√</td><td>√</td></tr><tr><td>ABEX (ours)</td><td>1. In which year did Beyonce, the famous pop star, quit the band Destiny's Child to launch her independent music venture? 2. When did the music icon Beyonce decide to leave the successful group Destiny's Child and pursue an independent musical endeavor?</td><td>√</td><td>√</td><td>√</td></tr></table>",
+        "bbox": [
+            115,
+            475,
+            880,
+            863
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "page_number",
+        "text": "747",
+        "bbox": [
+            485,
+            928,
+            517,
+            942
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "table",
+        "img_path": "",
+        "table_caption": [],
+        "table_footnote": [],
+        "bbox": [
+            115,
+            83,
+            880,
+            380
+        ],
+        "page_idx": 22
+    },
+    {
+        "type": "table",
+        "img_path": "images/f7966ea3fcc4caad74aefb87a404e2aced34e68f739a10165f6acd1a7630e15e.jpg",
+        "table_caption": [
+            "Figure 5: Augmentation examples on the SQuAD dataset. All generations are produced in a low-resource setting (500 training examples).",
+            "Figure 6: Augmentation examples on the Yahoo dataset. All generations are produced in a low-resource setting (500 training examples)."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Original</td><td>I think she is one of the most beautiful kind and a fabulous nature. i love her a lots and she is only mineFAMILY &amp; RELATIONSHIPS</td><td>Coherence</td><td>Context Diversity</td><td>Label Consistency</td></tr><tr><td>EDA</td><td>1. i think she is of the most beautiful kind and a fabulous nature i her a lots she is only mine 2. i think she is one of the most beautiful kind and fabulous nature i love her a lots and she</td><td>X</td><td>X</td><td>X</td></tr><tr><td>AEDA</td><td>is only mine 1. ? i . think she is one of the most beautiful kind and a fabulous nature.i ! love : her ; a lots and she : is : only mine 2. , i , think she is one of the most beautiful kind and a , fabulous nature.i love her a lots</td><td>X</td><td>X</td><td>X</td></tr><tr><td>Backtrans</td><td>1. I think she&#x27;s one of the most beautiful species and a fabulous nature.i love her a lot and she&#x27;s just my 2. I think she is one of the most beautiful kind and legendary nature. I love him a</td><td>X</td><td>X</td><td>√</td></tr><tr><td>SSMBA</td><td>Many and he is only mine 1. i think she makes one - the most beautiful kind, of fabulous nature. i love me a lots aa is only mine 2. i think she is one of the most beautiful, by a fabolus planet. i love her a lots and</td><td>X</td><td>X</td><td></td></tr><tr><td>AMRDA</td><td>everything is another mine 1. I think nature is one of the most beautiful kinds of nature and nature . I love it a lot and she is only my sister . 2. I think she is one of the most beautiful kinds of nature and yours is fabulous . I love her</td><td>X</td><td>√</td><td></td></tr><tr><td>GENIUS</td><td>a lot and you are my only subordinate . 1. I think she is one of the most beautiful kind. I love her a lot. 2. She is very adventurous and beautiful. She is mine.</td><td>√</td><td>×</td><td></td></tr><tr><td>Abstract Description</td><td>She&#x27;s one of the most beautiful kinds and I love her a lot.</td><td></td><td></td><td></td></tr><tr><td>ABEX-ft</td><td>1. I have a beautiful wife who is one of the most beautiful people I&#x27;ve ever met, and I love her a lot. 2. She is the most beautiful girl I have ever seen. I have been looking at her and</td><td>V</td><td>√</td><td></td></tr><tr><td>ABEX-pt</td><td>1. I really like her, and I should introduce you to her before we meet again. I&#x27;ve been married 30 years, and we have 3 daughters, and she is one of the best friends I&#x27;ve had. They have been inseparable from each other from their first wedding in their short lives. 2. Gloria Wintour, a beloved wife, mother, and grandmother, died during childbirth, but her beauty makes her one of the most beautiful gifts of all time, along with her heart and spirit.</td><td>√</td><td></td><td></td></tr><tr><td>ABEX (ours)</td><td>1. Susan Boyle (25) is recognized as one of the most beautiful girls of the &#x27;60s, with a wide range of styles and colors including Abercomb and Fitch. 2. Carla, one of a kind, is a beautiful woman with long dark hair and a gentle spirit, and I will miss her greatly in my life.</td><td>V</td><td>√</td><td>√</td></tr></table>",
+        "bbox": [
+            115,
+            426,
+            880,
+            881
+        ],
+        "page_idx": 22
+    },
+    {
+        "type": "page_number",
+        "text": "748",
+        "bbox": [
+            485,
+            929,
+            517,
+            942
+        ],
+        "page_idx": 22
+    }
+]

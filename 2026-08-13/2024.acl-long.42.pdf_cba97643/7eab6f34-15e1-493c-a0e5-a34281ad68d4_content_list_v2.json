@@ -1,0 +1,3255 @@
+[
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Analysis of Multi-Source Language Training in Cross-Lingual Transfer"
+                    }
+                ],
+                "level": 1
+            },
+            "bbox": [
+                129,
+                89,
+                867,
+                111
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Seong Hoon Lim†, Taejun Yun†, Jinhyeon Kim†, Jihun Choi‡, Taeuk Kim∗† †Hanyang University, ‡Sony AI"
+                    }
+                ]
+            },
+            "bbox": [
+                159,
+                145,
+                840,
+                179
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "{dmammfl,tj1616,kimjinhye0n,kimtaeuk}@hanyang.ac.kr, jihun.a.choi@sony.com"
+                    }
+                ]
+            },
+            "bbox": [
+                216,
+                181,
+                783,
+                196
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Abstract"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                262,
+                260,
+                342,
+                275
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The successful adaptation of multilingual language models (LMs) to a specific languagetask pair critically depends on the availability of data tailored for that condition. While cross-lingual transfer (XLT) methods have contributed to addressing this data scarcity problem, there still exists ongoing debate about the mechanisms behind their effectiveness. In this work, we focus on one of the promising assumptions about the inner workings of XLT, that it encourages multilingual LMs to place greater emphasis on language-agnostic or taskspecific features. We test this hypothesis by examining how the patterns of XLT change with a varying number of source languages involved in the process. Our experimental findings show that the use of multiple source languages in XLT—a technique we term Multi-Source Language Training (MSLT)—leads to increased mingling of embedding spaces for different languages, supporting the claim that XLT benefits from making use of language-independent information. On the other hand, we discover that using an arbitrary combination of source languages does not always guarantee better performance. We suggest simple heuristics for identifying effective language combinations for MSLT and empirically prove its effectiveness."
+                    }
+                ]
+            },
+            "bbox": [
+                141,
+                288,
+                462,
+                689
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "1 Introduction"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                713,
+                260,
+                730
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "There has been recent interest in multilingual language models (LMs), where multiple languages are used in training an LM, due to its capability of accepting multilingual inputs and achieving similar or even better performance compared to monolingual LMs at natural language processing (NLP) tasks. However, despite all these advantages, fine-tuning multilingual LMs using a specific language and an NLP task hinges on acquiring labeled data tailored to a specific purpose, which is not always possible."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                739,
+                490,
+                901
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/4396fe10fd19d8bab4a692bb5838def8aaea464af89a2b313f4acf68f1b44330.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 1: Overview of the effectiveness of Multi-Source Language Training (MSLT) in cross-lingual transfer. As we adopt more sophisticated approaches for MSLT, we can expect improved performance (from bottom to top)."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                514,
+                260,
+                880,
+                451
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To address this challenge amid linguistic resource disparities, cross-lingual transfer (XLT) approaches have been proposed. In the context of finetuning multilingual LMs, XLT leverages resourcerich source languages in fine-tuning to boost performance on low-resource target languages."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                549,
+                887,
+                645
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Although there is still active debate regarding the inner workings of XLT, a significant body of previous research indicates that multilingual LMs are capable of separating language-specific and language-agnostic information from text (Muller et al., 2021), and that XLT favors the enhancement of language-agnostic features while reducing the emphasis on language-specific ones (Qi et al., 2022; Tu et al., 2022; Wang et al., 2022; inter alia)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                648,
+                885,
+                793
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "While the standard practice in XLT is to employ only one language as a source for transfer, there exist attempts that have investigated the use of multiple source languages (Singh et al., 2019; Roy et al., 2020; Kew et al., 2023; Chai et al., 2024; Shaham et al., 2024). These studies reveal that employing multiple source languages in XLT—the concept we refer to as Multi-Source Language"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                794,
+                887,
+                922
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "*Corresponding author."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                908,
+                282,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "712"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "<sub>Proceedings</sub> <sub>of</sub> <sub>the</sub> <sub>62nd</sub> <sub>Annual</sub> <sub>Meeting</sub> <sub>of</sub> <sub>the</sub> <sub>Association</sub> <sub>for</sub> <sub>Computational</sub> <sub>Linguistics</sub> <sub>(Volume</sub> <sub>1:</sub> <sub>Long</sub> <sub>Papers),</sub> <sub>pages</sub> <sub>712–725</sub>1 August 11-16, 2024 ©2024 Association for Computational Linguistics"
+                    }
+                ]
+            },
+            "bbox": [
+                97,
+                946,
+                900,
+                973
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Training (MSLT)—leads to performance improvement. However, despite it is evident that MSLT has clear advantages, several research questions remain unexplored, including: (1) the specific changes that it induces in the internal states of LMs, (2) the conditions under which it achieves its optimal performance, and (3) the breadth of applications where it can be effectively applied, among others."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                85,
+                489,
+                214
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this work, we introduce a series of comprehensive analyses exploring the inner workings of MSLT, along with offering guidance for its effective utilization. Specifically, we first attempt to illustrate the utility of MSLT with a couple of intuitive visualizations, to clarify the underlying reasons for its effectiveness. In addition, our experimental results discover various intriguing findings. Regarding the number of languages involved in MSLT, we observe its positive correlation with performance in general, although the trend tends to plateau as the number of languages exceeds a certain threshold."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                215,
+                490,
+                424
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our empirical discovery also suggests that the enhanced diversity of source languages in MSLT does not invariably lead to improved performance. This underscores the importance of carefully selecting an effective combination of source languages (see Figure 1 for an intuitive illustration). Therefore, we examine various heuristics that can identify a suitable selection of source languages from an exponentially large pool of possible combinations. Based on our tests, we propose several competent strategies, some of which are derived from the statistical properties of languages in terms of pretraining, while others utilize linguistic characteristics of languages. Lastly, we discuss intriguing patterns evident in the group of languages selected as sources for transfer, providing insights into the interplay of languages in MSLT."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                425,
+                490,
+                701
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2 Related Work"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                715,
+                270,
+                732
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Multilingual LMs (Conneau et al., 2019; Scao et al., 2022; inter alia) are widely recognized for their ability to process inputs from diverse languages in an integrated manner. They have recently been the subject of extensive research for uncovering their working mechanisms, and this effort has converged on the robust hypothesis that the internal states of multilingual LMs can be categorized into language-sensitive and language-agnostic components (Choenni and Shutova, 2020; Chang et al., 2022; Zhao et al., 2020; Muller et al., 2021)."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                745,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Meanwhile, cross-lingual transfer (XLT) aims to improve the performance of multilingual LMs on specific tasks in languages with limited resources (i.e., target languages), by utilizing the support from resource-rich languages (i.e., source languages). Previous research on XLT has explored diverse implementations of the concept. For instance, Yang et al. (2022) attempt to achieve XLT by blending representations from source and target languages, while Zheng et al. (2021) introduce data augmentation techniques such as subword sampling and code-switching. Wang et al. (2022) propose a contrastive learning framework aimed at reducing the differences in sentence embeddings between languages. Concurrently, Qi et al. (2022) present a prompt-based approach that facilitates information transfer from a source language to prompts composed in the target language."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                85,
+                887,
+                375
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Note that the majority of existing methods for XLT (Libovicky et al. ` , 2020; Tiyajamorn et al., 2021; Yang et al., 2022), including the aforementioned studies, adhere to a common theme: they are crafted to facilitate XLT by prompting the enhancement of language-agnostic or universal features within multilingual LMs. In this work, we focus on a simple strategy that yields a similar effect, namely, introducing multiple source languages in XLT instead of just one as is customary, deliberately steering clear of complex algorithms."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                375,
+                887,
+                552
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In the literature, there is empirical acknowledgment that increasing the diversity of source languages in XLT can boost its performance. Singh et al. (2019) suggest that pairing sentences written in different languages (for example, one sentence in one language and another in a different language) is beneficial for improving performance on the crosslingual natural language inference (XNLI; Conneau et al., 2018) task. They additionally observe that the performance fluctuates based on the languages from which the sentences are sampled. Roy et al. (2020) demonstrate a similar trend in questionanswering tasks. Further, Kew et al. (2023) and Shaham et al. (2024) reveal that MSLT is also advantageous for instruction-tuned LMs."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                552,
+                887,
+                794
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Despite the recent surge in attention towards MSLT, it is important to highlight the lack of a comprehensive analysis or tailored strategies in this area so far. For instance, Kew et al. (2023) consider only pre-defined language sets in their experiments, ignoring the potential of discovering the best combination of source languages. On the other hand, Singh et al. (2019) and Shaham et al. (2024) utilize all available languages without specifically seeking to determine the ideal number of languages for the optimal performance of MSLT. Our work tackles these limitations, by presenting a series of wellsupported illustrations that clarify how and why MSLT operates, along with providing guidelines for enhanced utilization of the MSLT framework."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                794,
+                887,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "713"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                515,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2"
+                    }
+                ]
+            },
+            "bbox": [
+                492,
+                944,
+                505,
+                956
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                489,
+                198
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3 Terminology"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                208,
+                260,
+                225
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We first clarify the core concepts and their corresponding acronyms in this section."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                234,
+                489,
+                267
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Cross-Lingual Transfer (XLT) XLT is a technique applicable to multilingual LMs, particularly when obtaining a satisfactory amount of data for the language-task pair of interest is challenging. This is built on the assumption that fine-tuning a multilingual model for a task "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\tau"
+                    },
+                    {
+                        "type": "text",
+                        "content": "in a resource-rich language  can lead to a synergistic improvement in performance for another language , especially if has limited data available for the task ."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                273,
+                490,
+                418
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this work, we focus on the zero-shot XLT setting, under the assumption that no suitable data is available for the target language."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                419,
+                489,
+                468
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Single-Source Language Training (SSLT) SSLT represents an environment for XLT where multilingual LMs are trained on a single language. From now on, we adopt the notation ‘SSLT(L) to signify the setting where the language L is exclusively utilized as a source language in XLT."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                475,
+                489,
+                574
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Multi-Source Language Training (MSLT) MSLT refers to an environment in which two or more source languages are considered for XLT. We use the notation "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { \\bar { M S L T } } ( L _ { 1 } , L _ { 2 } , \\ldots , L _ { n } ) ^ { , }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "to denote the setting where MSLT is conducted with languages "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "L _ { 1 } , L _ { 2 } , \\ldots , L _ { n }"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                580,
+                489,
+                677
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "MSLT, when feasible, enables the possibility of leveraging an exponentially higher number of data points by allowing the use of instances from multiple languages. However, as the purpose of this study is to analyze the impact of language diversity, we decide to keep consistent the total number of data points used in experiments. For example, if SSLT(en) utilizes 1,000 data points in English, the corresponding MSLT(en, es) incorporates 500 data points each from English and Spanish, respectively."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                677,
+                490,
+                840
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4 Verifying the Effectiveness of MSLT"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                848,
+                462,
+                866
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We present a thorough analysis to confirm the effectiveness of MSLT, and additionally provide insights into its inner workings. We describe the intuition behind how MSLT enhances XLT performance (§4.2) and present visualizations related to our intuition (§4.3). We also provide empirical findings with respect to the ideal number of source languages in MSLT (§4.4). Section 4.1 presents the configurations used throughout the section."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                875,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/a887aa13a6365bc711aef1154c2a157419cc16e8ffd8ab9203b3089321aff318.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 2: A conceptual illustration of the advantages of MSLT over SSLT. The left illustrates the training process of an LM using only English (en) (i.e., SSLT(en)), while the right represents MSLT with English (en) and Spanish (es) (i.e., MSLT(en, es)). Incorporating more source languages enhances language-agnostic features and blurs language-specific ones, potentially improving effectiveness for unseen languages such as Korean (ko)."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                512,
+                84,
+                882,
+                247
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                401,
+                885,
+                499
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.1 Experimental Settings"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                511,
+                732,
+                526
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To investigate the inner workings of MSLT, we conduct experiments using XLM-RoBERTa<sub>Base</sub> (XLM-"
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { R } _ { \\mathrm { B a s e } } ;"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Conneau et al., 2019), a compact multilingual encoder that covers around 100 languages. We select three tasks from the XTREME benchmark (Hu et al., 2020) as our testbed for analysis: named entity recognition (WikiANN; Pan et al., 2017), cross-lingual natural language inference (XNLI; Conneau et al., 2018), and cross-lingual paraphrase identification (PAWS-X; Yang et al., 2019). More details on the datasets and training processes are specified in Appendix A and B, respectively."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                532,
+                887,
+                727
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.2 Advantages of MSLT over SSLT"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                738,
+                811,
+                753
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Rooted in the widely accepted notion within the literature that multilingual LMs can categorize language-specific and language-agnostic concepts (Muller et al., 2021), there is a prevalent belief that XLT can be more effectively activated by encouraging the influence of language-agnostic features while diminishing the role of language-specific ones. We draw on this wisdom to intuitively explain why MSLT generally outperforms SSLT."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                760,
+                887,
+                906
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Figure 2 illustrates the potential advantages of"
+                    }
+                ]
+            },
+            "bbox": [
+                527,
+                906,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "714"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3"
+                    }
+                ]
+            },
+            "bbox": [
+                490,
+                942,
+                505,
+                956
+            ]
+        }
+    ],
+    [
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/c646fbbfe8bc448b96cf3cb522d6d8871ab1b39888668e32aac2f4b1fa1ce3a8.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 3: Visualization of embeddings and corresponding CKA similarities (Kornblith et al., 2019) for 3 languages: English (en), Arabic (ar), and Indonesian (id). Note that English is used in both SSLT & MSLT, whereas Arabic and Indonesian are not. Therefore, we can observe the impact of SSLT & MSLT on both languages seen and unseen during training. Left: the original XLM-R. Center: XLM-R after SSLT(en). Right: XLM-R after MSLT(en, es, de). We find that while SSLT promotes language-agnostic alignment in the semantic space, MSLT enhances this further, leading to a more integrated space for languages."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                117,
+                82,
+                882,
+                229
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "MSLT over SSLT. When data from a single language is used in training for XLT, as in the case of SSLT, it may be challenging to guide a model to establish a decision boundary for classification (indicated by blue in Figure 2) that can robustly function across different languages. Conversely, with MSLT, the model is exposed to signals from a diverse range of languages, encouraging more frequent exploitation of language-agnostic features. This leads to representations that are comparatively languageindependent, enabling the identification of a more robust decision boundary applicable across different languages (red in Figure 2). In summary, we speculate that MSLT provides a more advantageous environment for XLT compared to SSLT, by underscoring the utility of language-agnostic features."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                349,
+                492,
+                608
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.3 Visualization of Embeddings after MSLT"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                621,
+                485,
+                638
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To better understand the impact of MSLT and empirically validate the hypothesis presented in §4.2, we conduct a comparative study by visualizing embeddings before and after applying SSLT and MSLT. To be specific, we first train the XLM-R<sub>Base</sub> model with data instances from the XNLI dataset, resulting in three variants: (1) the original XLM-R, (2) XLM-R with SSLT(en), and (3) XLM-R with MSLT(en,es,de).<sup>2</sup> We then visualize the embeddings computed by each model variant,<sup>3</sup> using a set of sentences from the Parallel Universal Dependencies (PUD) treebanks (De Marneffe et al., 2021). This decision stems from our goal to evaluate the model’s general capabilities, not just its performance on fine-tuning tasks, but also its effectiveness with out-of-domain data instances. We make use of t-SNE (van der Maaten and Hinton, 2008) for dimension reduction."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                644,
+                490,
+                872
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                349,
+                887,
+                413
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In Figure 3, we observe that the XLM-R model with MSLT (the rightmost) demonstrates significantly better language-agnostic alignment for unseen languages (ar and id), compared to both (1) the original XLM-R and (2) XLM-R after SSLT. This implies that the diversification of source languages prevents a model from learning language-specific features and encourages it to be more language-independent, which is beneficial for achieving better performance in XLT."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                413,
+                887,
+                576
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.4 On the Optimal Number of Languages"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                587,
+                862,
+                602
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In the previous part, we qualitatively demonstrated the effectiveness of MSLT through graphical illustrations. Here, we present a supplementary quantitative analysis on the impact of the number of source languages on XLT, addressing two research questions: (1) Is MSLT consistently superior to SSLT, at least in the evaluated environments? (2) What is the optimal number of languages for MSLT? We select English, Spanish, German, Chinese, and French as candidates for source languages and evaluate the performance of different language groups on cross-lingual datasets, calibrating their size from 1 (SSLT) to 5 (MSLT with five languages).<sup>4</sup>"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                607,
+                887,
+                834
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Figure 4 reveals that regardless of the task type or data quantity, task performance remarkably improves as the number of source languages increases from 1 to 3, demonstrating the effectiveness of"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                834,
+                887,
+                900
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>2</sup>en: English, es: Spanish, de: German."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                882,
+                383,
+                896
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>3</sup>Embeddings are derived by mean-pooling the hidden states from the last layer of the language model."
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                896,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>4</sup>The scores of groups with the same size are averaged."
+                    }
+                ]
+            },
+            "bbox": [
+                529,
+                907,
+                867,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "715"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "4"
+                    }
+                ]
+            },
+            "bbox": [
+                492,
+                944,
+                505,
+                956
+            ]
+        }
+    ],
+    [
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/95676ecbc9fb02887af42fa1f75dc7ef672fdaf46f686f50358cf4e9ec4668b5.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 4: Performance of XLT can vary depending on the number of source languages. The solid lines correspond to "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { X L M - R _ { B a s e } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and dotted lines to "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { X L M - R _ { L a r g e } } ."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                119,
+                82,
+                484,
+                242
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "MSLT. However, when the size of the group exceeds 3, the performance exhibits minimal improvement or even declines in some cases.<sup>5</sup> Taking into account the outcomes of our experiments and the expenses involved in creating datasets across various languages, we propose opting for three source languages as a pragmatic and sensible selection for MSLT. Consequently, we make use of threelanguage groups in the forthcoming experiments."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                323,
+                490,
+                470
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5 Language Set Composition in MSLT"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                480,
+                463,
+                498
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In the previous section, we demonstrated that MSLT exhibits markedly superior performance on XLT compared to SSLT. Assuming the selection of k source languages from a total of n languages, there exist (n) possible combinations. Given that n can be significantly larger than k, fine-tuning with every possible combination of source languages to identify the optimal mix is not time- and resourceefficient. Therefore, it is necessary to select an appropriate combination more efficiently. In this section, we first establish the importance of selecting an effective set of source languages and then proceed to examine various criteria for choosing an optimal source language combination."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                506,
+                490,
+                734
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.1 Experimental Settings"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                744,
+                336,
+                760
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We perform experiments utilizing the BLOOM-7B model (Scao et al., 2022), in conjunction with the previously utilized XLM-R. We fix the size of the source language set at 3, and its elements are chosen from a pool of 7 language candidates,<sup>6</sup> which are commonly considered resource-rich languages."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                765,
+                489,
+                863
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/72df3429ebda6875bba4fda343a26812da917a1da866377185e3fbb28655ce79.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 5: Relative performance gaps vary with source language combinations, reaching as high as a 10-point difference between the best and worst options. The worst combinations of MSLT in XCOPA and XWinograd even harm performance compared to SSLT, highlighting the need for careful source language selection."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                514,
+                83,
+                877,
+                255
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "When applying MSLT to XLM-R, we reuse the WikiAnn and XNLI datasets for fine-tuning and evaluation, as was done in the previous section.<sup>7</sup> For experiments with BLOOM-7B, we leverage separate datasets for instruction-tuning and evaluation, respectively. By introducing this instructiontuning setting, we aim to evaluate whether MSLT is also effective in this new paradigm, which would further extend the applicability of MSLT. BLOOM-7B is instruction-tuned using the Bactrian-X dataset (Li et al., 2023). For evaluation, we employ another suite of datasets, which includes XCOPA (Ponti et al., 2020), XWinograd (Muennighoff et al., 2023), and XStoryCloze (Lin et al., 2022). Also note that we fine-tune BLOOM-7B with QLoRA (Dettmers et al., 2023) for computational efficiency and to ascertain how well MSLT operates in a parameter-efficient fine-tuning setup. Details on the experimental settings can be again found in Appendix A and B."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                380,
+                887,
+                702
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.2 The Harmony of Languages Matters"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                714,
+                845,
+                731
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We compare the performance of MSLT across various source language combinations. According to our experiments, the magnitude of performance improvement varies greatly depending on the combination used, and in some cases, a poor choice may lead to performance deterioration. Figure 5 represents the upper and lower bounds of the performance of MSLT, along with that of SSLT as a baseline. A notable performance gap is observed between the optimal and worst combinations in most experiments. In certain tasks, e.g., XCOPA and XWinograd, MSLT with the least effective combination fails to outperform SSLT. These findings imply that the combination of source languages in MSLT has a substantial impact on performance, highlighting the need to establish criteria for selecting appropriate source languages."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                737,
+                887,
+                898
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>5</sup>In the case of XLM-R<sub>Large</sub>, performance shows a slight improvement even with more than three languages."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                870,
+                489,
+                896
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>6</sup>Arabic (ar), German (de), English (en), Spanish (es), French (fr), Russian (ru), Chinese (zh)."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                896,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>7</sup>PAWS-X is omitted owing to its limited linguistic variety."
+                    }
+                ]
+            },
+            "bbox": [
+                531,
+                907,
+                884,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "716"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "5"
+                    }
+                ]
+            },
+            "bbox": [
+                490,
+                944,
+                505,
+                956
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/ba8d57701ee16d8f97cdcdf74c976758e07299647aa6525ad0b21758b6f147a4.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 1: Results of the proposed criteria for source language selection, evaluated across five different test datasets. The numbers in parentheses indicate the ranking of the specific language set chosen by each method among the total of 35 possible combinations, with higher ranks (indicating better performance) closer to blue and lower ranks (indicating inferior performance) closer to red. We confirm that Lang2Vec-based methods are proficient in proposing useful source language sets."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=\"2\" colspan=\"2\">Method</td><td colspan=\"2\">Encoder</td><td colspan=\"3\">Decoder</td></tr><tr><td>WikiAnn</td><td>XNLI</td><td>XCOPA</td><td>XWinograd</td><td>XStoryCloze</td></tr><tr><td colspan=\"2\">MIN</td><td>76.30 (35)</td><td>70.97 (35)</td><td>48.87 (35)</td><td>48.15 (35)</td><td>51.05 (35)</td></tr><tr><td colspan=\"2\">Size of Pretraining Data</td><td>78.52 (31)</td><td>72.87 (16)</td><td>50.35 (17)</td><td>54.77 (12)</td><td>54.05 (26)</td></tr><tr><td colspan=\"2\">Vocab Coverage</td><td>78.52 (31)</td><td>72.46 (26)</td><td>50.32 (22)</td><td>58.21 (2)</td><td>54.05 (25)</td></tr><tr><td colspan=\"2\">Embedding Lang2Vec</td><td>85.58 (4)</td><td>72.26 (31)</td><td>48.85 (34)</td><td>53.33 (19)</td><td>56.98 (7)</td></tr><tr><td rowspan=\"5\"></td><td>→ Syntax</td><td>85.69 (3)</td><td>73.76 (3)</td><td>51.57 (4)</td><td>55.92 (7)</td><td>57.42 (2)</td></tr><tr><td>→ Phonology</td><td>84.82 (8)</td><td>73.39 (7)</td><td>49.88 (27)</td><td>58.21 (1)</td><td>55.12 (18)</td></tr><tr><td>→ Inventory</td><td>86.07 (2)</td><td>73.77 (2)</td><td>50.50 (11)</td><td>58.20 (3)</td><td>56.45 (10)</td></tr><tr><td>→ Family</td><td>84.82 (8)</td><td>73.39 (7)</td><td>49.88 (27)</td><td>58.21 (1)</td><td>55.12 (18)</td></tr><tr><td>→ Geometry</td><td>85.58 (4)</td><td>73.24 (9)</td><td>51.72 (2)</td><td>58.12 (6)</td><td>56.62 (9)</td></tr><tr><td colspan=\"2\">MAX</td><td>87.05 (1)</td><td>73.86 (1)</td><td>51.76 (1)</td><td>58.21 (1)</td><td>57.98 (1)</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                132,
+                82,
+                863,
+                268
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                110,
+                376,
+                490,
+                492
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.3 Criteria for Source Language Selection"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                501,
+                468,
+                518
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We further explore the criteria for selecting source language combinations by empirically testing several hypotheses related to them."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                523,
+                489,
+                573
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.3.1 Size of Pretraining Data"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                582,
+                364,
+                598
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We examine whether using a combination of the most frequent languages in the pretraining data leads to improved performance in MSLT. The underlying motivation is that the proportion of a language in the pretraining data might correlate with how much a model acquires the knowledge specific to that language during pretraining. Based on the volume of pretraining data for each language, as reported in the original papers (Conneau et al., 2019; Scao et al., 2022), we select three languages from the source language pool for fine-tuning: English, Russian, and German for XLM-R, and English, Simplified Chinese, and French for BLOOM-7B."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                601,
+                490,
+                813
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.3.2 Vocabulary Coverage"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                821,
+                344,
+                838
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Inspired by the findings of Pires et al. (2019), which suggest that XLT depends on vocabulary overlap between source and target languages, we test a heuristic that chooses source languages with extensive vocabulary coverage. Suppose there are n source languages available, represented as "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { L } = \\{ L _ { 1 } , \\cdots , L _ { n } \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", and let the vocabulary set for each language "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "L _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "be denoted by "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "V _ { L _ { i } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The coverage of a candidate set "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "{ \\mathcal { L } } _ { C } \\subseteq { \\mathcal { L } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is then defined by"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                841,
+                489,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                376,
+                884,
+                441
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathrm { C o v e r a g e } ( { \\mathcal { L } } _ { C } ) = { \\frac { \\left| \\bigcup _ { L _ { i } \\in { \\mathcal { L } } _ { C } } V _ { L _ { i } } \\right| } { \\left| \\bigcup _ { L _ { i } \\in { \\mathcal { L } } } V _ { L _ { i } } \\right| } } .",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/ccb011f4fc554e0eb4bf005b26cdb1a91757fe4c38c45b4cbe27e62bc5d86ba8.jpg"
+                }
+            },
+            "bbox": [
+                569,
+                451,
+                820,
+                499
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We anticipate that language combinations possessing extensive lexical breadth will encompass a broader spectrum of the target language’s vocabulary, ultimately leading to better XLT scores."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                507,
+                887,
+                573
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.3.3 Linguistic Diversity"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                581,
+                726,
+                596
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The last criterion we examine is the selection of source languages that exhibit distinct linguistic properties. This criterion shares a similar motivation with the previous ones, aiming to use languages that can generalize to other unseen languages. However, it uniquely posits that utilizing as diverse a range of source languages as possible will lead to a more stable and comprehensive modification of the model’s internal mechanism."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                600,
+                885,
+                745
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To achieve this, we first represent each language as language vectors and then identify a candidate set whose language vectors have the least similarity to each other. We introduce Lang2Vec (Littell et al., 2017), a framework offering a suite of vectors for each language that mirrors its linguistic properties. In particular, we test five variants of Lang2Vec, i.e., Syntax, Phonology, Inventory, Family, and Geometry vectors. Formally, given a set of languages "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { L } = \\{ L _ { 1 } , \\ldots , L _ { n } \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and their language vectors "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\{ v _ { 1 } , \\ldots , v _ { n } \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", the diversity score of a combination "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "{ \\mathcal { L } } _ { C } \\subseteq { \\mathcal { L } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is defined by the sum of pairwise cosine similarity of language vectors:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                746,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "717"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                515,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "6"
+                    }
+                ]
+            },
+            "bbox": [
+                492,
+                944,
+                505,
+                956
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/706e87e0dd7ae8339096ae4550409eabfe1456551cd6acedac802c3ca54d1275.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 2: Ranking of the results from different methods of selecting source languages in MSLT, especially in scenarios where English is consistently incorporated into the set. The patterns are similar; Lang2Vec-based criteria demonstrate reasonable performance."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Method</td><td>WikiAnn</td><td>XNLI</td><td>XCOPA</td><td>XW</td><td>XSC</td></tr><tr><td>Min</td><td>15</td><td>15</td><td>15</td><td>15</td><td>15</td></tr><tr><td>PT Data Size</td><td>12</td><td>6</td><td>5</td><td>6</td><td>11</td></tr><tr><td>Vocab Coverage</td><td>12</td><td>9</td><td>10</td><td>2</td><td>10</td></tr><tr><td>Embedding</td><td>1</td><td>13</td><td>9</td><td>9</td><td>7</td></tr><tr><td>L2V-Syn</td><td>1</td><td>2</td><td>11</td><td>1</td><td>6</td></tr><tr><td>L2V-Pho</td><td>1</td><td>2</td><td>11</td><td>1</td><td>6</td></tr><tr><td>L2V-Inv</td><td>6</td><td>12</td><td>8</td><td>5</td><td>8</td></tr><tr><td>L2V-Fam</td><td>1</td><td>2</td><td>11</td><td>1</td><td>6</td></tr><tr><td>L2V-Geo</td><td>6</td><td>12</td><td>8</td><td>5</td><td>8</td></tr><tr><td>Max</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                124,
+                82,
+                477,
+                216
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                322,
+                487,
+                355
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathrm { D i v e r s i t y } ( { \\mathcal L } _ { C } ) = \\sum _ { \\{ L _ { i } , L _ { j } \\} \\subseteq { \\mathcal L } _ { C } } ( 1 - \\sin ( v _ { i } , v _ { j } ) ) .",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/eb303211615052e104968e231b4176895c0e535d0782f2535601ddb83499ea83.jpg"
+                }
+            },
+            "bbox": [
+                121,
+                365,
+                475,
+                400
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Since our objective is to find a combination "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { L } _ { C }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "having the maximum diversity, i.e. the minimal uniformity, thus the desired combination is obtained by arg max "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\cdot \\mathcal { L } _ { C }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Diversity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( \\mathcal { L } _ { C } )"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                407,
+                489,
+                473
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "On the other hand, we consider an extra baseline called just ‘Language Embedding from LMs’ or just ‘Embedding’. This process is similar to that of Lang2Vec, but the vectors here are derived directly from pretrained LMs, specifically XLM-R or BLOOM-7B, depending on the case. The language vector for each language is calculated by averaging the embeddings of sentences in that language."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                473,
+                489,
+                602
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.4 Evaluation on Selection Criteria"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                612,
+                415,
+                627
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Table 1 represents the results from experiments on source language selection criteria presented in §5.3. The scores presented in the table are the averages of all scores for each task across target languages. Target languages will have the same language set when the selection criterion applied is identical."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                632,
+                489,
+                728
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The findings suggest that selection criteria based on the statistical properties of language models, referenced in Sections §5.3.1 and §5.3.2, do not substantially improve the performance of XLT. In contrast, selecting source languages based on linguistic diversity demonstrates a significant performance gain. This implies that in MSLT, prioritizing diversity within the source language combination is more important than relying on the characteristics of corpora used in pretraining LMs."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                730,
+                489,
+                890
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Furthermore, although the ‘Embedding’ method, which measures diversity directly based on embeddings from LMs, led to a fairly reasonable performance gain, measuring diversity using Lang2Vec vectors demonstrated the best outcomes. This further reinforces the importance of properly considering the inherent properties of languages in NLP."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                890,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/cfe78cb5b59c571241befcf473082353788bafc26c668e0b5ec9dbc50479cc45.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 3: The five most effective combinations of source languages for five specific tasks."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=1 colspan=6>Datasets      Top1 Top2 Top3 Top4 Top5</td></tr><tr><td rowspan=3 colspan=1>WikiAnn</td><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>ar</td><td rowspan=1 colspan=1>ar</td><td rowspan=1 colspan=1>ar</td></tr><tr><td rowspan=1 colspan=1>fr</td><td rowspan=1 colspan=1>es</td><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>es</td><td rowspan=1 colspan=1>de</td></tr><tr><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>ru</td></tr><tr><td rowspan=3 colspan=1>XNLI</td><td rowspan=1 colspan=1>ar</td><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>ar</td><td rowspan=1 colspan=1>ar</td><td rowspan=1 colspan=1>ar</td></tr><tr><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>es</td><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>ru</td><td rowspan=1 colspan=1>fr</td></tr><tr><td rowspan=1 colspan=1>ru</td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>zh</td></tr><tr><td rowspan=2 colspan=1>XCOPA</td><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>ar</td><td rowspan=1 colspan=1>fr</td><td rowspan=1 colspan=1>ar</td><td rowspan=1 colspan=1>ar</td></tr><tr><td rowspan=1 colspan=1>en</td><td rowspan=1 colspan=1>es</td><td rowspan=1 colspan=1>ru</td><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>de</td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>es</td></tr><tr><td rowspan=3 colspan=1>XWinograd</td><td rowspan=1 colspan=1>ar</td><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>en</td><td rowspan=1 colspan=1>es</td></tr><tr><td rowspan=1 colspan=1>en</td><td rowspan=1 colspan=1>en</td><td rowspan=1 colspan=1>es</td><td rowspan=1 colspan=1>es</td><td rowspan=1 colspan=1>fr</td></tr><tr><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>ru</td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>ru</td><td rowspan=1 colspan=1>ru</td></tr><tr><td rowspan=3 colspan=1>XStoryCloze</td><td rowspan=1 colspan=1>ar</td><td rowspan=1 colspan=1>ar</td><td rowspan=1 colspan=1>ar</td><td rowspan=1 colspan=1>es</td><td rowspan=1 colspan=1>ar</td></tr><tr><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>de</td><td rowspan=1 colspan=1>fr</td><td rowspan=1 colspan=1>fr</td></tr><tr><td rowspan=1 colspan=1>ru</td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>es</td><td rowspan=1 colspan=1>zh</td><td rowspan=1 colspan=1>zh</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                512,
+                83,
+                878,
+                313
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                382,
+                885,
+                466
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.5 Language Selection Sticking to English"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                478,
+                862,
+                494
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "This section features a case-study assuming that one of the source languages is necessarily English, a common scenario in practical applications. Table 2 reports that even in cases where English is always included in combinations, selecting other source languages based on diversity (or least similarity) according to Lang2Vec still exhibits reasonable performance."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                501,
+                885,
+                631
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "6 Discussion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                645,
+                636,
+                661
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "6.1 Which Language is Suitable for MSLT?"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                674,
+                868,
+                690
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To identify the necessary conditions of the languages comprising the optimal set, we manually examine top-ranked language combinations for each task in practice. Table 3 showcases the top five language combinations that exhibit the best performance for each task. The results reveal that, across all tasks, Chinese (zh), Arabic (ar), and German (de) are the most commonly used languages, with frequencies of 17, 15, and 15, respectively. Furthermore, we find that each of the top 5 combinations includes two or more distinct writing systems, such as Arabic scripts for Arabic, Latin scripts for European languages, Chinese characters for Chinese, and Cyrillic scripts for Russian. This suggests that the diversity of writing systems can act as a key factor in constructing good language sets for MSLT."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                696,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "718"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "7"
+                    }
+                ]
+            },
+            "bbox": [
+                492,
+                944,
+                505,
+                956
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/348a6b3386ec818c1d81a2e803cb084e3faf6816bcc5286d7ea1b67a6510815b.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 6: Visualization of performance for all (35) possible language sets. We observe that language combinations with the least similarity (high diversity) yield better performance than those with the most similarity (low diversity)."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                126,
+                84,
+                873,
+                300
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/b9cde1f5cb9332ab761cd1a125d67fe00ea5d19431863c999968e94ca5151ffb.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 4: Test accuracy results based on the diversity of writing systems. Writing system diversity in language combinations is categorized into three levels: Case 1, with all three languages sharing the same system; Case 2, with two languages sharing a system; and Case 3, with each language having a different system. The outcomes show that combinations of language with distinct writing systems always outperform other cases."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=\"2\">Dataset</td><td>Case 1</td><td>Case 2</td><td>Case 3</td></tr><tr><td>a = b = c</td><td>a = b≠c</td><td>a≠b≠c</td></tr><tr><td>WikiAnn</td><td>72.26</td><td>72.69</td><td>73.07</td></tr><tr><td>XNLI</td><td>80.36</td><td>81.54</td><td>84.02</td></tr><tr><td>XCOPA</td><td>52.82</td><td>53.06</td><td>53.10</td></tr><tr><td>XWinograd</td><td>52.33</td><td>52.89</td><td>53.40</td></tr><tr><td>XStoryČloze</td><td>52.54</td><td>53.32</td><td>53.62</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                124,
+                365,
+                477,
+                461
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                614,
+                490,
+                646
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To further investigate this perspective, we conduct an extra experiment whose outcomes are reported in Table 4. In this experiment, we categorize source language sets (in total, 35) into three types based on the extent of diversity in their writing systems, and then compare the performance of each group. The outcomes show that combinations of language with distinct writing systems always outperform other cases, implying the importance of diversity in writing systems among languages. We believe that Lang2Vec-based criteria can properly exploit similar linguistic information."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                648,
+                490,
+                841
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "6.2 Is Increasing Diversity Really Helpful?"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                852,
+                465,
+                869
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In §5.3.3, we follow the intuition that selecting language combinations with elements exhibiting distinct characteristics is beneficial. In fact, we can also consider the opposite direction, grouping languages with relatively high similarities rather than low ones. To determine which direction is more helpful for MSLT, we conduct an experiment using the two contrastive approaches."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                873,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                367,
+                885,
+                448
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Experimental results in Figure 6 reveal that constructing combinations with maximum diversity (as in §5.3.3) yields better performance than combinations having minimum diversity (i.e., high similarity) across the majority of tasks.<sup>8</sup> Notably, there is a significant performance gap between the two contrasting strategies for WikiAnn. We also observe similar patterns for other datasets, confirming the desirability of our decision to consider the diversity of source languages in §5.3.3."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                449,
+                887,
+                611
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "7 Conclusion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                624,
+                643,
+                642
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "This work demonstrates the positive impact of Multi-Source Language Training (MSLT) in crosslingual transfer (XLT). By leveraging multiple source languages, MSLT facilitates the learning of language-agnostic features in multilingual LMs. We provide qualitative and quantitative evidence suggesting that this approach promotes crosslingual semantic alignment, leading to better XLT performance compared to using a single source language. Furthermore, we identify the importance of selecting the optimal size and composition of source language sets for MSLT. To guide this selection efficiently, we propose diverse criteria based on the statistical and linguistic properties of candidate languages, such as Lang2Vec. Importantly,"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                652,
+                889,
+                896
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>8</sup>Full experimental results are listed in Appendix, Table 6."
+                    }
+                ]
+            },
+            "bbox": [
+                531,
+                907,
+                884,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "719"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "8"
+                    }
+                ]
+            },
+            "bbox": [
+                492,
+                944,
+                505,
+                956
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "MSLT demonstrates effectiveness across various configurations, including different tasks, architectures, and training paradigms. We hope this study serves as a springboard for further exploration of factors influencing the development of effective cross-lingual transfer methodologies."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                85,
+                489,
+                183
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Limitations"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                192,
+                221,
+                208
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Limited source language pools Given the practical availability of language-specific datasets and the ease of experimentation, this paper designates the top 7 languages that appeared most frequently in various multilingual datasets as source language candidates. By analyzing the permutations of selecting three out of these 7 languages, we aim to provide insights based on a wide range of scenarios to establish relevance in a generalized setting. However, it is important to note that further experiments with a greater number of languages as candidates for source languages are left as future work."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                216,
+                490,
+                411
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Comparison with other source language selection methods Our study shares many similarities with other research on source language selection for cross-lingual transfer, aiming to find the optimal source languages. However, many selection methods tend to focus on the correlation between the source and target languages, making the selection process target-specific and often favoring singlelanguage choices, which makes it challenging to quantitatively compare them with our approach."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                418,
+                490,
+                580
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Ethics Statement"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                589,
+                267,
+                605
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this study, we utilize models and datasets publicly available on Huggingface, ensuring that no ethical issues are associated with their usage. Additionally, we endeavor to minimize content related to social biases. However, we acknowledge the possibility that some biases may have been infused during the pretraining process of language models, highlighting the need for sufficient consideration in this regard."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                613,
+                490,
+                759
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Acknowledgements"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                769,
+                287,
+                785
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "This work was supported by Institute of Information & communications Technology Planning & Evaluation (IITP) grant funded by the Korea government(MSIT) (No.RS-2020-II201373, Artificial Intelligence Graduate School Program(Hanyang University)). This work was supported by Institute of Information & communications Technology Planning & Evaluation (IITP) under the artificial intelligence semiconductor support program to nurture the best talents (IITP-2024-RS-2023-00253914) grant funded by the Korea government(MSIT). This work was supported by the National Research Foundation of Korea(NRF) grant funded by the Korea government(*MSIT) (No.2018R1A5A7059549). *Ministry of Science and ICT."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                794,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                887,
+                214
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "References"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                510,
+                240,
+                610,
+                256
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Linzheng Chai, Jian Yang, Tao Sun, Hongcheng Guo, Jiaheng Liu, Bing Wang, Xiannian Liang, Jiaqi Bai, Tongliang Li, Qiyao Peng, et al. 2024. xcot: Crosslingual instruction tuning for cross-lingual chain-ofthought reasoning. arXiv preprint arXiv:2401.07037."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Tyler A Chang, Zhuowen Tu, and Benjamin K Bergen. 2022. The geometry of multilingual language model representations. arXiv preprint arXiv:2205.10964."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Rochelle Choenni and Ekaterina Shutova. 2020. What does it mean to be language-agnostic? probing multilingual sentence encoders for typological properties. arXiv preprint arXiv:2009.12862."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Alexis Conneau, Kartikay Khandelwal, Naman Goyal, Vishrav Chaudhary, Guillaume Wenzek, Francisco Guzmán, Edouard Grave, Myle Ott, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Unsupervised cross-lingual representation learning at scale. arXiv preprint arXiv:1911.02116."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Alexis Conneau, Ruty Rinott, Guillaume Lample, Adina Williams, Samuel Bowman, Holger Schwenk, and Veselin Stoyanov. 2018. XNLI: Evaluating crosslingual sentence representations. In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing, pages 2475–2485, Brussels, Belgium. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Marie-Catherine De Marneffe, Christopher D Manning, Joakim Nivre, and Daniel Zeman. 2021. Universal dependencies. Computational linguistics, 47(2):255– 308."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Tim Dettmers, Artidoro Pagnoni, Ari Holtzman, and Luke Zettlemoyer. 2023. QLoRA: Efficient finetuning of quantized LLMs. In Thirty-seventh Conference on Neural Information Processing Systems."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Junjie Hu, Sebastian Ruder, Aditya Siddhant, Graham Neubig, Orhan Firat, and Melvin Johnson. 2020. Xtreme: A massively multilingual multi-task benchmark for evaluating cross-lingual generalisation. In International Conference on Machine Learning, pages 4411–4421. PMLR."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Tannon Kew, Florian Schottmann, and Rico Sennrich. 2023. Turning english-centric llms into polyglots: How much multilinguality is needed? arXiv preprint arXiv:2312.12683."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                510,
+                263,
+                885,
+                329
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "720"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "9"
+                    }
+                ]
+            },
+            "bbox": [
+                492,
+                944,
+                505,
+                954
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Simon Kornblith, Mohammad Norouzi, Honglak Lee, and Geoffrey Hinton. 2019. Similarity of neural network representations revisited. In International conference on machine learning, pages 3519–3529. PMLR."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Haonan Li, Fajri Koto, Minghao Wu, Alham Fikri Aji, and Timothy Baldwin. 2023. Bactrian-x: Multilingual replicable instruction-following models with low-rank adaptation."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jindˇrich Libovicky, Rudolf Rosa, and Alexander` Fraser. 2020. On the language neutrality of pretrained multilingual representations. arXiv preprint arXiv:2004.05160."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xi Victoria Lin, Todor Mihaylov, Mikel Artetxe, Tianlu Wang, Shuohui Chen, Daniel Simig, Myle Ott, Naman Goyal, Shruti Bhosale, Jingfei Du, Ramakanth Pasunuru, Sam Shleifer, Punit Singh Koura, Vishrav Chaudhary, Brian O’Horo, Jeff Wang, Luke Zettlemoyer, Zornitsa Kozareva, Mona Diab, Veselin Stoyanov, and Xian Li. 2022. Few-shot learning with multilingual generative language models. In Proceedings ofthe 2022 Conference on Empirical Methods in Natural Language Processing, pages 9019–9052, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Patrick Littell, David R. Mortensen, Ke Lin, Katherine Kairis, Carlisle Turner, and Lori Levin. 2017. URIEL and lang2vec: Representing languages as typological, geographical, and phylogenetic vectors. In Proceedings ofthe 15th Conference ofthe European Chapter ofthe Associationfor Computational Linguistics: Volume 2, Short Papers, pages 8–14, Valencia, Spain. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Niklas Muennighoff, Thomas Wang, Lintang Sutawika, Adam Roberts, Stella Biderman, Teven Le Scao, M Saiful Bari, Sheng Shen, Zheng Xin Yong, Hailey Schoelkopf, Xiangru Tang, Dragomir Radev, Alham Fikri Aji, Khalid Almubarak, Samuel Albanie, Zaid Alyafeai, Albert Webson, Edward Raff, and Colin Raffel. 2023. Crosslingual generalization through multitask finetuning. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 15991–16111, Toronto, Canada. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Benjamin Muller, Yanai Elazar, Benoît Sagot, and Djamé Seddah. 2021. First align, then predict: Understanding the cross-lingual ability of multilingual bert. arXiv preprint arXiv:2101.11109."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xiaoman Pan, Boliang Zhang, Jonathan May, Joel Nothman, Kevin Knight, and Heng Ji. 2017. Cross-lingual name tagging and linking for 282 languages. In Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 1946–1958, Vancouver, Canada. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Telmo Pires, Eva Schlinger, and Dan Garrette. 2019. How multilingual is multilingual BERT? In Proceedings ofthe 57th Annual Meeting ofthe Associationfor Computational Linguistics, pages 4996–5001, Florence, Italy. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Edoardo Maria Ponti, Goran Glavaš, Olga Majewska, Qianchu Liu, Ivan Vulic, and Anna Korhonen. 2020.´ XCOPA: A multilingual dataset for causal commonsense reasoning. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 2362–2376, Online. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kunxun Qi, Hai Wan, Jianfeng Du, and Haolan Chen. 2022. Enhancing cross-lingual natural language inference by prompt-learning from cross-lingual templates. In Proceedings of the 60th Annual Meeting of the Associationfor Computational Linguistics (Volume 1: Long Papers), pages 1910–1923."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Uma Roy, Noah Constant, Rami Al-Rfou, Aditya Barua, Aaron Phillips, and Yinfei Yang. 2020. Lareqa: Language-agnostic answer retrieval from a multilingual pool. arXiv preprint arXiv:2004.05484."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Teven Le Scao, Angela Fan, Christopher Akiki, Ellie Pavlick, Suzana Ilic, Daniel Hesslow, Roman´ Castagné, Alexandra Sasha Luccioni, François Yvon, et al. 2022. Bloom: A 176b-parameter openaccess multilingual language model. arXiv preprint arXiv:2211.05100."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Uri Shaham, Jonathan Herzig, Roee Aharoni, Idan Szpektor, Reut Tsarfaty, and Matan Eyal. 2024. Multilingual instruction tuning with just a pinch of multilinguality. arXiv preprint arXiv:2401.01854."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jasdeep Singh, Bryan McCann, Nitish Shirish Keskar, Caiming Xiong, and Richard Socher. 2019. Xlda: Cross-lingual data augmentation for natural language inference and question answering. arXiv preprint arXiv:1905.11471."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Nattapong Tiyajamorn, Tomoyuki Kajiwara, Yuki Arase, and Makoto Onizuka. 2021. Languageagnostic representation from multilingual sentence encoders for cross-lingual similarity estimation. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing, pages 7764–7774."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Lifu Tu, Caiming Xiong, and Yingbo Zhou. 2022. Prompt-tuning can be much better than fine-tuning on cross-lingual understanding with multilingual language models. In Findings of the Association for Computational Linguistics: EMNLP 2022, pages 5478–5485, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Laurens van der Maaten and Geoffrey Hinton. 2008. Visualizing data using t-sne. Journal of Machine Learning Research, 9(86):2579–2605."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                85,
+                489,
+                151
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "721"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                515,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "10"
+                    }
+                ]
+            },
+            "bbox": [
+                489,
+                944,
+                510,
+                956
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yaushian Wang, Ashley Wu, and Graham Neubig. 2022. English contrastive learning can learn universal crosslingual sentence embeddings. In Proceedings ofthe 2022 Conference on Empirical Methods in Natural Language Processing, pages 9122–9133."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Huiyun Yang, Huadong Chen, Hao Zhou, and Lei Li. 2022. Enhancing cross-lingual transfer by manifold mixup. arXiv preprint arXiv:2205.04182."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yinfei Yang, Yuan Zhang, Chris Tar, and Jason Baldridge. 2019. PAWS-X: A cross-lingual adversarial dataset for paraphrase identification. In Proceedings ofthe 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), pages 3687–3692, Hong Kong, China. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Wei Zhao, Steffen Eger, Johannes Bjerva, and Isabelle Augenstein. 2020. Inducing languageagnostic multilingual representations. arXiv preprint arXiv:2008.09112."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Bo Zheng, Li Dong, Shaohan Huang, Wenhui Wang, Zewen Chi, Saksham Singhal, Wanxiang Che, Ting Liu, Xia Song, and Furu Wei. 2021. Consistency regularization for cross-lingual fine-tuning. arXiv preprint arXiv:2106.08226."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                85,
+                489,
+                152
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "722"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "11"
+                    }
+                ]
+            },
+            "bbox": [
+                489,
+                944,
+                510,
+                956
+            ]
+        }
+    ],
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Appendix"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                83,
+                206,
+                102
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A Dataset"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                107,
+                221,
+                124
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "WikiAnn is a named entity recognition dataset sourced from Wikipedia, comprising 282 language data segments. In our experimental setup, we utilize 7 languages (Arabic (ar), German (de), English (en), Spanish (es), French (fr), Russian (ru), Chinese (zh)) as the source language and 8 languages (Indonesian (id), Greek (el), Hebrew (he), Finnish (fi), Thai (th), Turkish (tr), Japanese (ja), Korean (ko)) as the target language for crosslingual transfer."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                131,
+                490,
+                294
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "PAWS-X comprises 23,659 human-translated evaluation pairs and 296,406 machine-translated training pairs across six typologically distinct languages: French (fr), Spanish (es), German (de), Chinese (zh), Japanese (ja), and Korean (ko). These translated pairs originate from examples within PAWS-Wiki. Two languages that are not included in the source language are used as target languages."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                310,
+                490,
+                441
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "XNLI is an evaluation corpus for language transfer and cross-lingual sentence classification in 15 languages. XNLI cover 15 languages: Arabic (ar), Bulgarian (bg), Chinese (zh), English (en), French (fr), Greek (el), German (de), Hindi (hi), Russian (ru), Spanish (es), Swahili (sw), Thai (th), Turkish (tr), Urdu (ur), and Vietnamese (vi). Among the aforementioned 15 languages, all except the one employed as the source language in our experiment serve as target languages."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                455,
+                490,
+                618
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "XCOPA, known as Cross-lingual Choice of Plausible Alternatives, is a benchmark designed to evaluate machine learning models’ capability to transfer commonsense reasoning across different languages. This dataset comprises translations and re-annotations of the English COPA, encompassing 11 languages (Estonian (et), Haitian (ht), Indonesian (id), Italian (it), Quechua (qu), Swahili (sw), Tamil (ta), Thai (th), Turkish (tr)) from diverse language families and regions worldwide. All languages in XCOPA are evaluated as target languages by instruction-tuned models."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                632,
+                490,
+                827
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "XWinograd is a multilingual benchmark designed for assessing commonsense reasoning, consisting of Winograd Schema Challenge problems presented in six languages. The task entails selecting the most plausible sentence from slightly varied options. We used Japanese (ja) and Portuguese (pt) as target languages for our experiments."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                841,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                84,
+                884,
+                118
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "XStoryCloze comprises the English StoryCloze dataset professionally translated into 10 non-English languages. Out of these, we chose six languages as target languages, ensuring they did not overlap with the source language set. The selected target languages are as follows: Basque(eu), Hindi (hi), Indonesian (id), Burmese (my), Swahili (sw), and Telugu (te)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                131,
+                887,
+                263
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "B Training Details"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                273,
+                690,
+                291
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We report the hyperparameters used for training each model in Table 5. For "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { X L M - R _ { B a s e } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and XLM-"
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { R } _ { \\mathrm { L a r g e } } ."
+                    },
+                    {
+                        "type": "text",
+                        "content": ", we conducted a hyperparameter search to find an appropriate learning rate for training. As for BLOOM-7B, we attempted to follow the settings from the original LoRA-tuned model,<sup>9</sup> but due to the lack of computation resources, we were unable to replicate the original settings such as batch size 128. Instead, we adjusted the training steps the same as the original LoRA-tuning setting. For the BLOOM model, prompt strategies employed for instruction-tuning and inference are listed in Table 7 and Table 8, respectively."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                299,
+                885,
+                510
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/6446ac5cf2a7085162f70e713bc2e544a4481cf7804143ec7ebf99082c74072f.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 5: Best hyperparameters for each task and model. LoRA indicates the rank of LoRA, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { L o R A } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "represents the position of LoRA’s module, and GA stands for Gradient Accumulation."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Model</td><td> ${ \\mathrm { X L M } } { \\mathrm { - } } { \\mathrm { R } } _ { \\mathrm { B } }$ </td><td>XLM-RL</td><td>BLOOM7B</td></tr><tr><td>Common</td><td>cutoff_length: 512 &amp; weight decay: 0.01</td><td></td><td></td></tr><tr><td>Learning rate</td><td>2e-5</td><td>5e-6</td><td>3e-4</td></tr><tr><td>LoRAr  $\\mathrm { L o R A } _ { m }$ </td><td></td><td>一</td><td>64 q,k,v</td></tr><tr><td>Task</td><td>WikiAnn</td><td>XNLI</td><td>PAWS-X Bactrian-X</td></tr><tr><td>Batch</td><td>16</td><td>16</td><td>16 4</td></tr><tr><td>Step</td><td>243K</td><td>12.5K 30K</td><td>5K</td></tr><tr><td>GA</td><td>1</td><td>1 1</td><td>3</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                519,
+                520,
+                872,
+                686
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>9</sup>https://huggingface.co/MBZUAI/ bactrian-x-bloom-7b1-lora"
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                895,
+                769,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "723"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                515,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "12"
+                    }
+                ]
+            },
+            "bbox": [
+                489,
+                942,
+                510,
+                956
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/0659a349463f28f765aa9a5db4008f8647e5ecbde3628029fe28f1afd4e2a0a2.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 6: Performance comparison of language combinations with high and low inter-lingual similarity. Accuracy is used as the evaluation metric for all tasks. The best results for each task are in bold."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=\"2\">Method</td><td colspan=\"2\">WikiAnn</td><td colspan=\"2\">XNLI</td><td colspan=\"2\">XCOPA</td><td colspan=\"2\">XWinograd</td><td colspan=\"2\">XStoryCloze</td></tr><tr><td>Most</td><td>Least</td><td>Most</td><td>Least</td><td>Most</td><td>Least</td><td>Most</td><td>Least</td><td>Most</td><td>Least</td></tr><tr><td>Embedding</td><td>77.93</td><td>85.58</td><td>72.88</td><td>72.26</td><td>48.85</td><td>48.85</td><td>52.61</td><td>53.33</td><td>55.12</td><td>56.98</td></tr><tr><td>L2V-Syn</td><td>78.52</td><td>85.69</td><td>72.87</td><td>73.76</td><td>50.32</td><td>51.57</td><td>58.21</td><td>55.92</td><td>54.05</td><td>57.42</td></tr><tr><td>L2V-Pho</td><td>76.68</td><td>84.82</td><td>72.88</td><td>73.39</td><td>49.88</td><td>49.88</td><td>58.20</td><td>58.21</td><td>51.05</td><td>55.12</td></tr><tr><td>L2V-Inv</td><td>78.71</td><td>86.07</td><td>73.13</td><td>73.77</td><td>50.85</td><td>50.50</td><td>52.98</td><td>58.20</td><td>56.92</td><td>56.45</td></tr><tr><td>L2V-Fam</td><td>82.95</td><td>84.82</td><td>71.90</td><td>73.39</td><td>50.75</td><td>49.88</td><td>58.20</td><td>58.21</td><td>53.62</td><td>55.12</td></tr><tr><td>L2V-Geo</td><td>78.71</td><td>85.58</td><td>73.13</td><td>73.24</td><td>50.85</td><td>51.72</td><td>52.98</td><td>58.12</td><td>56.92</td><td>56.62</td></tr><tr><td>AVG</td><td>78.92</td><td>85.43</td><td>72.80</td><td>73.30</td><td>50.25</td><td>50.40</td><td>55.53</td><td>57.00</td><td>54.61</td><td>56.29</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                141,
+                185,
+                855,
+                322
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/80be7707b998b41329bfc919a5c15c730e62e2a8190277d47c31a4443ed39872.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 7: Prompting strategies for instruction tuning."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Only Instruction:</td><td>### Input:</td></tr><tr><td></td><td>What is the capital of France?</td></tr><tr><td></td><td>### Output: The capital city of France is Paris.</td></tr><tr><td></td><td></td></tr><tr><td>Instruction with input:</td><td>### Input:</td></tr><tr><td></td><td>Evaluate this sentence for spelling and grammar mistakes. He finished his meal and left the restaurant.</td></tr><tr><td></td><td></td></tr><tr><td></td><td>### Output:</td></tr><tr><td></td><td>There are two spelling errors in the sentence. The corrected sentence should be: \"He finished his meal and left the restaurant.\"</td></tr><tr><td>XCOPA</td><td>### Input: Answer the number of options which is more plausible for the effect of the situation \"Mees keeras kraani lahti.\"</td></tr><tr><td></td><td></td></tr><tr><td></td><td>1. Tualett täitus veega. 2. Tilast voolas vett.</td></tr><tr><td></td><td></td></tr><tr><td>XWinograd</td><td>### Output: ### Input:</td></tr><tr><td></td><td>Answer the number of option which is more plausible for the blank.</td></tr><tr><td></td><td> $( 1 + 1 ) ( 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 +$   $\\hbar \\underline { { s } } _ { \\mathrm { ~ c ~ } }$  1I</td></tr><tr><td></td><td>1.  $F = \\therefore \\overrightarrow { \\vert } \\overrightarrow { \\vert } \\overrightarrow { \\vert } \\overrightarrow { \\vert } -$ </td></tr><tr><td></td><td>2.  $1 1 + \\cdot 1 7 7$ </td></tr><tr><td></td><td>### Output:</td></tr><tr><td>XStoryCloze</td><td>### Input: Answer the number of option which is more natural for the end of story.</td></tr><tr><td></td><td>\"Rick tumbuh di keluarga bermasalah. Dia tidak pernah menerima dukungan dari keluarga, dan menjadi anggota geng. Tak butuh waktu lama sampai Rick tertembak dalam sebuah perampokan. Peristiwa itu</td></tr><tr><td></td><td>membuatnya insaf.\"</td></tr><tr><td></td><td>1. Kini dia bahagia. 2. Dia menjadi anggota geng.</td></tr><tr><td></td><td></td></tr><tr><td></td><td>### Output:</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                121,
+                575,
+                877,
+                788
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "724"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "13"
+                    }
+                ]
+            },
+            "bbox": [
+                489,
+                944,
+                510,
+                956
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/"
+                },
+                "table_caption": [],
+                "table_footnote": [],
+                "html": "",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                121,
+                248,
+                877,
+                725
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Table 8: Prompting strategies for inference."
+                    }
+                ]
+            },
+            "bbox": [
+                349,
+                736,
+                645,
+                751
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "725"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                515,
+                941
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "14"
+                    }
+                ]
+            },
+            "bbox": [
+                489,
+                944,
+                510,
+                956
+            ]
+        }
+    ]
+]
