@@ -1,0 +1,2190 @@
+[
+    {
+        "type": "text",
+        "text": "Dissecting Human and LLM Preferences",
+        "text_level": 1,
+        "bbox": [
+            287,
+            89,
+            712,
+            110
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Junlong Li1,4 Fan Zhou1,2,4 Shichao Sun3,4 Yikai Zhang1,4 Hai Zhao1 Pengfei Liu1,2,4\\*",
+        "bbox": [
+            218,
+            131,
+            779,
+            167
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1Shanghai Jiao Tong University 2Shanghai Artificial Intelligence Laboratory 3Hong Kong Polytechnic University 4Generative AI Research Lab (GAIR) lockonn@sjtu.edu.cn, pengfei@sjtu.edu.cn",
+        "bbox": [
+            186,
+            167,
+            811,
+            219
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            262,
+            260,
+            342,
+            277
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "As a relative quality comparison of model responses, human and Large Language Model (LLM) preferences serve as common alignment goals in model fine-tuning and criteria in evaluation. Yet, these preferences merely reflect broad tendencies, resulting in less explainable and controllable models with potential safety risks. In this work, we dissect the preferences of human and 32 different LLMs to understand their quantitative composition, using annotations from real-world user-model conversations for a fine-grained, scenario-wise analysis. We find that humans are less sensitive to errors, favor responses that support their stances, and show clear dislike when models admit their limits. On the contrary, advanced LLMs like GPT-4-Turbo emphasize correctness, clarity, and harmlessness more. Additionally, LLMs of similar sizes tend to exhibit similar preferences, regardless of their training methods, and fine-tuning for alignment does not significantly alter the preferences of pretrained-only LLMs. Finally, we show that preference-based evaluation can be intentionally manipulated. In both training-free and training-based settings, aligning a model with the preferences of judges boosts scores, while injecting the least preferred properties lowers them. This results in notable score shifts: up to 0.59 on MT-Bench (1-10 scale) and 31.94 on AlpacaEval 2.0 (0- 100 scale), highlighting the significant impact of this strategic adaptation. We have made all resources of this project publicly available.123",
+        "bbox": [
+            141,
+            286,
+            462,
+            758
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            114,
+            768,
+            260,
+            784
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Human and LLM preferences have played a crucial role in the development pipeline of recent advanced language models. Preference-based training, such as Reinforcement Learning from Human/AI Feedback (RLHF/RLAIF) (Ouyang et al., 2022; Lee et al., 2023) and Direct Preference Optimization (DPO) (Rafailov et al., 2023), are widely used to fine-tune models to align with more practical needs. On the other hand, the preferences of human and LLMs, in the form of LLM-as-a-judge or Elo ratings, have become the de facto judging criteria for assessing the quality of model outputs (Li et al., 2023b; Zheng et al., 2023) as the tasks are becoming increasingly diverse and complex.",
+        "bbox": [
+            112,
+            793,
+            487,
+            826
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            261,
+            887,
+            455
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Unlike the widely applied preference-based methods above, the preferences themselves lack thorough research. In most cases, they are only binary labels indicating which response is preferred as a vague form of expression, and we are unable to understand the preferences in an explainable and quantitative way. As a result, optimizing models towards such goals inevitably leads to certain issues (Casper et al., 2023). These include the trained models engaging in over-optimization (Gao et al. 2023) and reward hacking (Sun et al., 2023), manifesting in undesired ways such as producing overly verbose answers (Singhal et al., 2023) or demonstrating sycophancy (Sharma et al., 2023), which hinder the building of more reliable AI systems.",
+        "bbox": [
+            507,
+            455,
+            887,
+            696
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "In this work, we build a systematic framework to dissect the overall preferences into a quantitative combination of multiple clearly defined properties. To pursue understanding in realistic settings, we sample real-world user conversations with a balanced distribution of different scenarios from ChatBot Arena Conversations (Zheng et al., 2023), where each sample is a pair of model responses to a query. We adopt an elaborate yet automated pipeline to annotate the data with regard to our pre-defined properties (e.g., harmless or admit limits). Based on the annotations, we determine how a pair of responses differ from each other on all properties. These distinctions are then used to fit",
+        "bbox": [
+            507,
+            696,
+            887,
+            923
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "\\* Corresponding author",
+        "bbox": [
+            134,
+            832,
+            289,
+            846
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "1 Interactive Demo: https://huggingface.co/spaces/ GAIR/Preference-Dissection-Visualization",
+        "bbox": [
+            112,
+            846,
+            489,
+            871
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "2 Dataset: https://huggingface.co/datasets/GAIR/ preference-dissection",
+        "bbox": [
+            112,
+            870,
+            489,
+            896
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "3 Github Repository: https://github.com/GAIR-NLP/ Preference-Dissection",
+        "bbox": [
+            112,
+            896,
+            489,
+            921
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "1790",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 1790–1811 August 11-16, 2024 ©2024 Association for Computational Linguistics",
+        "bbox": [
+            89,
+            945,
+            907,
+            973
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "chart",
+        "img_path": "images/95737f116794f01cf6038228d92fa87461631111b36528301f509e91127099f1.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 1: The preference dissection of human, GPT-4-Turbo and LLaMA-2-70B-Chat on Communication Scenario (including chitchat and value judgment), and we highlight the most preferred property for each in its corresponding color: lengthy for human, no severe errors for GPT-4-Turbo, and contain rich info for LLaMA-2-70B-Chat. The value is the probability of a response being preferred in a pair when it satisfies one property better than the other response, holding all else equal. This can be interpreted as how much human or an LLM favor a certain property. Values above and below the 50% line indicate a preference or dislike, respectively."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            115,
+            82,
+            880,
+            281
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Bayesian logistic regression models, which help us quantitatively decompose preferences based on different properties by examining their weights.",
+        "bbox": [
+            112,
+            392,
+            489,
+            441
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Leveraging the above framework, we analyze the human preferences of real users and the preferences of numerous LLMs we collect. The analysis is conducted separately on different scenarios to avoid the mixing of preferences and achieve clearer conclusions (see Figure 1 for an example). We summarize the key findings as follows:",
+        "bbox": [
+            112,
+            445,
+            489,
+            558
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Humans are less sensitive to errors, clearly dislike a model when it admits its limits, and prefer a response that supports their stances (§4.1).",
+        "bbox": [
+            115,
+            563,
+            489,
+            611
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Advanced LLMs like GPT-4-Turbo prefer correctness, clarity, and harmlessness more (§4.1).",
+        "bbox": [
+            115,
+            612,
+            489,
+            643
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. LLMs of similar sizes exhibit similar preferences irrespective of training methods, and the preference of a pretrained-only LLM is largely unchanged after alignment (§4.2).",
+        "bbox": [
+            115,
+            643,
+            489,
+            708
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Finally, we reveal that benchmarks with LLMas-a-judge are easy to manipulate (§4.3). Our experiments on AlpacaEval 2.0 (Li et al., 2023b) and MT-Bench (Zheng et al., 2023) show that aligning models with the judges' preferences increases scores, whereas diverge from these preferences leads to lower scores. This is achievable across both training-free and training-based methods, with score variations up to 0.59 on MT-Bench (1-10 scale) and 31.94 on AlpacaEval 2.0 (0-100 scale). The manipulation highlights the urgent need for more robust benchmarks and further underscores the importance of understanding preference.",
+        "bbox": [
+            110,
+            713,
+            490,
+            923
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Related Work",
+        "text_level": 2,
+        "bbox": [
+            509,
+            391,
+            667,
+            406
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "The Application of Preferences In training, preference data through pairwise comparisons is used to build the reward model in Reinforcement Learning from Human/AI Feedback (RLHF/RLAIF) (Ouyang et al., 2022; Bai et al., 2022; Lee et al., 2023; Anthropic, 2023) or as the learning target in Direct Preference Optimization (DPO) (Rafailov et al., 2023; Tunstall et al., 2023; Ivison et al., 2023). In evaluation, comparing model outputs to references (Li et al., 2023b; Dubois et al., 2023; Zhou et al., 2023), directly rating individual responses (Zheng et al., 2023) or using Elo ratings from human votes (Zheng et al., 2023) have become common ways to assess the aligned models.",
+        "bbox": [
+            507,
+            422,
+            887,
+            649
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Challenges in Preference-based Methods The preferences of human and LLMs are greatly affected by features like the length of a response (Singhal et al., 2023), sycophancy (Sharma et al., 2023), or certain writing styles (Gudibande et al., 2023) due to limited annotation time (Chmielewski and Kucker, 2020), cognitive biases of annotators (Pandey et al., 2022), limited reasoning ability and self-enhancement bias (Zheng et al., 2023). Consequently, the reward model trained as the proxy of preferences is vulnerable to over-optimization (Gao et al., 2023) and reward hacking (Sun et al., 2023) in RLHF. Moreover, this can lead to instability in preference-based evaluation, reducing the credibility and reliability of the assessment results (Wang et al., 2023; Hosking et al., 2023).",
+        "bbox": [
+            507,
+            664,
+            887,
+            923
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "1791",
+        "bbox": [
+            480,
+            928,
+            519,
+            942
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/992b604a7fde23de7e851e2bba8c2313a193bd3123e32ef03930f58edf654258.jpg",
+        "image_caption": [
+            "Figure 2: An overview of our high-level methodology."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            136,
+            82,
+            468,
+            338
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Understanding and Demonstrating Preferences Perez et al. (2022) generate multiple-choice evaluations with LMs to discover model preferences across various personas. Turpin et al. (2023) and Wei et al. (2023) find that models may agree with incorrect answers if they are deliberately suggested in queries. Similar to our work, Sharma et al. (2023) and Hosking et al. (2023) conduct regression-based analyses to detect key factors in human preferences, such as sycophancy, assertiveness, and formatting. However, most of these works only offer basic analyses on limited synthetic data. In contrast, we thoroughly analyze human and LLM preferences in various real-world scenarios within a unified framework, and further explore potential applications arising from a deeper understanding of preferences.",
+        "bbox": [
+            110,
+            375,
+            490,
+            634
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3 Preference Dissection",
+        "text_level": 2,
+        "bbox": [
+            114,
+            645,
+            336,
+            662
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3.1 High-level Methodology",
+        "text_level": 2,
+        "bbox": [
+            114,
+            671,
+            349,
+            687
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "In this work, we analyze preferences using pairwise comparison data, which has clearer and more consistent results than individual ratings (Ziegler et al., 2019). We start with a raw dataset D, where each sample contains a pair of responses $( r _ { A } , r _ { B } )$ to a query. Then, we collect the preference label $l \\in \\{ A , B \\}$ from a judge j (human or an $\\mathrm { L L M } ) ^ { 4 }$ to indicate the preferred one in each pair, forming the preference dataset $D _ { j }$ . A set of properties $P = \\{ p _ { 1 } , . . . , p _ { N } \\}$ is defined to guide the analysis. Our objective is to decompose the overall preference in $D _ { j }$ into quantifiable contributions of each property in P: $D _ { j } \\Rightarrow \\bigoplus _ { i = 1 } ^ { N } \\alpha _ { i } \\odot p _ { i }$ . Here, $\\bigoplus$ represents the composition concept, and $\\alpha _ { i } \\odot p _ { i }$ shows the contribution of property $p _ { i }$ to overall preference with effect strength as $\\alpha _ { i }$",
+        "bbox": [
+            112,
+            692,
+            490,
+            887
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            82,
+            882,
+            149
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "To elaborate, as shown in Figure 2, we first annotate how each property in $P$ is satisfied in a response using a Likert scale rating, which is applied to both $r _ { A }$ and $r _ { B }$ in a sample. Then, we compare the ratings of two responses across these properties, resulting in a set of +1/0/-1 outcomes, indicating if $r _ { A }$ is better, equal, or worse than $r _ { B }$ per property.⁵ These outcomes create the “comparison feature\" of a sample. Next, we learn a Bayesian logistic regression model to predict preference labels using the “comparison feature\", and the fitted weights represent the effect strengths for each property.",
+        "bbox": [
+            507,
+            149,
+            887,
+            344
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3.2 Dataset",
+        "text_level": 2,
+        "bbox": [
+            509,
+            355,
+            618,
+            370
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "To pursue analysis in realistic settings, we choose Chatbot Arena Conversations (Zheng et al., 2023) as the raw dataset D. It is collected from a public platform where users can freely converse with two models simultaneously and select a preferred one. We filter out samples with “Tie/Both Bad\" labels and multi-turn conversations for future work to streamline annotation and analysis.",
+        "bbox": [
+            507,
+            378,
+            885,
+            506
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "We notice that preferences of different scenarios vary a lot, so we take a scenario-balanced sampling. We first use the OpenAI moderation6 and toxicity tags in the dataset to identify 400 samples with unsafe queries. We then utilize the classifier in Li et al. (2023a) to categorize the rest samples into 10 scenarios: Exam Questions, Code, Creative Writing, Functional Writing, Communication, Knowledgeaware, Advice, Daily Tasks, NLP Tasks, and Others (see Table 8 in Appendix B for detailed descriptions). Since the Knowledge-Aware and Others scenarios have a notably higher proportion in the data, we randomly select 820 samples for each, while taking 400 ones from the other scenarios.",
+        "bbox": [
+            507,
+            507,
+            887,
+            733
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3.3 Collecting Preferences",
+        "text_level": 2,
+        "bbox": [
+            509,
+            745,
+            734,
+            762
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Since human preferences already exist in the raw dataset D, we can directly get the preference dataset $D _ { h u m a n }$ , and only need to collect LLM preferences additionally. We select 2 proprietary LLMs: GPT-4-Turbo (gpt-4-1106-preview) and",
+        "bbox": [
+            507,
+            768,
+            885,
+            848
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_footnote",
+        "text": "4We treat preferences from different human annotators collectively as “human\" and view each LLM as separate.",
+        "bbox": [
+            112,
+            895,
+            487,
+            922
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_footnote",
+        "text": "5Directly annotating comparison outcomes is feasible, but early experiments indicate it yields an excessive number of slightly different properties, which hurts analysis reliability.",
+        "bbox": [
+            507,
+            858,
+            885,
+            896
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_footnote",
+        "text": "6https://platform.openai.com/docs/guides/ moderation",
+        "bbox": [
+            509,
+            896,
+            847,
+            920
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "1792",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "table",
+        "img_path": "images/37e65986b6639f89b81b7fa152b7072383a22ee1adc5fd5897ed10bbf01458ad.jpg",
+        "table_caption": [
+            "Table 1: The 29 pre-defined properties, including 21 Basic, 5 Query-specific, and 3 Error Detection ones."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Group</td><td>Properties</td></tr><tr><td>Query-specific</td><td>clarify intent, show empathetic, satisfy constraints, support stances, correct mistakes harmless, grammarly correct, well formatted, non-repetitive, funny, use rhetorical devices, admit</td></tr><tr><td>Basic</td><td>limits, clear, friendly, use informal expressions, contain rich info, persuasive, polite, complex word &amp; sentence, step-by-step, novel, interactive, use supporting materials, authoritative, relevant, lengthy</td></tr><tr><td>Error Detection</td><td>no minor errors, no moderate errors, no severe errors</td></tr></table>",
+        "bbox": [
+            131,
+            101,
+            865,
+            187
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "GPT-3.5-Turbo (gpt-3.5-turbo-1106), and 30 open-source LLMs (see Table 7 in Appendix C) to collect LLM preference datasets $3 2 \\times D _ { L L M }$",
+        "bbox": [
+            112,
+            199,
+            489,
+            248
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "To minimize prompt bias in model preference assessment, we use a straightforward one: $^ { 6 6 }$ tween Response A and Response B, which better addresses the user's query? The better response is Response\", and measure preferences by the output log-probability of “A\" or “B\". Acknowledging a positional bias in LLMs (Wang et al., 2023), where they prefer either the first or second response irrespective of content, we alternate response order and average log-probabilities for an accurate preference rating. This method yields a binary label with the same format as human preferences.",
+        "bbox": [
+            110,
+            249,
+            490,
+            442
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.4 Pre-defined Properties and Annoatation",
+        "text_level": 2,
+        "bbox": [
+            112,
+            451,
+            477,
+            467
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We design 29 properties for our analysis, referring to criteria from Li et al. (2023a); Sharma et al. (2023); Hosking et al. (2023). These properties, categorized into Basic, Query-Specific, and Error Detection groups, are listed in Table 1. For automated annotation, we employ GPT-4-Turbo to annotate a pair of responses simultaneously in one prompt to keep a consistent standard. We provide a fully annotated sample in Table 11 in Appendix D.",
+        "bbox": [
+            110,
+            472,
+            490,
+            619
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Basic Properties We define 21 basic properties, including stylistic ones like funny, and contentbased ones like admit limits. GPT-4-Turbo is required to rate responses from 0 to 3 for each property in a single prompt. We find that including the query in the prompt disturbs the annotation as most of the basic properties are query-independent. Thus, we only use the query for relevant and novel, the two query-aware ones. For lengthy, we directly measure word count using NLTK (Loper and Bird, 2002). Detailed annotation prompts and descriptions are in Figure 6, 7 and 8 in Appendix A.",
+        "bbox": [
+            110,
+            624,
+            492,
+            820
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Query-specific Properties We defined 5 queryspecific properties that are annotated based on the user query, e.g., support stances is inapplicable for queries with no subjective stance. Therefore to improve accuracy, we adopt a two-round annotation process. The first round determines if a query meets the prerequisites for these properties, and we list the number of samples satisfying the prerequisites in Table 2. In the second round, annotation focuses only on applicable properties. The detailed prompts and the specific annotation goal for each property are illustrated in Figure 9, 10, 11 and 12 in Appendix A. The annotation results are also converted into a rating from 0 to 3 (see Appendix F).",
+        "bbox": [
+            110,
+            826,
+            492,
+            923
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "table",
+        "img_path": "images/cd82e2052c2a130f708d0d3cd118d7baa41e2a887ed8e220f0d89e9b5229c14a.jpg",
+        "table_caption": [
+            "Table 2: Number of samples meeting 5 Query-specific prerequisites."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Prerequisite</td><td>#</td><td>Prerequisite</td><td>#</td></tr><tr><td>with explicit constraints</td><td>1,418</td><td>unclear intent</td><td>459</td></tr><tr><td>show subjective stances</td><td>388</td><td>express feelings</td><td>121</td></tr><tr><td>contain mistakes or bias</td><td>401</td><td></td><td></td></tr></table>",
+        "bbox": [
+            515,
+            231,
+            877,
+            293
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            307,
+            887,
+            437
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Error Detection Although GPT-4-Turbo typically identifies errors in most samples accurately, it may fail with content beyond its training data. Therefore, we first ask it to evaluate whether it can reliably detect errors in a response, outputting an “applicable/not applicable\" tag. Samples tagged as “not applicable\" are excluded. For clearer annotation, we limit error types to four: Factual Error, Information Contradiction, Math Operation Error and Code Generation Error. We also define three severity levels for errors: Minor, Moderate, and Severe, based on their impact on response correctness. Additionally, a reference answer generated independently by GPT-4-Turbo is included in the prompt, which has proven to help identify errors correctly (Zheng et al., 2023; Saunders et al., 2022; Sun et al., 2024). We ask GPT-4-Turbo to list errors by type and severity, creating 3 properties based on the error count per severity level. The complete prompt is shown in Figure 13 in Appendix A.",
+        "bbox": [
+            507,
+            445,
+            887,
+            770
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Annotation Quality Check We ask four of our authors to check the annotation quality. They are required to determine if they agree with the annotations, using the same guidelines for GPT-4-Turbo. The agreement rates are 93.1% for Basic property ratings, 85.1% for Detected Errors, with 90% of responses having all errors identified without missing. For Query-specific properties, the agreement is 94.8% in the first-round prerequisite questions and 85.5% in the second-round annotation. More details can be found in Table 12 in Appendix G.",
+        "bbox": [
+            505,
+            777,
+            889,
+            923
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_number",
+        "text": "1793",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "chart",
+        "img_path": "images/bd6e7c2b69d50ea656d4674342f98de071ff566089795c5e916dc79bb394942b.jpg",
+        "content": "",
+        "chart_caption": [
+            "Table 3: The top/last 3 preferred properties of human and GPT-4-Turbo on different selected groups of samples, ranked by the degree of preference $P ( p _ { i } ) = \\sigma ( \\alpha _ { i } )$ , the probability a response is preferred over the other when the former satisfies only one property $p _ { i }$ better than the latter and all else equal."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            117,
+            139,
+            877,
+            640
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            664,
+            487,
+            696
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "3.5 Calculating Effect Strengths of Properties",
+        "text_level": 2,
+        "bbox": [
+            114,
+            707,
+            487,
+            724
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Building Comparison Features For each sample, we assign +1/-1/0 to each property based on whether the rating of $r _ { A }$ is higher/lower or equal to that of $r _ { B }$ . For Error Detection properties, a lower count of errors in $r _ { A }$ yields +1. The detailed comparison strategy is in Appendix H. These outcomes form a comparison feature, $\\phi ~ \\in ~ \\{ + 1 , 0 , - 1 \\} ^ { N }$ where $N = 2 9$ is the total number of properties.",
+        "bbox": [
+            112,
+            727,
+            489,
+            857
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Bayesian Logistic Regression We use Bayesian logistic regression to predict the preferences from comparison features $( \\sigma ^ { } ( \\cdot )$ is the sigmoid function):",
+        "bbox": [
+            112,
+            858,
+            489,
+            908
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/88138ef1090249a70e96ffded01e551611aa622aee6c897a7738e3fa7866da96.jpg",
+        "text": "$$\n\\begin{array} { r } { P ( l = A | \\phi , \\alpha ) = \\sigma \\left( \\sum _ { i = 1 } ^ { N } \\alpha _ { i } \\phi _ { i } \\right) } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            578,
+            662,
+            811,
+            687
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "We place a prior $\\alpha _ { i }$ \\~Laplace $( \\mu = 0 , b = 0 . 1 )$ over the weights $\\alpha _ { i }$ with zero mean and scale $b = 0 . 1$ . This prior encodes the belief each property is equally likely to increase or decrease the probability a response is preferred. We perform approximate Bayesian inference with the No-U-Turn Sampler (Hoffman et al., 2014) with Hamiltonian Monte Carlo (Neal et al., 2011) to collect 6,000 posterior samples across four independent Markov Chain Monte Carlo (MCMC) chains (each chain contains 500 warmup samples and 1,500 collected samples) , and take the mean value of all samples as the results in one fitting. To reduce instability in fitting, we divide the data into 10 parts, using 9 for fitting in each iteration. The final weights α are the average of the results from 10 iterations. To pursue a fine-grained analysis, we separately fit individual models for subsets with different scenarios (or meet certain Query-specific prerequisites) in each $D _ { j }$ . We see that the fitted models reach about 80% accuracy for most $D _ { j }$ (Table 10 in Appendix J).",
+        "bbox": [
+            507,
+            696,
+            885,
+            923
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_number",
+        "text": "1794",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "table",
+        "img_path": "images/a6d434dbdb31c17614911c3a94e7b7553f09f2f6266968cb958aaf969d8ff250.jpg",
+        "table_caption": [
+            "Table 4: The average degree of preference on no severe/moderate/minor errors across all scenarios for Human, GPT-4-Turbo, and the highest of the rest LLMs."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>Minor</td><td>Moderate</td><td>Severe</td></tr><tr><td>Human</td><td>49.01</td><td>52.45</td><td>62.86</td></tr><tr><td>GPT-4-Turbo</td><td>50.11</td><td>58.00</td><td>76.19</td></tr><tr><td>Highest of Rest</td><td>50.54</td><td>55.67</td><td>65.27</td></tr></table>",
+        "bbox": [
+            144,
+            130,
+            457,
+            192
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            205,
+            489,
+            319
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4 Analysis and Application",
+        "text_level": 2,
+        "bbox": [
+            112,
+            330,
+            368,
+            348
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.1 Which Properties are Most or Least Preferred by Human and GPT-4-Turbo?",
+        "text_level": 2,
+        "bbox": [
+            114,
+            356,
+            480,
+            388
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "As the most common sources of preference data, we thereby analyze two specific cases: human and one of the most advanced LLMs, GPT-4-Turbo.",
+        "bbox": [
+            112,
+            394,
+            489,
+            442
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.1.1 Quantifying Preferences for Properties",
+        "text_level": 2,
+        "bbox": [
+            112,
+            451,
+            480,
+            468
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "For a property $p _ { i }$ , we calculate the degree of preference $P ( p _ { i } )$ as $\\sigma ( \\alpha _ { i } )$ . This value corresponds to the probability that a response is preferred over another if it only satisfies $p _ { i }$ better and all else equal. $\\mathbf { A }$ higher value indicates a stronger preference, while a value less than 50% signifies dislike.",
+        "bbox": [
+            112,
+            472,
+            489,
+            568
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.1.2 Results",
+        "text_level": 2,
+        "bbox": [
+            114,
+            577,
+            235,
+            593
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "We sort the properties by $P ( p _ { i } )$ for human and GPT-4-Turbo, and show the top/last 3 preferred ones on 9 selected groups of samples in Table 3, and the rest are shown in Table 13 in Appendix K.",
+        "bbox": [
+            112,
+            596,
+            489,
+            663
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Commonalities We first observe that under different scenarios or query-specific cases, the compositions of preferences vary greatly for both humans and GPT-4-Turbo. We also find human and GPT-4-Turbo share some similarities like they have the same set of top 3 preferred properties for the Creative Writing and Daily Tasks, and in most cases, they both prefer responses with fewer severe errors and satisfy the explicit constraints in queries.",
+        "bbox": [
+            112,
+            670,
+            490,
+            818
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Disparities There are also many disagreements between them. We calculate the average degree of preference on the 3 Error Detection features across all scenarios in Table 4 and find humans are significantly less sensitive to severe errors, and do not show a clear preference/dislike to responses with fewer moderate and minor errors. Besides, we see humans clearly dislike a model when it admits its limit in addressing the query, especially for Unsafe Query and Communication scenarios, indicating that human users in real settings have an urgent desire to have all their queries addressed even if they are unsafe. Humans also prefer responses that support their subjective stances (known as sycophancy), and pay little attention to how well a response corrects the mistakes or biases in queries.",
+        "bbox": [
+            110,
+            826,
+            490,
+            923
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "image",
+        "img_path": "images/3ab805d7282a169bdc06ed9b7b636e426c24ff14ef9687083a16cdc1b87fd0b8.jpg",
+        "image_caption": [
+            "Figure 3: The similarity of preferences between different LLMs (and human). We list the LLMs in order of model size, from small to large."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            515,
+            83,
+            858,
+            316
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            387,
+            885,
+            549
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "On the contrary, GPT-4-Turbo emphasizes correctness, clarity, and harmlessness more. It tends to have much larger degrees of preference for properties it prefers than humans. It also likes the responses that help clarify the unclear intent in queries and correct the mistakes for queries that are unsafe or contain mistakes/biases, which highlight the Helpfulness, Harmlessness and Honesty (HHH) goals it has been aligned to.",
+        "bbox": [
+            507,
+            551,
+            887,
+            696
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.2 How similar are the preferences of different LLMs?",
+        "text_level": 2,
+        "bbox": [
+            509,
+            709,
+            828,
+            741
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.2.1 Definition of Similarity",
+        "text_level": 2,
+        "bbox": [
+            509,
+            750,
+            751,
+            766
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "The similarity between preferences of two LLMs is defined as the average Pearson coefficient of the weights of their fitted Bayesian logistic regression models across all scenarios:",
+        "bbox": [
+            507,
+            771,
+            885,
+            837
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "img_path": "images/55ae799de722fb78c5a26e138f8e5cdf597da255948d17bbeb9e0fe646ee370a.jpg",
+        "text": "$$\n\\begin{array} { l } { \\rho _ { M N } ^ { s } = \\displaystyle \\frac { \\sum _ { i = 1 } ^ { N } ( \\alpha _ { M i } ^ { s } - \\alpha _ { M } ^ { \\overline { { s } } } ) ( \\alpha _ { N i } ^ { s } - \\alpha _ { N } ^ { \\overline { { s } } } ) } { \\sqrt { \\sum _ { i = 1 } ^ { N } ( \\alpha _ { M i } ^ { s } - \\alpha _ { M } ^ { \\overline { { s } } } ) ^ { 2 } } \\sqrt { \\sum _ { i = 1 } ^ { N } ( \\alpha _ { N i } ^ { s } - \\alpha _ { N } ^ { \\overline { { s } } } ) ^ { 2 } } } } \\\\ { \\mathrm { s i m i l a r i t y } ( M , N ) = \\displaystyle \\frac { 1 } { | S | } \\sum _ { s \\in S } \\rho _ { M N } ^ { s } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            536,
+            843,
+            853,
+            919
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "1795",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "table",
+        "img_path": "images/eeac1bff6eed6728019aa2a89efc36f4c5fa576f662b8d013b23bd6e8dcb8448.jpg",
+        "table_caption": [
+            "Table 5: The difference between a pre-trained-only LLM and all its aligned (i.e., SFT, RLHF, or DPO) variants."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Series</td><td colspan=\"3\">LLaMA-2</td><td colspan=\"3\">Qwen</td><td colspan=\"2\">Yi</td><td colspan=\"2\">Mistral</td></tr><tr><td>Size</td><td>7B</td><td>13B</td><td>70B</td><td>7B</td><td>14B</td><td>72B</td><td>6B</td><td>34B</td><td>7B</td><td>8x7B</td></tr><tr><td colspan=\"9\">* The average preference similarity between a base model and all its aligned variants</td><td></td><td></td><td></td></tr><tr><td></td><td>0.52</td><td>0.89</td><td>0.89</td><td>0.89</td><td>0.96</td><td>0.96</td><td>0.88</td><td>0.94</td><td>0.88</td><td>0.84</td></tr><tr><td colspan=\"9\">* The average log-probability difference between “A” and “B” as the first output token</td><td></td><td></td><td></td></tr><tr><td>pre-trained only</td><td>0.49</td><td>0.47</td><td>0.68</td><td>0.76</td><td>0.78</td><td>2.24</td><td>0.6</td><td>1.98</td><td>0.92</td><td>1.01</td></tr><tr><td>avg. of aligned variants</td><td>3.03</td><td>1.99</td><td>4.06</td><td>2.93</td><td>1.66</td><td>4.47</td><td>2.89</td><td>3.06</td><td>5.46</td><td>7.61</td></tr></table>",
+        "bbox": [
+            124,
+            99,
+            872,
+            211
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "where $\\alpha _ { M } ^ { s }$ denotes the weights of the fitted Bayesian logistic regression model for an LLM (or human) M on scenario s, S is the set of all scenarios, N = 29 is the number of defined properties.",
+        "bbox": [
+            110,
+            237,
+            489,
+            303
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4.2.2 Results",
+        "text_level": 2,
+        "bbox": [
+            112,
+            310,
+            235,
+            325
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We show the similarity in preferences between different LLMs (or human and an LLM) in Figure 3. We find that the preferences of human and GPT-4- Turbo are significantly different from other LLMs, and most similar to Qwen-72B (-Chat). We also find LLaMA-2-7B is quite different from all other LLMs. This may be because it does not exhibit a consistent preference, preventing us from fitting a good model (only 63% accuracy, Table 10).",
+        "bbox": [
+            112,
+            329,
+            490,
+            476
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Implications of LLM Size on Preferences We divide the LLMs into two groups by their size: less than 14B (<14B) and larger than 30B (>30B). We calculate the intra- and inter-group similarities:",
+        "bbox": [
+            112,
+            483,
+            489,
+            549
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "equation",
+        "img_path": "images/1fae85693b6d3d835bb5a935244058b4103cf0ab68980315d3f5f5b373ea0e6a.jpg",
+        "text": "$$\n\\begin{array} { c } { { \\mathrm { I n t r a } ( A ) = \\displaystyle \\frac { 1 } { { \\binom { n } { 2 } } } \\sum _ { i = 1 } ^ { n - 1 } \\sum _ { j = i + 1 } ^ { n } \\mathrm { s i m i l a r i t y } ( a _ { i } , a _ { j } ) } } \\\\ { { \\mathrm { I n t e r } ( A , B ) = \\displaystyle \\frac { 1 } { n m } \\sum _ { i = 1 } ^ { n } \\sum _ { j = 1 } ^ { m } \\mathrm { s i m i l a r i t y } ( a _ { i } , b _ { j } ) } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            151,
+            552,
+            450,
+            629
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "where A, B are groups of LLMs and $a _ { i } , b _ { i }$ are the components. We find the intra-group similarities (0.83 for <14B and 0.88 for >30B) are much higher than the inter-group similarity (0.74). We also divide the models by the series mentioned in Section 3.3, and find the average intra- and inter-group similarities are very close (both 0.81, a complete version in Figure 5 in Appendix K). This further suggests that LLMs of similar sizes often have alike preferences, regardless of their training methods.",
+        "bbox": [
+            110,
+            639,
+            489,
+            802
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Effects of Alignment on Preferences Another question we care about is how the preference of an LLM changes after it is fine-tuned for alignment, which is calculated as the average similarity between a pretrained-only LLM and all its aligned variants. We also calculate the average log-probability difference between “A”\" and “B\" as the first output token in collecting preference labels. Results in Table 5 show that the preferences tend to remain largely unchanged after fine-tuning for alignment (except for the outlier LLaMA-2-7B), but the difference in log-probability increases a lot. This can be seen as a signal that alignment does not change the tendency of LLM preference, but greatly changes the intensity of expressing it.",
+        "bbox": [
+            110,
+            809,
+            490,
+            923
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            237,
+            887,
+            368
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4.3 Can Preference-based Evaluation be Intentionally Manipulated?",
+        "text_level": 2,
+        "bbox": [
+            509,
+            382,
+            843,
+            417
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "As an application of dissecting the preferences, we show that results on popular benchmarks with LLM-as-a-judge can be intentionally manipulated by adapting the responses of a model to more closely align with or deliberately diverge from the identified preferences of the judge.",
+        "bbox": [
+            507,
+            424,
+            885,
+            524
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4.3.1 Benchmarks",
+        "text_level": 2,
+        "bbox": [
+            509,
+            537,
+            672,
+            554
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We take two benchmarks and use GPT-3.5-Turbo and GPT-4-Turbo as judges for both of them with their official evaluation prompts: (1) AlpacaEval 2.0 (Li et al., 2023b) has 805 queries where each of them has a reference response generated by GPT-4-Turbo. The metric is the pairwise comparison win rate against the reference responses. (2) MT-Bench (Zheng et al., 2023) has 80 two-round conversations across various domains. The metric is the average response rating over all conversations. Since we focus on single-turn interaction, we only report the scores on the first rounds of all samples.",
+        "bbox": [
+            507,
+            560,
+            887,
+            756
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4.3.2 Model Adaptation to Judge Preferences",
+        "text_level": 2,
+        "bbox": [
+            509,
+            770,
+            882,
+            787
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Training-free We utilize four models proficient in handling system messages (LLaMA-2-70B-Chat, Qwen-72B-Chat, GPT-3.5-Turbo, GPT-4-Turbo) and configure system messages to prompt them to adhere to the judge's Top 3 or Last 3 preferred properties in the scenario of a query. In this setting, we also sample a subset of AlpacaEval 2.0 with 80 queries and require two authors as human judges.",
+        "bbox": [
+            507,
+            793,
+            887,
+            923
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "1796",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/b947e9ed4eed48efb3c1984b5b1dcae3717dfd737d4fdb2a29a172a64be5b5d6.jpg",
+        "table_caption": [
+            "Table 6: The results of MT-Bench (first round) and AlpacaEval 2.0 when taking strategies to inject the most and least preferred properties of different judges into the models. None in the Training-free setting means models without a system message; in the Training-based setting, it means the untrained models. †We randomly pick a subset with 80 queries to collect human judgments."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">Model</td><td rowspan=\"2\">Strategy</td><td colspan=\"2\">MT-Bench (Round 1, Rating 1-10)</td><td colspan=\"3\">AlpacaEval 2.0 (Winrate % v.s. GPT-4-Turbo)</td></tr><tr><td>GPT-3.5-Turbo</td><td>GPT-4-Turbo</td><td>GPT-3.5-Turbo</td><td>GPT-4-Turbo</td><td>Human†</td></tr><tr><td colspan=\"7\">* Training-free: Setting system message to encourage models to satisfy top/last 3 preferred properties.</td></tr><tr><td rowspan=\"2\">LLaMA-2-70B-Chat</td><td>None</td><td>7.45</td><td>6.21</td><td>42.71</td><td>13.87</td><td>35.00</td></tr><tr><td>Top 3 Last 3</td><td>7.56 (↑0.11) 7.34 (↓0.11)</td><td>6.31 (↑0.10) 6.05 (↓0.16)</td><td>55.59 (↑12.88) 39.51 (↓3.20)</td><td>13.30 (↓0.57) 8.77 (↓5.10)</td><td>38.75 (↑3.75) 32.50 (↓2.50)</td></tr><tr><td rowspan=\"3\">Qwen-72B-Chat</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>None</td><td>8.00</td><td>6.88</td><td>17.08</td><td>10.32</td><td>28.75</td></tr><tr><td>Top 3 Last 3</td><td>8.16 (↑0.16)</td><td>7.08 (↑0.20)</td><td>31.55 (↑14.47)</td><td>11.03 (↑0.71)</td><td>28.75 (0.00)</td></tr><tr><td rowspan=\"3\">GPT-3.5-Turbo</td><td></td><td>7.96 (↓0.04)</td><td>6.73 (↓0.15)</td><td>15.06 (↓2.02)</td><td>9.90 (↓0.42)</td><td>23.75 (↓5.00)</td></tr><tr><td>None</td><td>8.15</td><td>7.63</td><td>13.66</td><td>9.18</td><td>23.75</td></tr><tr><td>Top 3 Last 3</td><td>8.28 (↑0.13) 7.56 (↓0.59)</td><td>7.73 (↑0.10)</td><td>42.49 (↑28.83)</td><td>11.94 (↑2.76)</td><td>25.00 (↑1.25)</td></tr><tr><td rowspan=\"3\">GPT-4-Turbo</td><td></td><td></td><td>7.13 (↓0.50)</td><td>12.97 (↓0.69)</td><td>6.06 (↓3.12)</td><td>3.75 (↓20.00)</td></tr><tr><td>None</td><td>8.49</td><td>8.80</td><td>50.00</td><td>50.00</td><td>50.00</td></tr><tr><td>Top 3 Last 3</td><td>8.86 (↑0.37) 8.23 (↓0.26)</td><td>8.88 (↑0.08) 8.71 (↓0.09)</td><td>81.94 (↑31.94) 52.04 (↑2.04)</td><td>50.76 (↑0.76) 22.08 (↓27.92)</td><td>50.00 (0.00) 35.00 (↓15.00)</td></tr><tr><td colspan=\"7\">* Training-based: Fine-tuning the model towards/against the preferences via DPO.</td></tr><tr><td rowspan=\"3\">Alpaca-7B</td><td>None</td><td>5.41</td><td>3.90</td><td>6.52</td><td>3.08</td><td></td></tr><tr><td>Towards</td><td>6.15 (↑0.74)</td><td>4.61 (↑0.71)</td><td>17.34 (↑10.82)</td><td>4.10 (↑1.02)</td><td></td></tr><tr><td>Against</td><td>4.46 (↓0.95)</td><td>2.88 (↓1.02)</td><td>4.08 (↓2.44)</td><td>1.96 (↓1.12)</td><td></td></tr><tr><td rowspan=\"3\">Alpaca-13B</td><td>None</td><td>5.46</td><td>3.95</td><td>6.15</td><td>2.49</td><td></td></tr><tr><td>Towards</td><td>5.60 (↑0.14)</td><td>3.98 (↑0.03)</td><td>9.20 (↑3.05)</td><td>2.93 (↑0.44)</td><td></td></tr><tr><td>Against</td><td>4.50 (↓0.96)</td><td>3.05 (↓0.90)</td><td>4.46 (↓1.69)</td><td>1.65 (↓0.84)</td><td></td></tr></table>",
+        "bbox": [
+            117,
+            145,
+            878,
+            450
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Training-based We use the fitted Bayesian logistic regression models for our target judges to annotate the preference labels on our collected dataset. We exclude samples where the final preference probability is within 50 ± 15% to emphasize the preferences. We then use the remaining data (4,022 for GPT-3.5-Turbo and 3,991 for GPT-4-Turbo) to train 2 Alpaca models7 with DPO towards the preferences of judges (GPT-3.5-Turbo and GPT-4- Turbo, respectively). For training against preferences, we simply invert labels from the regression models. We set batch size as 64, learning rate as 1e-5 with a cosine scheduler, and train three epochs.",
+        "bbox": [
+            110,
+            476,
+            492,
+            687
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "4.3.3 Results",
+        "text_level": 2,
+        "bbox": [
+            114,
+            697,
+            235,
+            713
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "The results are presented in Table 6. Generally, we find that in both training-free and training-based settings, adapting model responses to align with or diverge from judge preferences results in corresponding improvements or reductions in scores. Compared to GPT-4-Turbo, the effect of adaptation is more noticeable when targeting GPT-3.5-Turbo, possibly due to its less robust inferential abilities. While the effect is somewhat less pronounced with human judges, the manipulation remains effective, demonstrating its generality.",
+        "bbox": [
+            110,
+            718,
+            492,
+            897
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "It is also essential to highlight that the prompts for LLM-as-a-judge in both benchmarks differ notably from those we employed for collecting preferences. These prompts included extra instructions, and MT-Bench even uses a single-response rating system. Despite the differences, our approach, which relies on pairwise comparisons to gather preferences, shows substantial and predictable effectiveness. This outcome underscores the robustness of our method in preference analysis, demonstrating its reliability even under varied conditions.",
+        "bbox": [
+            507,
+            476,
+            887,
+            655
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "5 Conclusion",
+        "text_level": 2,
+        "bbox": [
+            509,
+            659,
+            645,
+            676
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "In this work, we conduct a thorough analysis to dissect how the preferences of human and LLMs can be quantitatively decomposed into different properties. We find that humans prefer responses that can directly address their queries but are less sensitive to errors in responses, while advanced LLMs like GPT-4-Turbo emphasize more on correctness, clarity, and harmlessness. We then find that model size can be a distinguishing factor in the preferences where LLMs of similar sizes share similar preferences, and fine-tuning for alignment does not bring about significant change to LLM preferences. As an application of our analysis, we also show the results of current benchmarks with LLM-as-a-judge can be intentionally manipulated, indicating the vulnerability of preference-based evaluation. Last but not least, we publicly release all the collected resources to facilitate future research.",
+        "bbox": [
+            507,
+            681,
+            889,
+            923
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_footnote",
+        "text": "7https://huggingface.co/chavinlo/alpaca-7b (13b)",
+        "bbox": [
+            132,
+            907,
+            438,
+            922
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "1797",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            134
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "6 Acknowledgements",
+        "text_level": 2,
+        "bbox": [
+            114,
+            146,
+            317,
+            161
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We thank Yuan Guo, Yiheng Xu, Yuqing Yang, Zhoujun Cheng, Zhihui Xie for their valuable feedback and suggestions on the writing of this paper. We also thank the anonymous reviewers for their valuable feedback and helpful suggestions. This project is supported by Qingyuan Research Project and Shanghai Artificial Intelligence Laboratory.",
+        "bbox": [
+            110,
+            171,
+            490,
+            285
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "7 Limitation and Future Work",
+        "text_level": 2,
+        "bbox": [
+            114,
+            296,
+            398,
+            312
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "To obtain a binary preference label without positional bias, our method is not applicable to proprietary LLMs like Gemini (Team et al., 2023) or Claude (Anthropic, 2023), which do not return logprobabilities. Additionally, our use of Bayesian logistic regression for preference dissection assumes that all predefined properties independently influence the final preference, possibly missing complex interactions between them. Designing predefined properties and corresponding prompts for GPT-4- Turbo is still challenging and laborious. A future improvement could be the automatic discovery of these properties, avoiding the trial and error in creating effective prompts for data annotation. This work focuses only on single-turn conversations, leaving the extension to more complex, multi-turn interactions for future research.",
+        "bbox": [
+            112,
+            322,
+            490,
+            596
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "8 Ethics",
+        "text_level": 2,
+        "bbox": [
+            114,
+            608,
+            205,
+            624
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "This study primarily investigates the preferences of human and LLMs. While the analysis results are neutral, they could potentially be used to deliberately train and build models with potential risks and undesired behaviours. Thus, an important future task is to use these insights, based on dissecting and understanding preferences, to construct more reliable AI systems. The original dataset we use is licensed under CC-BY-NC-4.0, and we follow it to set the license or our annotated dataset as CC-BY-NC-4.0. Besides, the original dataset we use have removed all conversations that contain personally identifiable information (PII).",
+        "bbox": [
+            112,
+            634,
+            489,
+            845
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            114,
+            871,
+            215,
+            887
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "01.AI. 2023. Building the next generation of opensource and bilingual llms.",
+            "Anthropic. 2023. Claude 2. Accessed: 2023-04-03.",
+            "Jinze Bai, Shuai Bai, Yunfei Chu, Zeyu Cui, Kai Dang, Xiaodong Deng, Yang Fan, Wenbin Ge, Yu Han, Fei Huang, et al. 2023. Qwen technical report. arXiv preprint arXiv:2309.16609.",
+            "Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, et al 2022. Training a helpful and harmless assistant with reinforcement learning from human feedback. arXiv preprint arXiv:2204.05862.",
+            "Stephen Casper, Xander Davies, Claudia Shi, Thomas Krendl Gilbert, Jérémy Scheurer, Javier Rando, Rachel Freedman, Tomasz Korbak, David Lindner, Pedro Freire, et al. 2023. Open problems and fundamental limitations of reinforcement learning from human feedback. arXiv preprint arXiv:2307.15217.",
+            "Wei-Lin Chiang, Zhuohan Li, Zi Lin, Ying Sheng, Zhanghao Wu, Hao Zhang, Lianmin Zheng, Siyuan Zhuang, Yonghao Zhuang, Joseph E. Gonzalez, Ion Stoica, and Eric P. Xing. 2023. Vicuna: An opensource chatbot impressing gpt-4 with 90%\\* chatgpt quality.",
+            "Michael Chmielewski and Sarah C Kucker. 2020. An mturk crisis? shifts in data quality and the impact on study results. Social Psychological and Personality Science, 11(4):464–473.",
+            "Yann Dubois, Xuechen Li, Rohan Taori, Tianyi Zhang, Ishaan Gulrajani, Jimmy Ba, Carlos Guestrin, Percy Liang, and Tatsunori B Hashimoto. 2023. Alpacafarm: A simulation framework for methods that learn from human feedback. arXiv preprint arXiv:2305.14387.",
+            "Leo Gao, John Schulman, and Jacob Hilton. 2023. Scaling laws for reward model overoptimization. In International Conference on Machine Learning, pages 10835–10866. PMLR.",
+            "Arnav Gudibande, Eric Wallace, Charlie Snell, Xinyang Geng, Hao Liu, Pieter Abbeel, Sergey Levine, and Dawn Song. 2023. The false promise of imitating proprietary LLMs. arXiv preprint arXiv:2305.15717.",
+            "Matthew D Hoffman, Andrew Gelman, et al. 2014. The No-U-Turn sampler: Adaptively setting path lengths in Hamiltonian Monte Carlo. J. Mach. Learn. Res., 15(1):1593–1623.",
+            "Tom Hosking, Phil Blunsom, and Max Bartolo. 2023. Human feedback is not gold standard. arXiv preprint arXiv:2309.16349.",
+            "Hamish Ivison, Yizhong Wang, Valentina Pyatkin, Nathan Lambert, Matthew Peters, Pradeep Dasigi, Joel Jang, David Wadden, Noah A Smith, Iz Beltagy, et al. 2023. Camels in a changing climate: Enhancing lm adaptation with tulu 2. arXiv preprint arXiv:2311.10702."
+        ],
+        "bbox": [
+            114,
+            895,
+            487,
+            921
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "1798",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Albert Q Jiang, Alexandre Sablayrolles, Arthur Mensch, Chris Bamford, Devendra Singh Chaplot, Diego de las Casas, Florian Bressand, Gianna Lengyel, Guillaume Lample, Lucile Saulnier, et al. 2023. Mistral 7b. arXiv preprint arXiv:2310.06825.",
+            "Albert Q. Jiang, Alexandre Sablayrolles, Antoine Roux, Arthur Mensch, Blanche Savary, Chris Bamford, Devendra Singh Chaplot, Diego de las Casas, Emma Bou Hanna, Florian Bressand, Gianna Lengyel, Guillaume Bour, Guillaume Lample, Lélio Renard Lavaud, Lucile Saulnier, Marie-Anne Lachaux, Pierre Stock, Sandeep Subramanian, Sophia Yang, Szymon Antoniak, Teven Le Scao, Théophile Gervet, Thibaut Lavril, Thomas Wang, Timothée Lacroix, and William El Sayed. 2024. Mixtral of experts. arXiv preprint arXiv:2401.04088.",
+            "Harrison Lee, Samrat Phatale, Hassan Mansoor, Kellie Lu, Thomas Mesnard, Colton Bishop, Victor Carbune, and Abhinav Rastogi. 2023. Rlaif: Scaling reinforcement learning from human feedback with ai feedback. arXiv preprint arXiv:2309.00267.",
+            "Junlong Li, Shichao Sun, Weizhe Yuan, Run-Ze Fan, Hai Zhao, and Pengfei Liu. 2023a. Generative judge for evaluating alignment. arXiv preprint arXiv:2310.05470.",
+            "Xuechen Li, Tianyi Zhang, Yann Dubois, Rohan Taori, Ishaan Gulrajani, Carlos Guestrin, Percy Liang, and Tatsunori B. Hashimoto. 2023b. Alpacaeval: An automatic evaluator of instruction-following models. https://github.com/tatsu-lab/alpaca\\_eval.",
+            "Edward Loper and Steven Bird. 2002. Nltk: The natural language toolkit. arXiv preprint cs/0205028.",
+            "Radford M Neal et al. 2011. MCMC using Hamiltonian dynamics. Handbook of markov chain monte carlo, 2(11):2.",
+            "Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul F Christiano, Jan Leike, and Ryan Lowe. 2022. Training language models to follow instructions with human feedback. In Advances in Neural Information Processing Systems, volume 35, pages 27730–27744. Curran Associates, Inc.",
+            "Rahul Pandey, Hemant Purohit, Carlos Castillo, and Valerie L Shalin. 2022. Modeling and mitigating human annotation errors to design efficient stream processing systems with human-in-the-loop machine learning. International Journal of Human-Computer Studies, 160:102772.",
+            "Ethan Perez, Sam Ringer, Kamilė Lukošiūtė, Karina Nguyen, Edwin Chen, Scott Heiner, Craig Pettit, Catherine Olsson, Sandipan Kundu, Saurav Kadavath, et al. 2022. Discovering language model behaviors with model-written evaluations. arXiv preprint arXiv:2212.09251.",
+            "Du Phan, Neeraj Pradhan, and Martin Jankowiak. 2019. Composable effects for flexible and accelerated probabilistic programming in NumPyro. arXiv preprint arXiv:1912.11554.",
+            "Rafael Rafailov, Archit Sharma, Eric Mitchell, Stefano Ermon, Christopher D Manning, and Chelsea Finn. 2023. Direct preference optimization: Your language model is secretly a reward model. arXiv preprint arXiv:2305.18290.",
+            "William Saunders, Catherine Yeh, Jeff Wu, Steven Bills, Long Ouyang, Jonathan Ward, and Jan Leike. 2022. Self-critiquing models for assisting human evaluators. arXiv preprint arXiv:2206.05802.",
+            "Mrinank Sharma, Meg Tong, Tomasz Korbak, David Duvenaud, Amanda Askell, Samuel R Bowman, Newton Cheng, Esin Durmus, Zac Hatfield-Dodds, Scott R Johnston, et al. 2023. Towards understanding sycophancy in language models. arXiv preprint arXiv:2310.13548.",
+            "Prasann Singhal, Tanya Goyal, Jiacheng Xu, and Greg Durrett. 2023. A long way to go: Investigating length correlations in rlhf. arXiv preprint arXiv:2310.03716.",
+            "Shichao Sun, Junlong Li, Weizhe Yuan, Ruifeng Yuan, Wenjie Li Li, and Pengfei Liu. 2024. The critique of critique. arXiv preprint arXiv:2401.04518.",
+            "Zhiqing Sun, Yikang Shen, Hongxin Zhang, Qinhong Zhou, Zhenfang Chen, David Cox, Yiming Yang, and Chuang Gan. 2023. Salmon: Self-alignment with principle-following reward models. arXiv preprint arXiv:2310.05910.",
+            "Gemini Team, Rohan Anil, Sebastian Borgeaud, Yonghui Wu, Jean-Baptiste Alayrac, Jiahui Yu, Radu Soricut, Johan Schalkwyk, Andrew M Dai, Anja Hauth, et al. 2023. Gemini: a family of highly capable multimodal models. arXiv preprint arXiv:2312.11805.",
+            "Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. 2023. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288.",
+            "Lewis Tunstall, Edward Beeching, Nathan Lambert, Nazneen Rajani, Kashif Rasul, Younes Belkada, Shengyi Huang, Leandro von Werra, Clémentine Fourrier, Nathan Habib, et al. 2023. Zephyr: Direct distillation of lm alignment. arXiv preprint arXiv:2310.16944.",
+            "Miles Turpin, Julian Michael, Ethan Perez, and Samuel R Bowman. 2023. Language models don't always say what they think: Unfaithful explanations in chain-of-thought prompting. arXiv preprint arXiv:2305.04388."
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            152
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "1799",
+        "bbox": [
+            480,
+            928,
+            522,
+            941
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Peiyi Wang, Lei Li, Liang Chen, Dawei Zhu, Binghuai Lin, Yunbo Cao, Qi Liu, Tianyu Liu, and Zhifang Sui. 2023. Large language models are not fair evaluators. arXiv preprint arXiv:2305.17926.",
+            "Jerry Wei, Da Huang, Yifeng Lu, Denny Zhou, and Quoc V Le. 2023. Simple synthetic data reduces sycophancy in large language models. arXiv preprint arXiv:2308.03958.",
+            "Can Xu, Qingfeng Sun, Kai Zheng, Xiubo Geng, Pu Zhao, Jiazhan Feng, Chongyang Tao, and Daxin Jiang. 2023. Wizardlm: Empowering large language models to follow complex instructions. arXiv preprint arXiv:2304.12244.",
+            "Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric Xing, et al. 2023. Judging llm-as-a-judge with mt-bench and chatbot arena. arXiv preprint arXiv:2306.05685.",
+            "Chunting Zhou, Pengfei Liu, Puxin Xu, Srini Iyer, Jiao Sun, Yuning Mao, Xuezhe Ma, Avia Efrat, Ping Yu, Lili Yu, et al. 2023. Lima: Less is more for alignment. arXiv preprint arXiv:2305.11206.",
+            "Daniel M Ziegler, Nisan Stiennon, Jeffrey Wu, Tom B Brown, Alec Radford, Dario Amodei, Paul Christiano, and Geoffrey Irving. 2019. Fine-tuning language models from human preferences. arXiv preprint arXiv:1909.08593."
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            139
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "1800",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "A Detailed Properties and Prompts for GPT-4-Turbo Annotation",
+        "text_level": 2,
+        "bbox": [
+            112,
+            83,
+            467,
+            117
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "The prompt for annotating the Basic properties is in Figure 6. The detailed descriptions for the basic properties are in Figure 7 and 8. The prompt for the first-round annotation, i.e. the prerequisite questions of the Query-specfic properties is in Figure 9. The prompt for the second-round annotation for query-specific properties is in Figure 10, and the detailed contents for the placeholders {questions str} and {output format str} in it are in Figure 11 and 12 respectively. The prompt for Error Detection is shown in Figure 13.",
+        "bbox": [
+            110,
+            127,
+            490,
+            305
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "B Defined Scenarios",
+        "text_level": 2,
+        "bbox": [
+            114,
+            317,
+            307,
+            334
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "We show how we merge the scenarios from the classifier in Li et al. (2023a) into our newly-defined 10 scenarios in Table 8.",
+        "bbox": [
+            112,
+            343,
+            489,
+            393
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "C Details of Selected Open-Source LLMs",
+        "text_level": 2,
+        "bbox": [
+            114,
+            405,
+            487,
+            422
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "We select 30 recent open-source LLMs from different series: LLaMA-2 (Touvron et al., 2023), Mistral (Jiang et al., 2023, 2024), Vicuna (Chiang et al., 2023), WizardLM (Xu et al., 2023), Tulu-2 (Ivison et al., 2023), Yi (01.AI, 2023), Zephyr (Tunstall et al., 2023), Qwen (Bai et al., 2023). The details of all selected open-source LLMs are listed in Table 7, including the base model they are trained on, and whether they are only pre-trained or aligned via Supervised Fine-tuning (SFT), RLHF, or DPO.",
+        "bbox": [
+            110,
+            431,
+            490,
+            594
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "D Annotation Example",
+        "text_level": 2,
+        "bbox": [
+            112,
+            606,
+            334,
+            623
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "We present an example in Table 11 to illustrate the contents of a fully annotated sample in our collected dataset.",
+        "bbox": [
+            112,
+            632,
+            489,
+            681
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "E More Statistics of Collected Dataset",
+        "text_level": 2,
+        "bbox": [
+            114,
+            694,
+            460,
+            711
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "We show more statistics of the collected dataset, including the average score/count for each property in Table 9 and how different properties correlate with each other in Figure 4.",
+        "bbox": [
+            110,
+            720,
+            489,
+            785
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "F Converting Annotations of Query-Specific Properties to Ratings",
+        "text_level": 2,
+        "bbox": [
+            112,
+            797,
+            468,
+            832
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "For clarify intent and show empathetic, we directly annotate a score of 0,1,2,3 to measure how much a response matches the property.",
+        "bbox": [
+            112,
+            841,
+            489,
+            890
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "For satisfy constraints, we annotate 0,1,2,3 for each identified constraint on how each of them is satisfied and take the average value over all constraints as the final rating.",
+        "bbox": [
+            112,
+            890,
+            489,
+            922
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "table",
+        "img_path": "images/34bc83eab20af67b239700d434915572ed4316a3c367467c96696ba6e65c5570.jpg",
+        "table_caption": [
+            "Table 7: The detailed information of the selected opensource LLMs for preferences collection. We list the base models they are trained on, as well as whether they are only pre-trained or aligned via techniques like Instruction Tuning (SFT), RLHF, or DPO."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Series</td><td>Version</td><td>Base Model</td><td>Aligned</td></tr><tr><td rowspan=\"6\">LLaMA-2</td><td>7B</td><td>LLaMA-2-7B</td><td>x</td></tr><tr><td>7B-Chat</td><td>LLaMA-2-7B</td><td>√</td></tr><tr><td>13B</td><td>LLaMA-2-13B</td><td>x</td></tr><tr><td>13B-Chat</td><td>LLaMA-2-13B</td><td>√</td></tr><tr><td>70B</td><td>LLaMA-2-70B</td><td>x</td></tr><tr><td>70B-Chat</td><td>LLaMA-2-70B</td><td>√</td></tr><tr><td rowspan=\"2\">Vicuna</td><td>7B-v1.5</td><td>LLaMA-2-7B</td><td>√</td></tr><tr><td>13B-v1.5</td><td>LLaMA-2-13B</td><td>√</td></tr><tr><td rowspan=\"2\">WizardLM</td><td>13B-v1.2</td><td>LLaMA-2-13B</td><td>√</td></tr><tr><td>70B-v1.0</td><td>LLaMA-2-70B</td><td>√</td></tr><tr><td rowspan=\"5\">Mistral</td><td>7B</td><td>Mistral-7B</td><td>x</td></tr><tr><td>7B-Inst-v0.1</td><td>Mistral-7B</td><td>√</td></tr><tr><td>7B-Inst-v0.2</td><td>Mistral-7B</td><td>√</td></tr><tr><td>8x7B</td><td>Mistral-8x7B</td><td>x</td></tr><tr><td>8x7B-Inst-v0.1</td><td>Mistral-8x7B</td><td>√</td></tr><tr><td rowspan=\"3\">Tulu-2</td><td>7B-DPO</td><td>LLaMA-2-7B</td><td>√</td></tr><tr><td>13B-DPO</td><td>LLaMA-2-13B</td><td>√</td></tr><tr><td>70B-DPO</td><td>LLaMA-2-70B</td><td>√</td></tr><tr><td rowspan=\"4\">Yi</td><td>6B</td><td>Yi-6B</td><td>x</td></tr><tr><td>6B-Chat</td><td>Yi-6B</td><td>√</td></tr><tr><td>34B</td><td>Yi-34B</td><td>x</td></tr><tr><td>34B-Chat</td><td>Yi-34B</td><td>√</td></tr><tr><td rowspan=\"2\">Zephyr</td><td>7B-Alpha</td><td>Mistral-7B</td><td>√</td></tr><tr><td>7B-Beta</td><td>Mistral-7B</td><td>√</td></tr><tr><td rowspan=\"6\">Qwen</td><td>7B</td><td>Qwen-7B</td><td>x</td></tr><tr><td>7B-Chat</td><td>Qwen-7B</td><td>√</td></tr><tr><td>14B</td><td>Qwen-14B</td><td>x</td></tr><tr><td>14B-Chat</td><td>Qwen-14B</td><td>√</td></tr><tr><td>72B</td><td>Qwen-72B</td><td>x</td></tr><tr><td>72B-Chat</td><td>Qwen-72B</td><td>√</td></tr></table>",
+        "bbox": [
+            510,
+            178,
+            882,
+            607
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "chart",
+        "img_path": "images/5ed4ea4235ab5e25a9803ebd73d6b72b1deb7137e85fefb415c7bf1dc3d5f468.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 4: Property correlation in the annotated data."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            514,
+            642,
+            872,
+            878
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "page_number",
+        "text": "1801",
+        "bbox": [
+            480,
+            928,
+            519,
+            942
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "table",
+        "img_path": "images/cab49e8b2e7cd52274c67f6ba82c19fb2e50882b76b3e1194de516910bb056c6.jpg",
+        "table_caption": [
+            "Table 8: The 10 new scenarios and the mapping from scenarios defined in Li et al. (2023a) to ours."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Our Scenarios</td><td>Scenarios in Li et al. (2023a)</td></tr><tr><td>Exam Questions</td><td>math-reasoning, solving-exam-question-with-math, solving-exam-question-without-math</td></tr><tr><td>Code</td><td>code-simplification, code-generation, explaining-code, code-correction-rewriting, code-to-code- translation</td></tr><tr><td>Creative Writing</td><td>writing-song-lyrics, writing-social-media-post, writing-blog-post, writing-personal-essay, creative-writing, writing-advertisement, writing-marketing-materials, writing-presentation-script, counterfactual</td></tr><tr><td>Functional Writing</td><td>writing-product-description, writing-job-application, writing-news-article, writing-biography, writing-email, writing-legal-document, writing-technical-document, writing-scientific-paper, functional-writing, writing-cooking-recipe</td></tr><tr><td>Communication</td><td>value-judgement, chitchat</td></tr><tr><td>Knowledge-aware Advice</td><td>open-question, explaining-general, verifying-fact asking-how-to-question, seeking-advice</td></tr><tr><td>Daily Tasks</td><td>analyzing-general, roleplay, planning, recommendation, brainstorming ranking, text-to-text-translation, classification-identification, title-generation, question-</td></tr><tr><td>NLP Tasks</td><td>generation, reading-comprehension, keywords-extraction, information-extraction, topic- modeling, data-analysis, post-summarization, text-summarization, note-summarization, text-</td></tr><tr><td>Others</td><td>simplification, language-polishing, instructional-rewriting, text-correction, paraphrasing default</td></tr></table>",
+        "bbox": [
+            131,
+            107,
+            863,
+            349
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            114,
+            374,
+            489,
+            406
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "For support stances, we use this mapping to convert the collected labels to scores: {strong1y supported: 3, weakly supported: 2.25, neutral: 1.5, weakly opposed: 0.75, strongly opposed: 0}. The final rating is the average of these scores across all stances.",
+        "bbox": [
+            112,
+            407,
+            489,
+            504
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "For correct mistakes, we use this mapping to convert the collected labels to scores: {pointed out and corrected: 3, corrected without being pointed out: 2, pointed out but not corrected: 1, neither pointed out nor corrected: 0}. The final rating is the average of these scores across all mistakes/biases.",
+        "bbox": [
+            112,
+            505,
+            489,
+            618
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "G Detailed Statistics of Annotation Quality Check by Human",
+        "text_level": 2,
+        "bbox": [
+            114,
+            629,
+            433,
+            664
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "We show the detailed statistics of the quality check of the 50 randomly selected annotated samples by human evaluators in Table 12, where we ask the evaluators to choose whether they agree with each annotation item or not in a sample. These annotation items include the ratings of Basic properties, the answers to the prerequisite questions and the optional second-round annotation result for Query-Specific properties, and the detected errors for $E r \\mathrm { - }$ ror Detection.",
+        "bbox": [
+            110,
+            673,
+            490,
+            834
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "H Comparison Strategy",
+        "text_level": 2,
+        "bbox": [
+            114,
+            847,
+            341,
+            864
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "For most of the properties, we mark the comparison feature as +1/-1/0 if the rating of response A is larger/smaller than or equal to response B. For properties of Error Detection of different severity (i.e. no severe/moderate/minor errors), we mark the comparison feature as +1/-1/0 if response A contains less/more/equal number of errors than response B. We also have two special cases: For relevant, we only mark a +1/-1 when one response has a rating of 0 and the other >0, otherwise we mark it as 0; for lengthy, we mark +1/-1 when the word counts of the two responses have a significant difference, i.e., the shorter one has fewer than 70% words of the longer one, otherwise we mark it as 0.",
+        "bbox": [
+            112,
+            875,
+            490,
+            922
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            374,
+            885,
+            552
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "I Details of Fitting Bayesian Logistic Regression",
+        "text_level": 2,
+        "bbox": [
+            509,
+            564,
+            843,
+            599
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "We perform approximate Bayesian inference with the No-U-Turn Sampler (Hoffman et al., 2014) with Hamiltonian Monte Carlo (Neal et al., 2011) implemented using numpyro (Phan et al., 2019), collecting 6,000 posterior samples across four independent Markov Chain Monte Carlo (MCMC) chains (each chain contains 500 warmup samples and 1,500 collected samples). The scale b = 0.1 of the Laplace prior is determined using the remaining part as the validation set in each iteration of our 10-fold aggregation.",
+        "bbox": [
+            507,
+            608,
+            885,
+            787
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "J Accuracy of the Fitted Bayesian Logistic Models",
+        "text_level": 2,
+        "bbox": [
+            509,
+            799,
+            820,
+            832
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "We report the prediction accuracy of the fitted Bayesian Logistic models for a preference $D _ { j } { \\mathrm { : } }$",
+        "bbox": [
+            507,
+            843,
+            884,
+            876
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "img_path": "images/c7d3e677cf1bc30b7b713212efe4495554da307d111bab3c29d9e48d50bc73a5.jpg",
+        "text": "$$\n\\mathsf { a c c } ( D _ { j } ) = \\frac { 1 } { | S | } \\sum _ { s \\in S } \\mathsf { a c c } ( D _ { j } ^ { s } )\n$$",
+        "text_format": "latex",
+        "bbox": [
+            589,
+            887,
+            803,
+            926
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "page_number",
+        "text": "1802",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "table",
+        "img_path": "images/d4545b8ca60931fbed17664292239032afaa4c98e466b82529e19a9ca6793730.jpg",
+        "table_caption": [
+            "Table 9: Mean Score/Count for each property in collected data. †The average scores of 5 query-specific properties are calculated only on samples where the queries met specific prerequisites."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Property</td><td>Mean Score</td></tr><tr><td>harmless</td><td>2.90</td></tr><tr><td>grammarly correct</td><td>2.70</td></tr><tr><td>friendly</td><td>1.79</td></tr><tr><td>polite</td><td>2.78</td></tr><tr><td>interactive</td><td>0.22</td></tr><tr><td>authoritative</td><td>1.67</td></tr><tr><td>funny</td><td>0.08</td></tr><tr><td>use rhetorical devices</td><td>0.16</td></tr><tr><td>complex word &amp; sentence</td><td>0.89</td></tr><tr><td>use supporting materials</td><td>0.13</td></tr><tr><td>well formatted</td><td>1.26</td></tr><tr><td>admit limits</td><td>0.17</td></tr><tr><td>persuasive</td><td>0.27</td></tr><tr><td>step-by-step</td><td>0.37</td></tr><tr><td>use informal expressions</td><td>0.04</td></tr><tr><td>clear</td><td>2.54</td></tr><tr><td>contain rich information</td><td>1.74</td></tr><tr><td>novel</td><td>0.47</td></tr><tr><td>relevant</td><td>2.45</td></tr><tr><td>clarify intent†</td><td>1.33</td></tr><tr><td>show empathetic†</td><td>1.48</td></tr><tr><td>satisfy constraints†</td><td>2.01</td></tr><tr><td>support stances†</td><td>2.28</td></tr><tr><td>correct mistakes†</td><td>1.08</td></tr><tr><td>Property</td><td>Mean Count</td></tr><tr><td>severe errors</td><td>0.59</td></tr><tr><td>moderate errors</td><td>0.61</td></tr><tr><td>minor errors</td><td>0.23</td></tr><tr><td>length</td><td>164.52</td></tr></table>",
+        "bbox": [
+            163,
+            151,
+            440,
+            536
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": ", where $D _ { j }$ is the preference dataset of a judge j, $D _ { j } ^ { s }$ is the subset of it with scenario as s, and S is the set of all scenarios. The results are in Table 10.",
+        "bbox": [
+            112,
+            560,
+            490,
+            609
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "K Additional Analysis Results",
+        "text_level": 2,
+        "bbox": [
+            114,
+            620,
+            394,
+            637
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "The top/last 3 preferred properties of human and GPT-4-Turbo on the rest 7 groups of samples (5 scenario-wise and 2 query-specific) that are not included in Section 4.1 are shown in Table 13.",
+        "bbox": [
+            112,
+            646,
+            489,
+            711
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "We show the complete intra- and inter-group similarities when dividing LLMs by their series (mentioned in Section 4.2) in Figure 5.",
+        "bbox": [
+            112,
+            711,
+            489,
+            760
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/99c2d01457ce78549d2f97eda0f1c837cdce3240a2bea20b96c1fad36f1cc206.jpg",
+        "table_caption": [
+            "Table 10: Average prediction accuracy of all fitted Bayesian logistic models for a preference dataset $D _ { j }$"
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Judge</td><td>Prediction Accuracy</td></tr><tr><td>Yi-6B</td><td>75.81</td></tr><tr><td>Yi-6B-Chat</td><td>77.32</td></tr><tr><td>LLaMA-2-7B</td><td>63.16</td></tr><tr><td>LLaMA-2-7B-Chat</td><td>75.51</td></tr><tr><td>Vicuna-7B-v1.5</td><td>76.97</td></tr><tr><td>Tulu-2-DPO-7B</td><td>77.89</td></tr><tr><td>Mistral-7B</td><td>82.26</td></tr><tr><td>Mistral-7B-Inst-v0.1</td><td>80.24</td></tr><tr><td>Mistral-7B-Inst-v0.2</td><td>81.61</td></tr><tr><td>Zephyr-7B-alpha</td><td>82.50</td></tr><tr><td>Zephyr-7B-beta</td><td>80.90</td></tr><tr><td>Qwen-7B</td><td>76.93</td></tr><tr><td>Qwen-7B-Chat</td><td>73.75</td></tr><tr><td>LLaMA-2-13B</td><td>76.06</td></tr><tr><td>LLaMA-2-13B-Chat</td><td>78.51</td></tr><tr><td>WizardLM-13B-v1.2</td><td>80.86</td></tr><tr><td>Vicuna-13B-v1.5</td><td>81.03</td></tr><tr><td>Tulu-2-DPO-13B</td><td>80.69</td></tr><tr><td>Qwen-14B</td><td>80.69</td></tr><tr><td>Qwen-14B-Chat</td><td>81.30</td></tr><tr><td>Yi-34B</td><td>83.15</td></tr><tr><td>Yi-34B-Chat</td><td>83.42</td></tr><tr><td>Mistral-8x7B</td><td>82.78</td></tr><tr><td>Mistral-8x7B-Inst-v0.1</td><td>83.44</td></tr><tr><td>LLaMA-2-70B</td><td>82.03</td></tr><tr><td>LLaMA-2-70B-Chat</td><td>82.38</td></tr><tr><td>WizardLM-70B-v1.0</td><td>83.27</td></tr><tr><td>Tulu-2-DPO-70B</td><td>83.25</td></tr><tr><td>Qwen-72B</td><td>83.94</td></tr><tr><td>Qwen-72B-Chat</td><td>84.25</td></tr><tr><td>GPT-3.5-Turbo</td><td>84.15</td></tr><tr><td>GPT-4-Turbo</td><td>86.79</td></tr><tr><td>Human</td><td>78.12</td></tr></table>",
+        "bbox": [
+            539,
+            146,
+            855,
+            564
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/7002fd83c1381c7018bf2a1a5e5deb8d6b043b9fde5402dbbfb1f156b249b7fd.jpg",
+        "table_caption": [
+            "Figure 5: The intra-group and inter-group similarity of preferences when dividing all open-source LLMs by their series mentioned in Sec 3.3."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=1>Yi.</td><td rowspan=1 colspan=1>0.83</td><td rowspan=1 colspan=1>0.75</td><td rowspan=1 colspan=1>0.83</td><td rowspan=1 colspan=1>0.8</td><td rowspan=1 colspan=1>0.83</td><td rowspan=1 colspan=1>0.84</td><td rowspan=1 colspan=1>0.81</td><td rowspan=1 colspan=1>0.82</td></tr><tr><td rowspan=1 colspan=1>LLaMA-2</td><td rowspan=1 colspan=1>0.75</td><td rowspan=1 colspan=1>0.69</td><td rowspan=1 colspan=1>0.77</td><td rowspan=1 colspan=1>0.74</td><td rowspan=1 colspan=1>0.73</td><td rowspan=1 colspan=1>0.78</td><td rowspan=1 colspan=1>0.74</td><td rowspan=1 colspan=1>0.75</td></tr><tr><td rowspan=1 colspan=1>Vicuna</td><td rowspan=1 colspan=1>0.83</td><td rowspan=1 colspan=1>0.77</td><td rowspan=1 colspan=1>0.87</td><td rowspan=1 colspan=1>0.81</td><td rowspan=1 colspan=1>0.83</td><td rowspan=1 colspan=1>0.86</td><td rowspan=1 colspan=1>0.81</td><td rowspan=1 colspan=1>0.82</td></tr><tr><td rowspan=2 colspan=1>TuluMistral-</td><td rowspan=1 colspan=1>0.8</td><td rowspan=1 colspan=1>0.74</td><td rowspan=1 colspan=1>0.81</td><td rowspan=1 colspan=1>0.75</td><td rowspan=1 colspan=1>0.81</td><td rowspan=1 colspan=1>0.84</td><td rowspan=1 colspan=1>0.79</td><td rowspan=1 colspan=1>0.83</td></tr><tr><td rowspan=1 colspan=1>0.83</td><td rowspan=1 colspan=1>0.73</td><td rowspan=1 colspan=1>0.83</td><td rowspan=1 colspan=1>0.81</td><td rowspan=1 colspan=1>0.83</td><td rowspan=1 colspan=1>0.86</td><td rowspan=1 colspan=1>0.82</td><td rowspan=1 colspan=1>0.84</td></tr><tr><td rowspan=1 colspan=1>Zephyr-</td><td rowspan=1 colspan=1>0.84</td><td rowspan=1 colspan=1>0.78</td><td rowspan=1 colspan=1>0.86</td><td rowspan=1 colspan=1>0.84</td><td rowspan=1 colspan=1>0.86</td><td rowspan=1 colspan=1>0.92</td><td rowspan=1 colspan=1>0.83</td><td rowspan=1 colspan=1>0.86</td></tr><tr><td></td><td rowspan=2 colspan=1>0.810.82</td><td rowspan=1 colspan=1>0.74</td><td rowspan=1 colspan=1>0.81</td><td rowspan=1 colspan=1>0.79</td><td rowspan=1 colspan=1>0.82</td><td rowspan=1 colspan=1>0.83</td><td rowspan=1 colspan=1>0.79</td><td rowspan=1 colspan=1>0.83</td></tr><tr><td></td><td rowspan=1 colspan=1>0.75</td><td rowspan=1 colspan=1>0.82</td><td rowspan=1 colspan=1>0.83</td><td rowspan=1 colspan=1>0.84</td><td rowspan=1 colspan=1>0.86</td><td rowspan=1 colspan=1>0.83</td><td rowspan=1 colspan=1>0.82</td></tr></table>",
+        "bbox": [
+            519,
+            627,
+            862,
+            834
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_number",
+        "text": "1803",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/b5b15303e76444ce268c9b70b1a4100d169792ae37d301b851a73fd44fbcbcbb.jpg",
+        "table_caption": [
+            "Table 11: An example of a fully annotated sample in our collected dataset. For each property, we show the annotation results for of the two responses: first Response A, then Response B."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td colspan=\"4\">Query (Scenario: Daily Tasks) give me an itinerary for a day in paris on june 11th saturday from 12pm to 10pm. no museums or other things that take too long.</td></tr><tr><td colspan=\"4\">include lunch and dinner (vegan options preferred)</td></tr><tr><td colspan=\"4\">Response A (102 words), Preferred by User 12pm: Have lunch at a vegan restaurant in the Latin Quarter, such as Sage.</td></tr><tr><td colspan=\"4\">2pm: Take a stroll down the Rue Mouffetard, a bustling market street. 4pm: Visit Notre Dame Cathedral and take a look around the grounds. 6pm: Head to the Eiffel Tower and take in the views from the observation deck. 8pm: Enjoy dinner at a cozy Italian restaurant in the Marais, such as La Pizza Frites.</td></tr><tr><td colspan=\"4\">10pm: Wrap up the day with a stroll along the Seine, taking in the beautiful city lights. Response B (346 words)</td></tr><tr><td colspan=\"4\">Sure, here is a suggested itinerary for a day in Paris on June 11th, 2021, that includes lunch and dinner options and keeps the activities relatively short: 12:00pm: Arrive at the Sainte-Chapelle, a beautiful Gothic chapel that was built in the 13th century. The chapel is famous for its stunning stained glass windows, which are considered some of the most beautiful in Europe. 1:00pm: Walk along the River Seine and take a Seine River cruise. This allows you to see the city from a different perspective and also visit some of the city&#x27;s most famous landmarks such as the Eiffel Tower, the Notre-Dame and the Île de la Cité.</td></tr><tr><td colspan=\"4\">2:30pm: Have lunch at Chez L&#x27;Ami Jean, a popular vegan bakery located in the Montmartre neighborhood. The bakery offers a variety of vegan pastries and sandwiches.</td></tr><tr><td colspan=\"4\">3:30pm: Visit the Arc de Triomphe, a famous landmark that was built in the early 19th century. The arc is located at the top of the Champs-Élysées, one of the most famous streets in Paris. 4:30pm: Walk to the Musée du quai Branly - Jacques Chirac, a museum that showcases the art and culture of Africa, Oceania,</td></tr><tr><td colspan=\"4\">and the Americas. The museum&#x27;s stunning architecture and unique collections make for an interesting visit. 6:30pm: Have dinner at Le Comptoir du Relais, a vegan bakery located in the Montmartre neighborhood. The bakery offers a</td></tr><tr><td colspan=\"4\">variety of vegan pastries and sandwiches. 7:30pm: Visit the Eiffel Tower, a famous landmark that was built in the late 19th century. The tower offers stunning views of the city and is a must-see for any first-time visitor to Paris.</td></tr><tr><td colspan=\"4\">9:30pm: End the evening with a casual dinner at Chez L’Ami Jean, a popular vegan bakery located in the Montmartre neighborhood. The bakery offers a variety of vegan pastries and sandwiches. Note: This itinerary is just</td></tr><tr><td colspan=\"4\">Annotations For Basic Features (ratings, higher value means satisfying the property better) harmless 3 3 grammarly correct 3 2 polite 3 3 interactive 0 0 funny 0 0 use rhetorical devices 0 2 0</td></tr><tr><td colspan=\"4\">use supporting materials 0 0 well formatted persuasive 0 step-by-step 0 non-repetitive 3 clear 2 novel 1</td></tr><tr><td colspan=\"4\">contain rich information Annotations for Query-Specific Features, Both Rounds. Clear Intent Yes Explicitly express feeling Explicit Constraints 5 Subjective Stances</td></tr><tr><td colspan=\"4\">No Mistakes or Bias 2 5 Constraints 2 Stances Itinerary for a day in Paris on June 11th, Saturday: 3 3 Preference for a day without visiting museums or lengthy Time frame from 12pm to 10pm: 3 2 activities: Strongly supported Weakly opposed No museums or other activities that take too long: 3 1 Preference for vegan meal options:</td></tr><tr><td colspan=\"4\">Include lunch and dinner: 3 3 Strongly supported Weakly supported Vegan options preferred for meals: 3 2 Annotations for Error Detection</td></tr><tr><td colspan=\"4\">Response A: Moderate (Information contradiction to the query) - La Pizza Frites is not known as a vegan restaurant, which contradicts the user&#x27;s preference for vegan dinner options.</td></tr><tr><td colspan=\"4\">Response B:</td></tr><tr><td colspan=\"4\">Severe (Factual error) - Le Comptoir du Relais is not a vegan bakery, and it is incorrectly listed as such. Moderate (Information contradiction to the query) - Sainte-Chapelle visit contradicts the &#x27;no museums or other things that take</td></tr><tr><td colspan=\"4\">too long&#x27; request.</td></tr><tr><td colspan=\"4\">Moderate (Information contradiction to the query) - Chez L’Ami Jean is not a vegan bakery, and it is listed for both lunch and dinner, which contradicts the vegan preference.</td></tr><tr><td colspan=\"4\">Moderate (Information contradiction to the query) - Musée du quai Branly - Jacques Chirac visit contradicts the &#x27;no museums</td></tr><tr><td colspan=\"4\"></td></tr><tr><td colspan=\"4\">or other things that take too long&#x27; request.</td></tr><tr><td colspan=\"4\"></td></tr><tr><td colspan=\"4\">Moderate (Information contradiction to the query) - The itinerary suggests ending the evening with a casual dinner at Chez L’Ami Jean after already having dinner there at 6:30pm. Minor (Information contradiction to the query) - The date June 11th, 2021, is incorrect as the query asks for an itinerary for</td></tr></table>",
+        "bbox": [
+            134,
+            124,
+            865,
+            923
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_number",
+        "text": "1804",
+        "bbox": [
+            480,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "image",
+        "img_path": "images/c4bdabcfa9588e1d101deddc0ed3c1c0f2e136662d4b395c0485a26f78b5534b.jpg",
+        "image_caption": [
+            "Table 12: The agreement rate of human evaluators on the annotation results given by GPT-4-Turbo on 50 randomly selected samples from the full dataset. x/y denotes in y items (they can be samples, responses, or detected entities), x of them are agreed upon by human evaluators. In Query-Specific and Error Detection properties, the annotation of a response is agreed only when all detected entities in this response are agreed.",
+            "Figure 6: The prompt used to annotate the basic properties."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            115,
+            160,
+            882,
+            885
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_number",
+        "text": "1805",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "chart",
+        "img_path": "images/00d8870b112a4ed78dcbf72c08246a12cf394fdfad600c59e1329c2ffc905de1.jpg",
+        "content": "",
+        "chart_caption": [
+            "Table 13: The top/last 3 preferred properties of Human and GPT-4-Turbo on groups of samples that are not included in Table 3."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            117,
+            271,
+            877,
+            772
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "page_number",
+        "text": "1806",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "image",
+        "img_path": "images/77f5732c872de74b5020e4c840e2f0969a1d04cc2c9a5c38f41a1cc939e363fb.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            115,
+            83,
+            882,
+            719
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "table",
+        "img_path": "images/a1f9e9ec647a64713fe60c771a9bf16dbbd462374cbd3074a1efebeee4bd8249.jpg",
+        "table_caption": [
+            "Figure 7: The query-independent basic properties and their descriptions, input as {characteristics} in Figure 6. Their names are slightly different from those in Table 1 to make GPT-4-Turbo annotate them better.",
+            "Figure 8: The two query-aware basic properties, Relevant and Novel, and their descriptions."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>innovative and novel: The response is innovative and novel in addressing the user&#x27;s query by not just providing run-of-the-mill contents, but one that reflects a novel perspective, perhaps introducing unique ideas or solutions not commonly thought of. relevance without considering inaccuracy: When not considering the inaccuracies in the response, it should be relevant to the query and contain no irrelevant information that is not related to the user&#x27;s query, therefore the standard of &quot;relevant&quot; is very loose. We set 4 levels - When not considering the inaccuracy, the response satisfies 3) all contents are relevant / 2) the majority of contents are</td></tr></table>",
+        "bbox": [
+            115,
+            766,
+            882,
+            890
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_number",
+        "text": "1807",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "code",
+        "sub_type": "algorithm",
+        "code_caption": [
+            "Figure 9: The prompt of the 5 preliminary questions to check if a query satisfies certain conditions for the queryspecific properties. The results will be used to build the prompt for the second round of annotation (Figure 10)."
+        ],
+        "code_footnote": [],
+        "code_body": "You will need to analyze a user's query that is submitted to an AI assistant. The query is as follows:   \n[Query Start]   \n{query}   \n[Query End]   \nQ1. Does the user clearly express his/her intent in the query (like raising an unambiguous   \nquestion or asking the AI assistant to do a certain thing like explain a piece of code)? If yes,   \noutput \"Yes\". If no, output \"No\".   \nQ2. Does the user clearly and explicitly express his/her feelings or emotions in the query?   \nIf yes, output \"Yes\". If no, output \"No\".   \nQ3. Do any clear and explicit constraints specified by the user exist in the query? Explicit   \nconstraints include specific word/phrase use (like use word starts with 'A', must contain a certain   \nphrase in output, or do not use a certain word), response length limit (like more than 100 words or   \nless than 20 words), writing style (like in an Shakespeare style or in first person), output format   \n(like json, list, table), number of output items (like write the names of 4 fruits), output items   \nwith a certain property (like a list of games similar to Super Mario), etc. If yes, output answer   \nby listing all of them in a list. If no, output an empty list ([]) for the \"explicit constraints\" field.   \nQ4. Does the user clearly and explicitly show any specific subjective stance, bias, preference,   \nopinion, personal belief, or value (e.g. the support/opposition to a certain viewpoint)? If yes,   \noutput answer by listing all of them in a list. If no, output an empty list ([]) for the \"subjective   \nstance\" field.   \nQ5. Does the user clearly and explicitly show any specific mistakes or unfounded, inappropriate or   \ncontroversial bias, stance or belief in the query? If yes, output answer by listing all of them in a   \nlist. If no, output an empty list ([]) for the \"mistakes or biases\" field.   \nThe output should be in a json format like this:   \n\"clear intent\": \"Yes/No\",   \n\"explicitly express feelings\": \"Yes/No\",   \n\"explicit constraints\": [   \n\"a brief description of the explicit constraint\",   \n\"a brief description of the explicit constraint\"   \n],   \n\"explicit subjective stances\": [   \n\"a brief description of the explicit subjective stance\",   \n\"a brief description of the explicit subjective stance\"   \n],   \n\"explicit mistakes or biases\": [   \n\"a brief description of the explicit mistake or bias\",   \n\"a brief description of the explicit mistake or bias\"   \n]   \n了",
+        "bbox": [
+            110,
+            173,
+            882,
+            787
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_number",
+        "text": "1808",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "code",
+        "sub_type": "algorithm",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "You will need to analyze two responses from AI assistants to a user's query. The responses are as   \nfollows:   \n[Query Start]   \n{query}   \n[Query End]   \n[Response 1 Start]   \n{response 1}   \n[Response 1 End]   \n[Response 2 Start]   \n{response 2}   \n[Response 2 End]   \nYou need answer the following questions:   \n[Question Start]   \n{questions str}   \n[Question End]   \nFor each question, you should both of the given responses. Your output should be in a json   \nformat like this:   \n{output format str}",
+        "bbox": [
+            115,
+            323,
+            880,
+            625
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "Figure 10: The prompt for the second round of annotation for query-specific properties. The questions and output formats in this prompt are dynamically adjusted according to the results returned in the first round (Figure 9). See Figure 11 and 12 for details on the candidate range of these questions and output formats.",
+        "bbox": [
+            112,
+            633,
+            884,
+            680
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "page_number",
+        "text": "1809",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "code",
+        "sub_type": "algorithm",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "[Question 1]   \nThe user does not clearly and explicitly express his/her intent in the query. How well does the   \nresponse include relevant information, make reasonable inferences, and seek additional information   \nto clarify the intent? Please rate the response on this aspect on a scale from 0 to 3, where 0 is the   \nworst and 3 is the best.   \n[Question 2]   \nThe user clearly and explicitly expresses their feelings or emotions in the query. How well does the   \nresponse demonstrate understanding and sensitivity to the user's feelings and emotions by reflecting   \ncompassion, offering support or acknowledgment of the user's emotional state, and fostering a sense   \nof care? Please rate the response on this aspect on a scale from 0 to 3, where 0 is the worst and 3   \nis the best.   \n[Question 3]   \nThe user's query includes a list of clear and explicit constraints as follows:   \n- {constraint}   \nFor each of these explicit constraints, how does the response satisfy each of them? Tag each constraint   \nwith a score from 0 to 3, where 0 means completely unsatisfied, 1 means partially satisfied, 2 means   \nlargely satisfied, and 3 means perfectly satisfied.   \n[Question 4]   \nThe user's query clearly and explicitly includes some subjective stances, bias, preferences, opinions,   \npersonal beliefs or values presented by the user as follows:   \n- {subjective stance}   \nFor each of these user's explicitly stated stance, bias, preference, opinion, personal belief or   \nvalue, does the response unconditionally support it even if it is incorrect, unfair, or controversial?   \nTag each stance with a label of 'Strongly opposed', 'Weakly opposed', 'Neutral', 'Weakly supported',   \n'Strongly supported'.   \n[Question 5]   \nThe user's query clearly and explicitly includes some mistakes or unfounded, inappropriate or   \ncontroversial bias, stance or belief as follows:   \n- {mistake or bias}   \nFor each of these user's mistakes or biases, does the response correct them (or provide a more fair   \nand informed perspective)? Tag each mistake or bias with a label of 'Pointed out and corrected',   \n'Pointed out but not corrected', 'Corrected without being pointed out', 'Neither pointed out nor   \ncorrected'.",
+        "bbox": [
+            115,
+            83,
+            882,
+            562
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "Figure 11: {questions str} in Figure 10. Note that each question is only included in the prompt when the query satisfies certain conditions from the returned result in the first round (Figure 9). The {constraint}, {subjective stance}, {mistake or bias} will be replaced with actual items.",
+        "bbox": [
+            112,
+            570,
+            885,
+            617
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "code",
+        "sub_type": "algorithm",
+        "code_caption": [
+            "Figure 12: {output format str} in Figure 10. Note that each output format in the dictionary is only included in the prompt when the query satisfies certain conditions from the returned result in the first round (Figure 9)."
+        ],
+        "code_footnote": [],
+        "code_body": "\"clarify user intent\": {\"Response 1\": \"0/1/2/3\", \"Response 2\": \"0/1/2/3\"},   \n\"showing empathetic\": {\"Response 1\": \"0/1/2/3\", \"Response 2\": \"0/1/2/3\"},   \n\"satisfying explicit constraints\": {   \n\"explicit constraint\": {\"Response 1\": \"0/1/2/3\", \"Response 2\": \"0/1/2/3\"},   \n},   \n\"supporting explicit subjective stances\": {   \n\"explicit subjective stance\": {\"Response 1\": \"Strongly supported/Weakly supported/Neutral/Weakly   \nopposed/Strongly opposed\", \"Response 2\": \"Strongly supported/Weakly supported/Neutral/Weakly   \nopposed/Strongly opposed\"},   \n},   \n\"correcting explicit mistakes or biases\": {   \n\"explicit mistake or bias\": {\"Response 1\": \"Pointed out and corrected/Pointed out but not   \ncorrected/Corrected without being pointed out/Neither pointed out nor corrected\", \"Response 2\":   \n\"Pointed out and corrected/Pointed out but not corrected/Corrected without being pointed out/Neither   \npointed out nor corrected\"},   \n}   \n了",
+        "bbox": [
+            115,
+            624,
+            882,
+            878
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "page_number",
+        "text": "1810",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "code",
+        "sub_type": "code",
+        "code_caption": [
+            "Figure 13: The prompt used to detect errors in a pair of responses. We check if GPT-4-Turbo can reliably identify the errors by giving out an “applicable/not applicable\" tag. We also collect the type and severity of each error."
+        ],
+        "code_footnote": [],
+        "code_body": "```jsonl\nYou will need to analyze two responses from AI assistant to a user's query. The query and the response are as follows:\n[Query Start]\n{prompt}\n[Query End]\n[Response 1 Start]\n{response 1}\n[Response 1 End]\n[Response 2 Start]\n{response 2}\n[Response 2 End]\nYour task is to help me check the accuracy of the responses. The types of accuracy issues are as follows, please ignore\nall other kinds of issues like small grammar errors, speliing errors, etc:\nFactual error: Some information in the response is factually wrong, like the response says \"The sun orbits the\nearth\" without extra context or \"the print() function in python is to accept user's input\".\n2. Information contradiction to the query: Some information in the response contradicts the query (regardless of whether the\ninformation in query is accurate or not), like the query says \"Alice is 7 years old\" but the response says \"Alice is 8 years old\".\n3. Math operation error: The response contains some incorrect math operations, like the response says \"2 + 2 = 5\" or \"13 * 7 =\n100\"\n4. Code generation error: The response write or generate some wrong codes with errors such as syntax errors, logical errors,\nruntime errors, etc.\nHere is also a reference response to help you check the accuracy of the responses:\n[Reference Start]\n{reference}\n[Reference End]\nYou should first check if your knowledge and capability is sufficient to reliably check the accuracy of the responses\nwith regard to the above inaccuracy types (e.g. need knowledge that are beyond your training data or the results need external\ntools like web search to check). If yes, fill the \"accuracy check\" field with \"applicable\", otherwise fill it with \"not applicable\".\nThen you should find all the inaccuracies, provide a very brief description and output the type for each of them, and\ndecide how serious each inaccuracy is by three levels:\n1. Minor: The inaccuracy is minor and does not affect or only slightly affect the overall correctness of the response.\n2. Moderate: The inaccuracy is moderate and affects the overall correctness of the response.\n3. Severe: The inaccuracy is severe and makes the response totally wrong.\nWhen identifying inaccuracies, avoid nitpicking over minor details. For sections that are error-free but could be more\nelaborately written, do not categorize them as inaccuracies. For example \"Tax benefits. In many countries, corporate gifts and\npromotional items are tax deductible as a business expense.\" is accurate and you do not need to regard it as incorrect by saying\n\"Tax benefits for corporate gifts may not be universally applicable and have specific conditions that must be met.\". Also do not\nmake basic mistakes like saying \"Frankfurt Cathedral is not one of the most famous landmarks in Frankfurt.\".\nIf an inaccuracy is shared by both responses, you should use the same description, type and severity for both responses.\nYour output should be in a json format like this, if your knowledge and capability is not sufficient to check a response\n(\"accuracy check\" field with \"not applicable\") or no inaccuracy is found, just output an empty list (E]) for the \"inaccuracies\" field:\n\"Response 1\": {\n\"accuracy check\": \"applicable/not applicable\",\n\"inaccuracies\": [\n\"brief description\": \"a very brief description of the inaccuracy\",\n\"type\": \"inaccuracy type\",\n\"severity\": \"minor/moderate/severe\"\n},\n\"brief description\": \"a very brief description of the inaccuracy\",\n\"type\": \"inaccuracy type\",\n\"severity\": \"minor/moderate/severe\"\n}\n]\n}\n\"Response 2\": {\n\"accuracy check\": \"applicable/not applicable\"\n\"inaccuracies\": [\n\"brief description\": \"a very brief description of the inaccuracy\",\n\"type\": \"inaccuracy type\",\n\"severity\": \"minor/moderate/severe\"\n},\nt\n\"brief description\": \"a very brief description of the inaccuracy\",\n\"type\": \"inaccuracy type\",\n\"severity\": \"minor/moderate/severe\"\n7\n}\n```",
+        "bbox": [
+            131,
+            83,
+            862,
+            889
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "page_number",
+        "text": "1811",
+        "bbox": [
+            480,
+            929,
+            521,
+            942
+        ],
+        "page_idx": 21
+    }
+]
