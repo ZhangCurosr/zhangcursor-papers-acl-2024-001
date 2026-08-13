@@ -1,0 +1,3535 @@
+[
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Every Answer Matters: Evaluating Commonsense with Probabilistic Measures"
+                    }
+                ],
+                "level": 1
+            },
+            "bbox": [
+                238,
+                89,
+                759,
+                129
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Qi Cheng<sup>1</sup> Michael Boratko<sup>2</sup>* Pranay Kumar Yelugam<sup>2</sup>∗ Tim O’Gorman<sup>2</sup>∗ Nalini Singh<sup>2</sup>∗ Andrew McCallum<sup>2</sup> Xiang Lorraine Li<sup>1</sup> <sup>1</sup>University of Pittsburgh, <sup>2</sup>University of Massachusetts Amherst {qic69, xianglli}@pitt.edu"
+                    }
+                ]
+            },
+            "bbox": [
+                147,
+                152,
+                853,
+                221
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Abstract"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                260,
+                260,
+                342,
+                277
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Large language models have demonstrated impressive performance on commonsense tasks; however, these tasks are often posed as multiple-choice questions, allowing models to exploit systematic biases (Li et al., 2022). Commonsense is also inherently probabilistic with multiple correct answers. The purpose of “boiling water” could be making tea, cooking but also could be killing germs. Existing tasks do not capture the probabilistic nature of common sense. To this end, we present commonsense frame completion (CFC), a new generative task that evaluates common sense via multiple openended generations <sup>1</sup>. We also propose a method of probabilistic evaluation that strongly correlates with human judgments. Humans drastically outperform strong language model baselines on our dataset, indicating this approach is both a challenging and useful evaluation of machine common sense."
+                    }
+                ]
+            },
+            "bbox": [
+                141,
+                291,
+                462,
+                577
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "1 Introduction"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                592,
+                260,
+                607
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Most existing commonsense evaluations utilize multiple-choice question-answering (MCQA) tasks (Talmor et al., 2019; Sap et al., 2019a; Huang et al., 2019; Bhagavatula et al., 2020; Feng et al., 2022). This format offers a limited view of common sense. MCQA tasks simplify the problem with unrealistically small answer sets, and making the options challenging is difficult (Zellers et al., 2018, 2019). More crucially, common sense is implicit – understanding assumptions that are unspoken precisely because they are common knowledge. MCQA, by evaluating common sense explicitly, fails to capture a model’s ability to utilize this knowledge in unprompted, generative contexts. MCQA is also fundamentally at-odds with the fact that common sense is inherently probabilistic, and should be evaluated as such."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                620,
+                490,
+                863
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/6dfd8076a8ae05552e2153433a106e67aebb3796d4adaf43d63c599f4f06dfc4.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 1: Typical evaluations only compare human and model performance for their top choices (top). We propose to evaluate multiple plausible answer choices by clustering similar answers, denoted by color, to form categorical distributions, and evaluating probabilistically (bottom). This more accurately captures the probabilistic nature of common sense, and allows us to provide a more nuanced analysis of model capabilities."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                512,
+                260,
+                880,
+                447
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                600,
+                884,
+                632
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In order to avoid the issues in MCQA, many recent benchmarks have proposed generative commonsense evaluations. (Lin et al., 2020; Chen et al., 2023). While generative evaluation avoids the difficulty of generating hard negatives, it does not reflect the fact that there are often multiple correct answers, especially for commonsense questions. For example, in the phrase \"they boiled the water\", we can infer using our common sense that the most likely reason for this action is cooking or making tea. However, people in areas with limited clean water access may view this as a way to remove germs and ensure it’s safe to drink. This aspect is, unfortunately, frequently overlooked during the benchmark creation process. To ensure that the model can serve diverse populations, it is important to gather multiple responses. By focusing on collecting implicit information from larger population, this provides a more accurate evaluation of common sense required in real-world settings."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                632,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "*Now at Google DeepMind, Eightfold.ai, Thorn, and Meta respectively."
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                871,
+                489,
+                896
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>1</sup>Dataset and PROBEVAL available at: https://github. com/qxc101/PROBEVAL_CFC/"
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                896,
+                489,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "493"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                941
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 493–506 August 11-16, 2024 ©2024 Association for Computational Linguistics"
+                    }
+                ]
+            },
+            "bbox": [
+                97,
+                946,
+                900,
+                973
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                489,
+                117
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this setting, it is crucial to address the commonsense questions with multiple correct answers. While some previous works have proposed a clustering-and-ranking evaluation (Boratko* et al., 2020), we demonstrate that such an approach can lack nuance. Instead, we embrace the probabilistic nature of common sense and evaluate the model’s ability to capture a probability distribution over answer clusters sampled from the population. This ensures that the model not only captures common sense, but does so in a calibrated way."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                126,
+                490,
+                303
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To this end, we propose commonsense frame completion (CFC), a task focused on inferring missing information in a context sentence. This emphasizes the implicit nature of common sense in a given context and is tightly connected to downstream applications, such as home assistants, where inferring such information about a user’s query is key. In CFC, the questions are generated by identifying missing information from a given context sentence about daily scenarios. For each context-question pair, we collected a large number of diverse answers from human annotators."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                310,
+                490,
+                505
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In order to evaluate multiple responses effectively, we additionally propose a new evaluation method. Responses from different individuals often vary, and common sense is typically defined as the knowledge shared by nearly all people. To make every answer count, we consider the annotators’ answers from a probabilistic viewpoint and evaluate models using probabilistic measures (Moss, 2018; Pavese, 2020; Chater et al., 2006). Specifically, given raw string answers, we cluster them and consider the categorical distribution over these clusters based on the number of answers contained in each. We propose automated clustering and alignment mechanisms which allow models to be evaluated directly by comparing the KL divergence between distributions. The task format and evaluation metric are shown in Figure 1. We evaluate the proposed metric with two datasets, CFC and ProtoQA (Boratko* et al., 2020), and show high correlations with human judgments for both datasets."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                512,
+                490,
+                835
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Finally, we report multiple LLMs’ performance on CFC measured by the proposed probabilistic metrics. We identify a large performance gap between existing large models and humans, indicating the limitations of current LLMs."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                841,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2 Related Work"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                83,
+                667,
+                99
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Commonsense Evaluation Creating commonsense benchmarks to evaluate model performance is a long-standing research topic (Sakaguchi et al., 2020; Lin et al., 2020; Sap et al., 2019b; Zhou et al., 2020). However, most benchmarks are created using a multiple-choice selection paradigm, which is simpler to evaluate but misaligned with the realworld use-case of commonsense knowledge, and most egregiously ignores the existence of multiple correct answers. We are not the first ones to gather multiple human answers to facilitate robust evaluations, however. Aydin et al. (2014) and Boratko* et al. (2020) also collected multiple human responses for each question to get aggregated human ground-truth answer sets."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                109,
+                887,
+                350
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our work differs from these due to our emphasis on commonsense as implicit and probabilistic. We don’t treat each answer equally; rather, we aim to match the answer distribution given by human responses. For this purpose, we propose a novel probabilistic evaluation for open-ended generation tasks with multiple correct answers. A similar probabilistic evaluation was studied from a language model generation point of view (Pillutla et al., 2021). They proposed a KL-based evaluation to measure language model generations, while our focus is on the implicit answer distribution."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                350,
+                887,
+                544
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Among the previous work, our proposed dataset CFC is most similar to ProtoQA (Boratko* et al., 2020) as they share a similar task format (one question, multiple answers). However, there are several key differences. CFC is designed to uncover implicit commonsense information in various contexts, making it a more generalized variant of ProtoQA. Consequently, the question format in CFC is significantly more diverse than that of ProtoQA. In addition, the number of answers collected for CFC is rigorously justified through the Neyman-Pearson lemma, guaranteeing a sufficient and representative sample."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                544,
+                887,
+                755
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Commonsense as Probabilistic Knowledge In most knowledge evaluation benchmarks, commonsense knowledge is defined as absolute facts (Bian et al., 2023; Chen et al., 2023). We relax this absolute intersection between human knowledge using a probabilistic approach. The probabilistic notion of knowledge is well supported. Moss (2018) stated human beliefs or credences, inherently probabilistic, should be regarded as legitimate forms of knowledge. The growing trend towards building probabilistic models in cognitive studies reinforces the idea of human cognition and memory functioning as probabilistic processors (Chater et al., 2006). This collective body of work supports the view that common sense serves as probabilistic assumption instead of definite judgements in human mind."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                760,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "494"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/b7ec2a6b253210cfc8a3631295c8c6216960bd7de1c6a651d712ff059b5b7c4d.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 1: Examples for different missing slot types in CFC"
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Missing Slot |Definition</td><td></td><td>Examples</td></tr><tr><td>Arg0</td><td>Who/what does the event?</td><td>Sentence: putting cheese on the pizza. Arg0? Answers: person, cook</td></tr><tr><td>Purpose</td><td>What is the goal for doing the event?</td><td>Sentence: putting cheese on the pizza. Purpose? Answers: get nutrition, stop being hungry</td></tr><tr><td>Instrument</td><td>What kind of tools are used to accomplish the event?</td><td>Sentence: putting cheese on the pizza. Instrument? Answers: hands, spoon</td></tr><tr><td>Time</td><td>What is a particular time (time of day, season, etc.) for doing the event?</td><td>Sentence: putting cheese on the pizza. Time? Answers: lunch time, dinner time</td></tr><tr><td>Location</td><td>Where would the event usually happen?</td><td>Sentence: putting cheese on the pizza. Location? Answers: kitchen, restaurant</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                121,
+                80,
+                873,
+                246
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                297,
+                489,
+                394
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3 CFC Task Description"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                406,
+                342,
+                423
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section we motivate and describe the task of \"commonsense frame completion\" (CFC). We aim to create a task which evaluates implicit common sense with multiple correct answers. Given a direction such as “put the water on the burner to boil”, it is common sense which allows us to understand that the water is likely in a kettle and not simply dumped on the burner. Unlike factual question answering tasks, there is no single correct answer. In this example, the water could be placed in a “kettle”, “pot”, “cup”, or “glass”, although the former answers are more probable."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                432,
+                489,
+                625
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "It is necessary for any machine learning model which claims to capture common sense to correctly predict all the possible answers and have some sense of the distribution over the implicit information. To assess a model’s ability in this regard, we view the context sentence as a structured semantic frame, identify a missing slot, and ask the model to provide a distribution of potential slot fillers."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                626,
+                489,
+                756
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4 Dataset Creation and Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                768,
+                411,
+                783
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We now describe the dataset creation process of CFC. We first need to collect reasonable context sentences which contain natural element of common sense. CommonGen (Lin et al., 2020) is a commonsense dataset which contains many short sentences describing basic information about daily life, and so we choose this dataset as the source for potential context sentences."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                794,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Given a short sentence, we then identify implicit information. To this end, we perform semantic parsing on the sentence, and identify missing slots. We use AMR (Banarescu et al., 2013) for semantic parsing based on its ability to provide a rich representation of the sentence with a pre-defined fixed schema for the predicate roles. If a predicate is found, AMR parsing will match it to a schema and fill in the values for any identified slots. Any slots marked with amr-unkown indicate potential items of missing information, enabling us to obtain human annotations for the missing slot values."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                297,
+                885,
+                491
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We uniformly sampled 63,788 sentences from the CommonGen dev dataset, and parsed them using the AMR parser from Cai and Lam (2020), generating 228,170 pairs of context questions with missing slots. From this, we randomly sampled 101 (sentence, missing slot) pairs for crowd workers to annotate, such that we had a balanced distribution of missing slot types, as detailed in Section 4.2. We present the context sentence and missing slot to crowdworkers, who were also provided with training examples and descriptions of the meaning of each slot type (see Table 1). The number of answers is chosen such that the resulting answer distribution is stable (see Section 4.2). Each element of the raw dataset therefore includes a context sentence, missing slot value, and a collection of slot fillers."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                493,
+                887,
+                752
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.1 Probability Distribution"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                768,
+                746,
+                783
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In an open-ended task where multiple humans are asked to provide answers as raw strings of text there are a multitude of answers which may essentially capture the same underlying idea. Ultimately we are not interested in the different variations of the surface form, but rather in capturing the essence of the underlying concept. In the boiling water example, we may want to treat \"kettle\" and \"teapot\" as though they were representative of the same general concept. As originally proposed in Boratko* et al. (2020), we consider clustering the responses, converting a set of answer strings into a categorical distribution over answer clusters, where the probability of obtaining an answer from a given cluster is proportional to the number of answer strings contained within it. We explore both manual clustering and automated clustering methods (see Section 5)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                794,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "495"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                110,
+                85,
+                492,
+                230
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.2 Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                240,
+                230,
+                255
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Number of Answers The number of potential slot fillers might be very large, and we want to ensure we sample enough to approximate the true distribution over answer concepts. An essential question is how many samples are enough to approximate the true distribution with reasonable error rate? This is a classic problem in statistics, for which the Neyman-Pearson lemma proves that the uniformly most powerful test is to consider the KL divergence "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\begin{array} { r } { D _ { \\mathrm { K L } } ( g \\| f ) = \\sum _ { x } g ( x ) } \\end{array}"
+                    },
+                    {
+                        "type": "text",
+                        "content": "log "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\textstyle { \\frac { g ( x ) } { f ( x ) } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "g"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the empirical distribution and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "f"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the true distribution (Harremoës and Tusnády, 2012). The recent work from Mardia et al. (2020) showed that this can be bounded by the following equation"
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                260,
+                489,
+                488
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathbb { P } ( D _ { K L } ( g _ { n , k } \\| f ) \\ge \\epsilon ) \\le e ^ { - n \\epsilon } \\left[ \\frac { 3 c _ { 1 } } { c _ { 2 } } \\sum _ { i = 0 } ^ { k - 2 } K _ { i - 1 } ( \\frac { e \\sqrt { n } } { 2 \\pi } ) ^ { i } \\right]",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/b20096dab813557c5d546f49f688c3e0f8551d3d96bdb87ac52a6edcbbadc99d.jpg"
+                }
+            },
+            "bbox": [
+                122,
+                506,
+                475,
+                543
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "c _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are constant values, n is the number of samples, and k is the number of categories in the categorical distribution."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                554,
+                489,
+                601
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In our setting, we manually clustered 50 questions, and found that the number of categories is not more than 8. To get a bound on the number of answers we should collect, we set "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\epsilon \\ : = \\ : 0 . 2"
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "k = 8 ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", and solve "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\begin{array} { r } { e ^ { - n \\epsilon } \\left\\lceil \\frac { 3 c _ { 1 } } { c _ { 2 } } \\sum _ { i = 0 } ^ { k - 2 } K _ { i - 1 } ( \\frac { e \\sqrt { n } } { 2 \\pi } ) ^ { i } \\right\\rceil } \\end{array}"
+                    },
+                    {
+                        "type": "text",
+                        "content": "for n. Figure 2 (a) shows the value of this bound on the y-axis for increasing numbers of samples n on the x-axis. As we can see from the graph, for 100 samples, the error rate is less than 0.05, allowing us to approximate the true answer distribution with 95% confidence if there are fewer than 8 categories in the categorical distribution."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                601,
+                489,
+                800
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Question Types We collected 101 (context, missing slot) pairs, and obtained 100 slot fillers for each from crowdworkers, resulting in 10,100 annotations overall. The data collection page we used on Amazon MTurk is shown in Fig "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "7 ^ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". We create a dev set with 55 examples and a test set with 46 examples. The distribution of missing slot types are shown in Figure 2 (b). Each question type is associated with a different type of commonsense reasoning, e.g time represents temporal commonsense reasoning."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                807,
+                490,
+                889
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/7dd072830453680171883224d9eabb3293dd57889eed02930a6cdbeda3bebb6e.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(a)"
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                517,
+                95,
+                684,
+                185
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/051c12ceb79541894c7f1d8eded90c1ef558387b210df0c017f319a2d0e8fb4c.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(b)"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Figure 2: (a) The relationship between the number of examples (x-axis), and the approximation error rate (y-axis) calculated using the bound from Mardia et al. (2020). (b) Question type distribution in CFC."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                702,
+                95,
+                872,
+                184
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                296,
+                885,
+                393
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5 Probabilistic Evaluation"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                406,
+                754,
+                423
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we detail the method of evaluating multiple correct answers. As we relaxed commonsense to be probabilistic knowledge, a rigorous probabilistic evaluation is required; however the task is presented (both to humans and models) as a generative question answering task. Therefore, we need a way to compare two large sets of answer strings. We will start by how human evaluators may compare the similarity of there sets of answers and then describe the various ways by which this process can be automated."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                434,
+                887,
+                612
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.1 General Framework"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                624,
+                719,
+                639
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Given a question, the ground truth answer set G and the model generated answers H, the goal is to evaluate the similarity between these two answer sets. This is a difficult task even for a human, especially if the answer sets are large and diverse, however, we cares more about concepts being captured rather than unique surface forms. So we start with clustering the answer strings in G to form meaningful concept level clusters.<sup>3</sup> We could then match the answers in H to the proposed groundtruth clusters in G. Upon having the clusters, we could define categorical probability distributions over the clusters, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "P _ { g }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "P _ { h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", where the probability assigned to a given cluster is proportional to the number of answer strings assigned to "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { i t . } ^ { 4 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Finally, the similarity between G and H can be inferred by calculating the KL divergence of the two distributions, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "D _ { \\mathrm { K L } } ( \\hat { P } _ { g } | | \\hat { P } _ { h } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The overall evaluation framework is depicted in Figure 3."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                648,
+                887,
+                875
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>2</sup>The annotators are paid 0.15 per answer, and they are all anonymous English speakers who are based in the US."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                895,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>3</sup>When clustering, a new category \"wrong\" is added to the answer set to account for the wrong answers for a question. These will then be discarded prior to model evaluation."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                884,
+                885,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "496"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/25c42a88f2a6e2c83d7df4f4379c056bc9aa3226b8e0c12dc5e8dc2a5b41c933.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 3: Given a question, the ground truth answer set G from human, and the model predicted answers set H. The first step is to form clusters of G with concept-level meaningful clusters. The clusters could form categorical distribution of G. We then would match each answer in H into created clusters of G. After matching, we would form a categorical distribution of H. Finally, we calculate the KL score between these two distributions."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                132,
+                90,
+                465,
+                344
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                498,
+                489,
+                580
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.2 Automatic Evaluation"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                589,
+                334,
+                605
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Based on the general framework, we propose an automatic metric, PROBEVAL. The key steps are: 1. Embed ground-truth answers from G into vector space. 2. Automatically cluster the embeddings to obtain ground-truth clusters of G. 3. Match elements of H to clusters of G by assignment function score. Each step presents a number of options, which we detail in the following sections."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                611,
+                490,
+                740
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Embedding We first embed the discrete word tokens in G and H as word vectors. We experimented with various word embedding models, both without context(Word2Vec (Mikolov et al., 2013), GloVe (Pennington et al., 2014) and FastText (Bojanowski et al., 2017)) and with context (BERT (Devlin et al., 2019), and RoBERTa (Liu et al., 2019)) We found FastText to perform best, and use it for all future embedding components. For answers with multiple tokens, we use the average of the FastText embeddings to represent those answer."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                747,
+                490,
+                877
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                884,
+                134
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Clustering Given the vector representation of the word answers, we experimented with various clustering algorithms including X-means (Pelleg et al., 2000), G-means (Zhao et al., 2008) and hierarchical agglomerative clustering (HAC) (Murtagh and Legendre, 2014). We used the implementation from pyclustering (Novikov, 2019). The parameters used by these clustering algorithms are treated as hyper-parameters and are tuned based on the correlation score as we discuss in section 5.3."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                141,
+                885,
+                303
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Matching Given the predicted answers, we aim to match the answers to one or multiple ground truth answer clusters. This was also a requirement for ProtoQA (Boratko* et al., 2020), so we leverage the best-performing WordNet matching function from there. We also have embeddings for our answers, we consider embedding-based similarity matching functions. We train a Gaussian regression model for each cluster in the ground-truth answers. The regression takes one answer representation as input, and output is the label of whether the answer belongs to one particular cluster. We also experimented with cosine similarity as a alternative for Gaussin regression model. If an answer matches with multiple clusters we divide the weight evenly among all matching clusters."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                311,
+                887,
+                570
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.3 Validation of the CFC Evaluator"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                579,
+                813,
+                594
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In order to validate PROBEVAL’s performance, we compared it with the human evaluation results on two generative datasets, ProtoQA (Boratko* et al., 2020) and CFC. A robust automatic evaluation method should align well with human judgment when given different model predicted answers."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                600,
+                885,
+                696
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We started by taking a linear combination of the ground-truth distribution "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\hat { P } _ { g }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and a uniform distribution "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\hat { P } _ { u }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "to create diverse distributions that interpolates between the ideal ground truth answers to random noise, details in Appendix A.1.1. However, arguably, the most important area to assess the quality of the evaluator is around answers which are likely to be returned from a model. We thus extend the above distribution by taking a linear combination of the answer distributions of a given baseline model "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\hat { P } _ { h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", the ground-truth distribution "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\hat { P } _ { g }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", and a uniform distribution "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\hat { P } _ { u }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", with most of the weight assigned to the answers from a baseline model. This method predominantly features model-generated answers and is defined by the equation: "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "p = z \\hat { P } _ { h } + w _ { 1 } ^ { \\prime } \\hat { P } _ { g } + w _ { 2 } ^ { \\prime } \\hat { P } _ { u }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "w _ { 1 } ^ { \\prime }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "w _ { 2 } ^ { \\prime }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are coefficients obtained from uniform distributions, emphasizing the blend of model insights with controlled randomness. The intuition behind this equation is that we want to define a new distribution "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "p"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", which is a weighted combination of distributions "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\hat { P } _ { h } , \\hat { P } _ { g }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and a uniform distribution "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\hat { P } _ { u }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "We want these weights to be independent but still place most of the weight on the predicted distribution "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h a t P _ { h }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". We achieve this by first sampling z in (0.5, 1), and then sampling two other values w and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "w _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "in (0, 1). We then computer "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\begin{array} { r } { w _ { 1 } ^ { \\prime } = \\frac { w _ { 1 } ^ { \\prime } ( 1 - z ) } { w _ { 1 } + w _ { 2 } } } \\end{array}"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\begin{array} { r } { w _ { 2 } ^ { \\prime } = \\frac { w _ { 2 } ^ { \\prime } ( 1 - z ) } { w _ { 1 } + w _ { 2 } } } \\end{array}"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The coefficients are normalized in this process so that "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "z + w _ { 1 } ^ { \\prime } + w _ { 2 } ^ { \\prime } = 1"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                697,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>4</sup>To eliminate zero probabilities, we use Laplace smoothing on all categories before calculating the probabilities, — adding one dummy answer to all categories."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                884,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "497"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                515,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                84,
+                489,
+                335
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.3.1 Dataset"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                343,
+                236,
+                357
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We experimented with two datasets, the first one being ProtoQA (Boratko* et al., 2020). Both ProtoQA and CFC dev sets have 100 ground-truth answers and 30 additional human responses that were collected to measure human performance. For each question, in addition to the 130 human responses, we also use the 300 generated answers from the fine-tuned GPT2 model. All of these answers are annotated by expert annotators with cluster matching to the ground-truth clusters (details in Section 5.3.2). We use the GPT2 answers as the prediction set, H. We sample 50 answer sets for each question from H and G according to the sampling procedure mentioned above. ProtoQA dev has 102 questions and CFC dev has 55 questions."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                362,
+                490,
+                605
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.3.2 Gold Evaluator Annotation"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                613,
+                393,
+                629
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "An essential component in validation is to get human annotations for both clustering and matching. We requested two expert annotators to cluster 100 crowd-worker answers into 8 to 10 clusters independently as ground truth clusters. The innerannotator agreement reached 0.76 when measured by BLANC (Recasens and Hovy, 2011). For model prediction matching in CFC, we take one of the baseline model predictions and employ GPT4 as silver annotation for matching. Two human annotators then verified the GPT4 matching, and reached 0.94 BLANC agreement. For ProtoQA, we used the human-annotated cluster and matching results in the paper (Boratko* et al., 2020)"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                632,
+                490,
+                858
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We use automatic clustering and matching to get "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "D _ { \\mathrm { K L } } ( \\hat { P } _ { g } | | \\hat { P } _ { h } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". We can also evaluate the KL for manual clustering and matching, as all answers in ProtoQA have been annotated by human experts with clusters and assignments. After getting the human and automatic KL values for various sampled answer sets, we use the Spearman correlation coefficients across questions to measure the alignment between automatic and human evaluation."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                858,
+                489,
+                923
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/356dbaa7120a0aa3d3af95e5c8aab22bc84f5331dc00d29142a8c03536da99f7.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 2: Average Spearman correlation of ProtoQA evaluator and PROBEVAL compared with gold scores for ProtoQA and CFC dev questions. All entries use Word-Net as matching function. PROBEVAL achieved much higher correlation compared to baseline evaluators."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td colspan=\"2\">Clustering</td><td>ProtoQA</td><td>CFC</td></tr><tr><td rowspan=\"3\">ProtoQA Evaluator</td><td>Human</td><td>0.193</td><td>0.257</td></tr><tr><td>Gmeans</td><td>0.167</td><td>0.239 0.252</td></tr><tr><td>Xmeans HAC</td><td>0.190 0.193</td><td>0.252</td></tr><tr><td rowspan=\"4\">PROBEVAL</td><td>Human</td><td>0.752</td><td>0.788</td></tr><tr><td>Gmeans</td><td>0.681</td><td>0.721</td></tr><tr><td>Xmeans</td><td>0.669</td><td>0.728</td></tr><tr><td>HAC</td><td>0.698</td><td>0.728</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                529,
+                82,
+                865,
+                260
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                370,
+                887,
+                451
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.3.3 Experiment Setup"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                462,
+                714,
+                479
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Baseline To compare PROBEVAL with other metrics, we assess the correlation between ProtoQA evaluator and human annotation. ProtoQA Evaluator evaluates multiple answer output as well, and it evaluates model predictions via ranked list of answers. The higher the score it, the better model prediction is. To accommodate ProtoQA score, The correlation is measured between 1 - ProtoQA scores (MaxAnswer@10) and KL divergence with gold clustering/matching annotations."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                482,
+                887,
+                645
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.3.4 Results"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                655,
+                630,
+                670
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our findings, detailed in Table 2 and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "3 \\ ^ { 5 } ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", indicate strong correlations between human evaluation and PROBEVAL. Table 2 illustrates the correlation when using WordNet as the matching function with various automatic clustering algorithms. PROBE-VAL demonstrates a stronger correlation with human scores when compared to the baseline, ProtoQA evaluator. Table 3 presents the results by using other matching functions that are not implemented in the ProtoQA evaluator in combination with different clustering algorithms. The result showed that whenever humans are involved in the evaluation process, whether in clustering or matching, the correlation is consistently higher. However, it is worth noting that a fully automatic evaluator with HAC as the clustering algorithm and Word-Net as the matching function achieves around 0.7 correlation score that is nearly as good as humans."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                675,
+                887,
+                887
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>5</sup>Scores are averaged cross 10 runs for setting with human clustering."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                895,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "498"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/e911af4b2033efa5c70a0be8302985a47a528ad2f355b98df02cb459261c307b.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 3: Average Spearman correlation for PROBEVAL when compared with gold scores. GR stands for Gaussian Regression. Correlation is generally higher when human is involved in the evaluation process (top two rows), but fully automatic evaluator PROBEVAL still achieves decent correlation."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Clustering</td><td>Matching</td><td>ProtoQA</td><td>CFC</td></tr><tr><td>Human</td><td>Cosine</td><td>0.715</td><td>0.552</td></tr><tr><td>Human</td><td>GR</td><td>0.708</td><td>0.565</td></tr><tr><td>Gmeans</td><td>Cosine</td><td>0.528</td><td>0.561</td></tr><tr><td>Gmeans</td><td>GR</td><td>0.525</td><td>0.541</td></tr><tr><td>Xmeans</td><td>Cosine</td><td>0.525</td><td>0.503</td></tr><tr><td>Xmeans</td><td>GR</td><td>0.512</td><td>0.505</td></tr><tr><td>HAC</td><td>Cosine</td><td>0.585</td><td>0.558</td></tr><tr><td>HAC</td><td>GR</td><td>0.593</td><td>0.564</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                137,
+                83,
+                462,
+                248
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                110,
+                373,
+                490,
+                455
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Efficiency Analysis We also report the running time of PROBEVAL. When using pre-trained word embeddings to calculate the similarity score, PROBEVAL requires approximately 0.319 seconds per question. When using WordNet as the similarity score, PROBEVAL takes about 49.47 seconds per question. The longer evaluation time associated with WordNet is a direct result of its multistep process. This process becomes particularly time-consuming when the model predictions are long, as it involves the tokenization of the sentence followed by matching each token to ground truth tokens. Our main goal, however, was to come up with an automated evaluation to allow for efficient exploration, and our proposed approach is still much more efficient than human evaluation, which could take up to 10 minutes to perform clustering alone for a single question. Furthermore, human evaluation is expensive and not always feasible. Therefore, PROBEVAL offers an efficient and automated metric for the probabilistic evaluation of diverse answers."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                464,
+                490,
+                820
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.4 Qualitative Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                832,
+                321,
+                847
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.4.1 Visualization"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                853,
+                278,
+                869
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In order to qualitatively understand the correlation score gap between ProtoQA evaluator and PROBE-VAL shown in table 2, we plotted KL values when using human clustering and wordnet matching function, shown in figure 4. It is evident from figures (b) and (d) that PROBEVAL exhibits a clear positive correlation with the gold KL score. In contrast, the ProtoQA score tends to be a horizontal line, showing minimal correlation with the gold scores. We hypothesize that ProtoQA is less sensitive to subtle changes in the answer distribution, and we will verify in the next section."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                873,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/2f6b40c499294deea1d49560681b04498e8465289b2e0bf415b194a9192ef8f3.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(a) ProtoQA Score on CFC"
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                522,
+                99,
+                684,
+                189
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/39b050160da9157553c886770c184493d80a4eae5eaba3f2b6760be0152a7157.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(b) PROBEVAL on CFC"
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                704,
+                99,
+                863,
+                190
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/10be4f67b234d3f1f37620888557d09860d230239dba21d4dd84da76eee671b2.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                519,
+                224,
+                684,
+                316
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/ec166ddae789640b560457e8c662f02d2ac74ef20e3d23434c6cc185e803c297.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(c) ProtoQA Score on ProtoQA (d) PROBEVAL on ProtoQA"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Figure 4: Scatter plots of ProtoQA evaluator and PROBEVAL for two datasets. The X-axis is gold KL score with human annotations, and the y-axis is automatic score with human cluster and WordNet matching. (a) and (b) show for 1-ProtoQA Max-10 score and PROBEVAL on CFC dev. (c) and (d) are the same score methods on ProtoQA dev. Sampled five different questions are annotated with different colors. In both datasets, we see positive correlated trend with PROBE-VAL, while ProtoQA evaluator barely correlates with gold scores."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                704,
+                225,
+                863,
+                316
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                529,
+                887,
+                675
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5.4.2 Prediction Error Types"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                682,
+                754,
+                699
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We designed three sampling techniques to mimic common errors in model predictions when the model is tasked to predict multiple correct answers with accurate probability calibration. These sampling methods aim to reveal the performance difference between evaluators when given varying error types ranging from easy to hard to identify. Example samplings can be seen in Figure 5. A list of answer examples are shown in section A.2 in the Appendix."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                702,
+                887,
+                865
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Missing Answers The first type of error is one of the most common and easily made errors when predicting multiple correct answers, i.e missing one or more correct answers in prediction. In the implementation, we intentionally delete a random number of categorical probabilities of the ground truth distribution, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "P _ { g }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", from "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "P _ { h }"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                873,
+                885,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "499"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                941
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/51e7119279953693578721ef76a67ededce2a33fc7b667acd6851ae942afb4be.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 4: Average Spearman correlation between human evaluation and automatic evaluation when model prediction includes different error types, MA - missing answer, WR - wrong ranking, and WS - wrong score for CFC dev questions. The matching function for all the entries in this table is WordNet (see Table 8 for the correlation using other matching functions)."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td colspan=\"2\">Clustering</td><td>MA</td><td>WR</td><td>WS</td></tr><tr><td rowspan=\"3\">ProtoQA Evaluator</td><td>Human</td><td>0.733</td><td>0.320</td><td>-.025</td></tr><tr><td>Gmeans Xmeans HAC</td><td>0.744 0.721 0.678</td><td>0.465 0.409</td><td>0.033 0.035</td></tr><tr><td>Human</td><td>0.875</td><td>0.4 0.791</td><td>-.018 0.245</td></tr><tr><td rowspan=\"3\">PROBEVAL</td><td>Gmeans</td><td>0.745</td><td>0.706</td><td>0.187</td></tr><tr><td>Xmeans</td><td>0.782</td><td>0.68</td><td>0.231</td></tr><tr><td>HAC</td><td>0.711</td><td>0.642</td><td>0.188</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                114,
+                82,
+                492,
+                260
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                399,
+                489,
+                466
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Wrong Ranking If the model did not miss any correct answers, we ask the next question of whether it gives the correct ranking. For wrong ranking sampling, the probabilities of categories of the ground truth distribution, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "P _ { G }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", are randomly switched so that the answer ranking is wrong."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                475,
+                489,
+                574
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Wrong Score The last error type assumes the model predicts all correct answers with the correct ranking, however, the scores are not well calibrated. This could be the hardest task but can also be extremely important for high steak domains where the model needs to be well calibrated. For this sampling, the categorical ranking is kept the same but the categorical probabilities of the ground truth distribution, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "P _ { G }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", are varied to a random degree."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                583,
+                489,
+                728
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The results are shown in Table 4. For missing answers, both evaluators achieved correlation scores over 0.7, indicating a consistent alignment with human scores. However, PROBEVAL significantly outperforms the ProtoQA evaluator when the prediction includes incorrectly ranked responses. This demonstrates that the primary discrepancy between the ProtoQA and CFC evaluators arises from the ProtoQA evaluator’s inaccurate judgment when the prediction includes wrong rankings. A particularly notable finding emerges from the wrong score errors, given this error type is extremely hard to identify, even for humans, PROBEVAL achieves positive correlation scores, while the ProtoQA evaluator exhibits nearly zero correlation. This performance gap can be attributed to the ProtoQA max-10’s limitation of considering only the first 10 correct answers. In contrast, PROBEVAL considers all answers and is able to capture these finer changes, resulting in its ability to evaluate more nuanced differences between model predictions."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                730,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/bcfcceb77332257fb19ffd7239696f8f247664cbf9b1dcacf1da4edf130e583a.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 5: Model performance on CFC (lower is better). ZS means zero-shot, and FS means one-shot prediction. GPT2-L and GPT2-XL is the GPT2 large and XL model respectively, ProtoQA FT is the ProtoQA fine-tuned, while GPT2-L FT is our own fined-tuned model."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=1 colspan=1>Set</td><td rowspan=1 colspan=1>Dev</td><td rowspan=1 colspan=1>Test</td></tr><tr><td rowspan=1 colspan=1>Shot</td><td rowspan=1 colspan=1>ZS   FS</td><td rowspan=1 colspan=1>ZS   FS</td></tr><tr><td rowspan=1 colspan=1>GPT2-L</td><td rowspan=1 colspan=1>1.67  1.07</td><td rowspan=1 colspan=1>1.49  1.12</td></tr><tr><td rowspan=1 colspan=1>GPT2-XL</td><td rowspan=1 colspan=1>1.32  1.03</td><td rowspan=1 colspan=1>1.14 0.85</td></tr><tr><td rowspan=1 colspan=1>ProtoQA FT</td><td rowspan=1 colspan=1>0.80 0.79</td><td rowspan=1 colspan=1>0.61 0.70</td></tr><tr><td rowspan=1 colspan=1>GPT2-L FT</td><td rowspan=1 colspan=1>0.76 0.70</td><td rowspan=1 colspan=1>0.68  0.71</td></tr><tr><td rowspan=1 colspan=1>GPT 3.5 turbo</td><td rowspan=1 colspan=1>0.66 0.64</td><td rowspan=1 colspan=1>0.67 0.61</td></tr><tr><td rowspan=1 colspan=1>GPT 4</td><td rowspan=1 colspan=1>0.67  0.59</td><td rowspan=1 colspan=1>0.66 0.68</td></tr><tr><td rowspan=2 colspan=1>LLAMA2Human</td><td rowspan=1 colspan=1>0.85 0.87</td><td rowspan=2 colspan=1>0.82 0.850.06</td></tr><tr><td rowspan=1 colspan=1>0.18</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                537,
+                82,
+                857,
+                265
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                360,
+                887,
+                506
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "6 CFC Results"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                517,
+                657,
+                532
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Given the high correlation of PROBEVAL with human gold KL scores, we employ PROBEVAL in evaluating CFC model performance. All the evaluator parameter are tuned on CFC dev data, then fix the parameters to report results on CFC test data."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                543,
+                887,
+                624
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Baseline Models In order to generate different answers for the same prompt, we use Nucleus Sampling (Holtzman et al., 2019). We generate 200 sampled answers from the GPT2Large model and 100 answers for the GPT2XL model for each question and treat them as the model prediction. We experimented with temperatures from 0.1 to 1.0, and chose the model parameters with the best dev performance, then reported the test performance."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                632,
+                887,
+                777
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We conducted experiments using various large language models, employing Hugging Face’s Py-Torch GPT2 Large and XL models (Wolf et al., 2019; Radford et al., 2019) and OpenAI’s API for versions 3.5-turbo and 4 (Bian et al., 2023; OpenAI, 2023). Our tests spanned zero-shot, one-shot, and fine-tuning scenarios using the ProtoQA dataset."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                777,
+                887,
+                890
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In one-shot experiments, we reformatted CFC questions as \"[Q]: context, question, [A]\" and included a sample Q&A pair from the CFC dev set to familiarize the model with the format. For finetuning, we used the ProtoQA pre-trained model and also trained GPT2 Large with a similar task format for 3 epochs on an Nvidia M40 GPU, denoted as GPT2-L FT in our results."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                891,
+                885,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "500"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                489,
+                181
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Human Performance In order to get a human performance on this task, we collected 30 additional human responses and evaluated them the same way as a model prediction."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                191,
+                489,
+                256
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Discussion As shown in Table 5, the best performing model are large models, i.e GPT3.5/GPT4, or fine-tuned GPT2 model. Large models showed significant performance improvement compared to other models, even without fine-tuning data. However, all the model performances still have a large gap compared to human. This indicates the proposed benchmark combined with the probabilistic measurement PROBEVAL is able to identify the performance gap between LLMs and humans, and leaves us ample space to improve the model."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                265,
+                490,
+                443
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "7 Conclusion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                454,
+                247,
+                470
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this paper, we assert that commonsense is an implicit probability distribution over missing information, and propose a dataset that aims to evaluate commonsense in this setting via a generative question answering task; moreover, we embrace the probabilistic nature of commonsense knowledge in both the dataset creation and the metric design. We propose a probabilistic automatic evaluation PROBEVAL for evaluating answer distributions that is highly correlated to human judgment. Using this metric, we observe that model performance on our new dataset is significantly worse than human performance, indicating that the task is sufficiently challenging. In the future, we aim to further extend the size of the dataset, both in number of instances as well as answer length."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                481,
+                490,
+                739
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "8 Limitation"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                751,
+                243,
+                766
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We acknowledge that our collected answers are not nearly as perfect for populations around the world and coule be biased towards populations from certain regions, in this case, English speakers in the US. But we argue this framework is one step in the right direction, and we leave the collection for broader cultures for future work."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                777,
+                489,
+                889
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The collected data also only included a limited scope of commonsense. We believe that extending the CFC to other commonsense domains, like temporal and social understanding, is important. For example, the social outcome of a particular event could vary significantly depending on culture, and each outcome is valid. The size of the proposed dataset is also limited; however, considering the number of annotations we collected for each question, the size is decent. We also proposed a probabilistic measurement PROBEVAL, which is needed in the era of LLMs to identify model limitations."
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                890,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                885,
+                261
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We also acknowledge that the proposed evaluator PROBEVAL could be susceptible to adversarial attacks due to the automation and flexibility nature of the evaluation module. It is possible to have a model that achieves high scores but performs poorly for the task. We will explore the combination of symbolic and neural methods to increase the robustness of the evaluator in future work."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                262,
+                887,
+                392
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Acknowledgments"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                404,
+                673,
+                420
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We thank the NLP group at the University of Pittsburgh for their feedback on the early draft of the paper. We thank Joey Hou at Pitt for his help in data annotation. We also thank the anonymous reviewers for their feedback to help us improve the paper. Lorraine was partially supported by the DARPA MCS program at the beginning stage of the work. Any opinions, findings, conclusions, or recommendations expressed in this paper are those of the authors and do not necessarily reflect the sponsor."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                431,
+                887,
+                609
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "References"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                510,
+                637,
+                610,
+                652
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Bahadir Ismail Aydin, Yavuz Selim Yilmaz, Yaliang Li, Qi Li, Jing Gao, and Murat Demirbas. 2014. Crowdsourcing for multiple-choice question answering. In AAAI, pages 2946–2953. Citeseer."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Laura Banarescu, Claire Bonial, Shu Cai, Madalina Georgescu, Kira Griffitt, Ulf Hermjakob, Kevin Knight, Philipp Koehn, Martha Palmer, and Nathan Schneider. 2013. Abstract meaning representation for sembanking. In LAW@ACL."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Chandra Bhagavatula, Ronan Le Bras, Chaitanya Malaviya, Keisuke Sakaguchi, Ari Holtzman, Hannah Rashkin, Doug Downey, Wen tau Yih, and Yejin Choi. 2020. Abductive commonsense reasoning. In International Conference on Learning Representations."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ning Bian, Xianpei Han, Le Sun, Hongyu Lin, Yaojie Lu, and Ben He. 2023. Chatgpt is a knowledgeable"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                512,
+                661,
+                884,
+                714
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "501"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                515,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "but inexperienced solver: An investigation of commonsense problem in large language models."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Piotr Bojanowski, Edouard Grave, Armand Joulin, and Tomas Mikolov. 2017. Enriching word vectors with subword information. Transactions of the Associationfor Computational Linguistics, 5:135–146."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Michael Boratko*, Xiang Lorraine Li*, Tim O’Gorman*, Rajarshi Das*, Dan Le, and Andrew McCallum. 2020. ProtoQA: A question answering dataset for prototypical common-sense reasoning. In Conference on Empirical Methods in Natural Language Processing, EMNLP."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Deng Cai and Wai Lam. 2020. AMR parsing via graphsequence iterative inference. In Proceedings of the 58th Annual Meeting ofthe Associationfor Computational Linguistics, pages 1290–1301, Online. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Nick Chater, Joshua B. Tenenbaum, and Alan Yuille. 2006. Probabilistic models of cognition: Conceptual foundations. Trends in Cognitive Sciences, 10(7):287–291. Special issue: Probabilistic models of cognition."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jiangjie Chen, Wei Shi, Ziquan Fu, Sijie Cheng, Lei Li, and Yanghua Xiao. 2023. Say what you mean! large language models speak too positively about negative commonsense knowledge."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. Bert: Pre-training of deep bidirectional transformers for language understanding. In NAACL."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yu Feng, Ben Zhou, Haoyu Wang, Helen Jingshu Jin, and Dan Roth. 2022. Generic temporal reasoning with differential analysis and explanation. In Annual Meeting ofthe Associationfor Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Peter Harremoës and Gábor Tusnády. 2012. Information divergence is more χ 2-distributed than the χ 2-statistics. In 2012 IEEE International Symposium on Information Theory Proceedings, pages 533–537. IEEE."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ari Holtzman, Jan Buys, Maxwell Forbes, and Yejin Choi. 2019. The curious case of neural text degeneration. arXiv preprint arXiv:1904.09751."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Lifu Huang, Ronan Le Bras, Chandra Bhagavatula, and Yejin Choi. 2019. Cosmos QA: Machine reading comprehension with contextual commonsense reasoning. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), pages 2391–2401, Hong Kong, China. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xiang Lorraine Li, Adhi Kuncoro, Cyprien de Masson d’Autume, Phil Blunsom, and Aida Nematzadeh. 2022. A systematic investigation of commonsense understanding in large language models. EMNLP."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Bill Yuchen Lin, Minghan Shen, Wangchunshu Zhou, Pei Zhou, Chandra Bhagavatula, Yejin Choi, and Xiang Ren. 2020. Commongen: A constrained text generation challenge for generative commonsense reasoning. In Findings ofthe Conference on Empirical Methods in Natural Language Processing, EMNLP Findings."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A robustly optimized bert pretraining approach. ArXiv, abs/1907.11692."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jay Mardia, Jiantao Jiao, Ervin Tánczos, Robert D Nowak, and Tsachy Weissman. 2020. Concentration inequalities for the empirical distribution of discrete distributions: beyond the method of types. Information and Inference: A Journal ofthe IMA, 9(4):813– 850."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Tomas Mikolov, Kai Chen, Gregory S. Corrado, and Jeffrey Dean. 2013. Efficient estimation of word representations in vector space. In ICLR."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Sarah Moss. 2018. Probabilistic Knowledge. Oxford University Press, Oxford, United Kingdom."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Fionn Murtagh and Pierre Legendre. 2014. Ward’s hierarchical agglomerative clustering method: which algorithms implement ward’s criterion? Journal of classification, 31(3):274–295."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Andrei Novikov. 2019. PyClustering: Data mining library. Journal ofOpen Source Software, 4(36):1230."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "OpenAI. 2023. Introducing gpt-4. https://openai. com/blog/gpt-4/. Accessed: [Insert date here]."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Carlotta Pavese. 2020. Probabilistic knowledge in action. Analysis, 80(2):342–356."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Dan Pelleg, Andrew W Moore, et al. 2000. X-means: Extending k-means with efficient estimation of the number of clusters. In Icml, volume 1, pages 727– 734."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jeffrey Pennington, Richard Socher, and Christopher D. Manning. 2014. Glove: Global vectors for word representation. In EMNLP."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Krishna Pillutla, Swabha Swayamdipta, Rowan Zellers, John Thickstun, Sean Welleck, Yejin Choi, and Zaid Harchaoui. 2021. Mauve: Measuring the gap between neural text and human text using divergence frontiers. Advances in Neural Information Processing Systems, 34:4816–4828."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al. 2019. Language models are unsupervised multitask learners. OpenAI blog, 1(8):9."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Marta Recasens and Eduard Hovy. 2011. Blanc: Implementing the rand index for coreference evaluation. Natural Language Engineering."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                131,
+                85,
+                489,
+                114
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "502"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Keisuke Sakaguchi, Ronan Le Bras, Chandra Bhagavatula, and Yejin Choi. 2020. Winogrande: An adversarial winograd schema challenge at scale. In Proceedings of the AAAI Conference on Artificial Intelligence, volume 34, pages 8732–8740."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Maarten Sap, Hannah Rashkin, Derek Chen, Ronan Le Bras, and Yejin Choi. 2019a. Social IQa: Commonsense reasoning about social interactions. pages 4463–4473."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Maarten Sap, Hannah Rashkin, Derek Chen, Ronan Le Bras, and Yejin Choi. 2019b. Social IQa: Commonsense reasoning about social interactions. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), pages 4463– 4473, Hong Kong, China. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Alon Talmor, Jonathan Herzig, Nicholas Lourie, and Jonathan Berant. 2019. Commonsenseqa: A question answering challenge targeting commonsense knowledge. In NAACL."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Thomas Wolf, Lysandre Debut, Victor Sanh, Julien Chaumond, Clement Delangue, Anthony Moi, Pierric Cistac, Tim Rault, R’emi Louf, Morgan Funtowicz, and Jamie Brew. 2019. Huggingface’s transformers: State-of-the-art natural language processing. ArXiv, abs/1910.03771."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Rowan Zellers, Yonatan Bisk, Roy Schwartz, and Yejin Choi. 2018. Swag: A large-scale adversarial dataset for grounded commonsense inference. In EMNLP."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Rowan Zellers, Ari Holtzman, Yonatan Bisk, Ali Farhadi, and Yejin Choi. 2019. Hellaswag: Can a machine really finish your sentence? In Annual Meeting of the Association for Computational Linguistics, ACL."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zhonghua Zhao, Shanqing Guo, Qiuliang Xu, and Tao Ban. 2008. G-means: A clustering algorithm for intrusion detection. In International Conference on Neural Information Processing, pages 563–570. Springer."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xuhui Zhou, Yue Zhang, Leyang Cui, and Dandan Huang. 2020. Evaluating commonsense in pretrained language models. In Proceedings of the AAAI conference on artificial intelligence, volume 34, pages 9733–9740."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                85,
+                489,
+                152
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A Appendix"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                115,
+                791,
+                238,
+                808
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A.1 Validation of the CFC Evaluator"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                816,
+                421,
+                832
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A.1.1 Diverse Sampling"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                838,
+                319,
+                854
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We employed a naive sampling stragegy called diverse sampling to emulate the a noisy scenario where the prediction set is a linear combination of the ground-truth distribution "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\hat { P } _ { g }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and a uniform distribution "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\hat { P } _ { u } ."
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The formulation of diverse sampling is "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "p = \\alpha \\hat { P } _ { g } + ( 1 - \\alpha ) \\hat { P } _ { u }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "where α is drawn from a uniform distribution between 0 and 1. The comparison result between CFC evaluator and protoQA evaluator using diverse sampling are shown in Table 6 and comparison of CFC evaluator under different automatic clustering and matching are in Table 7."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                858,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/3f52ab1922bd7c4b5de1f1e2f8fac5c59915d2ad074c26b334bfaae274b84abb.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 6: Average Spearman correlation between human evaluation and automatic evaluation under diverse sampling strategy for CFC dev questions with matching function being WordNet (see Table 7 for the evaluation score using other matching function)."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td colspan=\"2\"></td><td>ProtoQA Dataset</td><td>CFC Dataset</td></tr><tr><td rowspan=\"3\">ProtoQA</td><td>Human</td><td>0.111</td><td>-0.082</td></tr><tr><td>Gmeans</td><td>0.471</td><td>0.391</td></tr><tr><td>Xmeans</td><td>0.375</td><td>0.3</td></tr><tr><td colspan=\"2\">HAC</td><td>0.309</td><td>0.27</td></tr><tr><td rowspan=\"3\">CFC</td><td>Human</td><td>0.829</td><td>0.855</td></tr><tr><td>Gmeans</td><td>0.881</td><td>0.773</td></tr><tr><td>Xmeans HAC</td><td>0.718</td><td>0.765</td></tr><tr><td colspan=\"2\">Evaluator</td><td>0.748</td><td>0.785</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                537,
+                146,
+                855,
+                329
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/0a041812ef9417511253a18067f54306ef665670ce2a516f0f28590daaaa86dc.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 7: Average Spearman correlation for CFC evaluator between human evaluation and automatic evaluation under diverse sampling strategy for ProtoQA dev and CFC dev questions with matching functions being human annotation, Cosine similarity function, or Gaussian Regression."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td></td><td>ProtoQA Dataset</td><td>CFC Dataset</td></tr><tr><td>Clustering Matching</td><td>Diverse</td><td>Diverse</td></tr><tr><td>Human</td><td>Cosine</td><td>0.886 0.754</td></tr><tr><td>Human GR</td><td>0.891</td><td>0.752</td></tr><tr><td>Gmeans</td><td>Cosine</td><td>0.616 0.661</td></tr><tr><td>Gmeans GR</td><td>0.607</td><td>0.682</td></tr><tr><td>Xmeans</td><td>Cosine 0.674</td><td>0.646</td></tr><tr><td>Xmeans GR</td><td>0.665</td><td>0.646</td></tr><tr><td>HAC</td><td>Cosine 0.696</td><td>0.701</td></tr><tr><td>HAC GR</td><td>0.699</td><td>0.673</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                509,
+                550,
+                853,
+                753
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "503"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                83,
+                489,
+                214
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A.2 Examples of sampling methods"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                227,
+                410,
+                243
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Question : A helicopter is being used to tackle the disaster. Who will use helicopters to tackle the disaster?"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                249,
+                487,
+                297
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Ground Truth Answers A selection of ground truth answers and their probability are:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                310,
+                487,
+                343
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Cluster 1: “pilot”, p (C1) = 0.5"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                356,
+                383,
+                372
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Cluster 2: \"disaster management team\", p(C2) = 0.3"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                386,
+                489,
+                417
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Cluster 3: \"people\" p(C3) = 0.2."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                432,
+                393,
+                449
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In terms of probabilistic distribution, p(cluster 1) > p(cluster 2) > p(cluster 3) for the ground truth."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                463,
+                489,
+                497
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Wrong Score Sampling The distribution could be:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                506,
+                487,
+                538
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Cluster 1: “pilot”, p(C1) = 0.7"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                554,
+                379,
+                569
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Cluster 2: \"disaster management team\", p(C2) = 0.2"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                583,
+                489,
+                615
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Cluster 3: \"people\", p(C3) = 0.1"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                630,
+                393,
+                646
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The ranking of distribution is kept the same but the actual probabilities of the clusters are much different than that of the ground truth clusters."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                661,
+                489,
+                709
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Wrong Ranking Sampling The distribution could be:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                720,
+                487,
+                752
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Cluster 1: “pilot”, p(C1) = 0.2"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                766,
+                379,
+                783
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Cluster 2: \"disaster management team\", p(C2) = 0.3"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                797,
+                489,
+                828
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Cluster 3: \"people\" p(C3) = 0.5"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                844,
+                388,
+                859
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The ranking of distribution is now cluster 3 > cluster 2 > cluster 1 which is different from the ground truth ranking."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                875,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/92b146b33c9904455534a9d90897ab023a1906411051923ed5bd3caf275ea61c.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 8: Average Spearman correlation between human evaluation and automatic evaluation under MA - missing answer, WR - wrong ranking, and WS - wrong score sampling strategies for CFC dev questions with matching functions being human annotation, Cosine similarity function, or Gaussian Regression."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Clustering</td><td>Matching MA</td><td>WR</td><td>WS</td></tr><tr><td>Human</td><td>Cosine</td><td>0.740 0.501</td><td>0.141</td></tr><tr><td>Human</td><td>GR</td><td>0.765 0.499</td><td>0.125</td></tr><tr><td>Gmeans</td><td>Cosine</td><td>0.763 0.599</td><td>0.086</td></tr><tr><td>Gmeans</td><td>GR</td><td>0.787 0.556</td><td>0.051</td></tr><tr><td>Xmeans</td><td>Cosine</td><td>0.773 0.519</td><td>0.090</td></tr><tr><td>Xmeans</td><td>GR</td><td>0.759 0.504</td><td>0.096</td></tr><tr><td>HAC</td><td>Cosine</td><td>0.694 0.593</td><td>0.143</td></tr><tr><td>HAC</td><td>GR</td><td>0.698 0.580</td><td>0.162</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                510,
+                84,
+                867,
+                247
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "missing answer sampling The distribution could be:"
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                370,
+                884,
+                403
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Cluster 1: “pilot”, p(C1)=0.7"
+                    }
+                ]
+            },
+            "bbox": [
+                531,
+                414,
+                766,
+                430
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Cluster 3: \"people\", p(C3)=0.3."
+                    }
+                ]
+            },
+            "bbox": [
+                531,
+                441,
+                783,
+                457
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Note that Cluster 2 (disaster management team) is missing from the sampled distribution."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                467,
+                884,
+                500
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "504"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/bebd002510798bbade77927f708ab942947812ed56ede6e94cb1879700c926fb.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                136,
+                181,
+                352,
+                305
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/3308443fc9e7d8e970544a4ce2a120bbdae032b19019ccaf64bfabdba8ccfe43.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                381,
+                181,
+                603,
+                305
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/70121da79cd3081500fb25347de0338e85fb8fbb09fe5c17bbac588b366f5a90.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 5: Example sampling step for missing answer sampling (left), wrong ranking sampling (middle), and wrong score sampling (right)."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                631,
+                183,
+                850,
+                305
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/cc748a7e5f5bd18b78955b453ffecd9a37573925105fdb274c059c0b52adae83.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                183,
+                551,
+                468,
+                709
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/d88cfd01fa10ebeb751407f42aa696364d72bf87be7bce6ab1a5535693e20309.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 6: Comparison of correlation between ProtoQA evaluator and CFC evaluator for Wrong Score sampled questions in ProtoQA with ground-truth clusters. The X-axis is the evaluaotr score with human assignment, and the y-axis is the KL value with WordNet assignment. The figure on the left is the correlation for ProtoQA Max-10 with human clustering and WordNet matching. The figure on the right is the correlation for CFC evaluator with human clustering and WordNet matching. These corresponds to the ProtoQA Evaluator / Human / WordNet row and the CFC Evaluator / Human / WordNet row with column being WS in Table 4. Different questions are annotated with different colors."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                514,
+                551,
+                798,
+                709
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "505"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/d97ec01007c7c3c9271fd396a475b5dcdb37e4d99cdfdc92f2d681fc6335431f.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 7: The screen shot for the the dataset collection page in Amazon MTurk."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                126,
+                247,
+                840,
+                719
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "506"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ]
+]

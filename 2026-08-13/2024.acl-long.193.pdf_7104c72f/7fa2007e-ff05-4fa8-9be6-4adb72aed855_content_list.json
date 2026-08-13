@@ -1,0 +1,2433 @@
+[
+    {
+        "type": "text",
+        "text": "Metaphor Understanding Challenge Dataset for LLMs",
+        "text_level": 1,
+        "bbox": [
+            215,
+            89,
+            783,
+            110
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Xiaoyu Tong♡, Rochelle Choenni♡, Martha Lewis♢<sup>,</sup>♣ and Ekaterina Shutova♡",
+        "bbox": [
+            159,
+            127,
+            842,
+            146
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "♡ILLC, University of Amsterdam, the Netherlands",
+        "bbox": [
+            292,
+            145,
+            710,
+            161
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "♢School of Engineering Mathematics and Technology, University of Bristol, UK",
+        "bbox": [
+            174,
+            161,
+            830,
+            179
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "♣Santa Fe Institute, Santa Fe, NM, USA",
+        "bbox": [
+            334,
+            179,
+            668,
+            195
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "{x.tong,r.m.v.k.choenni,e.shutova}@uva.nl",
+        "bbox": [
+            292,
+            197,
+            710,
+            212
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "martha.lewis@bristol.ac.uk",
+        "bbox": [
+            366,
+            214,
+            636,
+            228
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            262,
+            260,
+            342,
+            277
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Metaphors in natural language are a reflection of fundamental cognitive processes such as analogical reasoning and categorisation, and are deeply rooted in everyday communication. Metaphor understanding is therefore an essential task for large language models (LLMs). We release the Metaphor Understanding Challenge Dataset (MUNCH), designed to evaluate the metaphor understanding capabilities of LLMs. The dataset provides over 10k paraphrases for sentences containing metaphor use, as well as 1.5k instances containing inapt paraphrases. The inapt paraphrases were carefully selected to serve as control to determine whether the model indeed performs full metaphor interpretation or rather resorts to lexical similarity. All apt and inapt paraphrases were manually annotated. The metaphorical sentences cover natural metaphor uses across 4 genres (academic, news, fiction, and conversation), and they exhibit different levels of novelty. Experiments with LLaMA and GPT-3.5 demonstrate that MUNCH presents a challenging task for LLMs. The dataset is freely accessible at https://github.com/xiaoyuisrain/ metaphor-understanding-challenge.",
+        "bbox": [
+            141,
+            288,
+            462,
+            659
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            115,
+            671,
+            260,
+            687
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Large language models (LLMs), such as BERT (Devlin et al., 2019), GPT-3 (Brown et al., 2020) and LLaMA (Touvron et al., 2023), have become a common paradigm in natural language processing (NLP). Several benchmarks have been proposed to investigate the capabilities of LLMs (Srivastava, 2022; Liang et al., 2022; Hendrycks et al., 2021); and comprehensive analyses have been conducted, evaluating their performance on a range of NLU tasks (Zhong et al., 2023; Qin et al., 2023; Kocon´ et al., 2023; Ye et al., 2023; Bang et al., 2023). The community has extensively examined LLM performance on question answering, summarisation, sentiment analysis, natural language inference; a few studies have also shed light on LLMs’ analogical reasoning capabilities (Czinczoll et al., 2022; Webb et al., 2023). However, the ability of LLMs to comprehend metaphor—a fundamental linguistic and cognitive tool—is still poorly understood.",
+        "bbox": [
+            110,
+            696,
+            490,
+            923
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "table",
+        "img_path": "images/eeb3a7010aa21c5711358f419e3c4f40a7887d320a55400e9018ca2fd527b074.jpg",
+        "table_caption": [
+            "Figure 1: MUNCH dataset samples. Each metaphor sample has a highlighted word that is metaphorically used, and is accompanied by up to 5 crowdsourced paraphrases : Substituting the highlighted word with one of the provided words should result in an apt paraphrase. For a selection of metaphor samples, we also provide expert annotation : a pair of correct and incorrect substitution words."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Mark&#x27;s promotions and progress up the company *ladder*.</td><td>No golden light *bathed* the red brick of the house.</td></tr><tr><td>hierarchy, payroll</td><td>covered, enveloped, illuminated, immersed, reached</td></tr><tr><td>hierarchy vs steps</td><td>covered vs cleaned</td></tr></table>",
+        "bbox": [
+            529,
+            265,
+            865,
+            365
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            529,
+            885,
+            609
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Metaphors are linguistic expressions based on conceptual mappings between a target and a source domain (Lakoff and Johnson, 1980). The verb phrase to stir excitement, for example, is based on the conceptual metaphor FEELING IS LIQUID, with FEELING (excitement) being the target domain and LIQUID (something that can be stirred) the source domain. The metaphor compares FEELING with LIQUID, introducing vividness into the description of an otherwise intangible emotional impact. Such cross-domain mappings are sets of systematic ontological correspondences, mapping concepts and their relational structure across distinct domains. Performing this mapping is an essential part of reasoning involved in the interpretation of metaphorical language (Lakoff, 2014; Grady et al., 1999; Gentner and Markman, 1997).",
+        "bbox": [
+            507,
+            612,
+            887,
+            887
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Humans use metaphors so naturally and frequently that they largely fly under our radar. In one of the largest metaphor corpora annotated by linguists, the VU Amsterdam Metaphor Corpus (VUA; Steen et al., 2010b), every 8th word is metaphorical, as averaged over four different genres, including academic and conversation. LLMs, therefore, require the ability to comprehend metaphor in order to have a full command of language. As such, metaphor understanding is an essential task for evaluating the capabilities of LLMs.",
+        "bbox": [
+            509,
+            890,
+            887,
+            923
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "3517",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 3517–3536 August 11-16, 2024 ©2024 Association for Computational Linguistics",
+        "bbox": [
+            90,
+            945,
+            909,
+            973
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/d5077de7c7e74bbfafb96c55c60633eccc94346cdb1ca6a21b766d87eb7b1d96.jpg",
+        "image_caption": [
+            "Figure 2: Two tasks for MUNCH: Given a sentence containing a metaphorically used word, a model is prompted to 1) select correct paraphrases from two given candidates (Paraphrase Judgement), and 2) paraphrase the sentence by replacing the highlighted metaphorically used word (Paraphrase Generation)."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            139,
+            84,
+            463,
+            195
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            323,
+            490,
+            468
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Several corpora have been created that contain metaphor annotations at either word or sentence level. These include the VUA corpus (Steen et al., 2010b), the LCC metaphor datasets (Mohler et al., 2016) and the metaphor-emotion dataset of Mohammad et al. (2016), among others. These datasets have been widely used to develop and evaluate automated metaphor identification systems (see Tong et al. (2021) for a survey), but they do not contain information of how the annotated metaphors are interpreted. On the other hand, several works developed datasets with a focus on interpretation, typically casting the problem as a paraphrasing task (Shutova, 2010; Bizzoni and Lappin, 2018; Joseph et al., 2023). Yet, those datasets were often small in scale (containing 200–1000 instances) and were not designed to test the reasoning process by which a metaphor is interpreted, which remains an open question.",
+        "bbox": [
+            112,
+            469,
+            490,
+            776
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "This paper presents a novel Metaphor Understanding Challenge Dataset for LLMs (MUNCH). It provides over 10k paraphrases for metaphorical sentences and 1.5k triples of a metaphorical sentence and two candidate paraphrases, which could be apt or inapt (for dataset examples see Figure 1; for statistics see Appendix A). The metaphorical sentences were extracted from VUA texts, spanning four genres (academic, news, fiction, and conversation) and featuring metaphors at different levels of novelty. Each metaphorical sentence contains a content word that is marked as metaphorically used. A candidate paraphrase replaces the metaphorical word with another word, so that the resulting sentence is the same as the reference sentence except for that one word, therefore representing a lexical substitution task. An apt paraphrase shows correct contextual interpretation of the metaphor while an inapt paraphrase uses a word that is related to a literal, source domain sense of the metaphorical word (see the examples of correct and incorrect substitution words in Figure 1). Such a setup of the task is inspired by the conceptual metaphor theory (Lakoff and Johnson, 1980) and allows us to investigate whether the model performs full metaphor interpretation by cross-domain mapping or rather resorts to more shallow lexical similarity. In order to investigate this in a more controlled fashion, we opted for a lexical substitution task. Specifically, we test whether the model consistently chooses the correct target domain paraphrase (therefore, fully interpreting the metaphor) or rather bases its decisions on lexical similarity and chooses the inapt paraphrase that is similar in meaning to the literal use of the metaphorical word.",
+        "bbox": [
+            112,
+            777,
+            490,
+            923
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            887,
+            505
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "We set up a fill-in-the-blank task to crowdsource apt paraphrases, and manually selected the best paraphrases using expert knowledge. We also manually created inapt paraphrases from WordNet synsets, so that the apt and inapt paraphrases reflect the target and source domains of the metaphors respectively. Specifically, the inapt paraphrases are synonyms or hypernyms associated with the word’s literal use (the source domain).",
+        "bbox": [
+            507,
+            511,
+            885,
+            658
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Using this dataset, we tested the metaphor understanding capabilities of LLaMA-13B, 30B, and GPT-3.5 zero-shot in two tasks: paraphrase judgement and paraphrase generation, as illustrated in Figure 2. Our results show that both tasks are challenging for the models. In particular, the models are prone to confuse the target and source domains of the metaphors, as they often fail to distinguish the inapt paraphrases from the apt paraphrases or reference sentences. Our experiments also reveal that LLMs’ metaphor understanding capabilities are associated with genre, metaphor novelty, and POS of the metaphorical word. The MUNCH tasks thus allow us to gain insight into how LLMs process metaphors as well as how this remarkable ability can be improved in the future.",
+        "bbox": [
+            507,
+            665,
+            887,
+            923
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "3518",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Related work",
+        "text_level": 2,
+        "bbox": [
+            114,
+            84,
+            267,
+            99
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Steen et al. (2010b) created VUA, which marks out metaphor-related words (MRWs) in a 4-millionword subset of the British National Corpus. MRWs are lexical units implicative of underlying crossdomain mappings; they can be directly or indirectly used, depending on their contextual meaning. Consider the sentence “A small five-year-old perched like a mosquito on the beginners’ pony”. The noun mosquito is a direct metaphor, as it literally means mosquito (the source domain) in this context. The verb perched is an indirect metaphor, because it has a more basic usage, as in “A pair of glasses were perched on the bridge of his nose”.",
+        "bbox": [
+            112,
+            112,
+            489,
+            322
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "VUA has been widely used in studies on automated metaphor detection (Leong et al., 2018, 2020; Choi et al., 2021; Zhang and Liu, 2022; Li et al., 2023). However, the corpus does not specify the conceptual metaphors indicated by the MRWs or provide annotation for interpreting the metaphors. The corpus is not directly applicable to automated metaphor interpretation.",
+        "bbox": [
+            112,
+            323,
+            489,
+            451
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Shutova (2010) defined automated metaphor interpretation as a paraphrasing task: Given a metaphorical expression where a word is marked as metaphorically used, the model should replace this word with another word to render a literal paraphrase of the expression. For example, the verb phrase stir excitement, where stir is used metaphorically, should be paraphrased as provoke excitement.",
+        "bbox": [
+            112,
+            453,
+            490,
+            581
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Bizzoni and Lappin (2018) created a Metaphor Paraphrase Evaluation Corpus (MPEC), which provides correct and incorrect paraphrases for 200 short sentences containing metaphor use; paraphrases could greatly differ from the reference sentences. Joseph et al. (2023) created the NewsMet dataset, which consists of 1k verbal metaphors in news headlines as well as their literal equivalents; incorrect paraphrases are not provided.",
+        "bbox": [
+            112,
+            582,
+            490,
+            727
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Several recent studies approached metaphor understanding as an inference task. The IMPLI dataset (Stowe et al., 2022) includes entailed and non-entailed sentences for 900 metaphorical sentences. The FLUTE dataset (Chakrabarty et al., 2022b) provides entailment and contradiction pairs for 1500 metaphorical sentences (including 750 similes). Fine-tuned transformer-based models reached > 0.8 accuracies in these 2 studies in predicting the class of a given sentence pair.",
+        "bbox": [
+            112,
+            728,
+            490,
+            890
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Recent studies also employed multiple-choice and generative tasks to assess LLMs’ ability to reason with metaphorical language. The MiQA benchmark (Coms<sub>,</sub> a et al., 2022) uses such tasks to test whether models can distinguish metaphorical and literal uses of the same words; 150 conventional metaphors are involved. The Fig-QA task (Liu et al., 2022) includes 10k similes (a type of direct metaphor) and requires models to distinguish a pair of metaphors of opposite meanings. Chakrabarty et al. (2022a) examined LLMs’ figurative language understanding by asking them to generate text after encountering an idiom or simile.",
+        "bbox": [
+            114,
+            890,
+            489,
+            922
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            885,
+            262
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "The MUNCH dataset provides 3k samples of indirect metaphors, 10k correct paraphrases, and 1.5k incorrect paraphrases. It is therefore one of the largest datasets for paraphrasing of indirect metaphors. The candidate paraphrases are also systematically different from the ones in previous datasets, as we tailored the dataset for testing LLMs’ understanding of metaphors as crossdomain mappings and correctly capturing the underlying relational structures. We summarise differences between MUNCH and previous datasets and provide more details for the latter in Appendix A.",
+        "bbox": [
+            507,
+            262,
+            887,
+            456
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3 Data collection: metaphor samples",
+        "text_level": 2,
+        "bbox": [
+            509,
+            468,
+            845,
+            485
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "The metaphor samples in our dataset were selected from the publicly available metaphor corpus VUA. Each metaphor sample is a sentence containing a highlighted MRW, the metaphorical word to be interpreted; a paraphrase uses a single word to substitute the metaphorical word. We use two criteria for selecting metaphorical sentences: novelty of the metaphor and possibility of single-word substitution. We explicate our selection process below.",
+        "bbox": [
+            507,
+            494,
+            887,
+            640
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "The novelty criterion. We employed novelty scores from Do Dinh et al. (2018) to increase the proportion of novel metaphors in our dataset. Scores range from -1 to 1. VUA contains a large proportion of conventional metaphors: The metaphorical use of the word can be found in a dictionary of contemporary language use (Steen et al., 2010a). As LLMs might have encountered enough data for such conventional metaphor uses during pre-training, the understanding of such metaphors should be relatively easy. To render a more challenging dataset, we excluded MRWs with novelty scores below -0.3. Metaphors with a novelty score higher than -0.3 could still be conventional: The crowd workers who provided the novelty annotations in Do Dinh et al. (2018) relied on their intuition instead of a dictionary like Steen et al. (2010a).",
+        "bbox": [
+            507,
+            649,
+            887,
+            923
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "3519",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "And metaphorical uses included in dictionaries may still be considered novel by lay people. We chose -0.3 as the threshold in order to collect a large and diverse dataset as a starting point.",
+        "bbox": [
+            110,
+            85,
+            489,
+            149
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "The single-word criterion. To ensure that the metaphorical sentences can be paraphrased via single-word substitution, we excluded MRWs that are marked as direct metaphors, as well as a portion of indirect metaphors. Directly used MRWs usually occur in a sequence, such as “I knew the pathway like the back of my hand”. They are thus not suitable for single-word substitution. Also, the direct metaphor back of my hand refers literally to the back of the speaker’s hand—its contextual meaning is directly associated with the source domain. This is contrary to our task setup, where apt paraphrases (contextual meaning) should be associated with target domains. We therefore opted to focus on indirect metaphors in this study.",
+        "bbox": [
+            112,
+            159,
+            489,
+            400
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Within the category of indirect metaphors, we filtered out new-formations, consecutive MRWs, and proper names. New-formations are words that do not have an entry in dictionary, so VUA annotated the parts that do have corresponding entries. For example, in the phrase a rose-tinted vision of the world, the word rose-tinted was a new-formation; so rose and tinted are marked as separate MRWs in VUA and received their separate novelty scores. We filtered these out because a single metaphorical word should have a single novelty score (rosetinted has two), yet it is hard to paraphrase rose or tinted instead of rose-tinted altogether.",
+        "bbox": [
+            112,
+            400,
+            490,
+            609
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Likewise, we excluded cases where multiple content words marked as indirect metaphors occur consecutively, such as take place, long road home, great leapforward. These often involve fixed expressions or phrases that either should be replaced as a whole or should not be marked as consecutive indirect metaphors. We also excluded metaphorical words that are part of a proper name, which, like fixed expressions, need to be treated as a whole. For example, the proper name Nord Stream would lose its meaning if one changed the metaphorical word stream into another word.",
+        "bbox": [
+            112,
+            611,
+            490,
+            804
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "4 Annotation of apt paraphrases",
+        "text_level": 2,
+        "bbox": [
+            112,
+            816,
+            415,
+            833
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Crowdsourcing task. We constructed a fill-inthe-blank task to crowdsource (apt) paraphrases for the metaphorical sentences. Each task included 30 sentences to be paraphrased, so that the task can be finished within 30 minutes. Under each sentence, the workers were presented with a copy of the sentence where the metaphorical word is replaced with a blank; they were asked to fill the blank with a single word so that the new sentence is a semantically and grammatically apt paraphrase of the reference sentence. If they were not able to paraphrase the sentence, they were asked to explain why it was difficult. Examples of good and bad answers were provided in the instructions (see Appendix B).",
+        "bbox": [
+            112,
+            841,
+            490,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            887,
+            230
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "The workers were recruited via Prolific<sup>1</sup>. We set prescreening criteria to only include adult (age > 18) native English speakers who were living in an English-speaking country and did not have any language-related disorders. The workers were asked to confirm within the task that they met these criteria. After giving consent to participate and reading the instructions, they were also required to correctly paraphrase a trial sentence in order to access the task. More details (worker’s consent, the trial sentence) are given in Appendix B.",
+        "bbox": [
+            507,
+            230,
+            885,
+            407
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We released 99 tasks in total and collected 5 data points for each of the 2970 reference sentences. We received single-word substitutions for 2953 sentences (the other 17 are presented and explained in Appendix B), and 61% of them got repeated answers—multiple workers submit the same paraphrase despite the question being open-ended. This confirms the reliability of our task.",
+        "bbox": [
+            507,
+            406,
+            887,
+            537
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Expert validation. For a selection of the reference sentences for which we later annotated inapt paraphrases (Section 5), we further validated the crowdsourced paraphrases to determine the best paraphrase for creating the triples (one metaphor sample, two candidate paraphrases).",
+        "bbox": [
+            507,
+            545,
+            887,
+            642
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We used both majority vote and expert knowledge to find one best paraphrase for each reference sentence. For each sentence, we first sorted the collected single-word substitutions from the most to the least popular (in terms of how many participants proposed that substitution). The apt paraphrase that was proposed by the highest number of participants was verified by the authors and selected as the best paraphrase for that reference sentence.",
+        "bbox": [
+            507,
+            642,
+            887,
+            787
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "When multiple apt paraphrases have the same number of votes, we chose the one that is clearly within the target domain—that is, the paraphrase clearly shows that the metaphorical word is interpreted in its contextual sense. For instance, we received 5 different single-word substitutions for the metaphorical word attack in the sentence “. . . he has become involved in a row over his attack on the “Pharisees” of British society”. These are remarks, views, offense, incursion, and disagreement, each proposed by a single participant. All of them can be considered apt paraphrases. We chose remarks because it clearly shows the metaphorical word attack is interpreted in the ARGUMENT domain. The meaning of offense and disagreement are more abstract and could involve other conceptual domains; the paraphrases that replace attack with views and incursion respectively are still metaphorical, as view can be associated with VISION and incursion, like the metaphorical word itself, is still in the domain of BATTLE. These four are thus less preferable with regard to the purpose of our dataset.",
+        "bbox": [
+            507,
+            787,
+            887,
+            900
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>1</sup>https://www.prolific.co/",
+        "bbox": [
+            531,
+            907,
+            689,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_number",
+        "text": "3520",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            490,
+            326
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "While we managed to find one best paraphrase for most reference sentences, there are 45 for which we selected two paraphrases as the best, as the two received the same votes and are equally apt. There are also 11 sentences for which no paraphrase was selected. These are cases where the given context is insufficient for determining the contextual meaning of the metaphorical word.",
+        "bbox": [
+            112,
+            328,
+            489,
+            457
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "5 Annotation of inapt paraphrases",
+        "text_level": 2,
+        "bbox": [
+            114,
+            473,
+            431,
+            489
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Tong (2021) shows that incorrect paraphrases based on the basic sense of the metaphorical word are the least distinguishable from correct ones (i.e., paraphrases based on the contextual sense) with respect to aptness. To render truly challenging inapt paraphrases for our task, we therefore created inapt paraphrases exclusively from basic senses.",
+        "bbox": [
+            112,
+            500,
+            489,
+            614
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "We employed WordNet for identifying basic senses and obtaining sense-specific synonyms, following the annotation guidelines presented in Appendix C. For each metaphorical word, we first locate the WordNet synsets that correspond to its more basic meaning (relative to its contextual meaning in the reference sentence). Then we go through the synonyms (or hypernyms when no synonyms are provided) under the basic-sense synsets and select those that are clearly associated with the metaphor’s source domain and would render a grammatical (but inapt) paraphrase.",
+        "bbox": [
+            112,
+            615,
+            489,
+            809
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "We went through all 2970 sentences released for the crowdsourcing task and found inapt paraphrases for 991 of them. After removing items lacking apt paraphrases (either because no single-word substitutions were crowdsourced or because none of the collected ones are of sufficient quality), we created 1492 triples for 728 metaphorical sentences, including 1072 triples with an apt and an inapt paraphrase, 375 triples with two inapt paraphrases, and 45 with two apt paraphrases.",
+        "bbox": [
+            112,
+            809,
+            489,
+            923
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "table",
+        "img_path": "images/570f6f3dd4187e037d4c7a9f5f943c5debfb9ad82b988507d8d4abe26fad8f87.jpg",
+        "table_caption": [
+            "Table 1: Number of metaphor samples per genre (academic, news, fiction, conversation), and the percentage of sentences where the metaphorical word is a noun (N), a verb (V), or either an adjective or an adverb (A)."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>ACPROSE</td><td>NEWS</td><td>FICTION</td><td>CONVRSN</td><td>TOTAL</td></tr><tr><td></td><td>1061</td><td>922</td><td>593</td><td>377</td><td>2953</td></tr><tr><td>N</td><td>50%</td><td>38%</td><td>35%</td><td>25%</td><td>40%</td></tr><tr><td>V</td><td>35%</td><td>42%</td><td>39%</td><td>51%</td><td>40%</td></tr><tr><td>A</td><td>15%</td><td>20%</td><td>26%</td><td>24%</td><td>20%</td></tr></table>",
+        "bbox": [
+            510,
+            80,
+            882,
+            145
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            239,
+            885,
+            288
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Inter-annotator agreement. From the 991 sentences for which inapt paraphrases were identified, we randomly selected 200 to be annotated by a second annotator. The annotator was a PhD candidate in linguistics specialising in metaphor research. We explained the annotation process to the second annotator through a meeting and the guidelines in Appendix C. The Gwet’s gamma coefficient for the agreement between the two expert annotators is 0.84.",
+        "bbox": [
+            507,
+            299,
+            887,
+            460
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "6 Data analysis",
+        "text_level": 2,
+        "bbox": [
+            509,
+            474,
+            662,
+            491
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "The dataset contains approximately the same number of samples from academic and news genres, and fewer samples from fiction and conversation, as shown in Table 1. These metaphor samples cover metaphorical use of content words in all four parts of speech. Noun and verb MRWs are of a higher proportion compared to adjectives and adverbs. In news and fiction, these two categories have similar percentages. The academic genre contains more noun MRWs than verbs whereas in conversation the situation is reversed: Half of the metaphorical words are verbs, while the percentage of nouns is similar to that of adjectives and adverbs.",
+        "bbox": [
+            507,
+            502,
+            887,
+            712
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "As we excluded MRWs of novelty scores lower than -0.3, the metaphor samples exhibit a wider range of novelty scores above 0 than below 0 (see Appendix D). Meanwhile, a large proportion of the metaphor samples could be considered only slightly novel or conventional (novelty scores between -0.3 and 0.3). Metaphor samples of the highest novelty scores can be from any of the four genres. Despite their different proportion in the entire dataset (Table 1), all four genres include metaphor samples across all levels of perceived novelty.",
+        "bbox": [
+            507,
+            713,
+            885,
+            889
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "We also examined the cosine similarity between the metaphorical words and apt and inapt substitutions. Since the inapt paraphrases were based on the more basic meaning of the MRWs (section 5), we expected inapt substitution words to be more similar to the metaphorical words than apt substitution words. We computed the cosine similarity scores using glove-wiki-gigaword-300 embeddings (Pennington et al., 2014), accessed through the gensim Python library. Figure 3 shows the distribution of cosine similarity scores for 1006 triples, excluding the ones containing out-of-vocabulary words. Surprisingly, the target-apt pairs tend to have higher cosine similarity scores than the targetinapt pairs. The plot suggests that the 3 pairs are distinguishable in terms of cosine similarity scores, with target-apt pairs being the most similar, and apt-inapt the least similar. This might be associated with the fact that our metaphorical sentences were sampled from VUA, which, being representative of metaphor use in natural discourse, includes a large percentage of conventional metaphors. Nonetheless, the majority of the cosine similarity scores are above 0, and the 3 pairs still share a wide range of similarity scores. The distribution plot is therefore also suggestive of the reliability of our dataset, as well as its potential challenge for LLMs.",
+        "bbox": [
+            509,
+            890,
+            885,
+            922
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_number",
+        "text": "3521",
+        "bbox": [
+            480,
+            928,
+            519,
+            942
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "chart",
+        "img_path": "images/1030b770c2a51fec496d3a033f2dd2d53c7a630f54611c3d1abec45a02753e95.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 3: Distribution of the cosine similarity between target-apt, target-inapt, and apt-inapt pairs."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            149,
+            101,
+            436,
+            258
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            323,
+            490,
+            726
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "7 Model evaluation",
+        "text_level": 2,
+        "bbox": [
+            114,
+            736,
+            299,
+            752
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "We evaluated LLaMA-13B, LLaMA-30B, and GPT-3.5 (text-davinci-003) on two tasks: (Task 1) paraphrase judgement, which requires a model to select correct paraphrases for a given reference sentence from given candidates; and (Task 2) paraphrase generation, which asks a model to generate correct paraphrases for a given reference sentence. The paraphrase judgement task used the 1492 triples that include inapt paraphrases; the generation task used all 2953 metaphorical sentences. Details regarding computational budget is given in Appendix E.",
+        "bbox": [
+            110,
+            760,
+            489,
+            923
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "code",
+        "sub_type": "algorithm",
+        "code_caption": [
+            "Figure 4: Example prompt for the Word-judgement task (the Implicit condition). The given sentence is shortened for illustration."
+        ],
+        "code_footnote": [],
+        "code_body": "Select words that can replace the highlighted word in the given   \nsentence without altering the sentence's meaning.   \nSentence: ... \\*extending\\* the Government's borrowing power ...   \nOption A: increasing   \nOption B: exserting   \nOption C: Both Option A and Option B   \nOption D: Neither Option A nor Option B   \nCorrect answer: Option",
+        "bbox": [
+            542,
+            84,
+            850,
+            168
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            254,
+            884,
+            286
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "7.1 Paraphrase judgement",
+        "text_level": 2,
+        "bbox": [
+            509,
+            300,
+            737,
+            317
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "We evaluate the LLMs in a prompting setup. We test the models’ ability to interpret metaphor under different conditions. In the first scenario, we prompt the model by providing the reference sentence with the metaphorical word highlighted and two candidate replacement words for it (Wordjudgement). In the second scenario, each of the candidate replacement words is embedded in the sentence (Sentence-judgement). In both cases the model needs to solve a multiple choice task. Besides providing the apt and inapt paraphrases (Options A and B) as answer options, we also complement them with Option C, that both candidates are correct, or Option D, that neither are correct. See Figure 2 for an example. We expect Wordjudgement to be more challenging, as the model would need an additional inference step compared to sentence judgement, to replace the metaphorical word with the two given options and (implicitly) form the intended paraphrases.",
+        "bbox": [
+            507,
+            323,
+            887,
+            646
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "For both Word-judgement and Sentencejudgement setups, we further investigate whether it makes a difference if the model is explicitly “told” that the task is to paraphrase a metaphor or not. This results in three further conditions: Implicit (not mentioning metaphor in the prompt), Metaphor-Sent (revealing that the reference sentence contains a metaphor), and Metaphor-Word (revealing that the specific highlighted word in the sentence is metaphorically used). The Implicit condition corresponds best to the real-life application of LLMs, where the model needs to be able to interpret metaphors without being instructed that metaphors are there.",
+        "bbox": [
+            507,
+            648,
+            887,
+            872
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "We tested LLaMA-13B and 30B, and GPT-3.5 in each of the 6 conditions, using 3 prompts for each condition (the prompts are listed in Appendix E).",
+        "bbox": [
+            507,
+            873,
+            885,
+            923
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "3522",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "table",
+        "img_path": "images/9e40641d749321a0f249a6ca7b812e4c88d444a0271254c3f61a2b2cddfadfc3.jpg",
+        "table_caption": [
+            "Table 2: Mean (SD) accuracies across 3 prompts for each paraphrase judgement condition."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>LLaMA-13B</td><td>LLaMA-30B</td><td>GPT-3.5</td></tr><tr><td>Word-judge</td><td></td><td></td><td></td></tr><tr><td>Implicit</td><td>.28 (.18)</td><td>.21 (.10)</td><td>.23 (.10)</td></tr><tr><td>M-Sent</td><td>.30 (.16)</td><td>.19 (.09)</td><td>.20 (.10)</td></tr><tr><td>M-Word</td><td>.33 (.18)</td><td>.21 (.08)</td><td>.20 (.08)</td></tr><tr><td>Sent-judge</td><td></td><td></td><td></td></tr><tr><td>Implicit</td><td>.13 (.06)</td><td>.14 (.03)</td><td>.17 (.07)</td></tr><tr><td>M-Sent</td><td>.12 (.07)</td><td>.17 (.03)</td><td>.16 (.06)</td></tr><tr><td>M-Word</td><td>.10 (.08)</td><td>.27 (.05)</td><td>.21 (.02)</td></tr></table>",
+        "bbox": [
+            117,
+            80,
+            485,
+            192
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "image",
+        "img_path": "images/902470822b3bb76850f222953641cb7d7b1b0cae6ca1064769e4c8225715ffa2.jpg",
+        "image_caption": [
+            "Figure 5: Procedure of the paraphrase generation task, using GPT-3.5 prompt and outputs as example. We first ask the model to generate a single token to get a glimpse of its top 5 answers. For each token that matches the beginning of a human answer, we let the model complete it to see whether it is a complete match."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            126,
+            265,
+            473,
+            419
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Table 2 shows the mean accuracy and standard deviation for each model in each condition. The random baseline achieves an accuracy of 0.25, as there is always only one correct option out of the given four. The performance of all three models was below the random baseline in most cases, except for LLaMA-13B in the Word-judgement tasks and LLaMA-30B in the Metaphor-Word condition of the Sentence-judgement task. Meanwhile, the accuracy of LLaMA-13B varied a great deal across different prompts in the Word-judgement tasks.",
+        "bbox": [
+            112,
+            560,
+            489,
+            738
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "The Sentence-judgement task seems to be more challenging than Word-judgement for the models. For LLaMA-30B and GPT-3.5, the task was particularly difficult when they were not instructed to focus on the metaphorical word, and were not informed that the word is metaphorically used (the Metaphor-Word condition). For LLaMA-13B, all 3 Sentence-judgement conditions are similarly difficult. However, its higher accuracies in the Wordjudgement tasks also indicate the benefit of instructing the model to focus on the metaphorical word.",
+        "bbox": [
+            110,
+            745,
+            492,
+            923
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/b6fe54e58a62a148a931f86d05c5afa5610f01ce1b839d566b2236484f5478f6.jpg",
+        "table_caption": [
+            "Table 3: Mean (SD) performance across 3 prompts in the paraphrase generation task. Recall@10 does not apply to GPT-3.5 as the OpenAI API only allows access to the top-5 answers."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>MRR</td><td>Recall@5</td><td>Recall@10</td></tr><tr><td>LLaMA-13B</td><td>.33 (.02)</td><td>.22 (.02)</td><td>.33 (.02)</td></tr><tr><td>LLaMA-30B</td><td>.47 (.03)</td><td>.28 (.02)</td><td>.40 (.03)</td></tr><tr><td>GPT-3.5</td><td>.54 (.02)</td><td>.32 (.01)</td><td></td></tr></table>",
+        "bbox": [
+            526,
+            80,
+            867,
+            131
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "7.2 Paraphrase generation",
+        "text_level": 2,
+        "bbox": [
+            509,
+            227,
+            737,
+            242
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "The purpose of this task is to compare model and human performance in paraphrasing metaphorically used words. The prompts were thus designed to be semantically close to the instructions in our crowdsourcing task (Section 4). The model answers were generated in two steps (see Figure 5). We first let the models generate a single token— this allowed us to access the models’ ranking of all tokens in their vocabulary. Of these, we selected the ones that match human annotations and let the models complete them into words. The completions were then compared with human annotations to determine the rank of each expected answer.",
+        "bbox": [
+            507,
+            247,
+            887,
+            456
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We tested the models on 3 prompts (see Appendix E) and their mean performance in terms of mean reciprocal rank (MRR), recall at top 5 paraphrases and recall at top 10 paraphrases is shown in Table 3. GPT-3.5 performed best and LLaMA-30B came second. The models’ performance was also more stable across different prompts as compared to the paraphrase judgement task. Nonetheless, all three models clearly preferred different answers as compared to human annotators.",
+        "bbox": [
+            507,
+            456,
+            887,
+            619
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "8 Discussion",
+        "text_level": 2,
+        "bbox": [
+            509,
+            629,
+            638,
+            645
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Paraphrase judgement. We looked into the type of errors the models made in paraphrase judgement. The number of each combination of expected and predicted answers for each model is in Appendix F. We found that LLaMA-30B and GPT-3.5 could ignore the semantic differences between a given sentence and an inapt paraphrase, as they tend to predict both candidates as correct when presented with one or more inapt paraphrases. LLaMA-13B, on the other hand, tends to assume that the two given candidates always contain one apt and one inapt paraphrase. Nonetheless, it did not seem capable of distinguishing the two, as it made a similar number of Option A and Option B predictions.",
+        "bbox": [
+            507,
+            655,
+            887,
+            882
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Paraphrase generation. We examined the topranked answers of the models and found 4 categories that the ‘incorrect’ or unexpected answers could fall into. 1) Nonsensical: For the sentence “...for this number line I would say...”, GPT-3.5 gives thus as the best substitution word, ignoring the meaning of line, whereas LLaMA-13B repeats number. 2) Lack of contextual understanding: In “...he touched both sides of the coin...”, GPT-3.5 replaces the word sides withfacets, suggesting that it neglects details of the meaning of the sentence (that a coin only has 2 sides). 3) Ungrammatical: On the other hand, the model may have understood the metaphor, but fails to convert its understanding into a suitable substitution word. In “...they all shared the emphasis on ‘her’...”, LLaMA-30B suggests concurred as the best answer, implying that the meaning of shared is understood, but that grammatical agreement has been sacrificed. 4) Preference: Finally, the disagreement between the models and human annotators may simply be a matter of preference. For “For a man whom Rebecca West ... called ‘repulsive’ and ‘treacherous’...”, crowd workers provide 4 possible answers: revolting, disgusting, awful, and grotesque. Both LLaMA-30B and GPT-3.5 give odious as the best answer. Here, both the human annotators and the models understand and can paraphrase the sentence, and it is hard to say whose answer is best.",
+        "bbox": [
+            507,
+            890,
+            887,
+            922
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "3523",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            85,
+            490,
+            521
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Factors associated with model performance. We also examined the association between model performance and 3 factors: genre, metaphor novelty, and the POS of the metaphorical word. The details are available in Appendix F. We found metaphors of higher novelty scores to be more difficult for LLaMA-30B in paraphrase judgement, and for GPT-3.5 in paraphrase generation. The association between genre or POS and model performance tends to differ per model and task. The fiction genre, for example, is the easiest for the LLaMA models in paraphrase generation; yet it is the most difficult for GPT-3.5 in the generation task and for LLaMA-30B in the judgement task. Similarly, noun metaphors are the easiest for LLaMA-30B in the generation task and for GPT-3.5 in the judgement task. Meanwhile for GPT-3.5 in the generation task, adverb metaphors become the easiest.",
+        "bbox": [
+            110,
+            535,
+            490,
+            825
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "To sum up, the results of the two paraphrase tasks indicate that the LLMs are unable to (fully) understand some of the metaphors in our dataset. The paraphrase judgement task further reveals that the models have difficulty distinguishing the metaphors’ source domains (implied by the inapt paraphrases) and target domains (implied by the reference sentences and apt paraphrases). This further suggests that the models are unlikely to perform reasoning across semantic domains; when they succeed in understanding the metaphor, they may still reason in ways that are different from humans. This means that for downstream NLP tasks such as opinion mining, bias detection, humour detection, and intent recognition, the LLMs could overlook the entailment of a metaphor. In machine translation as well as summarisation of highly figurative or poetic texts, the problems may manifest as incorrect or peculiar explanation of metaphors.",
+        "bbox": [
+            112,
+            826,
+            490,
+            923
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            887,
+            294
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "A direction for improvement is to mark out metaphor uses in texts and direct the model’s attention to them: In the paraphrase judgement task, the models reach higher accuracies when the metaphorical word is marked out (in the Word-judgement task or in a Metaphor-Word condition). However, since the models generally performed poorly in the experiments, the LLMs may need to be fine-tuned in order to better understand metaphors. When finetuning, one can consider increasing the proportion of certain metaphor types in training data, as genre, metaphor novelty, and POS of the metaphorical word are all associated with model performance. Future studies could first employ MUNCH to detect the weak points of an LLM and then curate training data accordingly.",
+        "bbox": [
+            507,
+            294,
+            887,
+            554
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "9 Conclusion",
+        "text_level": 2,
+        "bbox": [
+            507,
+            565,
+            643,
+            581
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "We release a dataset of manually created apt and inapt paraphrases for metaphorical sentences and present two metaphor understanding tasks, which we demonstrate to be challenging for current LLMs. The errors the models make in the paraphrase generation task indicate various levels of misunderstanding of the metaphors. In the paraphrase judgement task, the models’ accuracy was lower than the random baseline in the majority of the cases; a closer look at their errors reveals that the models had difficulty in detecting the inaptness of the inapt paraphrases. The experiments also show that the models performed better when being instructed to focus on the metaphorical word, and that genre and the POS and novelty of the metaphorical word are all potential factors that affect model performance.",
+        "bbox": [
+            507,
+            593,
+            887,
+            852
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "10 Limitations",
+        "text_level": 2,
+        "bbox": [
+            509,
+            863,
+            657,
+            879
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "We designed the metaphor understanding tasks to be representative of a lexical substitution task: The metaphorical word is the only difference between a reference sentence and a candidate paraphrase. This setup makes it possible to examine whether LLMs indeed perform metaphor interpretation or resort to lexical similarity when they encounter metaphorically used words. At the same time, however, it also means that the models’ understanding of multi-word metaphors and direct metaphors (e.g., similes) could not be tested using our dataset.",
+        "bbox": [
+            507,
+            890,
+            885,
+            922
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "3524",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            490,
+            229
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We tested the lastest and state-of-the-art LLMs available at the time that our study was ongoing, but newer LLMs such as GPT-4 and Llama 2 emerged shortly after the completion of our study. We suggest running a data contamination test before evaluating newer LLMs using our dataset.",
+        "bbox": [
+            114,
+            230,
+            489,
+            325
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "This study reveals that LLMs have difficulty distinguishing the target and source domains of linguistic metaphors. A more extensive analysis is desirable to uncover more differences between LLMs and humans in terms of metaphor interpretation.",
+        "bbox": [
+            112,
+            326,
+            490,
+            407
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "11 Ethics statement",
+        "text_level": 2,
+        "bbox": [
+            114,
+            417,
+            304,
+            432
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We abide by the ACL Code of Ethics. The metaphor resources used in this study are publicly available. The crowdsourcing task was approved by an ethics committee. The crowd workers received fair payment (9 GBP per hour), and no personal information was collected or stored in our database.",
+        "bbox": [
+            112,
+            442,
+            489,
+            538
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "The metaphor samples in our dataset come from excerpts of natural discourse. They may therefore involve bias, taboo, violence, or other aspects of everyday language use that could be considered negative (we also pointed this out to the crowd workers before they gave their consent to participate, as presented in Appendix B). Nonetheless, these are integral parts of language use, and should be properly understood by NLP systems, which is precisely what this paper aims at.",
+        "bbox": [
+            112,
+            538,
+            489,
+            700
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Acknowledgements",
+        "text_level": 2,
+        "bbox": [
+            114,
+            711,
+            287,
+            727
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "The crowdsourcing task (for collecting apt paraphrases) was funded by the Faculty of Engineering at the University of Bristol, through the faculty’s Pump-Priming Fund. We thank Dr. Jie Fu for coannotating the inapt paraphrases. We also thank all anonymous reviewers who provided constructive feedback for previous versions of this paper.",
+        "bbox": [
+            112,
+            734,
+            489,
+            848
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            114,
+            872,
+            215,
+            888
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Yejin Bang, Samuel Cahyawijaya, Nayeon Lee, Wenliang Dai, Dan Su, Bryan Wilie, Holy Lovenia, Ziwei",
+            "Ji, Tiezheng Yu, Willy Chung, Quyet V. Do, Yan Xu, and Pascale Fung. 2023. A multitask, multilingual, multimodal evaluation of ChatGPT on reasoning, hallucination, and interactivity. In Proceedings of the 13th International Joint Conference on Natural Language Processing and the 3rd Conference ofthe Asia-Pacific Chapter ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 675–718, Nusa Dua, Bali. Association for Computational Linguistics.",
+            "Yuri Bizzoni and Shalom Lappin. 2018. Predicting human metaphor paraphrase judgments with deep neural networks. In Proceedings ofthe Workshop on Figurative Language Processing, pages 45–55, New Orleans, Louisiana. Association for Computational Linguistics.",
+            "Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. 2020. Language models are few-shot learners. In Advances in Neural Information Processing Systems, volume 33, pages 1877–1901. Curran Associates, Inc.",
+            "Tuhin Chakrabarty, Yejin Choi, and Vered Shwartz. 2022a. It’s not rocket science: Interpreting figurative language in narratives. Transactions of the Associationfor Computational Linguistics, 10:589–606.",
+            "Tuhin Chakrabarty, Arkadiy Saakyan, Debanjan Ghosh, and Smaranda Muresan. 2022b. FLUTE: Figurative language understanding through textual explanations. In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing, pages 7139–7159, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics.",
+            "Minjin Choi, Sunkyung Lee, Eunseong Choi, Heesoo Park, Junhyuk Lee, Dongwon Lee, and Jongwuk Lee. 2021. MelBERT: Metaphor detection via contextualized late interaction using metaphorical identification theories. In Proceedings of the 2021 Conference of the North American Chapter ofthe Associationfor Computational Linguistics: Human Language Technologies, pages 1763–1773, Online. Association for Computational Linguistics.",
+            "Iulia Coms<sub>,</sub> a, Julian Eisenschlos, and Srini Narayanan. 2022. MiQA: A benchmark for inference on metaphorical questions. In Proceedings of the 2nd Conference ofthe Asia-Pacific Chapter ofthe Associationfor Computational Linguistics and the 12th International Joint Conference on Natural Language Processing (Volume 2: Short Papers), pages 373–381, Online only. Association for Computational Linguistics."
+        ],
+        "bbox": [
+            115,
+            895,
+            487,
+            921
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "3525",
+        "bbox": [
+            480,
+            929,
+            521,
+            941
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Tamara Czinczoll, Helen Yannakoudakis, Pushkar Mishra, and Ekaterina Shutova. 2022. Scientific and creative analogies in pretrained language models. In Findings ofthe Associationfor Computational Linguistics: EMNLP 2022, pages 2094–2100, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics.",
+            "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: Pre-training of deep bidirectional transformers for language understanding. In Proceedings ofthe 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers), pages 4171–4186, Minneapolis, Minnesota. Association for Computational Linguistics.",
+            "Erik-Lân Do Dinh, Hannah Wieland, and Iryna Gurevych. 2018. Weeding out conventionalized metaphors: A corpus of novel metaphor annotations. In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing, pages 1412–1424, Brussels, Belgium. Association for Computational Linguistics.",
+            "D. Gentner and A. B Markman. 1997. Structure mapping in analogy and similarity. American Psychologist, 52(1):45–56.",
+            "Joseph Grady, Todd Oakley, and Seana Coulson. 1999. Blending and metaphor. AMSTERDAM STUDIES IN THE THEORYAND HISTORY OF LINGUISTIC SCIENCE SERIES 4, pages 101–124.",
+            "Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou, Mantas Mazeika, Dawn Song, and Jacob Steinhardt. 2021. Measuring massive multitask language understanding.",
+            "Rohan Joseph, Timothy Liu, Aik Beng Ng, Simon See, and Sunny Rai. 2023. NewsMet : A ‘do it all’ dataset of contemporary metaphors in news headlines. In Findings ofthe Associationfor Computational Linguistics: ACL 2023, pages 10090–10104, Toronto, Canada. Association for Computational Linguistics.",
+            "Jan Kocon, Igor Cichecki, Oliwier Kaszyca, Mateusz´ Kochanek, Dominika Szydło, Joanna Baran, Julita Bielaniewicz, Marcin Gruza, Arkadiusz Janz, Kamil Kanclerz, Anna Kocon, Bartłomiej Koptyra, Wik-´ toria Mieleszczenko-Kowszewicz, Piotr Miłkowski, Marcin Oleksy, Maciej Piasecki, Łukasz Radlinski,´ Konrad Wojtasik, Stanisław Wo´zniak, and Przemysław Kazienko. 2023. Chatgpt: Jack of all trades, master of none. Information Fusion, page 101861.",
+            "George Lakoff. 2014. Mapping the brain’s metaphor circuitry: metaphorical thought in everyday reason. Frontiers in Human Neuroscience, 8.",
+            "George Lakoff and Mark Johnson. 1980. Metaphors we live by. University of Chicago Press.",
+            "Zhenzhong Lan, Mingda Chen, Sebastian Goodman, Kevin Gimpel, Piyush Sharma, and Radu Soricut.",
+            "2020. Albert: A lite bert for self-supervised learning of language representations. In International Conference on Learning Representations.",
+            "Chee Wee (Ben) Leong, Beata Beigman Klebanov, Chris Hamill, Egon Stemle, Rutuja Ubale, and Xianyang Chen. 2020. A report on the 2020 VUA and TOEFL metaphor detection shared task. In Proceedings of the Second Workshop on Figurative Language Processing, pages 18–29, Online. Association for Computational Linguistics.",
+            "Chee Wee (Ben) Leong, Beata Beigman Klebanov, and Ekaterina Shutova. 2018. A report on the 2018 VUA metaphor detection shared task. In Proceedings of the Workshop on Figurative Language Processing, pages 56–66, New Orleans, Louisiana. Association for Computational Linguistics.",
+            "Yucheng Li, Shun Wang, Chenghua Lin, Frank Guerin, and Loic Barrault. 2023. FrameBERT: Conceptual metaphor detection with frame embedding learning. In Proceedings ofthe 17th Conference ofthe European Chapter ofthe Associationfor Computational Linguistics, pages 1558–1563, Dubrovnik, Croatia. Association for Computational Linguistics.",
+            "Percy Liang, Rishi Bommasani, Tony Lee, Dimitris Tsipras, Dilara Soylu, Michihiro Yasunaga, Yian Zhang, Deepak Narayanan, Yuhuai Wu, Ananya Kumar, Benjamin Newman, Binhang Yuan, Bobby Yan, Ce Zhang, Christian Cosgrove, Christopher D. Manning, Christopher Ré, Diana Acosta-Navas, Drew A. Hudson, Eric Zelikman, Esin Durmus, Faisal Ladhak, Frieda Rong, Hongyu Ren, Huaxiu Yao, Jue Wang, Keshav Santhanam, Laurel Orr, Lucia Zheng, Mert Yuksekgonul, Mirac Suzgun, Nathan Kim, Neel Guha, Niladri Chatterji, Omar Khattab, Peter Henderson, Qian Huang, Ryan Chi, Sang Michael Xie, Shibani Santurkar, Surya Ganguli, Tatsunori Hashimoto, Thomas Icard, Tianyi Zhang, Vishrav Chaudhary, William Wang, Xuechen Li, Yifan Mai, Yuhui Zhang, and Yuta Koreeda. 2022. Holistic evaluation of language models.",
+            "Emmy Liu, Chenxuan Cui, Kenneth Zheng, and Graham Neubig. 2022. Testing the ability of language models to interpret figurative language. In Proceedings of the 2022 Conference of the North American Chapter ofthe Associationfor Computational Linguistics: Human Language Technologies, pages 4437–4452, Seattle, United States. Association for Computational Linguistics.",
+            "Saif Mohammad, Ekaterina Shutova, and Peter Turney. 2016. Metaphor as a medium for emotion: An empirical study. In Proceedings of the Fifth Joint Conference on Lexical and Computational Semantics, pages 23–33, Berlin, Germany. Association for Computational Linguistics.",
+            "Michael Mohler, Mary Brunson, Bryan Rink, and Marc Tomlinson. 2016. Introducing the LCC metaphor datasets. In Proceedings of the Tenth International Conference on Language Resources and Evaluation"
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            178
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "3526",
+        "bbox": [
+            480,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "(LREC’16), pages 4221–4227, Portorož, Slovenia. European Language Resources Association (ELRA).",
+            "Jeffrey Pennington, Richard Socher, and Christopher Manning. 2014. GloVe: Global vectors for word representation. In Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 1532–1543, Doha, Qatar. Association for Computational Linguistics.",
+            "Chengwei Qin, Aston Zhang, Zhuosheng Zhang, Jiaao Chen, Michihiro Yasunaga, and Diyi Yang. 2023. Is ChatGPT a general-purpose natural language processing task solver? In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 1339–1384, Singapore. Association for Computational Linguistics.",
+            "Ekaterina Shutova. 2010. Automatic metaphor interpretation as a paraphrasing task. In Human Language Technologies: The 2010 Annual Conference of the North American Chapter of the Association for Computational Linguistics, pages 1029–1037, Los Angeles, California. Association for Computational Linguistics.",
+            "Aarohi Srivastava, Abhinav Rastogi, Abhishek Rao, Abu Awal Md Shoeb, Abubakar Abid, Adam Fisch, Adam R. Brown, Adam Santoro, Aditya Gupta, Adrià Garriga-Alonso, Agnieszka Kluska, Aitor Lewkowycz, Akshat Agarwal, Alethea Power, Alex Ray, Alex Warstadt, Alexander W. Kocurek, Ali Safaya, Ali Tazarv, Alice Xiang, Alicia Parrish, Allen Nie, Aman Hussain, Amanda Askell, Amanda Dsouza, Ambrose Slone, Ameet Rahane, Anantharaman S. Iyer, Anders Andreassen, Andrea Madotto, Andrea Santilli, Andreas Stuhlmüller, An drew Dai, Andrew La, Andrew Lampinen, Andy Zou, Angela Jiang, Angelica Chen, Anh Vuong, Animesh Gupta, Anna Gottardi, Antonio Norelli, Anu Venkatesh, Arash Gholamidavoodi, Arfa Tabassum, Arul Menezes, Arun Kirubarajan, Asher Mullokandov, Ashish Sabharwal, Austin Herrick, Avia Efrat, Aykut Erdem, Ayla Karaka¸s, B. Ryan Roberts, Bao Sheng Loe, Barret Zoph, Bartłomiej Bojanowski, Batuhan Özyurt, Behnam Hedayatnia, Behnam Neyshabur, Benjamin Inden, Benno Stein, Berk Ekmekci, Bill Yuchen Lin, Blake Howald, Cameron Diao, Cameron Dour, Catherine Stinson, Cedrick Argueta, César Ferri Ramírez, Chandan Singh, Charles Rathkopf, Chenlin Meng, Chitta Baral, Chiyu Wu, Chris Callison-Burch, Chris Waites, Christian Voigt, Christopher D. Manning, Christopher Potts, Cindy Ramirez, Clara E. Rivera, Clemencia Siro, Colin Raffel, Courtney Ashcraft, Cristina Garbacea, Damien Sileo, Dan Garrette, Dan Hendrycks, Dan Kilman, Dan Roth, Daniel Freeman, Daniel Khashabi, Daniel Levy, Daniel Moseguí González, Danielle Perszyk, Danny Hernandez, Danqi Chen, Daphne Ippolito, Dar Gilboa, David Dohan, David Drakard, David Jurgens, Debajyoti Datta, Deep Ganguli, Denis Emelin, Denis Kleyko, Deniz Yuret, Derek Chen, Derek Tam, Dieuwke Hupkes, Diganta Misra, Dilyar Buzan, Dimitri Coelho Mollo, Diyi Yang, Dong-Ho Lee, Ekaterina Shutova, Ekin Dogus Cubuk, Elad Segal, Eleanor"
+        ],
+        "bbox": [
+            131,
+            85,
+            489,
+            114
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "Hagerman, Elizabeth Barnes, Elizabeth Donoway, El lie Pavlick, Emanuele Rodola, Emma Lam, Eric Chu, Eric Tang, Erkut Erdem, Ernie Chang, Ethan A. Chi Ethan Dyer, Ethan Jerzak, Ethan Kim, Eunice Engefu Manyasi, Evgenii Zheltonozhskii, Fanyue Xia Fatemeh Siar, Fernando Martínez-Plumed, Francesca Happé, Francois Chollet, Frieda Rong, Gaurav Mishra, Genta Indra Winata, Gerard de Melo, Ger mán Kruszewski, Giambattista Parascandolo, Gior gio Mariani, Gloria Wang, Gonzalo Jaimovitch López, Gregor Betz, Guy Gur-Ari, Hana Galijase vic, Hannah Kim, Hannah Rashkin, Hannaneh Ha jishirzi, Harsh Mehta, Hayden Bogar, Henry Shevlin Hinrich Schütze, Hiromu Yakura, Hongming Zhang Hugh Mee Wong, Ian Ng, Isaac Noble, Jaap Jumelet, Jack Geissinger, Jackson Kernion, Jacob Hilton, Jae hoon Lee, Jaime Fernández Fisac, James B. Simon, James Koppel, James Zheng, James Zou, Jan Ko con, Jana Thompson, Jared Kaplan, Jarema Radom,´ Jascha Sohl-Dickstein, Jason Phang, Jason Wei, Ja son Yosinski, Jekaterina Novikova, Jelle Bosscher, Jennifer Marsh, Jeremy Kim, Jeroen Taal, Jesse En gel, Jesujoba Alabi, Jiacheng Xu, Jiaming Song, Jil lian Tang, Joan Waweru, John Burden, John Miller, John U. Balis, Jonathan Berant, Jörg Frohberg, Jos Rozen, Jose Hernandez-Orallo, Joseph Boudeman, Joseph Jones, Joshua B. Tenenbaum, Joshua S. Rule, Joyce Chua, Kamil Kanclerz, Karen Livescu, Kar Krauth, Karthik Gopalakrishnan, Katerina Ignatyeva, Katja Markert, Kaustubh D. Dhole, Kevin Gim pel, Kevin Omondi, Kory Mathewson, Kristen Chiafullo, Ksenia Shkaruta, Kumar Shridhar, Kyle Mc-Donell, Kyle Richardson, Laria Reynolds, Leo Gao, Li Zhang, Liam Dugan, Lianhui Qin, Lidia Contreras Ochando, Louis-Philippe Morency, Luca Moschella, Lucas Lam, Lucy Noble, Ludwig Schmidt, Luheng He, Luis Oliveros Colón, Luke Metz, Lütfi Kerem ¸Senel, Maarten Bosma, Maarten Sap, Maartje ter Hoeve, Maheen Farooqi, Manaal Faruqui, Mantas Mazeika, Marco Baturan, Marco Marelli, Marco Maru, Maria Jose Ramírez Quintana, Marie Tolkiehn, Mario Giulianelli, Martha Lewis, Martin Potthast, Matthew L. Leavitt, Matthias Hagen, Mátyás Schu bert, Medina Orduna Baitemirova, Melody Arnaud, Melvin McElrath, Michael A. Yee, Michael Co hen, Michael Gu, Michael Ivanitskiy, Michael Starritt, Michael Strube, Michał Sw˛edrowski, Michele Bevilacqua, Michihiro Yasunaga, Mihir Kale, Mike Cain, Mimee Xu, Mirac Suzgun, Mo Tiwari, Mohit Bansal, Moin Aminnaseri, Mor Geva, Mozhdeh Gheini, Mukund Varma T, Nanyun Peng, Nathan Chi, Nayeon Lee, Neta Gur-Ari Krakover, Nicholas Cameron, Nicholas Roberts, Nick Doiron, Nikita Nangia, Niklas Deckers, Niklas Muennighoff, Nitish Shirish Keskar, Niveditha S. Iyer, Noah Constant, Noah Fiedel, Nuan Wen, Oliver Zhang, Omar Agha, Omar Elbaghdadi, Omer Levy, Owain Evans, Pablo Antonio Moreno Casares, Parth Doshi, Pascale Fung, Paul Pu Liang, Paul Vicol, Pegah Alipoormo labashi, Peiyuan Liao, Percy Liang, Peter Chang, Peter Eckersley, Phu Mon Htut, Pinyu Hwang, Piotr Miłkowski, Piyush Patil, Pouya Pezeshkpour, Priti Oli, Qiaozhu Mei, Qing Lyu, Qinlang Chen, Rabin Banjade, Rachel Etta Rudolph, Raefer Gabriel, Rahe",
+        "bbox": [
+            524,
+            86,
+            889,
+            923
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "3527",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "Habacker, Ramón Risco Delgado, Raphaël Millière, Rhythm Garg, Richard Barnes, Rif A. Saurous, Riku Arakawa, Robbe Raymaekers, Robert Frank, Rohan Sikand, Roman Novak, Roman Sitelew, Ronan Le-Bras, Rosanne Liu, Rowan Jacobs, Rui Zhang, Ruslan Salakhutdinov, Ryan Chi, Ryan Lee, Ryan Sto vall, Ryan Teehan, Rylan Yang, Sahib Singh, Saif M. Mohammad, Sajant Anand, Sam Dillavou, Sam Shleifer, Sam Wiseman, Samuel Gruetter, Samuel R. Bowman, Samuel S. Schoenholz, Sanghyun Han, Sanjeev Kwatra, Sarah A. Rous, Sarik Ghazarian, Sayan Ghosh, Sean Casey, Sebastian Bischoff, Sebastian Gehrmann, Sebastian Schuster, Sepideh Sadeghi, Shadi Hamdan, Sharon Zhou, Shashank Srivastava, Sherry Shi, Shikhar Singh, Shima Asaadi, Shixi ang Shane Gu, Shubh Pachchigar, Shubham Toshniwal, Shyam Upadhyay, Shyamolima, Debnath, Siamak Shakeri, Simon Thormeyer, Simone Melzi, Siva Reddy, Sneha Priscilla Makini, Soo-Hwan Lee, Spencer Torene, Sriharsha Hatwar, Stanislas Dehaene, Stefan Divic, Stefano Ermon, Stella Biderman, Stephanie Lin, Stephen Prasad, Steven T. Piantadosi, Stuart M. Shieber, Summer Misherghi, Svetlana Kiritchenko, Swaroop Mishra, Tal Linzen, Tal Schuster, Tao Li, Tao Yu, Tariq Ali, Tatsu Hashimoto, Te-Lin Wu, Théo Desbordes, Theodore Rothschild, Thomas Phan, Tianle Wang, Tiberius Nkinyili, Timo Schick, Timofei Kornev, Timothy Telleen-Lawton, Titus Tunduny, Tobias Gerstenberg, Trenton Chang, Trishala Neeraj, Tushar Khot, Tyler Shultz, Uri Shaham, Vedant Misra, Vera Demberg, Victoria Nyamai, Vikas Raunak, Vinay Ramasesh, Vinay Uday Prabhu, Vishakh Padmakumar, Vivek Srikumar, William Fedus, William Saunders, William Zhang, Wout Vossen, Xiang Ren, Xiaoyu Tong, Xinran Zhao, Xinyi Wu, Xudong Shen, Yadollah Yaghoobzadeh, Yair Lakretz, Yangqiu Song, Yasaman Bahri, Yejin Choi, Yichi Yang, Yiding Hao, Yifu Chen, Yonatan Belinkov, Yu Hou, Yufang Hou, Yuntao Bai, Zachary Seid, Zhuoye Zhao, Zijian Wang, Zijie J. Wang, Zirui Wang, and Ziyi Wu. 2022. Beyond the imitation game: Quantifying and extrapolating the capabilities of language models.",
+        "bbox": [
+            131,
+            85,
+            492,
+            648
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Harshvardhan Srivastava. 2022. Poirot at CMCL 2022 shared task: Zero shot crosslingual eye-tracking data prediction using multilingual transformer models. In Proceedings of the Workshop on Cognitive Modeling and Computational Linguistics, pages 102–107, Dublin, Ireland. Association for Computational Linguistics.",
+            "Gerard J. Steen, Aletta G. Dorst, J. Berenike Herrmann, Anna A. Kaal, and Tina Krennmayr. 2010a. Metaphor in usage. Cognitive Linguistics, 21(4):765– 796.",
+            "Gerard J. Steen, Aletta G. Dorst, J. Berenike Herrmann, Anna A. Kaal, Tina Krennmayr, and Tryntje Pasma. 2010b. A Methodfor Linguistic Metaphor Identification: From MIP to MIPVU. John Benjamins.",
+            "Kevin Stowe, Prasetya Utama, and Iryna Gurevych. 2022. IMPLI: Investigating NLI models’ performance on figurative language. In Proceedings ofthe"
+        ],
+        "bbox": [
+            115,
+            656,
+            489,
+            749
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "60th Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 5375–5388, Dublin, Ireland. Association for Computational Linguistics.",
+        "bbox": [
+            526,
+            85,
+            885,
+            140
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Xiaoyu Tong. 2021. Metaphor paraphrasing and wordsense disambiguation: toward a new approach to automated metaphor processin. Master’s thesis, Universitetit van Amsterdam, the Netherlands.",
+            "Xiaoyu Tong, Ekaterina Shutova, and Martha Lewis. 2021. Recent advances in neural metaphor processing: A linguistic, cognitive and social perspective. In Proceedings of the 2021 Conference of the North American Chapter ofthe Association for Computational Linguistics: Human Language Technologies, pages 4673–4686, Online. Association for Computational Linguistics.",
+            "Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. 2023. Llama: Open and efficient foundation language models."
+        ],
+        "bbox": [
+            510,
+            147,
+            885,
+            202
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Taylor Webb, Keith J. Holyoak, and Hongjing Lu. 2023. Emergent analogical reasoning in large language models.",
+        "bbox": [
+            510,
+            413,
+            884,
+            454
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Junjie Ye, Xuanting Chen, Nuo Xu, Can Zu, Zekai Shao, Shichun Liu, Yuhan Cui, Zeyang Zhou, Chao Gong, Yang Shen, Jie Zhou, Siming Chen, Tao Gui, Qi Zhang, and Xuanjing Huang. 2023. A comprehensive capability analysis of gpt-3 and gpt-3.5 series models.",
+        "bbox": [
+            510,
+            462,
+            885,
+            543
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Shenglong Zhang and Ying Liu. 2022. Metaphor detection via linguistics enhanced Siamese network. In Proceedings of the 29th International Conference on Computational Linguistics, pages 4149–4159, Gyeongju, Republic of Korea. International Committee on Computational Linguistics.",
+            "Qihuang Zhong, Liang Ding, Juhua Liu, Bo Du, and Dacheng Tao. 2023. Can chatgpt understand too? a comparative study on chatgpt and fine-tuned bert."
+        ],
+        "bbox": [
+            510,
+            551,
+            885,
+            632
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "A Previous metaphor understanding datasets and tasks",
+        "text_level": 2,
+        "bbox": [
+            509,
+            692,
+            845,
+            725
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Table 4 summarises the differences between MUNCH and previous datasets.",
+        "bbox": [
+            509,
+            734,
+            884,
+            766
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Example (1) is extracted from MPEC. The correct paraphrase, sentence (1-a), is almost completely different from the original sentence. The two distractor sentences that follow indicate different types of misinterpretation: Sentence (1-b) wrongly interprets the meaning of the original sentence, while the last sentence is based on a literal use of the word wheels.",
+        "bbox": [
+            507,
+            766,
+            887,
+            896
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "(1) the wheels of justice turn slowly a. it might take time but eventually justice prevails",
+        "bbox": [
+            509,
+            906,
+            808,
+            922
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "page_number",
+        "text": "3528",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "table",
+        "img_path": "images/e8f8a8948850e3937c00fcda8fb221c0b3d66613d70ef43fe930303780c9040d.jpg",
+        "table_caption": [
+            "Table 4: Differences between MUNCH and previous datasets that provide paraphrases for metaphors: MPEC (Bizzoni and Lappin, 2018; github.com/yuri-bizzoni/Metaphor-Paraphrase), NewsMet (Joseph et al., 2023; https://github.com/AxleBlaze3/NewsMet\\_Metaphor\\_Dataset/tree/main), IMPLI (Stowe et al., 2022; github.com/UKPLab/acl2022-impli), FLUTE (Chakrabarty et al., 2022b; https://github.com/ tuhinjubcse/model-in-the-loop-fig-lang), MiQA (Comsa et al., 2022), and Fig-QA(Liu et al., 2022; https://github.com/nightingal3/Fig-QA/tree/master). We present their differences regarding number of metaphor samples (#met), mean (SD) length of the metaphor samples (met:length, measured by number of words), number of correct paraphrases (#correct), the part of a metaphor sample that is replaced to create correct paraphrases (correct:type; s=sentence, p=phrase, w=word), number of distractors (#distractor), and distractor type. The numbers are calculated from the datasets available on GitHub. Note that our dataset is much more extensive than the previous ones."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>#met</td><td>met:length</td><td>#correct</td><td>correct:type</td><td>#distractor</td><td>distractor:type</td></tr><tr><td>MPEC</td><td>192</td><td>9 (4)</td><td>218</td><td> $s  s$ </td><td>526</td><td>mixed</td></tr><tr><td>NewsMet</td><td>791</td><td>12 (3)</td><td>791</td><td> $w  w$ </td><td>0</td><td>NA</td></tr><tr><td>IMPLI</td><td>913</td><td>16 (10)</td><td>1032</td><td> $w  p$ </td><td>281</td><td>context change</td></tr><tr><td>FLUTE</td><td>1500</td><td>11 (5)</td><td>1500</td><td> $p  p$ </td><td>1500</td><td>opposite meaning</td></tr><tr><td>MiQA</td><td>150</td><td>8 (2)</td><td>150</td><td> $s  s$ </td><td>150</td><td>context change</td></tr><tr><td>Fig-QA</td><td>10256</td><td>9 (3)</td><td>10256</td><td> $s  s$ </td><td>10256</td><td>opposite meaning</td></tr><tr><td>MUNCH</td><td>2953</td><td>26 (15)</td><td>10261</td><td> $w  w$ </td><td>1492</td><td>paraphrase</td></tr></table>",
+        "bbox": [
+            151,
+            80,
+            847,
+            214
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            166,
+            406,
+            490,
+            438
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "b. ¿ justice prevails in very little time",
+        "bbox": [
+            168,
+            439,
+            465,
+            455
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "c. ¿ the wheels of a car turn slowly",
+        "bbox": [
+            168,
+            456,
+            450,
+            472
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "The MPEC corpus is employed by two metaphor understanding tasks in BIG-Bench (Srivastava et al., 2022). The metaphor-boolean task uses a binary classification setup: Given a pair of sentences, is the second sentence a paraphrase of the first? GPT-2 only reached 0.41 accuracy on this task in a zero-shot scenario. The metaphor-understanding task consists of two subtasks: metaphor to paraphrase, which asks the model to select the correct paraphrase from 4 candidates; and paraphrase to metaphor, which requires the model to distinguish the metaphorical sentence corresponding to a given paraphrase from 3 other metaphors. GPT-2 large performed poorly on both subtasks: In a zeroshot scenario, the model gave 0.27 accuracy on the metaphor-to-paraphrase task, and 0.67 accuracy on the paraphrase-to-metaphor task.",
+        "bbox": [
+            110,
+            485,
+            490,
+            759
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "The metaphor-literal pairs in the NewsMet dataset was created with the help of LLMs. Each news headline has a verb considered as the focus word. They first passed the headlines with the focus words masked to ALBERT (Lan et al., 2020) to obtain the first 200 words that can replace the focus word. These 200 words were then passed to a metaphor detector to obtain the top-6 metaphorical and top-6 literal candidates. Human annotators then identified the best literal counterparts for metaphorical focus words and the best metaphorical counterpart for literal focus words.",
+        "bbox": [
+            110,
+            760,
+            490,
+            923
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            406,
+            885,
+            439
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "In the IMPLI example (2), the correct paraphrase (2-a) uses a phrase, paidfor, to explain the metaphorically used word absorbed in the original sentence. The distractor, on the other hand, is based on the literal meaning of absorbed. Fine-tuned RoBERTa base and RoBERTa large achieved high accuracies (> 0.8) on labelling these metaphorparaphrase and metaphor-distractor sentence pairs.",
+        "bbox": [
+            507,
+            442,
+            887,
+            573
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "(2) he absorbed the costs for the accident",
+        "bbox": [
+            509,
+            585,
+            848,
+            601
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "a. he paid for the costs for the accident",
+        "bbox": [
+            563,
+            605,
+            878,
+            620
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "b. ¿ he absorbed the sunlight after the accident",
+        "bbox": [
+            561,
+            621,
+            884,
+            652
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Example (3) is extracted from the FLUTE dataset; included in the parentheses are explanations for the paraphrase and the contradict respectively. Contrary to the MUNCH dataset, the authors aimed at paraphrases that use more than one word to replace a metaphorically used word. Note that sentence (3-b) is more of a direct contradiction of the reference metaphor than the paraphrase, as it preserves the metaphorically used word louder. The difference between the contradict and the reference metaphor may thus be easier to detect as compared to a contradict that is more similar to the paraphrase (e.g., Actions are not more important than words).",
+        "bbox": [
+            507,
+            667,
+            887,
+            894
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "(3) Actions speak louder than words.",
+        "bbox": [
+            509,
+            906,
+            815,
+            922
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "page_number",
+        "text": "3529",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "a. Actions are more important than words. (This phrase is used to say that what someone does is more important than what they say.)",
+        "bbox": [
+            168,
+            85,
+            489,
+            148
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "b. ¿ Actions are not louder than words. (The metaphor suggests that deeds or actions are more important than words, while the contradiction suggests that words are more important than deeds or actions.)",
+        "bbox": [
+            166,
+            149,
+            490,
+            246
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "As example (4) shows, each metaphorical premise in the MiQA dataset is paired with a literal premise exemplifying literal use of the metaphorical word; the dataset also includes implications (the text in parenthesis) of the metaphorical and literal premises:",
+        "bbox": [
+            112,
+            258,
+            489,
+            355
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "(4) a. I see what you mean (I understand you)",
+        "bbox": [
+            112,
+            365,
+            487,
+            395
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "b. I see what you are pointing at (My eyes are working well)",
+        "bbox": [
+            166,
+            397,
+            487,
+            430
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Coms<sub>,</sub> a et al. (2022) set up 2 binary-choice tasks using the MiQA dataset: (1) Given a metaphorical premise, select the correct implication; (2) given an implication, select the corresponding premise. They also set up a generative task: Given a metaphorical premise, answer whether it implies the literal conclusion. LLMs performed well on these tasks.",
+        "bbox": [
+            112,
+            439,
+            489,
+            569
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "The Fig-QA dataset provides similes of opposite meanings as well as their implications (given in parentheses):",
+        "bbox": [
+            112,
+            569,
+            489,
+            619
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "(5) a. The meteor was as bright as New York City (The meteor was very bright)",
+        "bbox": [
+            114,
+            629,
+            487,
+            661
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "b. The meteor was as bright as coal (The meteor was not bright at all)",
+        "bbox": [
+            168,
+            662,
+            487,
+            694
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "The binary-choice task is similar to MiQA: Given a metaphorical premise, select the correct implication. They also develop a generative task which prompt models to generate implications freely. Liu et al. (2022) found these tasks challenging for LLMs in zero-shot settings.",
+        "bbox": [
+            112,
+            705,
+            489,
+            802
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "B Crowdsourcing task",
+        "text_level": 2,
+        "bbox": [
+            114,
+            814,
+            327,
+            832
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "The participant information sheet, which was presented to the crowd workers prior to the consent form, has a section dedicated to potential disadvantages and risks involved in participating in the study—",
+        "bbox": [
+            112,
+            841,
+            490,
+            923
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "The sentences you will paraphrase were from a wide range of sources, including newspapers, fiction, and dialogues. You may occasionally encounter violence or taboo topics (e.g., war, crime, sex), as well as potentially disturbing opinions.",
+        "bbox": [
+            544,
+            85,
+            848,
+            183
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "If you are concerned, you do not have to give consent; you can also withdraw anytime during the experiment.",
+        "bbox": [
+            544,
+            186,
+            848,
+            236
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "The information sheet also explains how data collected from the study will be used. The workers were informed that their participation would remain confidential, that their response would be anonymised, and that the data would be made open access at the end of the study.",
+        "bbox": [
+            507,
+            247,
+            885,
+            343
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "The annotation guidelines are shown in Figure 6. The trial sentence is provided in example (6), where introduce is the metaphorical word to be interpreted. Our final list of acceptable answers includes: address, advance, clarify, convey, cover, define, describe, discuss, elucidate, establish, explain, mention, present, propose, reveal, share, show, state, submit, suggest, teach, unveil.",
+        "bbox": [
+            507,
+            343,
+            887,
+            474
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "(6) I shall now introduce the concept of an elementary charge, 1.6 × 10 -19 C, carried by an elementary particle called the electron.",
+        "bbox": [
+            509,
+            482,
+            887,
+            532
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Table 5 presents the 17 sentences for which none of the crowd workers were able to provide single-word substitutions for the metaphorical words. These are mainly highly conventionalised metaphors, for which it is usually difficult to find an alternative expression. There are also cases where the target word is part of a multi-part word (e.g., carry out, point ofview) or a phrase (e.g., put in an appearance, get rid of). These stem from annotation mistakes in VUA: According to the MIPVU procedure, VUA should have marked the entire word or phrase as a single annotation unit. We still collected paraphrases for these cases as there were no suitable way to filter them out automatically.",
+        "bbox": [
+            507,
+            542,
+            887,
+            770
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "C Inapt paraphrase annotation",
+        "text_level": 2,
+        "bbox": [
+            509,
+            778,
+            800,
+            796
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "The guidelines for inapt paraphrase annotation are presented in Figure 7.",
+        "bbox": [
+            507,
+            804,
+            884,
+            838
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "D Novelty distribution of MUNCH metaphor samples",
+        "text_level": 2,
+        "bbox": [
+            509,
+            847,
+            828,
+            882
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Figure 8 presents the novelty distribution of the metaphor samples in MUNCH.",
+        "bbox": [
+            507,
+            890,
+            884,
+            922
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_number",
+        "text": "3530",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Table 5: Sentences that did not receive single-word substitutions in the crowdsourcing task.",
+        "bbox": [
+            186,
+            708,
+            808,
+            724
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_number",
+        "text": "3531",
+        "bbox": [
+            480,
+            928,
+            519,
+            942
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "image",
+        "img_path": "images/d1046970a63fb6c6592d8c7a36ded92125196ae53769f3abe30866c289a4f50d.jpg",
+        "image_caption": [
+            "Figure 6: Instructions for the paraphrasing task."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            121,
+            99,
+            877,
+            834
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "E Model evaluation details",
+        "text_level": 2,
+        "bbox": [
+            509,
+            881,
+            759,
+            897
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "We accessed the LLaMA models through Hugging <sup>Face;</sup> <sup>the</sup> <sup>queries</sup> <sup>used</sup> ∼<sup>880</sup> <sup>GPU</sup> <sup>hours.</sup> <sup>Our</sup> <sup>GPT-</sup> 3532",
+        "bbox": [
+            477,
+            906,
+            885,
+            942
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "<sub>tenc</sub>e li<sup>ke</sup> <sup>th</sup> <sub>y</sub> <sub>an</sub> <sub>Eng</sub>li<sub>sh</sub> <sub>speaker</sub> w<sup>ou</sup>l<sup>d</sup> <sup>paraphrase</sup> <sup>th</sup> <sub>so</sub> <sub>p</sub>l<sub>ease</sub> <sub>do</sub> <sub>not</sub> <sub>try</sub> <sub>to</sub> <sub>jus1fy</sub> <sub>the</sub>m <sup>(that</sup> i <sub>y</sub> <sub>humans</sub> wi<sup>th</sup> <sup>an</sup> <sup>a\\empt</sup> <sup>to</sup> <sup>paraphrase</sup> <sup>th</sup> <sub>ed</sub> <sub>to</sub> <sub>a</sub> <sub>random</sub> <sub>sense</sub> <sub>o</sub><sup>f</sup> <sup>the</sup> <sup>former</sup>. <sup>The</sup> <sub>rated</sub> <sub>automa1ca</sub>ll<sub>y</sub> <sub>by</sub> <sub>rep</sub>l<sup>ac</sup>i<sup>ng</sup> <sup>a</sup> <sup>target</sup> <sup>w</sup> <sub>ease</sub> <sub>keep</sub> i<sub>n</sub> mi<sup>nd</sup> <sup>that</sup> <sup>the</sup> <sup>cand</sup>i<sup>date</sup> <sup>pa</sup>",
+        "bbox": [
+            625,
+            123,
+            741,
+            348
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>t</sub> <sub>of</sub> <sub>the</sub> l<sub>ast</sub> <sub>fu</sub>ll w<sup>eek</sup> <sup>of</sup> <sup>th</sup>i<sup>s</sup> <sup>e</sup>l<sup>ec1on</sup> <sup>ca</sup> m<sup>ost</sup> <sup>str</sup>i<sup>k</sup>i<sup>ng</sup> <sup>th</sup>i<sup>ng</sup> <sup>about</sup> <sup>Bagehot’s</sup> <sup>essa</sup> i<sub>mp</sub>l<sub>y</sub> <sub>does</sub> <sub>n</sub>o<sup>t</sup> <sup>app</sup>l<sup>y</sup> <sup>to</sup> <sup>Majo</sup>",
+        "bbox": [
+            569,
+            123,
+            618,
+            334
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>t</sub> <sub>of</sub> <sub>the</sub> l<sub>ast</sub> <sub>fu</sub>ll w<sup>eek</sup> <sup>of</sup> <sup>th</sup>i<sup>s</sup> <sup>e</sup>l<sup>ec1on</sup> <sup>ca</sup> <sub>he</sub> m<sup>ost</sup> <sup>str</sup>i<sup>k</sup>i<sup>ng</sup> <sup>th</sup>i<sup>ng</sup> <sup>about</sup> <sup>Bagehot’s</sup> <sup>ess</sup>",
+        "bbox": [
+            534,
+            122,
+            569,
+            344
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>or</sub> <sup>(3a)</sup> <sub>d</sub> <sub>not</sub> <sub>be</sub> <sub>se</sub>l<sub>ected</sub> <sub>as</sub> <sup>a</sup> <sup>good-enough</sup> i<sup>napt</sup> <sup>p</sup> <sub>erb</sub> <sub>and</sub> <sub>shou</sub>l<sub>d</sub> <sub>not</sub> <sub>be</sub> <sub>fo</sub>ll<sub>o</sub>w<sup>ed</sup> <sup>by</sup> <sup>a</sup> <sup>prep</sup> <sub>Sentence</sub> <sub>(3b)</sub> i<sub>s</sub> <sub>ungram</sub><sup>ma1ca</sup>l <sup>as</sup> <sup>c</sup> <sub>so</sub> <sub>ungram</sub><sup>ma1ca</sup>l <sup>cand</sup>i<sup>date</sup> <sup>paraphrases</sup> <sub>nt</sub> <sub>3</sub>: <sub>Grammar.</sub> W<sup>e</sup> <sup>focus</sup> <sup>on</sup> <sup>seman1c</sup> <sup>d</sup>i<sup>f</sup> <sub>te</sub>ll<sub>-ta</sub>l<sub>e</sub> <sub>com</sub><sup>munica'ons</sup> <sup>of</sup> <sup>f</sup>",
+        "bbox": [
+            426,
+            123,
+            534,
+            346
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>th</sub>i<sub>ng</sub> <sub>they</sub> <sub>do</sub> <sub>not</sub> <sub>do</sub> i<sub>s</sub> <sub>to</sub> <sub>re-exa</sub>mi<sup>ne</sup> <sup>th</sup>",
+        "bbox": [
+            408,
+            124,
+            428,
+            334
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>e</sub> <sub>te</sub>ll<sub>-ta</sub>l<sub>e</sub> <sub>si</sub>g<sup>ns</sup> <sup>of</sup> <sup>for</sup> <sub>one</sub> <sub>th</sub>i<sub>ng</sub> <sub>they</sub> <sub>do</sub> <sub>not</sub> <sub>do</sub> i<sub>s</sub> <sub>to</sub> <sub>re-exa</sub>mi<sup>ne</sup> <sup>th</sup>",
+        "bbox": [
+            378,
+            123,
+            410,
+            344
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>erent</sub> m<sup>ean</sup>i<sup>n</sup> <sub>ugh</sub> i<sub>t</sub> <sub>meets</sub> <sub>the</sub> <sub>fi</sub><sup>rst</sup> <sup>requ</sup>i<sup>rement</sup> <sup>of</sup> <sup>co</sup> <sub>cted</sub> <sub>as</sub> <sub>a</sub> <sub>good-e</sub>n<sup>ough</sup> i<sup>napt</sup> <sup>paraphrase</sup> <sup>o</sup> <sub>the</sub> <sub>phys</sub>i<sub>ca</sub>l <sub>sense</sub> <sub>of</sub> <sup>sign</sup>. <sup>Sentence</sup> <sup>(2b)</sup> <sup>th</sup> l<sub>e</sub> <sub>be</sub>l<sub>ow,</sub> <sub>howeve</sub>r<sup>,</sup> <sup>communica.on</sup> i<sup>s</sup> <sup>not</sup> <sup>n</sup> <sub>entence</sub> <sub>(1b)</sub> i<sub>s</sub> <sub>th</sub><sup>us</sup> <sup>an</sup> i<sup>napt</sup> <sup>paraphrase</sup> <sub>dbag</sub> i<sub>s</sub> <sub>re</sub>l<sub>ated</sub> <sub>to</sub> <sub>the</sub> <sub>h</sub>iZ<sup>ng</sup> <sup>sense</sup> <sup>of</sup> <sub>ep</sub>l<sub>ace</sub> <sub>the</sub> <sub>target</sub> w<sup>ord),</sup> i<sup>nstead</sup> <sup>of</sup> <sup>the</sup> <sup>c</sup> <sub>word</sub> <sub>(by</sub> <sub>us</sub>i<sub>ng</sub> <sub>a</sub> w<sup>ord</sup> <sup>re</sup>l<sup>ated</sup> <sup>to</sup> <sup>the</sup> <sup>m</sup> <sub>at</sub> <sub>a</sub> <sub>more</sub> <sub>bas</sub>i<sup>c</sup> <sup>sense</sup> <sup>m</sup>i<sup>ght</sup> <sup>have</sup> <sup>been</sup> <sup>a</sup> <sub>nt</sub> <sub>2</sub>: W<sup>rong</sup> <sup>sense.</sup> <sup>A</sup> <sup>good-enough</sup> i<sup>napt</sup> <sup>p</sup>",
+        "bbox": [
+            205,
+            123,
+            379,
+            347
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "l<sub>y</sub> <sub>convey</sub> <sub>the</sub> m<sup>ean</sup>i<sup>ng</sup> <sup>of</sup> <sup>the</sup> <sup>or</sup>i<sup>g</sup>i<sup>na</sup>l <sup>s</sup> <sub>espond</sub> <sub>to</sub> <sub>the</sub> <sub>or</sub>i<sub>g</sub>i<sub>na</sub>l <sub>sentence</sub>–<sup>they</sup> i<sub>napt</sub> <sub>paraphrases,</sub> <sub>ev</sub><sup>en</sup> i<sup>f</sup> <sup>one</sup> <sup>of</sup> <sup>the</sup> i<sup>nter</sup> <sub>ways</sub>. <sub>S</sub><sup>uch</sup> <sup>amb</sup>i<sup>guous</sup> <sup>sentences</sup> <sup>ar</sup> <sub>(1b)</sub> i<sub>s</sub> <sub>a</sub>l<sub>so</sub> <sub>a</sub>m<sup>b</sup>i<sup>guous</sup> <sup>and</sup> <sup>can</sup> <sup>be</sup> i<sup>nte</sup> <sub>u</sub>l<sub>a</sub> <sub>repeated,</sub> <sup>sandba</sup>",
+        "bbox": [
+            685,
+            373,
+            774,
+            596
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>pt</sub> <sub>pa</sub>r<sup>aphras</sup> <sub>nts</sub> <sub>and</sub> <sub>shou</sub>l<sub>d</sub> <sub>be</sub> m<sup>arked</sup> <sup>out</sup> <sup>as</sup> <sup>a</sup> <sup>goo</sup> <sub>e</sub> <sub>annota1on</sub> <sub>(</sub>i<sub>n</sub> <sub>fact,</sub> i<sub>t</sub> <sub>a</sub>l<sub>so</sub> m<sup>eets</sup> <sup>the</sup> <sub>nt</sub> <sub>and</sub> <sub>can</sub> <sub>be</sub> <sub>further</sub> <sub>c</sub>o<sup>ns</sup>i<sup>dered</sup> <sub>nvoke</sub> <sub>d</sub>i<sub>ferent</sub> i<sub>mages,</sub> <sub>sent</sub><sup>ence</sup> <sup>(1b)</sup> <sup>mee</sup> <sub>erson</sub> <sub>h</sub>i<sub>t</sub> <sub>her</sub> <sub>hard</sub> wi<sup>th</sup> <sup>a</sup> <sup>sandbag</sup>. <sup>S</sup>i<sup>nc</sup> <sub>dangerous,</sub> <sub>or</sub> w<sup>hat</sup> <sup>she</sup> <sup>repeated</sup> i<sup>rr</sup>i<sup>tated</sup> <sub>or</sub> <sub>metaphor</sub>i<sub>ca</sub>l <sup>sandbags)</sup> <sup>wh</sup>il<sup>e</sup> <sub>erent</sub> i<sub>mages</sub>: <sub>E</sub>i<sub>th</sub><sup>er</sup> <sup>Pau</sup>l<sup>a</sup> <sup>was</sup> <sup>prote</sup> <sub>refers</sub> <sub>to</sub> <sub>Pau</sub>l<sub>a’s</sub> <sub>e</sub>m<sup>o1ons,</sup> <sup>sentence</sup> <sup>(1b</sup> <sub>1a)</sub> <sub>and</sub> <sub>a</sub> <sub>cand</sub>i<sub>date</sub> <sub>paraphrase</sub> <sub>(1b)</sub>. W<sup>h</sup>il<sup>e</sup> <sub>nt</sub> <sub>1</sub>: <sub>Diferent</sub> m<sup>eanings.</sup> <sup>Cons</sup>i<sup>der</sup> <sup>th</sup> <sub>r</sub> <sub>exp</sub>l<sub>a</sub>i<sub>n</sub> <sub>these</sub> <sub>requ</sub>i<sub>re</sub>m<sup>ents</sup>",
+        "bbox": [
+            462,
+            372,
+            662,
+            596
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>ce</sub>p<sup>tab</sup>l <sub>tua</sub>l <sub>sense</sub> <sub>of</sub> <sub>the</sub> <sub>target</sub> w<sup>ord</sup>. <sup>(3)</sup> I<sup>t</sup> i<sup>s</sup> <sup>gra</sup> <sub>2)</sub> I<sub>t</sub> i<sub>nd</sub>i<sub>cates</sub> <sub>that</sub> <sub>a</sub> <sub>more</sub> <sub>bas</sub>i<sub>c</sub> <sup>sense</sup> i<sup>s</sup> <sup>m</sup> <sub>nts</sub>: <sub>(1)</sub> I<sub>t</sub> i<sub>s</sub> <sub>d</sub>i<sub>ferent</sub> <sub>fro</sub>m <sup>the</sup> <sup>or</sup>i<sup>g</sup>i<sup>na</sup>l <sup>se</sup> <sub>ough</sub> i<sub>napt</sub> <sub>paraphrase</sub> <sub>shou</sub>l<sub>d</sub> m<sup>eet</sup> <sup>the</sup> <sub>t,</sub> <sub>and</sub> <sub>you</sub> <sub>are</sub> <sub>done</sub> wi<sup>th</sup> <sup>the</sup> <sup>annota1on</sup> <sup>of</sup> <sub>nse,</sub> i<sub>t</sub> m<sup>eans</sup> <sup>th</sup>i<sup>s</sup> <sup>sense</sup> <sup>does</sup> <sup>not</sup> <sup>have</sup> <sup>re</sup>l<sup>a</sup> <sub>ense;</sub> i<sub>f</sub> <sub>no</sub> <sub>add</sub>i<sub>1</sub>o<sup>na</sup>l <sup>ques1on</sup> <sup>appears</sup> <sub>the</sub> <sub>first</sub> <sub>step,</sub> <sub>p</sub>l<sub>ease</sub> <sub>go</sub> <sub>thr</sub>o<sup>ugh</sup> <sup>the</sup> <sup>op1on</sup> <sub>es</sub> <sub>of</sub> <sub>the</sub> <sub>or</sub>i<sub>g</sub>i<sub>na</sub>l <sub>sentence</sub>. I<sub>f</sub> m<sup>u</sup>l<sup>1p</sup>l<sup>e</sup> <sup>s</sup> <sub>and</sub> <sub>se</sub>l<sub>ect</sub> <sub>the</sub> <sub>ones</sub> <sub>that</sub> <sub>ar</sub>e <sup>good-eno</sup> <sub>he</sub> <sub>or</sub>i<sub>g</sub>i<sub>na</sub>l <sub>sentenc</sub>e. <sup>P</sup>l<sup>ease</sup> <sup>read</sup> <sup>thro</sup> <sub>,</sub> <sub>wh</sub>i<sub>ch</sub> <sub>uses</sub> <sub>t</sub><sup>he</sup> <sup>re</sup>l<sup>ated</sup> <sup>word</sup> <sup>to</sup> <sup>rep</sup>l<sup>ace</sup> <sub>e,</sub> <sub>each</sub> <sub>word</sub> <sub>be</sub>i<sup>ng</sup> <sup>fo</sup>ll<sup>owed</sup> <sup>by</sup> <sup>a</sup> <sub>nse</sub> i<sub>s</sub> <sub>se</sub>l<sub>ected,</sub> <sub>you</sub> <sub>w</sub>ill <sub>see</sub> a li<sup>st</sup> <sup>of</sup> <sup>words</sup> <sub>ect</sub> <sub>inapt</sub> p<sup>araphr</sup>",
+        "bbox": [
+            206,
+            372,
+            457,
+            596
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>en</sub>t<sup>enc</sup> <sub>ou</sub> <sub>can</sub> <sub>say</sub> <sub>so</sub> i<sub>n</sub> <sub>the</sub> <sub>com</sub><sup>ment</sup> <sup>box</sup> <sup>and</sup> <sub>rd’s</sub> <sub>contextua</sub>l <sub>mean</sub>i<sub>ng</sub> <sup>unc</sup>l<sup>ear</sup> <sup>w</sup>i<sup>thou</sup> <sub>d</sub> <sub>a</sub> <sub>sentence</sub> <sub>too</sub> <sub>d</sub>ifi<sup>cu</sup>l<sup>t</sup> <sup>to</sup> <sup>comprehen</sup>",
+        "bbox": [
+            680,
+            621,
+            746,
+            846
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>e</sub> <sub>se</sub>l<sub>ect</sub> <sub>’N</sub>o<sup>ne</sup> <sup>of</sup> <sup>the</sup> <sup>ab</sup> <sub>be</sub>li<sub>eve</sub> <sub>the</sub> <sub>target</sub> <sub>word</sub> i<sub>s</sub> <sub>us</sub><sup>ed</sup> <sup>non-metap</sup> <sub>f</sub> <sub>the</sub> li<sub>sted</sub> <sub>senses</sub> <sub>are</sub> m<sup>ore</sup> <sup>bas</sup>i<sup>c</sup> <sup>(for</sup>",
+        "bbox": [
+            633,
+            621,
+            678,
+            846
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>d</sub> <sub>sense</sub> <sub>d</sub>i<sub>s1nc1ons,</sub> <sub>and</sub> <sub>mu</sub>l<sub>1p</sub>l<sub>e</sub> <sup>senses</sup> <sup>m</sup> <sub>hoose</sub> <sub>more</sub> <sub>than</sub> <sub>one</sub> <sub>sense,</sub> <sub>as</sub> W<sup>ordNe</sup>",
+        "bbox": [
+            588,
+            621,
+            623,
+            844
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>c</sub>mill<sup>an</sup> <sup>D</sup>i<sup>c1ona</sup> <sub>ocedure,</sub> <sub>but</sub> <sub>w</sub>i<sub>th</sub> W<sup>ordNet</sup> i<sup>n</sup> <sup>the</sup> <sup>p</sup>l<sup>a</sup> <sub>tua</sub>l <sub>sense</sub> <sub>and</sub> <sub>bas</sub>i<sub>c</sub> <sub>sense</sub> i<sub>den1</sub>fi<sup>ca1on</sup> <sup>st</sup> <sub>textua</sub>l <sub>sense</sub>. I<sub>n</sub> <sub>essenc</sub>e<sup>,</sup> <sup>you</sup> <sup>are</sup> <sup>asked</sup> <sup>t</sup> <sub>find</sub> <sub>one</sub> <sub>or</sub> <sub>more</sub> <sub>sense</sub><sup>s</sup> <sup>that</sup> <sup>are</sup> <sup>more</sup> <sup>bas</sup>i <sub>extracted</sub> <sub>from</sub> W<sup>ordNet;</sup> <sup>your</sup> <sup>job</sup> i<sup>s</sup> <sup>to</sup> <sup>se</sup> <sub>first</sub> <sub>ques1on</sub> <sub>prov</sub>i<sub>des</sub> <sub>you</sub> wi<sup>th</sup> <sup>a</sup>ll <sup>the</sup> <sup>sen</sup> <sub>nce</sub> <sub>has</sub> <sub>a</sub> <sub>h</sub>i<sub>gh</sub>li<sub>ghted</sub> <sub>word,</sub> w<sup>h</sup>i<sup>ch</sup> <sup>we</sup> <sup>ca</sup>ll <sub>'fy</sub> <sub>the</sub> <sub>more</sub> b<sup>asic</sup> <sup>me</sup>",
+        "bbox": [
+            445,
+            621,
+            588,
+            846
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>y,</sub> <sub>p</sub>l<sub>ease</sub> <sub>fe</sub><sup>e</sup>l <sup>free</sup> <sup>to</sup> <sup>conta</sup> <sub>r</sub> <sub>your</sub> <sub>annota1</sub><sup>on</sup>. I<sup>f</sup> <sup>you</sup> <sup>have</sup> <sup>any</sup> <sup>ques1</sup> <sub>ave</sub> <sub>anyth</sub>i<sub>ng</sub> <sub>that</sub> <sub>needs</sub> <sub>t</sub>o <sup>be</sup> <sup>expressed</sup> <sub>at</sub> <sub>the</sub> <sub>end</sub> <sub>of</sub> <sub>a</sub>ll <sub>the</sub> <sub>ques1</sub><sup>ons</sup> <sup>for</sup> <sup>that</sup> <sup>sen</sup> <sub>ur</sub> <sub>annota1ons;</sub> <sub>there</sub> i<sub>s</sub> <sub>a</sub>l<sub>so</sub> <sub>a</sub> <sub>com</sub><sup>ment</sup> <sup>bo</sup> <sub>apt</sub> <sub>paraphrases</sub>. I <sub>use</sub> m<sup>u</sup>l<sup>1p</sup>l<sup>e</sup> <sup>cho</sup>i<sup>ce</sup> <sup>qu</sup> <sub>n1fy</sub>i<sub>ng</sub> <sub>the</sub> <sub>more</sub> b<sup>as</sup>i<sup>c</sup> <sup>mean</sup>i<sup>ng</sup> <sup>and</sup> <sup>se</sup>l<sup>ec</sup> <sub>cument</sub> I will <sup>exp</sup>l<sup>a</sup>i<sup>n</sup> <sup>the</sup> <sup>two</sup> <sup>annota1</sup>",
+        "bbox": [
+            304,
+            621,
+            430,
+            846
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>av</sub>i<sup>gat</sup> <sub>ces</sub> i<sub>n</sub> <sub>each),</sub> <sub>so</sub> <sub>that</sub> i<sub>t</sub> will <sup>be</sup> <sup>eas</sup>i<sup>er</sup> <sup>f</sup> <sub>ces</sub> <sub>that</sub> <sub>need</sub> <sub>your</sub> <sub>annota</sub>1<sup>on,</sup> <sup>sp</sup>li<sup>t</sup> i<sup>nto</sup> <sub>for</sub> <sub>tak</sub>i<sub>ng</sub> <sub>part</sub> i<sub>n</sub> <sub>th</sub>i<sub>s</sub> <sub>annota1on</sub> <sub>task</sub>. I wil",
+        "bbox": [
+            240,
+            621,
+            304,
+            846
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "<sub>nes</sub> <sub>for</sub> <sub>Inapt</sub> <sub>Paraphrase</sub> A<sup>nn</sup>",
+        "bbox": [
+            206,
+            632,
+            225,
+            834
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Figure 7: Guidelines for inapt paraphrase annotation.",
+        "bbox": [
+            317,
+            890,
+            680,
+            906
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "page_number",
+        "text": "3533",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "chart",
+        "img_path": "images/269133639411fc35b608ffccd5cfc45f9ffe098ddbe3da5f5f7fd01bb6c52134.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 8: Novelty distribution of the metaphor samples, across all genres (above) and in different genres (below). The novelty scores are extracted from Do Dinh et al. (2018)."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            146,
+            99,
+            438,
+            435
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "3.5 queries through the OpenAI API cost 255 USD.",
+        "bbox": [
+            114,
+            536,
+            487,
+            568
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "We provide all the prompts used in this study: three prompts for each condition of the paraphrase judgement tasks, including word judgement (Table 6) and sentence judgement (Table 7); and three prompts for the paraphrase generation task (Table 8).",
+        "bbox": [
+            112,
+            573,
+            490,
+            670
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "F Error analysis details",
+        "text_level": 2,
+        "bbox": [
+            114,
+            696,
+            337,
+            713
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "F.1 Paraphrase judgement",
+        "text_level": 2,
+        "bbox": [
+            114,
+            732,
+            341,
+            749
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Table 9 shows the number of each expectationvs-prediction combination for each model when it achieved the highest accuracy score across all conditions and prompts: The Metaphor-Word condition of Word-judgement for LLaMA-13B, using the third prompt (see Table 6); the Metaphot-Word condition of Sentence-judgement for LLaMA-30B, using the second prompt (see Table 7); the Implicit condition of Word-judgement for GPT-3.5, using the third prompt.",
+        "bbox": [
+            112,
+            762,
+            490,
+            923
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "table",
+        "img_path": "images/809c975726a8e944493369005cac991ed565732332854e6688b0c0b77ec9e353.jpg",
+        "table_caption": [
+            "Table 6: Prompts for the word judgement task."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=1>Implicit</td></tr><tr><td rowspan=1 colspan=1>(1) Choose the word(s) that can replace the highlightedword in the given sentence without changing the meaningof the sentence.Sentence: (a metaphor sample)Option A: (a substitution word)Option B: (another substitution word)Option C: Both Option A and Option BOption D: Neither Option A nor Option BCorrect answer: Option</td></tr><tr><td rowspan=1 colspan=1>(2) Select words that can replace the highlighted word inthe given sentence without altering the sentence&#x27;s meaning.(...)</td></tr><tr><td rowspan=1 colspan=1>(3) Which of the given options can replace the highlightedword in the given sentence without altering the sentence&#x27;smeaning?(.. .)</td></tr><tr><td rowspan=1 colspan=1>M-sent</td></tr><tr><td rowspan=1 colspan=1>(1) Choose the word(s) that can replace the highlightedword in the given metaphorical sentence without changingthe meaning of the sentence. (...)</td></tr><tr><td rowspan=1 colspan=1>(2) Select words that can replace the highlighted wordin the given metaphorical sentence without altering thesentence&#x27;s meaning. (...)</td></tr><tr><td rowspan=1 colspan=1>(3) Which of the given options can replace the highlightedword in the given metaphorical sentence without alteringthe sentence&#x27;s meaning? (.. .)</td></tr><tr><td rowspan=1 colspan=1>M-word</td></tr><tr><td rowspan=1 colspan=1>(1) Choose the word(s) that can replace the highlightedmetaphorically used word in the given sentence withoutchanging the meaning of the sentence. (. . .)</td></tr><tr><td rowspan=1 colspan=1>(2) Select words that can replace the highlighted metaphor-ically used word in the given sentence without altering thesentence&#x27;s meaning. (...)</td></tr><tr><td rowspan=1 colspan=1>(3) Which of the given options can replace the highlightedmetaphorically used word in the given sentence withoutaltering the sentence&#x27;s meaning? (...)</td></tr></table>",
+        "bbox": [
+            512,
+            80,
+            880,
+            516
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "F.2 Factors associated with model performance",
+        "text_level": 2,
+        "bbox": [
+            509,
+            567,
+            791,
+            599
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Table 10 summarises the novelty scores of the metaphor samples that receive correct versus incorrect answers from the models in the two paraphrase tasks. Table 11 and 12 show model accuracies in different genres and for different POS of the metaphorical word respectively. Like in F.1, the statistics are based on the best performance of each model. In paraphrase generation, the LLaMA models achieve their respective best performance when given the first prompt (see Table 8); for GPT-3.5, it is the second prompt.",
+        "bbox": [
+            507,
+            605,
+            885,
+            782
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_number",
+        "text": "3534",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "table",
+        "img_path": "images/331351bdcc48d8d850b22d7b33fdd73751584bf1396929ae29ef1a7ac078aa23.jpg",
+        "table_caption": [
+            "Table 7: Prompts for the sentence judgement task."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=1>Implicit</td></tr><tr><td rowspan=1 colspan=1>(1) Choose the correct paraphrase(s) for the given sen-tence.Sentence: (a metaphor sample)Option A: (a candidate paraphrase)Option B: (another candidate paraphrase)Option C: Both Option A and Option BOption D: Neither Option A nor Option BCorrect answer: Option</td></tr><tr><td rowspan=1 colspan=1>(2) Select sentences that paraphrase the given sentence.(...)</td></tr><tr><td rowspan=1 colspan=1>(3) Select sentences that are semantically equivalent to thefollowing sentence. (...)</td></tr><tr><td rowspan=1 colspan=1>M-sent</td></tr><tr><td rowspan=1 colspan=1>(1) Choose the correct paraphrase(s) for the givenmetaphorical sentence. (...)</td></tr><tr><td rowspan=1 colspan=1>(2) Select sentences that paraphrase the given metaphoricalsentence. (...)</td></tr><tr><td rowspan=1 colspan=1>(3) Select sentences that are semantically equivalent to thefollowing metaphorical sentence. (...)</td></tr><tr><td rowspan=1 colspan=1>M-word</td></tr><tr><td rowspan=1 colspan=1>(1) You are given a sentence where the highlighted wordis metaphorically used. Choose the correct paraphrase(s)for the given sentence. (...)</td></tr><tr><td rowspan=1 colspan=1>(2) Given a sentence where the highlighted word ismetaphorically used, select sentences that paraphrase thissentence. (...)</td></tr><tr><td rowspan=1 colspan=1>(3) Given a sentence where the highlighted word ismetaphorically used, select sentences that are semanti-cally equivalent to this sentence. (...)</td></tr></table>",
+        "bbox": [
+            117,
+            103,
+            485,
+            469
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "table",
+        "img_path": "images/eccc9856d07af5dc2d574a04865ccfc0be645363d1fd9cf3ea712f16e90221c3.jpg",
+        "table_caption": [
+            "Table 8: Prompts for the paraphrase generation task. The blank (\\_\\_\\_) denotes the place where models are asked to provide their answers: The LLaMA models append answer after the left quotation mark (“) while GPT-3.5 inserts answer between the two asterisks ( ). The blank itself is not part of the prompts."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>(1) Paraphrase the given sentence by substituting the high- lighted word with another word. The substitution should be a single word. Sentence: No golden light *bathed* the red brick of the house. 1lama: Paraphrase: No golden light *[blank]* the red brick of the house.</td></tr><tr><td>[blank] should be “ gpt: Paraphrase: No golden light *_* the red brick of the house.</td></tr><tr><td>(2) Use a single word to replace the highlighted word in the given sentence, so that the new sentence and the given sentence mean the same thing. Sentence: (...) New sentence: (...)</td></tr><tr><td>(3) Given a sentence with a highlighted word, replace this word with a different word to make a paraphrase. Sentence: (...) Paraphrase: (...)</td></tr></table>",
+        "bbox": [
+            117,
+            544,
+            484,
+            800
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "table",
+        "img_path": "images/feb0a45f551a7457d0a8b325c94ff21bcf6f8fce6fb578a9fbe38d8dad228d94.jpg",
+        "table_caption": [
+            "Table 9: Count for each combination of expected answer and correct or incorrect prediction when each model achieves their highest performance in the paraphrase judgement task. A/B (A or B) means one of the two candidate paraphrases is expected or predicted as the correct answer. The counts are based on the predictions of the models when they reach their respective highest accuracy in our experiments."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>11ama-13b</td><td></td><td>11ama-30b</td><td>gpt-3.5</td></tr><tr><td>A/B</td><td></td><td></td><td></td></tr><tr><td>A/B</td><td>667</td><td>462</td><td>373</td></tr><tr><td>B/A</td><td>212</td><td>47</td><td>20</td></tr><tr><td>C</td><td>193</td><td>563</td><td>641</td></tr><tr><td>D</td><td>0</td><td>0</td><td>38</td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td>CIC</td><td>10</td><td>32</td><td>38</td></tr><tr><td>A/B</td><td>35</td><td>13</td><td>5</td></tr><tr><td>D</td><td>0</td><td>0</td><td>2</td></tr><tr><td>D</td><td></td><td></td><td></td></tr><tr><td>D</td><td>0</td><td>0</td><td>101</td></tr><tr><td>A/B</td><td>241</td><td>33</td><td>52</td></tr><tr><td>C</td><td>134</td><td>342</td><td>222</td></tr></table>",
+        "bbox": [
+            547,
+            104,
+            847,
+            275
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "table",
+        "img_path": "images/d9a770e390cbc27c5c8d0fa2151b627d2d14d2c2b24f244bfb9ae548c51c0324.jpg",
+        "table_caption": [
+            "Table 10: Mean novelty scores of metaphor samples that each model gives correct/incorrect answers when it achieves its respective highest performance in the paraphrase judgement and paraphrase generation tasks. All standard deviations are 0.20 0.01. Boldface denotes that the difference between correct and incorrect answers is statistically significant."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>Judgement</td><td>Generation</td></tr><tr><td>11ama-13b</td><td>0.07 / 0.07</td><td>0.07 / 0.06</td></tr><tr><td>11ama-30b</td><td>0.05 / 0.08</td><td>0.06 / 0.06</td></tr><tr><td>gpt-3.5</td><td>0.06 / 0.08</td><td>0.04 / 0.07</td></tr></table>",
+        "bbox": [
+            564,
+            455,
+            828,
+            507
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "table",
+        "img_path": "images/ab2e2d3812b0844f9ec040e3ea1e911e1bb8e5caa7d05768cf34daaa03f0aef8.jpg",
+        "table_caption": [
+            "Table 11: Model accuracy in different genres when the models achieve their best performance in the paraphrase judgement and paraphrase generation tasks. The metaphor samples for the paraphrase judgement task do not cover the conversation genre. Boldface denotes statistically significant difference between the highest and lowest accuracies on the same row."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>ACPROSE</td><td>NEWS</td><td>FICTION</td><td>CONVRSN</td></tr><tr><td>Judgement</td><td></td><td></td><td></td><td></td></tr><tr><td>11ama-13b 11ama-30b</td><td>.44</td><td>.47</td><td>.47</td><td></td></tr><tr><td>gpt-3.5</td><td>.37 .34</td><td>.33 .36</td><td>.24 .32</td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td>Generation</td><td></td><td></td><td></td><td></td></tr><tr><td>11ama-13b</td><td>.15</td><td>.17</td><td>.21</td><td>.13</td></tr><tr><td>11ama-30b</td><td>.34</td><td>.37</td><td>.37</td><td>.32</td></tr><tr><td>gpt-3.5</td><td>.45</td><td>.41</td><td>.40</td><td>.40</td></tr></table>",
+        "bbox": [
+            515,
+            670,
+            877,
+            783
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_number",
+        "text": "3535",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "table",
+        "img_path": "images/601fa5108f549a5e2489579cf783e3b4668a0def35e25392be8ac7331c06075e.jpg",
+        "table_caption": [
+            "Table 12: Model accuracy per POS of the metaphorical word (Noun, Verb, Adjective, and adveRb) when each model achieves its best performance in the paraphrase judgement and paraphrase generation tasks. Boldface denotes statistically significant difference between the highest and lowest accuracies on the same row. Accuracies for adverb metaphors in the paraphrase judgement task are disregarded as the task only includes 10 adverb samples."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>N</td><td>V</td><td>A</td><td>R</td></tr><tr><td>Judgement</td><td></td><td></td><td></td><td></td></tr><tr><td>11ama-13b</td><td>.44</td><td>.47</td><td>.46</td><td>.70</td></tr><tr><td>11ama-30b</td><td>.34</td><td>.32</td><td>.30</td><td>.30</td></tr><tr><td>gpt-3.5</td><td>.38</td><td>.29</td><td>.31</td><td>.30</td></tr><tr><td>Generation</td><td></td><td></td><td></td><td></td></tr><tr><td>11ama-13b</td><td>.18</td><td>.16</td><td>.15</td><td>.13</td></tr><tr><td>11ama-30b</td><td>.37</td><td>.36</td><td>.32</td><td>.37</td></tr><tr><td>gpt-3.5</td><td>.44</td><td>.41</td><td>.40</td><td>.52</td></tr></table>",
+        "bbox": [
+            178,
+            374,
+            425,
+            486
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "page_number",
+        "text": "3536",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 19
+    }
+]

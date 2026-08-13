@@ -1,0 +1,2466 @@
+[
+    {
+        "type": "text",
+        "text": "Unsupervised Multimodal Clustering for Semantics Discovery in Multimodal Utterances",
+        "text_level": 1,
+        "bbox": [
+            253,
+            82,
+            742,
+            122
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Hanlei Zhang1, Hua Xu1, Fei Long1, Xin Wang1,2,3, Kai Gao2 1State Key Laboratory of Intelligent Technology and Systems, Department of Computer Science and Technology, Tsinghua University, 2School of Information Science and Engineering, Hebei University of Science and Technology 3Samton (Jiangxi) Technology Development Co.,Ltd, Nanchang 330036, China zhang-hl20@mails.tsinghua.edu.cn,xuhua@tsinghua.edu.cn",
+        "bbox": [
+            117,
+            130,
+            885,
+            233
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            260,
+            252,
+            342,
+            268
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Discovering the semantics of multimodal utterances is essential for understanding human language and enhancing human-machine interactions. Existing methods manifest limitations in leveraging nonverbal information for discerning complex semantics in unsupervised scenarios. This paper introduces a novel unsupervised multimodal clustering method (UMC), making a pioneering contribution to this field. UMC introduces a unique approach to constructing augmentation views for multimodal data, which are then used to perform pre-training to establish well-initialized representations for subsequent clustering. An innovative strategy is proposed to dynamically select high-quality samples as guidance for representation learning, gauged by the density of each sample's nearest neighbors. Besides, it is equipped to automatically determine the optimal value for the top-K parameter in each cluster to refine sample selection. Finally, both high- and low-quality samples are used to learn representations conducive to effective clustering. We build baselines on benchmark multimodal intent and dialogue act datasets. UMC shows remarkable improvements of 2-7% scores in clustering metrics over state-of-the-art methods, marking the first successful endeavor in this domain. The complete code and data are available at https://github.com/thuiar/UMC.",
+        "bbox": [
+            141,
+            275,
+            462,
+            706
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            115,
+            713,
+            260,
+            730
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Discovering the semantics of dialogue utterances in unsupervised multimodal data requires integrating various modalities (i.e., text, video, and audio) to effectively mine the complicated semantics inherent in multimodal language. Conventional methods for semantics discovery typically focus solely on the text modality with clustering algorithms (Zhang et al., 2021a, 2023), failing to leverage the rich multimodal information in the real world (e.g., body language, facial expressions, and tones).",
+        "bbox": [
+            112,
+            739,
+            489,
+            901
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/3f60bd79a964e03fa1b5209397d1d189c8c8460a01391ea59955ad8b46454971.jpg",
+        "image_caption": [
+            "Figure 1: Text-only clustering deviates from real multimodal utterance semantics, highlighting the need of multimodal information in semantics discovery."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            527,
+            249,
+            865,
+            404
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "However, we argue that non-verbal modalities (i.e., video and audio) also play a critical role when performing unsupervised clustering. Taking Figure 1 as an example, relying solely on textual information yields clustering results that differ from the ground truth of multimodal cluster allocations (a detailed analysis on real-world examples is available in Appendix A), suggesting that non-verbal modalities can provide useful cues for semantics discovery. Moreover, effectively capturing multimodal interactions can yield more powerful and robust representations, thereby better addressing the challenges of ambiguous intent-cluster boundaries found in text-based clustering (see Section 6.3 and Appendix J). Discovering multimodal utterance semantics holds significant promise for a variety of applications, including video content recommendation, efficient multimodal data annotation, and virtual human technologies (detailed in Appendix B).",
+        "bbox": [
+            507,
+            485,
+            887,
+            791
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Understanding semantics in multimodal utterances has attracted much attention with the boom in multimodal language analysis (Poria et al., 2019; Saha et al., 2021b; Zhang et al., 2022a). For example, Saha et al. (2021b) annotated multimodal dialogue act (DA) labels on two popular multimodal multi-party conversational datasets (Busso et al., 2008; Poria et al., 2019) and performed DA recognition using attention sub-networks build upon modality encoders. Zhang et al. (2022a) pioneered multimodal intent analysis, introducing a new dataset with multimodal intent labels and establishing baselines with three multimodal fusion methods (Tsai et al., 2019; Rahman et al., 2020; Hazarika et al., 2020). However, these works remain restricted within supervised tasks, i.e., the training target for each piece of data is known which is not applicable in unsupervised scenarios.",
+        "bbox": [
+            507,
+            807,
+            887,
+            921
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "\\* Hua Xu is the corresponding author.",
+        "bbox": [
+            141,
+            906,
+            381,
+            920
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            490,
+            263
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "In contrast, semantics discovery is an emerging field in NLP. It fundamentally operates as a clustering task and has seen the development of many unsupervised (Cheung and Li, 2012; Padmasundari and Bangalore, 2018; Haponchyk et al. 2018; Zhang et al., 2023) and semi-supervised (Lin et al., 2020; Zhang et al., 2021c, 2022b; Zhou et al., 2023) methods. However, these methods are primarily designed for the text-only modality and lack proficiency in handling the diverse modalities encountered in real-world scenarios. Thus, there is a lack of multimodal clustering methods for discovering utterance semantics, posing two challenges: (1) determining how to leverage information from nonverbal modalities to complement the text modality in clustering and (2) devising ways to fully exploit multimodal unlabeled data to learn clusteringfriendly representations.",
+        "bbox": [
+            112,
+            267,
+            492,
+            557
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "To address these challenges, we introduce UMC, a novel unsupervised multimodal clustering algorithm for semantics discovery, as shown in Figure 2. We utilize the capabilities of the pre-trained language model (Devlin et al., 2019) to process text data. For the video and audio modalities, deep features are initially extracted using powerful backbones from computer vision and speech signal processing. Two transformer encoders are then employed to capture the deep semantics of these features. The text modality is designated as the anchor, guiding the learning of the other modalities. For this purpose, we concatenate features from all three modalities and mask the video or audio features with zero vectors, creating two sets of positive augmentation views. These multimodal representations and their augmentations are applied to an unsupervised contrastive loss, yielding wellinitialized representations for subsequent process.",
+        "bbox": [
+            112,
+            562,
+            490,
+            869
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "To fully mine the semantic similarities among unsupervised multimodal data, we introduce a novel strategy that initially selects high-quality samples.",
+        "bbox": [
+            114,
+            872,
+            492,
+            921
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "This strategy employs a dynamic sample selection threshold t, aiming to select the highest-quality t percent of samples in each iteration for training. This selection is based on a unique mechanism that calculates the density of each sample within its respective cluster and ranks them accordingly. Besides, an evaluation process is designed to automatically determine the optimal parameters for the top-K nearest neighbors from a set of candidates. After selecting high-quality samples, we propose a sequential process for multimodal representation learning. This process begins by learning from high-quality samples using supervised contrastive loss and then refines the remaining low-quality samples using unsupervised contrastive loss. This twostep approach promotes beneficial intra-class and inter-class relations among high-quality samples while pushing apart low-quality samples, thereby generating representations conducive to clustering. The entire process is repeated until the sample selection threshold t is met.",
+        "bbox": [
+            507,
+            85,
+            887,
+            423
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "We summarize our contributions as follows:",
+        "bbox": [
+            527,
+            424,
+            857,
+            438
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "In this work, we make a pioneering contribution by formulating the challenging multimodal semantics discovery task. To solve this problem, we first introduce a novel method for constructing positive augmentations for multimodal data, effectively leveraging non-verbal modalities for unsupervised pre-training, which provides a good initialization for unsupervised clustering.",
+        "bbox": [
+            507,
+            441,
+            885,
+            569
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Then, we propose a new clustering algorithm, UMC, which features an innovative high-quality sample selection strategy and a sequential representation learning method between high- and lowquality samples, resulting in excellent performance across both single and multimodal modalities.",
+        "bbox": [
+            507,
+            569,
+            887,
+            665
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Finally, we establish baselines using benchmark multimodal intent and dialogue datasets. Extensive experiments show that the proposed UMC outperforms state-of-the-art clustering algorithms by a notable margin of 2-7% scores in standard clustering metrics. To the best of our knowledge, this is the first successful attempt at leveraging multiple modalities for unsupervised clustering, marking a substantial advancement in this area.",
+        "bbox": [
+            507,
+            667,
+            887,
+            812
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Related Works",
+        "text_level": 2,
+        "bbox": [
+            509,
+            824,
+            675,
+            840
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2.1 Unsupervised Clustering",
+        "text_level": 2,
+        "bbox": [
+            509,
+            851,
+            752,
+            866
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Unsupervised clustering is fundamental in machine learning. Classic clustering methods like K-Means (MacQueen et al., 1967) and Agglomerative",
+        "bbox": [
+            507,
+            872,
+            887,
+            921
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/6fa6c6a9cac1435b359a67ac01ef4aac7f3ec1abef7590702e7b5ad3c0195fbe.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            129,
+            95,
+            865,
+            214
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/f6260e449282297091806bcc67d402cad3a33c15a9f1ae1b2ab35ae1cbeeb4b2.jpg",
+        "image_caption": [
+            "Step 2: Clustering and High-quality Sample Selection",
+            "Step 3: Multimodal Representation Learning",
+            "Figure 2: Overview of our proposed unsupervised multimodal clustering algorithm UMC."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            131,
+            223,
+            868,
+            369
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Clustering (Gowda and Krishna, 1978) iteratively assign clusters until convergence based on features. Deep clustering methods, like DEC (Xie et al., 2016) and DCN (Yang et al., 2017), enhance this process by jointly clustering and feature learning, employing stacked autoencoders (Vincent et al., 2010). DeepCluster (Caron et al., 2018) uses cluster assignments as guidance for feature learning.",
+        "bbox": [
+            112,
+            423,
+            490,
+            551
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Recent methods using contrastive learning (Chen et al., 2020) have achieved the state-of-the-art performance. For instance, SCCL (Zhang et al., 2021a) combines instance-level contrastive learning with cluster refinement from target distributions. CC (Kumar et al., 2022) optimizes contrastive losses at both instance and cluster levels to generate clustering-friendly representations. However, these methods focus on merely the single text or image modality and fall short with multimodal data. MCN (Chen et al., 2021) is tailored for multimodal clustering, learning a unified representation from all modalities and applying cross-modal contrastive losses during clustering. However, MCN struggles with complex utterance semantics.",
+        "bbox": [
+            112,
+            551,
+            490,
+            794
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2.2 Intent Discovery",
+        "text_level": 2,
+        "bbox": [
+            114,
+            803,
+            292,
+            819
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Intent discovery is a key challenge in NLP, with numerous clustering methods developed to address it. Early methods (Hakkani-Tür et al., 2015; Haponchyk et al., 2018) use weakly supervised signals to aid in clustering but struggle to capture the high-level semantics in text. Recent methods (Lin et al., 2020; Zhang et al., 2021c; Mou et al., 2022; Zhang et al., 2022b; Mou et al., 2023; Zhou et al., 2023; Shi et al., 2023) exploit limited labeled data to guide the feature learning process for clustering.",
+        "bbox": [
+            112,
+            824,
+            489,
+            921
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            423,
+            885,
+            486
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "However, these methods suffer a substantial decrease in performance in totally unsupervised scenarios. USNID (Zhang et al., 2023) proposes a novel centroid-guided mechanism with a pretraining strategy, achieving significant improvements over previous methods. Yet, USNID also falls short in handling multimodal data. See Appendix C for more related works on multi-view clustering and multimodal language analysis.",
+        "bbox": [
+            507,
+            488,
+            887,
+            633
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3 Problem Formulation",
+        "text_level": 2,
+        "bbox": [
+            509,
+            649,
+            732,
+            664
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "For the task of multimodal semantics discovery, we are provided with a multimodal intent or dialogue act dataset $\\mathcal { D } _ { \\mathrm { m m } } ~ = ~ \\{ ( s _ { i } ^ { \\mathrm { T } } , s _ { i } ^ { \\mathrm { A } } , s _ { i } ^ { \\mathrm { V } } ) | y _ { i } ~ \\in$ ${ \\mathcal { I } } , i = 1 , . . . , N \\}$ , where each $i ^ { \\mathrm { t h } }$ instance $s _ { i }$ contains multimodal utterances, including $s _ { i } ^ { \\mathrm { T } }$ , audio $\\boldsymbol { s } _ { i } ^ { \\mathrm { A } }$ , and video $\\boldsymbol { s } _ { i } ^ { \\mathrm { v } }$ . Here, N represents the total number of instances. The ground-truth label $y _ { i }$ , belonging to the set of intent or dialogue act classes $\\mathcal { Y } = \\{ y _ { i } \\} _ { i = 1 } ^ { K _ { y } }$ , remains unseen during training and validation and is only available during testing. The number of classes is denoted by $K y$",
+        "bbox": [
+            507,
+            677,
+            885,
+            854
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "The objective is to learn a multimodal neural network $\\mathcal F ( \\cdot )$ capable of obtaining multimodal representations z conducive to clustering. These representations are subsequently employed to divide the set $\\{ s _ { i } \\} _ { i = 1 } ^ { N }$ into $K _ { \\mathcal { y } }$ groups.",
+        "bbox": [
+            507,
+            856,
+            887,
+            921
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "header",
+        "text": "Step 1: Multimodal Unsupervised Pre-training",
+        "bbox": [
+            443,
+            83,
+            672,
+            92
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            83,
+            352,
+            102
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "4 Methodologies",
+        "text_level": 2,
+        "bbox": [
+            114,
+            114,
+            277,
+            130
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "4.1 Multimodal Representation",
+        "text_level": 2,
+        "bbox": [
+            112,
+            141,
+            378,
+            156
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "To obtain multimodal representations, we first extract deep features from text, video, and audio modalities. For text, we employ the pre-trained language model (PLM), BERT (Devlin et al., 2019) as the encoder, fine-tuning it on the text inputs $s ^ { \\mathrm { T } }$ The initial [CLS] token embedding, ${ \\pmb x } _ { \\mathrm { T } } \\in \\mathbb { R } ^ { D _ { \\mathrm { T } } }$ serves as the sentence-level representation, where $D _ { \\mathrm { T } }$ is the feature dimension of 768. We then incorporate a linear layer, represented as $f _ { \\mathrm { T } } ( \\cdot )$ , yielding $z _ { \\mathrm { T } } \\in \\mathbb { R } ^ { D _ { H } }$ . Here, H indicates a dimensionally reduced space, enhancing computational efficiency and accentuating primary features.",
+        "bbox": [
+            110,
+            164,
+            490,
+            357
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "For non-verbal modalities, we use semantically rich features as inputs as suggested in (Saha et al., 2020; Zhang et al., 2022a). For video, we employ the Swin Transformer (Liu et al., 2021) to extract video feature representations $\\pmb { x } _ { \\mathrm { V } } \\in \\mathbb R ^ { L _ { \\mathrm { V } } \\times D _ { \\mathrm { V } } }$ at the frame level from the video inputs $s ^ { \\mathrm { V } }$ . Here, $L _ { \\mathrm { V } }$ represents the video length, and $D _ { \\mathrm { V } }$ is the feature dimension of 1024. For audio $s ^ { \\mathrm { A } }$ , we first extract audio waveforms as in (Zhang et al., 2022a) and then use the WavLM (Chen et al., 2022) to obtain features $\\pmb { x } _ { \\mathrm { A } } \\in \\mathbb { R } ^ { L _ { \\mathrm { A } } \\times D _ { \\mathrm { A } } }$ . Here, $L _ { \\mathrm { { A } } }$ and $D _ { \\mathrm { { A } } }$ denote the audio length and feature dimension of 768, respectively. Unsupervised multimodal clustering can benefit from these two powerful non-verbal features extracted from the Swin Transformer and WavLM models. A comparison between them and other multimodal features is shown in Appendix D.",
+        "bbox": [
+            110,
+            357,
+            489,
+            631
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "For both audio and video modalities, initially introduce a linear layer $f _ { M } ( \\cdot )$ in alignment with the text modality. Subsequently, we apply the multi-headed attention mechanism with the Transformer (Vaswani et al., 2017) encoder, adeptly capturing intricate semantic relationships and temporal nuances. Eventually, in line with (Tsai et al., 2019), the last sequence elements are employed to derive the sentence-level representation $z _ { M } .$",
+        "bbox": [
+            110,
+            632,
+            490,
+            777
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/3857cd6ed1677b4a5b2aea6879a7a4faf19c692b1db4bd1285b2102f19bdffee.jpg",
+        "text": "$$\nz _ { M } = \\mathrm { T r a n s f o r m e r } ( f _ { M } ( { \\pmb x } _ { M } ) ) [ - 1 ] ,\\tag{1}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            166,
+            791,
+            433,
+            809
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where $M \\in \\{ \\mathbf { A } , \\mathbf { V } \\}$ , and $\\boldsymbol { z } _ { M } \\in \\mathbb { R } ^ { D _ { H } }$",
+        "bbox": [
+            112,
+            821,
+            393,
+            838
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Following this, we concatenate the representations $z _ { \\mathrm { T } } , z _ { \\mathrm { A } }$ , and $z _ { \\mathrm { V } }$ and pass them through a nonlinear fusion layer, denoted as $\\mathcal { F } : \\mathbb { R } ^ { 3 D _ { H } } \\to \\mathbb { R } ^ { D _ { H } }$ This layer is designed to learn cross-modal interactions, yielding the combined representation",
+        "bbox": [
+            112,
+            840,
+            489,
+            921
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "ZTAV $\\in \\mathbb { R } ^ { D _ { H } }$",
+        "bbox": [
+            509,
+            83,
+            615,
+            99
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/ab69e536963b193aae1672a8c5033692025b1ffe68c97d6ea55840367ab5e77b.jpg",
+        "text": "$$\nz _ { \\mathrm { T A V } } = \\mathcal { F } ( \\mathrm { C o n c a t } ( z _ { \\mathrm { T } } , z _ { \\mathrm { A } } , z _ { \\mathrm { V } } ) ) ,\\tag{2}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            574,
+            112,
+            818,
+            130
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where $\\mathcal { F }$ is defined as $W _ { 1 } \\sigma _ { \\mathrm { G E L U } } ( \\mathrm { D r o p o u t } ( \\cdot ) ) + b _ { 1 }$ Here, σGELU represents the GELU activation function, and $W _ { 1 }$ and $b _ { 1 }$ are the corresponding weight and bias matrices, respectively. Subsequently, we employ $z _ { \\mathrm { T A V } }$ and its augmentations for further clustering and representation learning.",
+        "bbox": [
+            507,
+            141,
+            885,
+            240
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "4.2 Multimodal Unsupervised Pre-training",
+        "text_level": 2,
+        "bbox": [
+            509,
+            249,
+            863,
+            265
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Effective pre-training strategies can provide wellinitialized representations conducive to clustering (Zhang et al., 2023). Unsupervised contrastive learning (Chen et al., 2020) has emerged as an effective approach for unsupervised clustering (Zhang et al., $2 0 2 1 \\mathrm { a } ;$ Li et al., 2021). It pushes apart samples and makes them distribute uniformly in the feature space while capturing implicit similarity relations between augmentations. However, existing methods often fall short in providing effective augmentations for multimodal data. In this work, we introduce a novel method of non-verbal modality masking to address this gap.",
+        "bbox": [
+            507,
+            269,
+            887,
+            480
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Given the predominant role of the text modality in intent analysis, we retain it as the core modality and mask either the video or audio modality for data augmentation. For the $i ^ { \\mathrm { t h } }$ sample $z _ { \\mathrm { T A V } , i }$ in a minibatch of B samples, either the video or audio modality is replaced with zero vectors. Eq. 2 is used to derive $z _ { \\mathrm { T A 0 } , i }$ and $z _ { \\mathrm { T 0 V } , i }$ as positively augmented samples. For each positive pair (i, $j )$ among the generated 3B augmented samples, we apply the multimodal unsupervised contrastive learning loss:",
+        "bbox": [
+            507,
+            479,
+            887,
+            657
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/20a6848b9a1404c4b31d0d6726cf7eae04163f390bcabd0e060d2a2302897dca.jpg",
+        "text": "$$\n\\begin{array} { r l } & { \\mathcal { L } _ { i , j } ^ { \\mathrm { m u c l } } = } \\\\ & { - \\log \\Bigg ( \\frac { \\exp ( \\sin ( \\phi _ { 1 } ( z _ { i } ) , \\phi _ { 1 } ( z _ { j } ) ) / \\tau _ { 1 } ) } { \\sum _ { k } \\mathbb { I } _ { [ k \\neq i ] } \\exp ( \\sin ( \\phi _ { 1 } ( z _ { i } ) , \\phi _ { 1 } ( z _ { k } ) ) / \\tau _ { 1 } ) } \\Bigg ) , } \\end{array}\\tag{3}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            509,
+            667,
+            890,
+            731
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where $z _ { i } \\in \\{ z _ { \\mathrm { T A V } , i } , z _ { \\mathrm { T A 0 } , i } , z _ { \\mathrm { T 0 V } , i } \\}$ , sim(·) refers to the dot product operation on two L2-normalized vectors, and $\\phi _ { 1 } ( \\cdot )$ is a non-linear layer with ReLU activation, serving as the contrastive head. The parameter $\\tau _ { 1 }$ represents the temperature, and $\\mathbb { I } _ { [ \\cdot ] }$ is the indicator function, outputting 1 if and only if $j = i ,$ , and 0 otherwise.",
+        "bbox": [
+            507,
+            758,
+            884,
+            871
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "By masking the video or audio modality with zero vectors, the model can focus on learning the implicit similarities in the shared modalities among positive pairs (i.e., text and video, text and audio, and text alone). This further encourages the model to capture intricate relationships and leverage complementary information across modalities.",
+        "bbox": [
+            507,
+            872,
+            885,
+            921
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "image",
+        "img_path": "images/d0248476c8656c980dba13cf5595145ab6913d8708c87b04b99715f56195693d.jpg",
+        "image_caption": [
+            "Figure 3: Pipeline of the high-quality sample selection mechanism."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            144,
+            84,
+            853,
+            279
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            332,
+            489,
+            398
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "4.3 Clustering and High-Quality Sample Selection",
+        "text_level": 2,
+        "bbox": [
+            112,
+            406,
+            450,
+            438
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "After pre-training, we employ the representations zTAv to perform clustering. Specifically, we adopt the K-Means++ algorithm (Arthur and Vassilvitskii, 2007) for this task due to its advanced initial centroid selection technique that improves convergence over standard K-Means.",
+        "bbox": [
+            112,
+            444,
+            489,
+            541
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "However, we observe that the cluster assignments obtained directly from K-Means++ are insufficiently high-quality to guide the learning of multimodal representations. To address this, we introduce a strategy to incrementally incorporate highquality samples into the learning process. This is achieved through a curriculum-based method, where we progressively adjust the sample selection threshold, t, dictating the proportion of selected samples from each cluster for a given training iteration. The threshold t is linearly updated as follows:",
+        "bbox": [
+            112,
+            541,
+            490,
+            719
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/19bd5e522b57560e7dc3a5d3733d3f36a9042da1414a5842a5efb1538d49ed3b.jpg",
+        "text": "$$\nt = t _ { 0 } + \\Delta \\cdot \\mathrm { i t e r } ,\\tag{4}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            233,
+            730,
+            366,
+            746
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where $t , t _ { 0 } \\in [ 0 , 1 ] , t _ { 0 }$ is the initial threshold set to 0.1 (see Appendix E for a detailed discussion), iter is the iteration index within the epoch, and $\\Delta$ is a preset positive increment, applied after each epoch.",
+        "bbox": [
+            112,
+            759,
+            489,
+            824
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "To further refine clustering performance, we incorporate the centroid inheritance strategy as proposed in (Zhang et al., 2023). Specifically, K-Means++ is utilized only during the first training iteration. In subsequent iterations, the cluster centroids from the previous iteration are inherited as initial centroids. This approach effectively leverages historical clustering information to guide and improve current clustering results.",
+        "bbox": [
+            112,
+            824,
+            490,
+            921
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            332,
+            885,
+            380
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Then, we need to identify high-quality samples for representation learning. We introduce a novel mechanism for selecting high-quality samples, as depicted in Figure 3. This mechanism comprises two main steps: density calculation and high-quality sample selection and evaluation.",
+        "bbox": [
+            507,
+            381,
+            887,
+            479
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "4.3.1 Density Calculation",
+        "text_level": 2,
+        "bbox": [
+            509,
+            487,
+            727,
+            502
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "To discern high-quality samples within each cluster, we propose using density as the criterion. The underlying intuition is that high-quality samples are likely to exhibit high local density, whereas low-quality, anomalous, or falsely clustered data are expected to have low local density. For the $i ^ { \\mathrm { { t h } } }$ sample, we compute its density, $\\rho _ { i } .$ , as the reciprocal of the average distance between $z _ { \\mathrm { T A V } , i }$ and its top-K nearest neighbors:",
+        "bbox": [
+            507,
+            506,
+            885,
+            652
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/0718bc43e0388b3485a843b679869e03cfa7e5a1b09bffc929c2b0bad2b59a39.jpg",
+        "text": "$$\n\\rho _ { i } = \\frac { K _ { \\mathrm { n e a r } } } { \\sum _ { j = 1 } ^ { K _ { \\mathrm { n e a r } } } d _ { i j } } ,\\tag{5}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            630,
+            662,
+            761,
+            701
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where $K _ { \\mathrm { n e a r } }$ denotes the number of top-K nearest neighbors. $d _ { i j }$ represents the Euclidean distance between the $i ^ { \\mathrm { { t h } } }$ sample and its $j ^ { \\mathrm { t h } }$ nearest neighbor.",
+        "bbox": [
+            507,
+            712,
+            885,
+            760
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "4.3.2 High-Quality Sample Selection and Evaluation",
+        "text_level": 2,
+        "bbox": [
+            509,
+            769,
+            847,
+            800
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "After calculating the density of each sample in each cluster, we rank them based on their densities in descending order. Specifically, for each sample in the $k ^ { \\mathrm { { t h } } }$ cluster $C _ { k }$ with a density of $\\rho _ { i }$ , we compute a sorted index list $I d x _ { C _ { k } }$ as follows:",
+        "bbox": [
+            507,
+            804,
+            884,
+            885
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/50c903578551992646a8f7356cfb3b2e6f6b89340d5eac1c302775db7cd76dd9.jpg",
+        "text": "$$\nI d x _ { C _ { k } } = \\mathrm { a r g s o r t } ( - [ \\rho _ { 1 } , \\rho _ { 2 } , \\cdot \\cdot \\cdot , \\rho _ { n } ] ) ,\\tag{6}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            552,
+            898,
+            836,
+            917
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where argsort yields the indices that sort the densities in ascending order of the negative values, and n represents the number of samples in $C _ { k }$ . The high-quality samples are selected based on the highest densities. The number of selected highest-density samples has a proportion in cluster $C _ { k }$ above the threshold t. Let $\\begin{array} { l l l } { m } & { = } & { \\lfloor n * t \\rfloor } \\end{array}$ , the chosen samples are denoted as: $z _ { \\mathrm { T A V } } ( { \\cal I } d x _ { C _ { k , 1 } } ) , \\dots , z _ { \\mathrm { T A V } } ( { \\cal I } d x _ { C _ { k , m } } )$ $z _ { \\mathrm { T A V } } ( I d x _ { C _ { k , i } } )$ is the $i ^ { \\mathrm { t h } }$ selected sample feature in cluster $C _ { k } .$ , based on the ordered density indices.",
+        "bbox": [
+            110,
+            85,
+            489,
+            263
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Considering that real-world data might not exhibit a uniform distribution across each class, assigning a fixed $K _ { \\mathrm { n e a r } }$ to every cluster could compromise the precision of density calculations, subsequently affecting the selection of high-quality samples. To address this, we introduce an innovative method to automatically select the optimal $K _ { \\mathrm { n e a r } } ^ { k }$ for each cluster $C _ { k }$ . Initially, we provide a candidate set $\\{ K _ { \\mathrm { n e a r } , q } ^ { k } \\} _ { q = 1 } ^ { u }$ , uniformly sampled based on the cluster size $| C _ { k } |$ . Specifically, $K _ { \\mathrm { n e a r } , q } ^ { k }$ is defined as:",
+        "bbox": [
+            112,
+            263,
+            490,
+            442
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "img_path": "images/af1cf35f00224018ce8cb0e62b93afb5f25df366a570421102cdcce503ecfc0d.jpg",
+        "text": "$$\nK _ { \\mathrm { n e a r } , q } ^ { k } = \\lfloor | C _ { k } | \\cdot ( L + \\Delta ^ { \\prime } \\cdot ( q - 1 ) ) \\rfloor ,\\tag{7}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            157,
+            451,
+            442,
+            472
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "where L is the lower proportion bound with the constraint of $0 \\le L \\le 1 , \\Delta ^ { \\prime }$ is a fixed interval, and u is the number of candidates. Then, for each candidate $K _ { \\mathrm { n e a r } , q } ^ { k }$ , we use Eq. 6 to compute sorted indices $I d x _ { C _ { k } } ^ { q }$ and select a subset $C _ { k } ^ { q }$ with topm samples. The quality of $C _ { k } ^ { q }$ is gauged through the cluster cohesion metric, measuring intra-cluster similarity. The cohesion of $C _ { k } ^ { q }$ is defined as:",
+        "bbox": [
+            112,
+            481,
+            489,
+            613
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "img_path": "images/511d815dee60dbaaeaa72a2dfb566ab65f50fe369fed9e35d1b519229727beab.jpg",
+        "text": "$$\n\\coth ( C _ { k } ^ { q } ) = \\sum _ { i = 1 } ^ { m } \\cosh ( C _ { k , i } ^ { q } ) ,\\tag{8}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            121,
+            623,
+            322,
+            664
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "img_path": "images/b96a1398a78559a94d6c2cd991ff9e7668b659170b17aa947bc8b8cbddc88a3f.jpg",
+        "text": "$$\n\\mathrm { c o h } ( C _ { k , i } ^ { q } ) =\\tag{9}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            114,
+            667,
+            213,
+            686
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "img_path": "images/16ac2916d0b1a3cdafee47763b7064c81873cabb484d4b05467955d4c97621a2.jpg",
+        "text": "$$\n\\frac { 1 } { m - 1 } \\sum _ { j = 1 , j \\neq i } ^ { m } d ( z _ { \\mathrm { T A V } } ( I d x _ { C _ { k , i } ^ { q } } ) , z _ { \\mathrm { T A V } } ( I d x _ { C _ { k , j } ^ { q } } ) ) ,\n$$",
+        "text_format": "latex",
+        "bbox": [
+            132,
+            688,
+            495,
+            732
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "where m is the previously defined number of chosen samples, $d ( \\cdot )$ represents the Euclidean distance. The cohesion score can effectively capture the feature compactness and reflect the cluster quality. The optimal selected candidate index $q _ { \\mathrm { o p t } }$ is calculated as:",
+        "bbox": [
+            112,
+            741,
+            490,
+            838
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "img_path": "images/b3bf60981abb83877e01608cac148d4d9fa002a45f7a21a80391f28c9aa5b426.jpg",
+        "text": "$$\nq _ { \\mathrm { o p t } } = \\operatorname * { a r g m i n } _ { \\boldsymbol { q } } \\left\\{ \\cosh \\left( C _ { k } ^ { q } \\right) \\right\\} .\\tag{10}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            196,
+            848,
+            403,
+            876
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "That is, the optimal $K _ { \\mathrm { n e a r } , q _ { \\mathrm { o p t } } } ^ { k }$ is selected by the candidate with the highest cluster cohesion score.",
+        "bbox": [
+            112,
+            888,
+            489,
+            920
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Subsequently, we use $\\{ K _ { \\mathrm { n e a r } , q _ { \\mathrm { o p t } } } ^ { k } \\} _ { k = 1 } ^ { K _ { y } }$ to obtain the selected high-quality indices $I d x ^ { \\prime } = \\{ I d x _ { C _ { k } } ^ { q _ { \\mathrm { o p t } } } \\} _ { k = 1 } ^ { K _ { \\mathcal { V } } }$ with Eq. 5 and 6. These indices are then employed to select high-quality samples for subsequent representation learning.",
+        "bbox": [
+            507,
+            82,
+            885,
+            171
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.4 Multimodal Representation Learning",
+        "text_level": 2,
+        "bbox": [
+            509,
+            181,
+            852,
+            197
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "The high-quality samples identified by the selected indices $I d x ^ { \\prime }$ tend to have more reliable pseudolabels, so we employ them as a guiding set to facilitate the learning of friendly representations for clustering. We aim to leverage these samples to capture high-level similarity relations between pairwise samples. To achieve this, we introduce the multimodal supervised contrastive loss:",
+        "bbox": [
+            507,
+            202,
+            887,
+            332
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "img_path": "images/ff56c2b5a91236d2e1047280d603fef4f6de24ed025e472cfb7027bf790add41.jpg",
+        "text": "$$\n\\begin{array} { r l } & { \\mathcal { L } _ { i } ^ { \\mathrm { m s c l } } = } \\\\ & { \\frac { - 1 } { | P ( i ) | } \\displaystyle \\sum _ { p \\in \\mathcal { P } ( i ) } \\log \\frac { \\exp ( \\sin ( l _ { i } , l _ { p } ) / \\tau _ { 2 } ) } { \\sum _ { j } \\mathbb { I } _ { [ j \\neq i ] } \\exp ( \\sin ( l _ { i } , l _ { j } ) / \\tau _ { 2 } ) } , } \\end{array}\\tag{11}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            517,
+            343,
+            873,
+            406
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "where $\\begin{array} { r } { \\displaystyle \\boldsymbol { l } _ { i } = \\phi _ { 2 } ( \\boldsymbol { z } _ { i } ) } \\end{array}$ , and $\\phi _ { 2 }$ is a non-linear layer with ReLU activation, consistent with Eq. 3. Here, we perform the same data augmentation techniques as in Section 4.2, and $l _ { i } \\in \\{ l _ { \\mathrm { T A V } , i } , l _ { \\mathrm { T 0 V } , i } , l _ { \\mathrm { T A 0 } , i } \\}$ $\\tau _ { 2 }$ denotes the temperature parameter. $P ( i )$ is the set of indices for the augmented samples that share the same classes with $\\mathbf { \\xi } _ { l _ { i } }$ . With this loss, each sample can learn not only from its respective augmentations but also learn from the clustering information derived from high-quality pseudo-labels.",
+        "bbox": [
+            507,
+            436,
+            885,
+            596
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Conversely, low-quality samples are prone to erroneous clustering, where dissimilar samples may be grouped into the same class. This misgrouping can disrupt the integrity of the clustering process. To mitigate this issue, we propose the application of an unsupervised contrastive loss to these samples. This loss function is designed to increase the separation between distinct low-quality samples, thereby encouraging a more uniform distribution in the feature space, as supported by (Zhang et al., 2021a). Specifically, we use Eq. 3, replacing φ1 with $\\phi _ { 3 }$ , and apply this modified equation to the remaining samples in the training set, excluding those with selected indices $I d x ^ { \\prime }$",
+        "bbox": [
+            507,
+            598,
+            887,
+            824
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "In our approach, we sequentially apply multimodal supervised contrastive learning to highquality samples and unsupervised contrastive learning to low-quality samples. This two-step strategy is crafted to concurrently enhance multimodal representation learning and clustering process. The training phase concludes when the sample selection threshold t (as defined in Eq. 4) reaches 100%. During the inference stage, we utilize the well-trained model to extract $z _ { \\mathrm { T A V } }$ and subsequently employ the K-Means++ algorithm for prediction.",
+        "bbox": [
+            507,
+            824,
+            887,
+            921
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "table",
+        "img_path": "images/1137c953628eb20e485d8c1c1e62d03bd5427778b97a87e0d26d9e7994452529.jpg",
+        "table_caption": [
+            "Table 1: Statistics of MIntRec, MELD-DA, IEMOCAP-DA datasets. # indicates the total number of sentences. #C and #U denote the number of classes and utterances."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Datasets</td><td>#C</td><td>#U</td><td>#Train</td><td>#Test</td></tr><tr><td>MIntRec</td><td>20</td><td>2,224</td><td>1,779</td><td>445</td></tr><tr><td>MELD-DA</td><td>12</td><td>9,988</td><td>7,990</td><td>1,998</td></tr><tr><td>IEMOCAP-DA</td><td>12</td><td>9,416</td><td>7,532</td><td>1,884</td></tr></table>",
+        "bbox": [
+            142,
+            82,
+            457,
+            145
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            225,
+            489,
+            307
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "5 Experiments",
+        "text_level": 2,
+        "bbox": [
+            114,
+            319,
+            260,
+            336
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "5.1 Datasets",
+        "text_level": 2,
+        "bbox": [
+            114,
+            346,
+            230,
+            361
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We use MIntRec, MELD-DA, and IEMOCAP-DA as benchmark datasets for the multimodal semantics discovery task. The rationale for using these datasets is that the defined intents or dialogue acts typically exhibit a variety of distinct sentence-level semantics and possess properties of uncertainty in the open world, making them suitable for discovery in unsupervised scenarios. Detailed statistics of the three datasets are presented in Table 1, with further information on dataset specifics and their splits available in Appendix F.",
+        "bbox": [
+            110,
+            367,
+            489,
+            546
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "5.2 Baselines",
+        "text_level": 2,
+        "bbox": [
+            114,
+            557,
+            236,
+            573
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We compare UMC with the state-of-the-art unsupervised clustering methods from both NLP and CV, as well as multimodal clustering methods. The TEXTOIR platform (Zhang et al., 2021b) is used to reproduce the methods in NLP. Detailed descriptions of the baselines are follows:",
+        "bbox": [
+            112,
+            580,
+            489,
+            676
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "SCCL (Zhang et al., 2021a): It jointly optimizes clustering and instance-level contrastive learning losses. The learning rate is set to 3e-5.",
+        "bbox": [
+            112,
+            676,
+            489,
+            725
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "CC (Li et al., 2021): It employs dual non-linear heads to independently optimize instance-level and cluster-level contrastive learning losses. The learning rate is set to 3e-5.",
+        "bbox": [
+            112,
+            725,
+            489,
+            789
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "USNID (Zhang et al., 2023): It performs strong data augmentation by randomly erasing words in a sentence. It also introduces a centroid-guided clustering mechanism to construct high-quality supervised signals for representation learning .",
+        "bbox": [
+            112,
+            790,
+            489,
+            871
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "UMC (Text): This UMC variant excludes video and audio modalities during clustering. Unlike UMC, which uses multimodal augmentations, here we apply dropout twice to generate positive augmentations for contrastive learning.",
+        "bbox": [
+            112,
+            872,
+            489,
+            921
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/bb00cd3e8ab3f09e6d82e4fdbff4dd06071880b19184d3815e0a8c7906cb22c5.jpg",
+        "table_caption": [
+            "Table 2: Results on MIntRec, MELD-DA (M-DA), and IEMOCAP-DA (I-DA) datasets."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td></td><td>Methods</td><td>NMI</td><td>ARI</td><td>ACC</td><td>FMI</td><td>Avg.</td></tr><tr><td>MIRec</td><td>SCCL CC</td><td>45.33 47.45</td><td>14.60 22.04</td><td>36.86 41.57</td><td>24.89 26.91</td><td>30.42 34.49</td></tr><tr><td></td><td>USNID MCN</td><td>47.91 18.24</td><td>21.52 1.70</td><td>40.32 16.76</td><td>26.58 10.32</td><td>34.08 11.76</td></tr><tr><td>SCCL</td><td>UMC (Text) UMC</td><td>47.99 49.46</td><td>21.33 24.79</td><td>42.00 44.00</td><td>26.33 29.48</td><td>34.41 36.93</td></tr><tr><td>M-DA</td><td>CC USNID</td><td>22.42 23.03 20.80</td><td>14.48 13.53 12.16</td><td>32.09 25.13 24.07</td><td>27.51 24.86 23.28</td><td>24.13 21.64</td></tr><tr><td></td><td>MCN</td><td>8.34</td><td>1.57</td><td>18.10</td><td>15.31</td><td>20.08 10.83</td></tr><tr><td></td><td>UMC (Text)</td><td>20.33</td><td>17.90</td><td>32.54</td><td>31.29</td><td>25.52</td></tr><tr><td></td><td>UMC</td><td>23.18</td><td>21.34</td><td>35.58</td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td><td>34.39</td><td>28.62</td></tr><tr><td></td><td>SCCL</td><td>21.90</td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>CC</td><td></td><td>10.90</td><td>26.80</td><td>24.14</td><td>20.94</td></tr><tr><td>ID-A</td><td></td><td>23.59</td><td>12.99</td><td>25.86</td><td>24.42</td><td>21.72</td></tr><tr><td></td><td>USNID</td><td>22.19</td><td>11.92</td><td>27.35</td><td>23.86</td><td>21.33</td></tr><tr><td></td><td>MCN</td><td>8.12</td><td>1.81</td><td>16.16</td><td>14.34</td><td>10.11</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td>UMC (Text) UMC</td><td>20.99 24.60</td><td>19.05 21.43</td><td>32.40 36.36</td><td>31.39 34.42</td><td>25.96 29.21</td></tr></table>",
+        "bbox": [
+            521,
+            82,
+            873,
+            332
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            399,
+            885,
+            431
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "MCN (Chen et al., 2021): It employs an online K-Means algorithm to dynamically determine cluster centers and periodically update them. However, we find its performance drops with online clustering. Thus, we modify it to perform K-Means on the full dataset to ensure optimal performance.",
+        "bbox": [
+            507,
+            431,
+            887,
+            530
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "5.3 Evaluation Metrics",
+        "text_level": 2,
+        "bbox": [
+            509,
+            541,
+            709,
+            557
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Following (Fahad et al., 2014; Saxena et al., 2017), we use four standard clustering metrics to evaluate the clustering performance, including Normalized Mutual Information (NMI), Accuracy (ACC), Adjusted Rand Index (ARI), and Fowlkes-Mallows Index (FMI). Details can be found in Appendix G.",
+        "bbox": [
+            507,
+            562,
+            887,
+            661
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "5.4 Experimental Setup",
+        "text_level": 2,
+        "bbox": [
+            509,
+            671,
+            715,
+            688
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "For the text modality, we utilize the pre-trained BERT model from the Huggingface Transformers library (Wolf et al., 2020) and optimize it using the AdamW (Loshchilov and Hutter, 2019) optimizer. It is important to note that all the baselines utilize the same backbone for each of the three modalities for a fair comparison. In our experiments, the multimodal data employed for pre-training and training adhere to a consistent distribution and characteristics, and no external data is used for pre-training.",
+        "bbox": [
+            507,
+            694,
+            887,
+            856
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We configure the sequence lengths $L _ { \\mathrm { T } } , L _ { \\mathrm { V } } , L _ { \\mathrm { A } }$ for MIntRec, MELD-DA, and IEMOCAP-DA datasets to (30, 230, 480), (70, 250, 520), and (44, 230, 380), respectively. The threshold t is incremented by ∆ of 0.05. For the selection of optimal $K _ { \\mathrm { n e a r } } .$ we configure $L = 0 . 1 , \\Delta ^ { \\prime } = 0 . 0 2$ and $u = 1 0$ . The learning rates are 2e-5 and (3e-4, 2e-4, 5e-4) for pre-training and training stages of MIntRec, MELD-DA, and IEMOCAP-DA datasets. The temperature parameters T1, T2, and τ3 are set at (0.1,7.5,0.9), (0.1, 4, 4) and (0.1, 4, 8) for these datasets, respectively. A detailed hyper-parameter sensitivity analysis is provided in Appendix H. We use a training batch size of 128 and report an average performance over five random seeds of 0-4.",
+        "bbox": [
+            507,
+            856,
+            885,
+            921
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/04b2be1f1654675e041f6832967b958fc945c479d6fe8ea94ae23a466b6913cb.jpg",
+        "table_caption": [
+            "Table 3: Ablation studies on the three datasets."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Methods w/o Step 1</td><td></td><td>NMI</td><td>ARI</td><td>ACC</td><td>FMI</td><td>Avg.</td></tr><tr><td>MIec</td><td>Random (Step 2) SCL (Step 3) Step 1&amp;K-Means++ Step 1&amp;UCL Step 1&amp;MSE UMC</td><td>39.15 47.80 37.78 37.62 47.08 24.57 49.46</td><td>14.24 23.27 13.22 12.32 22.02 3.86 24.79</td><td>31.91 43.60 29.93 32.00 43.95 18.61 44.00</td><td>19.51 28.03 19.44 17.66 26.84 10.38 29.48</td><td>26.20 35.67 25.09 24.90 34.97 14.35 36.93</td></tr><tr><td>M-DA</td><td>w/o Step 1 Random (Step 2) SCL (Step 3) Step 1&amp;K-Means++ Step 1&amp;UCL Step 1&amp;MSE UMC</td><td>10.17 20.49 14.08 14.24 22.14 11.73 23.18</td><td>4.50 17.35 8.55 6.71 14.77 6.39 21.34</td><td>22.15 31.73 26.43 22.93 27.54 28.05 35.58</td><td>20.09 30.45 22.48 18.63 26.32 23.63 34.92</td><td>14.23 25.01 17.88 15.63 22.69 17.45 28.76</td></tr><tr><td>ID-A</td><td>w/o Step 1 Random (Step 2) SCL (Step 3) Step 1&amp;K-Means++ Step 1&amp;UCL Step 1&amp;MSE UMC</td><td>9.72 19.91 9.71 11.17 22.35 10.60 24.60</td><td>3.86 12.60 3.31 4.38 14.48 3.11 21.43</td><td>24.25 28.45 22.85 20.01 29.13 21.16 36.36</td><td>19.87 25.67 19.54 16.58 26.58 18.32 34.42</td><td></td><td>14.43 21.67 13.85 13.04 23.14 13.30 29.21</td></tr></table>",
+        "bbox": [
+            124,
+            82,
+            477,
+            317
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            370,
+            490,
+            549
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "5.5 Results",
+        "text_level": 2,
+        "bbox": [
+            114,
+            560,
+            220,
+            575
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Table 2 shows the results on the multimodal semantics discovery task. Overall, UMC consistently outperforms all baseline methods across all datasets and evaluation metrics, achieving state-of-the-art performance. Specifically, compared to the best baseline in each metric, UMC achieves average performance improvements of 2.44%, 4.49%, and 7.49% on MIntRec, MELD-DA, and IEMOCAP-DA, respectively. This demonstrates that our proposed high-quality sample selection and unsupervised learning framework can effectively assist the model in learning multimodal representations tailored for clustering. Notably, the only multimodal clustering baseline, MCN, exhibits poor performance, lagging behind UMC by a substantial margin of 17% to 25%. This disparity highlights the apparent limitations of computer vision-centric clustering methods when applied to multimodal language understanding tasks dominated by the discrete text modality.",
+        "bbox": [
+            112,
+            581,
+            490,
+            903
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "UMC (Text), a unimodal variant of our method utilizing only the text modality, exhibits comparable or superior performance to existing SOTA methods across most clustering metrics. In particular, while UMC (Text) performs comparably to the strongest baseline on the MIntRec dataset, it yields significant FMI improvements of 3.78% and 7.25% on MELD-DA and IEMOCAP-DA, respectively. This underscores the critical role of high-quality sample selection and multi-stage optimization in both clustering and representation learning. Furthermore, compared to UMC (Text), UMC incorporates non-verbal modalities and demonstrates significant and consistent average improvements of 2.52%, 3.10%, and 3.25% on the MIntRec, MELD-DA, and IEMOCAP-DA datasets, respectively. On the ARI metric specifically, UMC surpasses UMC (Text) by 3.46%, 3.44%, and 2.38% on the three datasets, demonstrating that non-verbal modalities and our multimodal representation learning can more fully exploit non-linguistic cues to boost unsupervised data mining efficiency.",
+        "bbox": [
+            132,
+            904,
+            487,
+            920
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "chart",
+        "img_path": "images/a5561c01f78405321f74f78bf3fea77b954c5611f49fa4112c341e2e230112b7.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 4: Automatic vs. fixed $K _ { \\mathrm { n e a r } }$ selection strategy."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            510,
+            80,
+            889,
+            174
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            233,
+            887,
+            573
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "When examining individual metrics, UMC exhibits particularly pronounced improvements in ARI, ACC, and FMI compared to the baselines. Across the three datasets, UMC improves ARI by 2-8%, ACC by 2-9%, and FMI by 2-10%. Compared to NMI, these metrics are more reflective of instance-level intra-cluster compactness and intercluster separation. These notable increases verify the capability of UMC to capture complex, fine-grained semantic differences. By dynamically introducing high-quality samples, our method adapts to complex environments in a curriculumlike (easy-to-hard) manner, leveraging high-quality pseudo-labels to guide representation learning. In contrast, although baselines like SCCL, CC, and USNID employ instance-level contrastive learning, they fail to achieve optimal performance due to the lack of high-quality sample guidance and nonverbal modality integration. A case study for error analysis is detailed in Appendix I.",
+        "bbox": [
+            507,
+            598,
+            889,
+            922
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "image",
+        "img_path": "images/cd3f8152d82a2605a990b7f9e18b6de254f2d73839d70eb014a1b7d403512c37.jpg",
+        "image_caption": [
+            "Figure 5: Visualization of representations on the IEMOCAP-DA dataset."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            127,
+            82,
+            872,
+            183
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "6 Discussion",
+        "text_level": 2,
+        "bbox": [
+            114,
+            234,
+            242,
+            248
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "6.1 Ablation Studies",
+        "text_level": 2,
+        "bbox": [
+            114,
+            268,
+            292,
+            284
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We conduct extensive ablation studies and show the results in Table 3. (1) w/o Step 1: Removing Step 1 results in performance drops of 10-12%, 13-16%, and 12-17% across the MIntRec, MELD-DA, and IEMOCAP-DA datasets, emphasizing the importance of our proposed non-verbal modality masking strategy in enhancing subsequent clustering.",
+        "bbox": [
+            112,
+            297,
+            489,
+            410
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "(2) Random (Step 2): To assess the impact of our high-quality sampling strategy in Step 2, we replace it with random sampling (i.e., randomly selecting the top-t percent of samples from each cluster). This change leads to average score decreases of 1.26%, 3.61%, and 7.54% on the clustering metrics, highlighting that carefully selected highquality samples are pivotal in guiding the learning of multimodal representations.",
+        "bbox": [
+            110,
+            412,
+            490,
+            558
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "(3) SCL (Step 3): To evaluate the two-step learning approach in Step 3, we remove the unsupervised contrastive learning loss (UCL), resulting in more significant decreases of 10-17% in average clustering scores across all three datasets.",
+        "bbox": [
+            112,
+            562,
+            489,
+            643
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "(4) Step 1 & other strategies (K-Means++, UCL, MSE): Since the high-quality sampling strategy (Step 2) works in conjunction with multimodal representation learning (Step 3), we experiment with alternative strategies and observe their performance. Initially, applying K-Means++ directly after Step 1 leads to dramatic drops of over 10% across all three datasets. Then, implementing UCL after Step 1 still brings noticeable decreases of 1.96%, 5.93%, and 6.07% in average clustering metric scores. Lastly, we apply a mean squared error (MSE) loss between each sample feature and its corresponding cluster centroid, resulting in extremely low performance with decreases of 22.58%, 11.17%, and 15.91% in average clustering metric scores. These ablation studies further validate the effectiveness of each component in our proposed UMC algorithm.",
+        "bbox": [
+            112,
+            646,
+            490,
+            922
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "6.2 Effect of the $K _ { \\mathbf { n e a r } }$ Selection Strategy",
+        "text_level": 2,
+        "bbox": [
+            509,
+            235,
+            847,
+            249
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "In Section 4.3.2, we introduce an automatic method for determining the optimal $K _ { \\mathrm { n e a r } }$ for each cluster. To demonstrate its efficacy, we compare it with a fixed $K _ { \\mathrm { n e a r } }$ approach, where the fixed value varies from 5 to 25 in increments of 5. We then evaluate the performance using ARI scores.",
+        "bbox": [
+            507,
+            255,
+            885,
+            351
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "As shown in Figure 4, the automatic $K _ { \\mathrm { n e a r } }$ selection strategy outperforms all fixed $K _ { \\mathrm { n e a r } }$ settings (i.e., 1–2% on MIntRec, 4–6% on MELD-DA, and 6–9% on IEMOCAP-DA). The reason is that the fixed strategy struggles with the imbalanced data distribution across clusters of varying sizes, whereas our approach adapts $K _ { \\mathrm { n e a r } }$ to the unique characteristics of each cluster. Importantly, this approach obviates the need for extensive manual hyper-parameter tuning while still ensuring excellent performance.",
+        "bbox": [
+            507,
+            353,
+            887,
+            530
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "6.3 Visualization",
+        "text_level": 2,
+        "bbox": [
+            509,
+            539,
+            660,
+            555
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Figure 5 uses t-SNE (Maaten and Hinton, 2008) to visualize representations on the IEMOCAP-DA dataset, with additional results provided in Appendix J. SCCL exhibits substantial overlap among intent classes. CC displays more compact clusters, yet still presents implicit cluster boundaries. USNID shows clear cluster boundaries, but the different clusters are close in the feature space and difficult to discern. UMC (Text) demonstrates the most distinct cluster boundaries among text-based baselines, highlighting the robustness of the representations learned through our clustering algorithm. When incorporating non-verbal modalities, the multimodal representations learned by UMC reveal that each cluster is both compact and wellseparated from others, verifying its efficacy.",
+        "bbox": [
+            507,
+            560,
+            887,
+            820
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "7 Conclusions",
+        "text_level": 2,
+        "bbox": [
+            509,
+            829,
+            652,
+            846
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "This paper introduces the multimodal semantics discovery task and proposes a novel unsupervised multimodal clustering (UMC) method to address this critical challenge. UMC effectively utilizes non-verbal modalities for semantics discovery by constructing positive multimodal data augmentations. Besides, it proposes a novel high-quality sample selection mechanism and a two-step representation learning strategy.",
+        "bbox": [
+            507,
+            856,
+            885,
+            921
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            489,
+            165
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "We conduct extensive experiments on both multimodal intent and dialogue act benchmark datasets. UMC achieves remarkable improvements of 2-8% in standard clustering metrics compared to stateof-the-art clustering algorithms. Further analyses demonstrate the effectiveness of each component and the robustness of the learned representations conducive to clustering. We believe this work makes significant progress in this area and provide a solid foundation for related research.",
+        "bbox": [
+            112,
+            166,
+            490,
+            328
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "8 Limitations",
+        "text_level": 2,
+        "bbox": [
+            114,
+            340,
+            250,
+            356
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "There are two limitations in this work. Firstly, given the complexity of real-world multimodal intent datasets, the achieved clustering performance still suggests significant potential for further improvements. Secondly, while this study establishes a foundational approach for automatically determining the $K _ { \\mathrm { n e a r } }$ parameter, there is scope for exploring diverse methodologies within this automatic selection mechanism.",
+        "bbox": [
+            112,
+            368,
+            490,
+            513
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "9 Acknowledgements",
+        "text_level": 2,
+        "bbox": [
+            114,
+            526,
+            317,
+            543
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "This work was supported by the National Natural Science Foundation of China (Grant No. 62173195), the National Science and Technology Major Project towards the new generation of broadband wireless mobile communication networks of Jiangxi Province (03 and 5G Major Project of Jiangxi Province) (Grant No. 20232ABC03402), High-level Scientific and Technological Innovation Talents \"Double Hundred Plan\" of Nanchang City in 2022 (Grant No. Hongke Zi (2022) 321-16), and Natural Science Foundation of Hebei Province, China (Grant No. F2022208006).",
+        "bbox": [
+            112,
+            554,
+            490,
+            749
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            114,
+            776,
+            215,
+            793
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Humam Alwassel, Dhruv Mahajan, Bruno Korbar, Lorenzo Torresani, Bernard Ghanem, and Du Tran. 2020. Self-supervised learning by cross-modal audiovideo clustering. In Proc. of NeurIPS, pages 9758– 9770.",
+            "David Arthur and Sergei Vassilvitskii. 2007. kmeans++: the advantages of careful seeding. In Proc. of SODA, pages 1027–1035.",
+            "Alexei Baevski, Yuhao Zhou, Abdelrahman Mohamed, and Michael Auli. 2020. wav2vec 2.0: A framework for self-supervised learning of speech representations. pages 12449–12460.",
+            "Carlos Busso, Murtaza Bulut, Chi-Chun Lee, Abe Kazemzadeh, Emily Mower, Samuel Kim, Jeannette N Chang, Sungbok Lee, and Shrikanth S Narayanan. 2008. Iemocap: Interactive emotional dyadic motion capture database. Language resources and evaluation, 42:335–359.",
+            "Mathilde Caron, Piotr Bojanowski, Armand Joulin, and Matthijs Douze. 2018. Deep clustering for unsupervised learning of visual features. In Proc. of ECCV, pages 132–149.",
+            "Brian Chen, Andrew Rouditchenko, Kevin Duarte, Hilde Kuehne, Samuel Thomas, Angie Boggust, Rameswar Panda, Brian Kingsbury, Rogerio Feris, David Harwath, et al. 2021. Multimodal clustering networks for self-supervised learning from unlabeled videos. In Proc. of ICCV, pages 8012–8021.",
+            "Sanyuan Chen, Chengyi Wang, Zhengyang Chen, Yu Wu, Shujie Liu, Zhuo Chen, Jinyu Li, Naoyuki Kanda, Takuya Yoshioka, Xiong Xiao, et al. 2022. Wavlm: Large-scale self-supervised pre-training for full stack speech processing. IEEE Journal of Selected Topics in Signal Processing, 16(6):1505–1518.",
+            "Ting Chen, Simon Kornblith, Mohammad Norouzi, and Geoffrey Hinton. 2020. A simple framework for contrastive learning of visual representations. In Proc. of ICML, pages 1597–1607.",
+            "Jackie Chi Kit Cheung and Xiao Li. 2012. Sequence clustering and labeling for unsupervised query intent discovery. In Proc. of WSDM, pages 383–392.",
+            "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. Bert: Pre-training of deep bidirectional transformers for language understanding. In Proc. of NAACL, pages 4171–4186.",
+            "Adil Fahad, Najlaa Alshatri, Zahir Tari, Abdullah Alamri, Ibrahim Khalil, Albert Y. Zomaya, Sebti Foufou, and Abdelaziz Bouras. 2014. A survey of clustering algorithms for big data: Taxonomy and empirical analysis. IEEE Transactions on Emerging Topics in Computing, pages 267–279.",
+            "K Chidananda Gowda and G Krishna. 1978. Agglomerative clustering using the concept of mutual nearest neighbourhood. Pattern Recognition, 10(2):105– 112.",
+            "Dilek Hakkani-Tür, Yun-Cheng Ju, Geoffrey Zweig, and Gokhan Tur. 2015. Clustering novel intents in a conversational interaction system with semantic parsing. In Proc. of Interspeech.",
+            "Wei Han, Hui Chen, and Soujanya Poria. 2021. Improving multimodal fusion with hierarchical mutual information maximization for multimodal sentiment analysis. In Proc. of EMNLP, pages 9180–9192."
+        ],
+        "bbox": [
+            117,
+            801,
+            489,
+            865
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Iryna Haponchyk, Antonio Uva, Seunghak Yu, Olga Uryupina, and Alessandro Moschitti. 2018. Supervised clustering of questions into intents for dialog system applications. In Proc. of EMNLP, pages 2310– 2321.",
+            "Devamanyu Hazarika, Roger Zimmermann, and Soujanya Poria. 2020. Misa: Modality-invariant andspecific representations for multimodal sentiment analysis. In Proc. of ACM MM, pages 1122–1131.",
+            "Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2016. Deep residual learning for image recognition. In Proc. of CVPR, pages 770–778.",
+            "Di Hu, Feiping Nie, and Xuelong Li. 2019. Deep multimodal clustering for unsupervised audiovisual learning. In Proc. of CVPR, pages 9248–9257.",
+            "Guimin Hu, Ting-En Lin, Yi Zhao, Guangming Lu, Yuchuan Wu, and Yongbin Li. 2022. UniMSE: Towards unified multimodal sentiment analysis and emotion recognition. In Proc. of EMNLP, pages 7837-7851.",
+            "Shudong Huang, Ivor W Tsang, Zenglin Xu, Jiancheng Lv, and Quanhui Liu. 2021. Cdd: Multi-view subspace clustering via cross-view diversity detection. In Proc. of ACM MM, pages 2308–2316.",
+            "Rajat Kumar, Mayur Patidar, Vaibhav Varshney, Lovekesh Vig, and Gautam Shroff. 2022. Intent detection and discovery from user logs via deep semisupervised contrastive clustering. In Proc. of NAACL, pages 1836–1853.",
+            "Yunfan Li, Peng Hu, Zitao Liu, Dezhong Peng, Joey Tianyi Zhou, and Xi Peng. 2021. Contrastive clustering. In Proc. of AAAI, pages 8547–8555.",
+            "Ting-En Lin, Hua Xu, and Hanlei Zhang. 2020. Discovering new intents via constrained deep adaptive clustering with cluster refinement. In Proc. of AAAI, pages 8360–8367.",
+            "Ze Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin, and Baining Guo. 2021. Swin transformer: Hierarchical vision transformer using shifted windows. In Proc. of ICCV, pages 10012-10022.",
+            "Ilya Loshchilov and Frank Hutter. 2019. Decoupled weight decay regularization. In Proc. of ICLR.",
+            "Laurens van der Maaten and Geoffrey Hinton. 2008. Visualizing data using t-sne. Journal of machine learning research, 9(11):2579–2605.",
+            "James MacQueen et al. 1967. Some methods for classification and analysis of multivariate observations. In Proc. of the fifth Berkeley symposium on mathematical statistics and probability, pages 281–297.",
+            "Adyasha Maharana, Quan Hung Tran, Franck Dernoncourt, Seunghyun Yoon, Trung Bui, Walter Chang, and Mohit Bansal. 2022. Multimodal intent discovery from livestream videos. In Proc. of NAACL Findings, pages 476–489.",
+            "Yutao Mou, Keqing He, Yanan Wu, Zhiyuan Zeng, Hong Xu, Huixing Jiang, Wei Wu, and Weiran Xu. 2022. Disentangled knowledge transfer for OOD intent discovery with unified contrastive learning. In Proc. of ACL, pages 46–53.",
+            "Yutao Mou, Xiaoshuai Song, Keqing He, Chen Zeng, Pei Wang, Jingang Wang, Yunsen Xian, and Weiran Xu. 2023. Decoupling pseudo label disambiguation and representation learning for generalized intent discovery. In Proc. of ACL, pages 9661–9675.",
+            "Srinivas Bangalore Padmasundari and Srinivas Bangalore. 2018. Intent discovery through unsupervised semantic text clustering. In Proc. of Interspeech.",
+            "Xi Peng, Zhenyu Huang, Jiancheng Lv, Hongyuan Zhu, and Joey Tianyi Zhou. 2019. Comic: Multi-view clustering without parameter selection. In Proc. of ICML, pages 5092–5101.",
+            "Soujanya Poria, Devamanyu Hazarika, Navonil Majumder, Gautam Naik, Erik Cambria, and Rada Mihalcea. 2019. MELD: A multimodal multi-party dataset for emotion recognition in conversations. In Proc. of ACL, pages 527–536.",
+            "Wasifur Rahman, Md Kamrul Hasan, Sangwu Lee, Amir Zadeh, Chengfeng Mao, Louis-Philippe Morency, and Ehsan Hoque. 2020. Integrating multimodal information in large pretrained transformers. In Proc. of ACL, pages 2359–2369.",
+            "Tulika Saha, Dhawal Gupta, Sriparna Saha, and Pushpak Bhattacharyya. 2021a. Emotion aided dialogue act classification for task-independent conversations in a multi-modal framework. Cognitive Computation, 13:277–289.",
+            "Tulika Saha, Aditya Prakash Patra, Sriparna Saha, and Pushpak Bhattacharyya. 2020. Towards emotionaided multi-modal dialogue act classification. In Proc. of ACL, pages 4361–4372.",
+            "Tulika Saha, Apoorva Upadhyaya, Sriparna Saha, and Pushpak Bhattacharyya. 2021b. Towards sentiment and emotion aided multi-modal speech act classification in Twitter. In Proc. of NAACL, pages 5727–5737.",
+            "Amit Saxena, Mukesh Prasad, Akshansh Gupta, Neha Bharill, Om Prakash Patel, Aruna Tiwari, Meng Joo Er, Weiping Ding, and Chin-Teng Lin. 2017. A review of clustering techniques and developments. Neurocomputing, pages 664–681.",
+            "Tao Shi and Shao-Lun Huang. 2023. MultiEMO: An attention-based correlation-aware multimodal fusion framework for emotion recognition in conversations. In Proc. of ACL, pages 14752–14766.",
+            "Wenkai Shi, Wenbin An, Feng Tian, Qinghua Zheng, QianYing Wang, and Ping Chen. 2023. A diffusion weighted graph framework for new intent discovery. In Proc. of EMNLP, pages 8033–8042."
+        ],
+        "bbox": [
+            114,
+            85,
+            489,
+            151
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Mengjing Sun, Pei Zhang, Siwei Wang, Sihang Zhou, Wenxuan Tu, Xinwang Liu, En Zhu, and Changjian Wang. 2021. Scalable multi-view subspace clustering with unified anchors. In Proc. of ACM MM, pages 3528-3536.",
+            "Zhongkai Sun, Prathusha Sarma, William Sethares, and Yingyu Liang. 2020. Learning relationships between text, audio, and video via deep canonical correlation for multimodal language analysis. In Proc. of AAAI, pages 8992–8999.",
+            "Yao-Hung Hubert Tsai, Shaojie Bai, Paul Pu Liang, J Zico Kolter, Louis-Philippe Morency, and Ruslan Salakhutdinov. 2019. Multimodal transformer for unaligned multimodal language sequences. In Proc. of ACL, pages 6558–6569.",
+            "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. In Proc. of NeurIPS, pages 6000–6010.",
+            "Pascal Vincent, Hugo Larochelle, Isabelle Lajoie, Yoshua Bengio, Pierre-Antoine Manzagol, and Léon Bottou. 2010. Stacked denoising autoencoders: Learning useful representations in a deep network with a local denoising criterion. Journal of Machine Learning Research, 11(12).",
+            "Yiwei Wei, Shaozu Yuan, Ruosong Yang, Lei Shen, Zhangmeizhi Li, Longbiao Wang, and Meng Chen. 2023. Tackling modality heterogeneity with multiview calibration network for multimodal sentiment detection. In Proc. of ACL, pages 5240–5252.",
+            "Thomas Wolf, Lysandre Debut, Victor Sanh, Julien Chaumond, Clement Delangue, Anthony Moi, Pierric Cistac, Tim Rault, Rémi Louf, Morgan Funtowicz, et al. 2020. Transformers: State-of-the-art natural language processing. In Proc. of EMNLP, pages 38– 45.",
+            "Junyuan Xie, Ross Girshick, and Ali Farhadi. 2016. Unsupervised deep embedding for clustering analysis. In Proc. of ICML, pages 478–487.",
+            "Bo Yang, Xiao Fu, Nicholas D Sidiropoulos, and Mingyi Hong. 2017. Towards k-means-friendly spaces: Simultaneous deep learning and clustering. In Proc. of ICML, pages 3861–3870.",
+            "Jiuding Yang, Yakun Yu, Di Niu, Weidong Guo, and Yu Xu. 2023. ConFEDE: Contrastive feature decomposition for multimodal sentiment analysis. In Proc. of ACL, pages 7617–7630.",
+            "Wenmeng Yu, Hua Xu, Fanyang Meng, Yilin Zhu, Yixiao Ma, Jiele Wu, Jiyun Zou, and Kaicheng Yang. 2020. Ch-sims: A chinese multimodal sentiment analysis dataset with fine-grained annotation of modality. In Proc. of ACL, pages 3718–3727.",
+            "Wenmeng Yu, Hua Xu, Ziqi Yuan, and Jiele Wu. 2021. Learning modality-specific representations with selfsupervised multi-task learning for multimodal sentiment analysis. In Proc. of AAAI, pages 10790–10797.",
+            "Amir Zadeh, Rowan Zellers, Eli Pincus, and Louis-Philippe Morency. 2016. Mosi: multimodal corpus of sentiment intensity and subjectivity analysis in online opinion videos. arXiv preprint arXiv:1606.06259.",
+            "AmirAli Bagher Zadeh, Paul Pu Liang, Soujanya Poria, Erik Cambria, and Louis-Philippe Morency. 2018. Multimodal language analysis in the wild: Cmumosei dataset and interpretable dynamic fusion graph. In Proc. of ACL, pages 2236–2246.",
+            "Dejiao Zhang, Feng Nan, Xiaokai Wei, Shang-Wen Li, Henghui Zhu, Kathleen R McKeown, Ramesh Nallapati, Andrew O Arnold, and Bing Xiang. 2021a. Supporting clustering with contrastive learning. In Proc. of NAACL, pages 5419–5430.",
+            "Hanlei Zhang, Xiaoteng Li, Hua Xu, Panpan Zhang, Kang Zhao, and Kai Gao. 2021b. TEXTOIR: An integrated and visualized platform for text open intent recognition. In Proc. of ACL, pages 167–174.",
+            "Hanlei Zhang, Xin Wang, Hua Xu, Qianrui Zhou, Kai Gao, Jianhua Su, jinyue Zhao, Wenrui Li, and Yanting Chen. 2024. MIntrec2.0: A large-scale benchmark dataset for multimodal intent recognition and out-of-scope detection in conversations. In Proc. of ICLR.",
+            "Hanlei Zhang, Hua Xu, Ting-En Lin, and Rui Lyu. 2021c. Discovering new intents with deep aligned clustering. In Proc. of AAAI, pages 14365–14373.",
+            "Hanlei Zhang, Hua Xu, Xin Wang, Fei Long, and Kai Gao. 2023. A clustering framework for unsupervised and semi-supervised new intent discovery. IEEE Transactions on Knowledge and Data Engineering.",
+            "Hanlei Zhang, Hua Xu, Xin Wang, Qianrui Zhou, Shaojie Zhao, and Jiayan Teng. 2022a. Mintrec: A new dataset for multimodal intent recognition. In Proc. of ACM MM, pages 1688–1697.",
+            "Yi Zhang, Xinwang Liu, Siwei Wang, Jiyuan Liu, Sisi Dai, and En Zhu. 2021d. One-stage incomplete multiview clustering via late fusion. In Proc. of ACM MM, pages 2717–2725.",
+            "Yuwei Zhang, Haode Zhang, Li-Ming Zhan, Xiao-Ming Wu, and Albert Lam. 2022b. New intent discovery with pre-training and contrastive learning. In Proc. of ACL, pages 256–269.",
+            "Qianrui Zhou, Hua Xu, Hao Li, Hanlei Zhang, Xiaohan Zhang, Yifan Wang, and Kai Gao. 2024. Token-level contrastive learning with modality-aware prompting for multimodal intent recognition. In Proc. of AAAI, pages 17114–17122.",
+            "Yunhua Zhou, Guofeng Quan, and Xipeng Qiu. 2023. A probabilistic framework for discovering new intents. In Proc. of ACL, pages 3771–3784."
+        ],
+        "bbox": [
+            114,
+            85,
+            489,
+            152
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "A Limitations of Text-only Information in Multimodal Semantics Discovery",
+        "text_level": 2,
+        "bbox": [
+            114,
+            83,
+            487,
+            117
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Multimodal information is crucial for semantics discovery, as it encompasses a broader range of communicative cues beyond mere text, such as tone of voice, facial expressions, and body language. These cues significantly enhance human communication by conveying subtle nuances and emotions that text alone cannot fully capture.",
+        "bbox": [
+            112,
+            129,
+            489,
+            242
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "To illustrate this, we analyze examples from the MIntRec dataset, particularly focusing on two clusters with intents of Joke (top) and Prevent (bottom), as detailed in Table 4. In the Joke cluster, the first two examples contain text utterances with exaggerated rhetoric, clearly conveying the intent of Joke. However, the latter four examples, with the semantics of Statement-opinion, Question, and Statementnon-opinion, are less straightforward. Their real intention become clearer when considering nonverbal cues like exaggerated body language and expressions in a relaxed and happy tone.",
+        "bbox": [
+            112,
+            243,
+            490,
+            438
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Similarly, in the Prevent intent cluster, the first two examples with clear negative directives are easily distinguished from text. However, the following three examples, which misleadingly suggest intentions of Agree, Oppose, and Inform when relying solely on text. Here, non-verbal cues like nodding and arm blocking from body language, combined with a resolute voice of tone, are vital for discovering the real Prevent intention.",
+        "bbox": [
+            112,
+            438,
+            489,
+            583
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Hence, incorporating non-verbal modalities is essential in real-world contexts for a comprehensive understanding of the complex semantics in human language. This shows the importance of leveraging non-verbal modalities when performing semantics discovery.",
+        "bbox": [
+            112,
+            585,
+            489,
+            682
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "B Applications of Multimodal Semantics Discovery",
+        "text_level": 2,
+        "bbox": [
+            114,
+            697,
+            484,
+            731
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Video Content Recommendation: Online short video platforms, such as TikTok, have become globally popular, featuring content that includes text, video, and audio elements provided by content creators. Given the vast volume of videos on the internet, accurately tagging each video to match individual user preferences can be prohibitively expensive. Therefore, discovering potential user intentions from unsupervised multimodal data is crucial. An effective multimodal clustering method can discover user needs and group similar content, significantly improving the relevance of recommendations for content retrieval and search.",
+        "bbox": [
+            112,
+            743,
+            490,
+            921
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            885,
+            117
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Efficient Multimodal Data Annotation: A well-trained multimodal clustering model is invaluable for processing real-world multimodal data. It can quickly create clusters based on similar multimodal characteristics, facilitating the identification and analysis of new patterns. Moreover, it enables the efficient generation of semantic annotations at the cluster level, speeding up the annotation process and reducing the workload compared to instancelevel annotation.",
+        "bbox": [
+            507,
+            117,
+            887,
+            278
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Virtual Human: Virtual humans hold significant commercial value for many businesses, with some companies promoting custom-designed robots as flagship products. However, effective virtual humans must be able to accurately capture human intentions from various signals, including natural language, body language, facial expressions, and vocal tone. Given that data from realworld human-machine interactions are often unsupervised, it is vital for virtual humans to discern potential user needs from clustered data. This capability allows them to offer better performance and interact with humans in a more natural and fluent manner.",
+        "bbox": [
+            507,
+            279,
+            887,
+            504
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Overall, multimodal semantics discovery opens up new possibilities for the analysis and interpretation of unsupervised multimodal data, which is increasingly prevalent in our digital communication era.",
+        "bbox": [
+            507,
+            505,
+            887,
+            586
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "C Additional Related Works",
+        "text_level": 2,
+        "bbox": [
+            509,
+            598,
+            776,
+            614
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "C.1 Multi-view Clustering",
+        "text_level": 2,
+        "bbox": [
+            509,
+            624,
+            736,
+            640
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Multi-view clustering primarily employs matrix optimization algorithms such as CDD (Huang et al., 2021), COMIC (Peng et al., 2019), OS-LF-IMVC (Zhang et al., 2021d), and SMVSC (Sun et al., 2021). These algorithms utilize graphical or spatial methods to mathematically divide clustering into several sub-tasks and then iteratively optimize the subtask matrices. However, multi-view clustering may become inefficient when processing highdimensional data, and its time cost can increase at an ultra-linear rate with larger datasets. Besides, the design of optimization objectives in multi-view clustering methods presents certain challenges and does not always guarantee favorable results.",
+        "bbox": [
+            507,
+            645,
+            887,
+            872
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "In contrast, multimodal clustering, which tends to focus on deep neural network methodologies, can alleviate these difficulties. For example,",
+        "bbox": [
+            507,
+            872,
+            887,
+            921
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "image",
+        "img_path": "images/8cdc31705e557448f199ed455c600bc6a6e359fc2248705466ddd26bde1289c0.jpg",
+        "image_caption": [
+            "Table 4: Real-world examples of Joke (top) and Prevent (bottom) intent clusters."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            124,
+            83,
+            872,
+            697
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "XDC (Alwassel et al., 2020) clusters two separate modalities and employs cross-modal pseudo-labels as a supervisory signal for model training, effectively utilizing the semantic connections and distinctions between different modalities. DMC (Hu et al., 2019) uses an exponential function approximation to enable differentiable minimum optimization for clustering, drawing data points closer to their cluster center. It is important to note that these methods are limited to bimodal learning rather than accommodating multiple modalities.",
+        "bbox": [
+            110,
+            747,
+            490,
+            910
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/cc7ec802c040b729069a02ea24029cc19b5984096a49b00c760217c2a54ae391.jpg",
+        "table_caption": [
+            "Table 5: Effect of the multimodal features on the MIntRec dataset."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Backbones</td><td>NMI</td><td>ARI</td><td>ACC</td><td>FMI</td></tr><tr><td>ResNet-50 + wav2vec 2.0</td><td>47.90</td><td>23.04</td><td>42.61</td><td>27.79</td></tr><tr><td>Swin Transformer + WavLM</td><td>49.46</td><td>24.79</td><td>44.00</td><td>29.48</td></tr></table>",
+        "bbox": [
+            517,
+            745,
+            875,
+            788
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            838,
+            786,
+            856
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "C.2 Multimodal Language Analysis",
+        "text_level": 2,
+        "bbox": [
+            509,
+            866,
+            810,
+            883
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Multimodal language analysis has introduced numerous datasets (Zadeh et al., 2016, 2018; Yu et al.,",
+        "bbox": [
+            507,
+            888,
+            887,
+            920
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "chart",
+        "img_path": "images/282b2a3df1f13f81037067fb0b470ffae6a4eee96fe8fa2309223905fd4cd7f1.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            238,
+            80,
+            413,
+            210
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "chart",
+        "img_path": "images/d9fb0310515d4b5c39f53cceb69a8a984a1ba0cacf5d00a4c8c9c4be5e99afdc.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            415,
+            79,
+            586,
+            211
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "chart",
+        "img_path": "images/a472ca07c6dbd070a528e544674b86fb4defaa065dca8b8e21ed6cd9fcff3855.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 6: Results of clustering with varying initial thresholds $t _ { 0 }$"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            588,
+            80,
+            759,
+            210
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "chart",
+        "img_path": "images/29708f3ec1d22b518f1bd6bbb1bf5a90a101addd2d28a39852672868c49e1805.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 7: Sensitivity analysis of $\\tau _ { 1 } , \\tau _ { 2 } .$ and $\\tau _ { 3 }$ on the three datasets."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            221,
+            248,
+            776,
+            649
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "2020) and multimodal fusion methods (Tsai et al., 2019; Sun et al., 2020; Rahman et al., 2020; Hazarika et al., 2020; Yu et al., 2021; Han et al., 2021; Maharana et al., 2022; Hu et al., 2022; Wei et al., 2023; Yang et al., 2023; Shi and Huang, 2023).",
+        "bbox": [
+            112,
+            701,
+            490,
+            783
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "While most research has focused on meta properties like emotions or sentiment, less attention has been given to the content semantics of multimodal utterances. Zhou et al. (2024) has specifically designed a method for multimodal intent recognition, leveraging the text modality to guide the learning of prompts from non-verbal modalities. However, this method is inapplicable for unsupervised scenarios.",
+        "bbox": [
+            112,
+            791,
+            490,
+            921
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "To address this, EMOTyDA (Saha et al., 2020) offers dialogue act labels that complement two multimodal emotion datasets (Busso et al., 2008; Poria et al., 2019), and recent studies have ventured into multimodal dialogue act classification (Saha et al., $^ { 2 0 2 1 \\mathrm { b } , \\mathrm { a } ) }$ . Maharana et al. (2022) introduce a dataset for recognizing operational intents in instructive videos, employing a multimodal cascaded cross-attention late fusion model. MIntRec (Zhang et al., 2022a) provides the first multimodal dataset for conversational intent recognition, using multimodal fusion methods as benchmarks. However, these works depend on supervised learning with provided labels, with few studies in the area of unsupervised multimodal language analysis. Very recently, Zhang et al. (2024) introduces the first largescale multimodal dataset for both intent recognition and out-of-scope detection in conversations, highlighting the challenges of existing machine learning methods in understanding complex semantics within multimodal utterances.",
+        "bbox": [
+            507,
+            701,
+            887,
+            913
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "chart",
+        "img_path": "images/7a1fad30061391b649baee39ef4dc403a60192d9f527f29af461a11b141fc429.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 8: Confusion matrix on the MIntRec dataset."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            132,
+            80,
+            472,
+            296
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            348,
+            490,
+            476
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "D Effect of Multimodal Features",
+        "text_level": 2,
+        "bbox": [
+            112,
+            488,
+            415,
+            504
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "In this study, we select the Swin Transformer and WavLM, two state-of-the-art models in computer vision and speech signal processing, as backbones for extracting multimodal features. These models demonstrate superior performance compared to the original features used in the MIntRec (Zhang et al., 2022a) and EMOTyDA (Saha et al., 2020) datasets. Due to the unavailability of features from EMOTyDA, which poses a challenge for reproduction, we employed features from the MIntRec dataset. MIntRec utilizes ResNet (He et al., 2016) and wav2vec 2.0 (Baevski et al., 2020) for video and audio modalities, respectively.",
+        "bbox": [
+            110,
+            513,
+            489,
+            722
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "As illustrated in Table 5, our results show that Swin Transformer and WavLM enhance performance by over 1% on the MIntRec dataset. This improvement evidences their effectiveness in modeling multimodal representations and capturing the semantics of non-verbal modalities, which are pivotal for cross-modal interactions.",
+        "bbox": [
+            112,
+            722,
+            490,
+            835
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "E Selection of $t _ { 0 }$",
+        "text_level": 2,
+        "bbox": [
+            114,
+            846,
+            272,
+            863
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "To select the appropriate parameter to as mentioned in Eq. 4, we vary $t _ { 0 }$ from 0.0 to 0.5 at intervals of 0.1 and present the experimental results of the clustering metric FMI on three multimodal intent datasets.",
+        "bbox": [
+            112,
+            872,
+            489,
+            921
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            884,
+            116
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "As shown in Figure 6, the clustering results fluctuate with different values of $t _ { 0 } ,$ with $t _ { 0 } { = } 0 .$ 1 generally achieving the best performance. Specifically, this value of $t _ { 0 }$ achieve the highest performance on the MIntRec and IEMOCAP-DA datasets, and comparable performance on the MELD-DA dataset. This is reasonable because a larger $t _ { 0 }$ tends to include more data initially, which may introduce more low-quality data as anchors, thereby hindering the learning of representations conducive to effective clustering.",
+        "bbox": [
+            507,
+            117,
+            887,
+            294
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "F Dataset Specifications and Split Details",
+        "text_level": 2,
+        "bbox": [
+            507,
+            305,
+            884,
+            322
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Multimodal Intent Dataset: MIntRec (Zhang et al., 2022a) is the premier dataset for multimodal intent recognition in conversation scenarios, spanning text, audio, and video modalities. It comprises 20 intent classes with 2,224 high-quality annotated samples. The original dataset has a 3:1:1 split for training, validation, and testing. As unsupervised clustering does not require the validation set, we merge it with the training set, resulting in a 4:1 ratio between the training and testing sets.",
+        "bbox": [
+            507,
+            330,
+            885,
+            492
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Multimodal Dialogue Act Datasets: We use two large-scale multimodal dialogue act datasets, MELD-DA and IEMOCAP-DA, which are derived from the MELD (Poria et al., 2019) and IEMO-CAP (Busso et al., 2008) datasets, respectively. The EMOTyDA (Saha et al., 2020) dataset provides dialogue act labels for these datasets, encompassing 12 dialogue act classes. We maintain a 4:1 data split ratio for training and testing, consistent with the split used for MIntRec.",
+        "bbox": [
+            507,
+            492,
+            887,
+            653
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "G Evaluation Metrics",
+        "text_level": 2,
+        "bbox": [
+            509,
+            664,
+            717,
+            680
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Particularly, ACC is calculated by aligning predictions and ground truth using the Hungarian algorithm, as described in (Zhang et al., 2021a, 2023). For NMI, ACC, FMI, the range of possible values is from 0 to 1, while ARI ranges from -1 to 1. Higher values of all these metrics indicate better clustering performance.",
+        "bbox": [
+            507,
+            689,
+            887,
+            802
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "The normalized mutual information (NMI) is defined as:",
+        "bbox": [
+            509,
+            802,
+            884,
+            833
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "img_path": "images/38cc721d47fea11bfa63788b32a6e7849f3e7a4f2e63ef4524cecd8a29fc3423.jpg",
+        "text": "$$\n\\operatorname { N M I } ( \\mathbf { y } ^ { g t } , \\mathbf { y } ^ { p } ) = \\frac { M I ( \\mathbf { y } ^ { g t } , \\mathbf { y } ^ { p } ) } { \\frac { 1 } { 2 } ( H ( \\mathbf { y } ^ { g t } ) + H ( \\mathbf { y } ^ { p } ) ) } ,\\tag{12}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            532,
+            841,
+            830,
+            878
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "where $\\mathbf { y } ^ { g t }$ and $\\mathbf { y } ^ { p }$ are the ground-truth and predicted labels, respectively. $M I ( \\mathbf { y } ^ { g t } , \\mathbf { y } ^ { p } )$ represents the mutual information between $\\mathbf { y } ^ { g t }$ and $\\mathbf { y } ^ { p } .$ and $H ( \\cdot )$ is the entropy. The mutual information is normalized by the arithmetic mean of $H ( \\mathbf { y } ^ { g t } )$ and $H ( \\mathbf { y } ^ { p } )$ , and the resulting NMI values fall within the range of [0, 1].",
+        "bbox": [
+            507,
+            887,
+            885,
+            921
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "image",
+        "img_path": "images/04cc2ffad4d23cce60076c6ddce2a156aa11da17bd0f907c234a7cdb1069c518.jpg",
+        "image_caption": [
+            "Figure 9: Visualization of representations on the MIntRec dataset."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            126,
+            82,
+            872,
+            183
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "image",
+        "img_path": "images/0977c61487ba2c47796d54a10b775556fe60ed3b5c6a8ab7adbd8078d552cf71.jpg",
+        "image_caption": [
+            "Figure 10: Visualization of representations on the MELD-DA dataset."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            126,
+            221,
+            872,
+            324
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            374,
+            489,
+            454
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "The adjusted Rand index (ARI) is defined as:",
+        "bbox": [
+            131,
+            455,
+            470,
+            470
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "img_path": "images/cd9e816dabba52f70479858b5612a93d187397d73f62fcd180543b2954a4fa5f.jpg",
+        "text": "$$\n\\begin{array} { r l } & { \\mathrm { A R I } = } \\\\ & { ~ \\frac { \\sum _ { i , j } { \\binom { n _ { i , j } } { 2 } } - [ \\sum _ { i } { \\binom { u _ { i } } { 2 } } \\sum _ { j } { \\binom { v _ { j } } { 2 } } ] / { \\binom { n } { 2 } } } { \\frac { 1 } { 2 } [ \\sum _ { i } { \\binom { u _ { i } } { 2 } } + \\sum _ { j } { \\binom { v _ { j } } { 2 } } ] - [ \\sum _ { i } { \\binom { u _ { i } } { 2 } } \\sum _ { j } { \\binom { v _ { j } } { 2 } } ] / { \\binom { n } { 2 } } } , } \\end{array}\\tag{13}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            115,
+            479,
+            484,
+            541
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "where $u _ { i } = \\textstyle \\sum _ { j } n _ { i , j }$ , and $\\begin{array} { r } { v _ { j } = \\sum _ { i } n _ { i , j } } \\end{array}$ . n is the number of samples, and $n _ { i , j }$ is the number of samples that have both the $i ^ { \\mathrm { t h } }$ predicted label and the $j ^ { \\mathrm { t h } }$ ground-truth label. The values of ARI fall within the range of [-1, 1].",
+        "bbox": [
+            112,
+            562,
+            489,
+            642
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "The accuracy (ACC) is defined as:",
+        "bbox": [
+            131,
+            643,
+            391,
+            658
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "img_path": "images/1db5f5945e416c79280df2be44b6fda41c6fc02bad5831040df3b8239e329792.jpg",
+        "text": "$$\n\\operatorname { A C C } ( \\mathbf { y } ^ { g t } , \\mathbf { y } ^ { p } ) = \\operatorname* { m a x } _ { m } { \\frac { \\sum _ { i = 1 } ^ { n } \\mathbb { I } \\left\\{ y _ { i } ^ { g t } = m \\left( y _ { i } ^ { p } \\right) \\right\\} } { n } } ,\\tag{14}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            119,
+            665,
+            477,
+            707
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "where $m$ is a one-to-one mapping between the ground-truth label $\\mathbf { y } ^ { g t }$ and predicted label $\\mathbf { y } ^ { p }$ of the $i ^ { \\mathrm { t h } }$ sample. The Hungarian algorithm efficiently obtains the best mapping m. The values of ACC range from [0, 1].",
+        "bbox": [
+            112,
+            728,
+            489,
+            808
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "FMI (Fowlkes-Mallows Index) is defined as:",
+        "bbox": [
+            131,
+            809,
+            465,
+            824
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "img_path": "images/f599d32a790d71ced70822c84053702e2e745209196d7e7425ac86b38a53f617.jpg",
+        "text": "$$\n\\operatorname { F M I } ( \\mathbf { y } ^ { g t } , \\mathbf { y } ^ { p } ) = \\frac { \\mathrm { T P } } { \\sqrt { ( \\mathrm { T P } + \\mathrm { F P } ) ( \\mathrm { T P } + \\mathrm { F N } ) } } ,\\tag{15}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            126,
+            829,
+            443,
+            865
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "where $\\mathbf { y } ^ { g t }$ and $\\mathbf { y } ^ { p }$ are the ground-truth and predicted labels, respectively. TP represents the number of true positive instances, FP is the number of false positive instances, and FN is the number of false negative instances. The FMI is calculated as the ratio of true positive instances to the geometric mean of the product of false positives and false negatives. The values of FMI range from 0 to 1, with higher values indicating better clustering performance.",
+        "bbox": [
+            112,
+            871,
+            490,
+            920
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            374,
+            885,
+            488
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "H Hyper-parameter Sensitivity Analysis",
+        "text_level": 2,
+        "bbox": [
+            509,
+            500,
+            877,
+            517
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "We conduct a sensitivity analysis on the key hyperparameters $\\tau _ { 1 }$ , T2, and $\\tau _ { 3 }$ , which are essential for multimodal unsupervised pre-training and representation learning. The results are displayed in Figure 7.",
+        "bbox": [
+            507,
+            526,
+            887,
+            606
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Initially, with $\\tau _ { 2 }$ and $\\tau _ { 3 }$ set to their optimal values, we explore the impact of varying $\\tau _ { 1 }$ on multimodal clustering. The optimal value for $\\tau _ { 1 }$ is 0.15 across all three datasets, and any deviation from this value results in a performance decline. Next, keeping $\\tau _ { 1 }$ and $\\tau _ { 3 }$ constant, we find that the optimal values for $\\tau _ { 2 }$ are 7.5 for MIntRec and 4.0 for the MELD-DA and IEMOCAP-DA datasets, respectively, with slight performance fluctuations on the IEMOCAP-DA dataset. Finally, by fixing $\\tau _ { 1 }$ and $\\tau _ { 2 } ,$ we observe that the optimal values of $\\tau _ { 3 }$ are 0.9, 4.0, and 8.0 for the MIntRec, MELD-DA, and IEMOCAP-DA datasets, respectively. The performance also exhibits fluctuations on the IEMOCAP-DA dataset.",
+        "bbox": [
+            507,
+            607,
+            887,
+            850
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "I Error Analysis",
+        "text_level": 2,
+        "bbox": [
+            509,
+            862,
+            673,
+            878
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Utilizing Hungarian alignment between predictions and ground truth, we present the confusion matrix in Figure 8. First, we note that several classes with simpler semantics, such as Apologise and Care, achieve an accuracy of 85%. This is reasonable, as they can be easily identified using textual information alone, and the incorporation of non-verbal information maintains this high accuracy.",
+        "bbox": [
+            507,
+            888,
+            885,
+            921
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            114,
+            85,
+            489,
+            181
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "However, for moderately difficult intent classes like Agree, Joke, and Ask for help, which achieve over 60% accuracy, non-verbal cues such as nodding and gestures play a crucial role in inferring the true intent. On the other hand, some intent classes, including Oppose, Complain, Taunt, and Flaunt, are particularly challenging, with very few or even no samples being accurately clustered. These classes often exhibit complex semantics that require a sophisticated integration of different modalities to accurately interpret real human intentions, resulting in poor performance in multimodal clustering. The overall modest performance also indicates significant room for improvement in the field of unsupervised multimodal clustering.",
+        "bbox": [
+            114,
+            181,
+            490,
+            424
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "J Representation Visualization",
+        "text_level": 2,
+        "bbox": [
+            114,
+            435,
+            398,
+            451
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Besides the visualized representations on the IEMOCAP-DA dataset, as introduced in Figure 5, we visualize the representations on the MIntRec and MELD-DA datasets. These are respectively illustrated in Figure 9 and Figure 10. SCCL struggles to effectively learn cluster-level features, resulting in a trivial case of discrete points. CC performs better, forming cluster shapes that are relatively easy to distinguish. USNID shows more compact cluster boundaries, but the boundaries between adjacent clusters are still somewhat indistinct. UMC (Text) performs the best among the text baselines but still has difficult clusters that are close to others. In contrast, our proposed UMC method displays explicit decision boundaries between different clusters, with intra-cluster cohesion being more compact compared to the other methods.",
+        "bbox": [
+            112,
+            461,
+            490,
+            736
+        ],
+        "page_idx": 17
+    }
+]

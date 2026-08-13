@@ -1,0 +1,3327 @@
+[
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Mementos: A Comprehensive Benchmark for Multimodal Large Language Model Reasoning over Image Sequences"
+                    }
+                ],
+                "level": 1
+            },
+            "bbox": [
+                147,
+                85,
+                848,
+                127
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Xiyao Wang<sup>1</sup>† Yuhang Zhou<sup>1</sup> Xiaoyu Liu<sup>1</sup>"
+                    }
+                ]
+            },
+            "bbox": [
+                299,
+                136,
+                695,
+                154
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Hongjin Lu<sup>1</sup> Yuancheng Xu<sup>1</sup> Feihong He<sup>2</sup> Jaehong Yoon<sup>2</sup> Taixi Lu<sup>2</sup> Fuxiao Liu<sup>1</sup> Gedas Bertasius<sup>2</sup> Mohit Bansal<sup>2</sup> Huaxiu Yao<sup>2</sup>‡ Furong Huang<sup>1</sup>‡"
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                153,
+                882,
+                187
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>1</sup>University of Maryland, College Park <sup>2</sup>UNC-Chapel Hill, Chapel Hill †xywang@umd.edu ‡ Equal advising"
+                    }
+                ]
+            },
+            "bbox": [
+                341,
+                187,
+                657,
+                239
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Abstract"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                262,
+                260,
+                341,
+                275
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Multimodal Large Language Models (MLLMs) have demonstrated proficiency in handling a variety of visual-language tasks. However, current MLLM benchmarks are predominantly designed to evaluate reasoning based on static information about a single image, and the ability of modern MLLMs to extrapolate from image sequences, which is essential for understanding our ever-changing world, has been less investigated. To address this challenge, this paper introduces Mementos, a new benchmark designed to assess MLLMs’ sequential image reasoning abilities. Mementos features 4,761 diverse image sequences with varying lengths. We also employ a GPT-4 assisted method to evaluate MLLM reasoning performance. Through a careful evaluation of nine recent MLLMs on Mementos, including GPT-4V and Gemini, we find that they struggle to accurately describe dynamic information about given image sequences, often leading to hallucinations/misrepresentations of objects and their corresponding behaviors. Our quantitative analysis and case studies identify three key factors impacting MLLMs’ sequential image reasoning: the correlation between object and behavioral hallucinations, the influence of cooccurring behaviors, and the compounding impact of behavioral hallucinations."
+                    }
+                ]
+            },
+            "bbox": [
+                141,
+                291,
+                462,
+                705
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "1 Introduction"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                718,
+                260,
+                734
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The recent emergence of Multimodal Large Language Models (MLLMs) such as GPT-4V (OpenAI, 2023b) and Gemini (Team, 2023) has shown strong visual-language understanding and generation capabilities in many areas, like image captioning and visual question answering. Despite the notable performance of existing MLLMs, they often suffer from hallucination (a phenomenon where MLLMs produce inaccurate descriptions of the given images) due to insufficient reasoning capabilities, generating inaccurate responses in visual inference (Liu et al., 2023a; Yue et al., 2023). Thus, monitoring the reasoning capability is of great importance in understanding the ability and the limitations of MLLMs and applying MLLMs in the real world. Previous benchmarks, such as Liu et al. (2023a) and Yue et al. (2023), have primarily addressed evaluating reasoning in each individual image, relying on static and object-centric knowledge. However, they are insufficient to comprehensively assess the reasoning capabilities of MLLMs due to a lack of time-varying object behaviors or events."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                745,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                261,
+                887,
+                438
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To investigate the capabilities of Multi-Modal Language Models (MLLMs) in dynamic reasoning across image sequences, we present a new benchmark, Mementos. This benchmark focuses on the complex task of monitoring and deciphering the positional changes of objects within an image sequence, followed by the inference of behavioral patterns and logical connections among them. Such an endeavor requires the interpretation of the overarching context based on time-variant visual elements, posing a greater challenge than the analysis of static scenes. Concretely, Mementos consists of 4,761 image sequences with varying episode lengths, encompassing diverse scenarios from everyday life, robotics tasks, and comic-style storyboards. An episode refers to a specific event or series of events depicted in the image sequence. Each sequence is paired with a human-annotated description of the key objects and their behaviors."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                439,
+                887,
+                745
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To assess the reasoning capability of MLLMs on Mementos, we employ a GPT-4-assisted evaluation procedure: after an MLLM produces a description for an image sequence, we extract behavior and object keywords from both AI-generated and human-annotated descriptions using GPT-4. We then use keyword matching to assess the degree of behavioral and object hallucinations. To refine the correctness of this evaluation, we have developed behavior and object synonym graphs for each domain. These graphs facilitate more precise keyword matching, ensuring a thorough and nuanced analysis of the MLLMs’ reasoning abilities. Besides, we also provide the comparison with human evaluation to demonstrates that the GPT-4-assisted evaluation procedure is very reliable."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                745,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "416"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 416–442 August 11-16, 2024 ©2024 Association for Computational Linguistics"
+                    }
+                ]
+            },
+            "bbox": [
+                97,
+                946,
+                900,
+                973
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/17b51635412046a018b544c658f630b4d43d64a65a94cdbe273057fd5d97ab4c.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 1: Examples of hallucinations by GPT-4V in three domains on Mementos. The red box shows the description generated by GPT-4V based on the given prompt, and the human-annotated descriptions are in the blue box. Texts highlighted in yellow are hallucination parts generated by GPT-4V. This illustrates that even GPT-4V experiences severe hallucinations when reasoning from image sequences."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                151,
+                83,
+                836,
+                568
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                629,
+                489,
+                709
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We evaluated the reasoning proficiency of nine leading-edge MLLMs on Mementos, encompassing both black-box and open-source models. Our findings indicate that Mementos poses a considerable challenge to these current MLLMs. For instance, as depicted in Figure 1, GPT-4V exhibits notable behavioral and object hallucinations in various domains during image sequence reasoning. Behavioral hallucinations are defined as the MLLMs erroneous interpretations or predictions of entity actions, while object hallucinations pertain to the inaccurate identification or creation of objects. Notably, behavioral hallucinations were more frequent than object hallucinations, highlighting a significant deficiency in MLLMs’ capability to deduce events from image sequences."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                713,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                629,
+                885,
+                676
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Furthermore, our research pinpoints three principal factors that lead to the reasoning failures of MLLMs: (1) the interconnectedness of object and behavioral hallucinations, (2) the impact of cooccurring behaviors, and (3) the cumulative effect of behavioral hallucinations. The objective of our proposed benchmark and analyses is to shed light on innovative approaches to augment the reasoning abilities of MLLMs and to reduce hallucinations in their subsequent advancements."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                677,
+                885,
+                839
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2 Mementos"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                848,
+                636,
+                865
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we introduce Mementos, a novel and challenging benchmark designed to test the reasoning capability of Multimodal Large Language"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                875,
+                885,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "417"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Model (MLLM) under sequential image input. Initially, we detail the data gathering and annotation methodology for Mementos, alongside an overview of data distribution. Subsequently, we outline the procedure and the metric employed to evaluate the reasoning capabilities of MLLMs on Mementos."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                85,
+                489,
+                183
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.1 Mementos Benchmark"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                195,
+                341,
+                211
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.1.1 Dataset Composition"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                217,
+                341,
+                234
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Mementos comprises 4,761 image sequences of varying lengths, predominantly sourced from Dailylife, Robotics, and Comics domains. Detailed statistics are provided in Table 1. This diverse collection is instrumental in evaluating the comprehensive time-varying reasoning abilities of MLLMs. Specifically, the robotics data, closely associated with embodied AI or real-world contexts, and the comic-style storyboard data, rich in stylistic and episodic diversity in image sequences, significantly enhance the benchmark’s relevance and robustness."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                239,
+                490,
+                417
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/89ce80da28b4c27ba6f397a4a4dbe5144a531b14d2ac51227e41b75e20fdff4f.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 1: The number of image sequences in different categories within Mementos."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>Total</td><td rowspan=1 colspan=1>Train Set</td><td rowspan=1 colspan=1>Val set</td></tr><tr><td rowspan=1 colspan=1>Daily-life</td><td rowspan=1 colspan=1>3505</td><td rowspan=1 colspan=1>3055</td><td rowspan=1 colspan=1>450</td></tr><tr><td rowspan=2 colspan=1>RoboticsComics</td><td rowspan=1 colspan=1>1101</td><td rowspan=1 colspan=1>902</td><td rowspan=1 colspan=1>199</td></tr><tr><td rowspan=1 colspan=1>155</td><td rowspan=1 colspan=1>105</td><td rowspan=1 colspan=1>50</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                163,
+                462,
+                435,
+                525
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Daily-life The Daily-life image sequences in Mementos are derived from video clips in the Next-QA dataset, as cited in Xiao et al. (2021). These sequences represent a range of everyday life scenarios. We have selectively extracted videos from the Next-QA Training set, specifically those with frame counts ranging from 400 to 2,500. To balance the challenge of testing MLLMs’ reasoning capabilities against the risk of losing critical information, our methodology involves retaining the first frame of each video. Subsequently, we sample one image every 100 frames. The collected images from this sampling process then form an image sequence that corresponds to the original video. This approach ensures a rigorous yet feasible evaluation of MLLMs’ reasoning abilities in dynamically evolving everyday scenarios."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                539,
+                490,
+                815
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Robotics For the Robotics data, we utilized videos from various sub-datasets within Open X-Embodiment (Collaboration et al., 2023). Open X-Embodiment aggregates video datasets from multiple university laboratories, showcasing a variety of tasks performed by different robotic systems. We meticulously selected sub-datasets from Open X-Embodiment that offer video resolutions exceeding 128x128 and exhibit a high degree of task diversity. From these chosen sub-datasets, a total of 1,101 videos were sampled. The precise number of videos sourced from each sub-dataset is detailed in Appendix A. For video sampling, our approach varied based on the length of the videos. Videos exceeding 100 frames were processed by sampling one image every n/20 frames, where n represents the total frame count. Conversely, for videos with frame counts ranging from 20 to 100, we sampled one image every 5 frames. This ensures the formation of comprehensive and representative image sequences for each video, catering to the evaluation of MLLMs in diverse and complex robotic contexts."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                826,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                887,
+                360
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Comics The Comics data is composed of wordless multi-panel comics of diverse styles, curated from online sources. Unlike Daily-life and Robotics sections, where image sequences are uniformly extracted from video frames, the comics represent intentionally selected key moments within a narrative, manually illustrated by artists. This distinction sets our dataset apart from conventional video datasets. In addition to traditional comics, this category also incorporates 20 storyboards from movies reimagined in comic style. We have further deconstructed these comics into individual image sequences by taking screenshots. This approach enables a unique exploration of sequential visual reasoning, enhancing the diversity and complexity of the dataset for evaluating MLLMs."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                372,
+                887,
+                631
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.1.2 Dataset Annotation"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                642,
+                724,
+                657
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "For each image sequence in Mementos, we have meticulously annotated a ground truth description that captures the unfolding events. These descriptions focus on the primary objects and their respective behaviors, where behavior refers to a verb or verb phrase associated with the object in question."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                663,
+                887,
+                760
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "For the Daily-life data, we initially employed GPT-4V(ision) (OpenAI, 2023a), to amalgamate and reformulate the questions and answers from the Next-QA videos into single paragraph descriptions. This method significantly expedited the manual annotation process. Following this, we conducted a thorough manual review of these automated descriptions, making necessary adjustments. This included rectifying inaccuracies, removing nonexistent episodes, and adding missing details to ensure alignment with the actual image sequences. To ensure reliability, we implemented a crossvalidation step, where a separate set of annotators performed a secondary review. For the Robotics and Comics categories, the annotation process was entirely manual, conducted by human annotators. These annotations were then subjected to a verification process by the authors which ensures the accuracy and consistency of the descriptions across all categories."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                762,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "418"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                110,
+                85,
+                490,
+                247
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.1.3 Dataset Statistics"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                253,
+                310,
+                268
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In showcasing the diversity of Mementos, we present a detailed overview of the data distribution within the Mementos validation set. Our analysis focuses on two key dimensions: the length of the image sequence and the length of the episode. The length of an image sequence is defined by the number of frames it contains, while the episode length is determined by the total number of events depicted in the sequence. A longer image sequence necessitates the MLLM to process a larger number of images, thereby challenging the model’s capacity to manage sequences spanning broader timeframes. A greater episode length signifies that the image sequence encompasses more intricate scenarios."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                273,
+                490,
+                497
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/43baaa1ee553952a5b518876aede961ea3b824838c386b272491d1f159f7f824.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                127,
+                497,
+                470,
+                644
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/3616b675612436bb9f34bc49d15362fb57f809afd065aa644cb6c23b3fe50311.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(a) Distribution of image sequence length"
+                    },
+                    {
+                        "type": "text",
+                        "content": "(b) Distribution of episode length"
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                124,
+                668,
+                470,
+                809
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Figure 2: Data distribution in Mementos Val set. Image sequence length For the image sequence length, we count the number of frames in each image sequence. As shown in Figure 2(a), the majority of image sequences are between 4 and 14 frames in length. 67.38% of image sequences contain 4 to 14 frames, yet 31.90% of sequences are composed of longer frames - more than 15 frames."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                829,
+                489,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                885,
+                118
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Episode length To quantify the episode length within each image sequence of Mementos, we employed GPT-4 for extracting behavior keywords, specifically verbs associated with objects, from the human-annotated descriptions. This extraction was facilitated using a pre-defined manual prompt, details of which can be found in Appendix D. Following the extraction, we calculated the length of the behavior list for each image sequence. A lengthier behavior list signifies a more extended episode within the image sequence, which inherently poses a greater challenge for the MLLM in comprehending the entire image sequence. As illustrated in Figure 2(b), a significant portion of the image sequences, particularly those from the robotics data, feature episode lengths ranging between 1 and 3. This is mainly attributed to the dominance of twoaction episodes like ‘pick up and place’, ‘move and pull open’, ‘locate and push’. Meanwhile, the remaining data exhibits a normal distribution for episode lengths spanning 4 to 17."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                126,
+                887,
+                464
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/ade47bdc5734d89e06c001379d7e19fa98ebb04b2212ed13cecbaeea87beb868.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 3: GPT-4-assisted evaluation procedure. We use "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\" 0 \\ – \""
+                    },
+                    {
+                        "type": "text",
+                        "content": "for objects and \"B-\" for behaviors."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                534,
+                463,
+                870,
+                640
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.2 Evaluation Procedure and Metrics"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                676,
+                828,
+                692
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we illustrate how to evaluate the descriptions generated by MLLMs, including the evaluation procedure and metrics."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                696,
+                884,
+                745
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Procedure As shown in Figure 3, we use an image sequence and a pre-designed prompt together as the input for MLLMs, and generate the description aligned with the corresponding image sequence. Next, we ask GPT-4 to extract object and behavior keywords in the AI-generated description. We then match the obtained keywords with the synonym graph we built, replacing the matched keywords with the root word from the synonym graph. Finally, we obtain two lists of keywords: AI-generated object list and AI-generated behavior list. We note that the proposed keyword extraction leveraging GPT-4 is surprisingly reliable and accurate, which is competitive with human extraction. Please refer to Appendix C for more details."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                746,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "419"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                490,
+                149
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Synonym graph The synonym graph is an unilateral digraph where each edge connects two nodes representing words or phrases. For instance, given a synonym pair (pick up, lift up), an edge is directed from ‘lift up’ to ‘pick up’. In each synonym pair, the first word, originating from the human-annotated keyword list, is referred to as the root word, while the second word is from the AI-generated keyword. To construct this synonym graph, we use GPT-4 to extract object and behavior keywords from all human-annotated descriptions in the Val set, forming a human-annotated keyword list. Then, we generate descriptions using GPT-4V, LLAVA, and Gemini and use GPT-4 to extract object and behavior keywords. After that, we manually match these words with the human-annotated keyword list to identify all synonym pairs and add them as edges to the synonym graph. Given a word or phrase, this synonym graph can quickly match the corresponding root word if a synonym exists in the human-annotated keyword list, completing the keyword replacement. For convenience in evaluation, we maintain separate synonym graphs for objects and behaviors of different categories. We make all constructed synonym graphs publicly available as open-source resources."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                151,
+                490,
+                569
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Metrics After obtaining the AI-generated object list and behavior list, we utilize the corresponding human-annotated object list and human-annotated behavior list as the ground truth to calculate ‘Recall,’ ‘Precision,’ and ‘F1 metrics’ at both the object and behavior levels. These metrics are used to measure the understanding capabilities regarding the image sequence episode. ‘Recall’ reflects the accuracy of an MLLM’s reasoning about episodes in an image sequence, while ‘precision’ focuses on assessing the severity of hallucinations that occur when understanding the image sequence."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                570,
+                490,
+                765
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3 Experiments"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                781,
+                260,
+                797
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In our experimental section, we delve into two key questions: (a) We examine the reasoning capabilities of current MLLMs on Mementos. Specifically, we assess the severity of object and behavioral hallucinations in these models. (b) We investigate the underlying causes of reasoning failures in MLLMs when interpreting image sequences."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                809,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.1 Baseline evaluation"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                84,
+                709,
+                99
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.1.1 Models"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                104,
+                630,
+                120
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We establish our baseline using 9 popular MLLMs. The black-box MLLMs include GPT-4V (OpenAI, 2023a) and Gemini (Team, 2023), and the opensource MLLMs are Video-LLaMA-2 (Zhang et al., 2023a), Chat-UniVi (Jin et al., 2023), LLaVA-1.5 (Liu et al., 2023c), MiniGPT4 (Zhu et al., 2023), MiniGPT5 (Zheng et al., 2023), mPLUG_Owlv2 (Ye et al., 2023), and InstructBLIP (Dai et al., 2023). Considering that only a few open-source MLLMs are designed to process sequential images (Video-LLaMA-2 and Chat-UniVi), we adapt input for other models by combining all frames from an image sequence into one composite image, referred to as the combined-input (c-input) setting. For black-box MLLMs and Chat-UniVi, we conduct evaluations using both the c-input and an alternative approach where frames from the image sequence are input sequentially, termed the sequential-input (s-input) setting. For Video-LLaMA-2, we only test in s-input setting."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                123,
+                889,
+                448
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/0b5139a583778df25dffa922fc20d38ed932b45f50744a4fa6239dc786c58e07.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 4: Comparison of metrics for different MLLMs."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                527,
+                455,
+                867,
+                682
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.1.2 Evaluation results"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                726,
+                715,
+                741
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We evaluate all MLLMs on Mementos and report the results in Figure 4. Besides, we provide the performance of each baseline method in three different domains (Daily-life, Robotics, and Comics) in Table 2. We summarize our findings as follows: GPT-4V (s-input) and LLaVA-1.5 are the bestperforming models among black-box and opensource MLLMs, respectively. As shown in Figure 4, except for being on par with Gemini (sinput) and LLaVA-1.5 in behavior precision, GPT-4V with s-input demonstrates the best reasoning capability compared with all other MLLMs in understanding image sequences. Among open-source models, LLaVA1.5 performs the best, nearly matching or even surpassing the black-box model Gemini in object comprehension, but its ability to infer behaviors from image sequences is weaker compared to Gemini and GPT-4V. Although Video-LLaMA-2 and Chat-UniVi are designed for video understanding, they do not show an advantage over LLaVA-1.5, especially Video-LLaMA-2, which performs notably worse compared to LLaVA-1.5. The weakest models in understanding image sequences are MiniGPT4 and MiniGPT5, with a significant gap in every metric compared to the other baselines. It’s noteworthy that under c-input setting, the performance of black-box MLLMs does not significantly differ from that of open-source MLLMs. LLaVA-1.5 and mPLUG_Owl-v2 meet or even exceed the black-box MLLMs on many metrics."
+                    }
+                ]
+            },
+            "bbox": [
+                505,
+                745,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "420"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/c60d475fcf89b352d8b4e435aeb556b11c64306a212bca8f40482b0965027ece.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 2: Evaluation of different MLLMs on Mementos."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=1 colspan=1>Domain</td><td rowspan=1 colspan=1>Input type</td><td rowspan=1 colspan=1>Model</td><td rowspan=1 colspan=1>ObjectRecall   Precision    F1</td><td rowspan=1 colspan=1>BehaviorRecall   Precision    F1</td></tr><tr><td rowspan=12 colspan=1>Daily-life</td><td rowspan=4 colspan=1>Sequential</td><td rowspan=4 colspan=1>GPT-4VGeminiVideo-LLaMA-2Chat-UniVi</td><td rowspan=1 colspan=1>59.80%   50.96%   53.51%</td><td rowspan=1 colspan=1>36.71%   32.97%   33.59%</td></tr><tr><td rowspan=1 colspan=1>35.92%   42.06%   37.10%</td><td rowspan=1 colspan=1>18.80%   29.42%   21.64%</td></tr><tr><td rowspan=1 colspan=1>31.59%   30.01%   29.37%</td><td rowspan=1 colspan=1>17.05%   28.19%   20.12%</td></tr><tr><td rowspan=1 colspan=1>40.74%   40.78%   39.13%</td><td rowspan=1 colspan=1>22.30%   31.10%   24.90%</td></tr><tr><td rowspan=8 colspan=1>Combined</td><td rowspan=8 colspan=1>GPT-4VGeminiChat-UniViLLaVa-1.5MiniGPT4MiniGPT5mPLUG_Owl-v2InstructBLIP</td><td rowspan=1 colspan=1>39.45%   39.64%   38.04%</td><td rowspan=1 colspan=1>26.43%   23.59%   23.98%</td></tr><tr><td rowspan=1 colspan=1>31.17%   37.39%   32.38%</td><td rowspan=1 colspan=1>17.71%   25.65%   19.74%</td></tr><tr><td rowspan=1 colspan=1>36.19%   38.88%   36.02%</td><td rowspan=1 colspan=1>21.80%   28.52%   23.73%</td></tr><tr><td rowspan=2 colspan=1>37.72%   47.01%   40.18%32.25%   23.14%   25.75%</td><td rowspan=1 colspan=1>22.17%   37.33%   26.65%</td></tr><tr><td rowspan=1 colspan=1>18.09%   24.16%   19.45%</td></tr><tr><td rowspan=1 colspan=1>31.39%   22.62%   24.91%</td><td rowspan=1 colspan=1>18.42%   24.56%   19.85%</td></tr><tr><td rowspan=2 colspan=1>32.59%   47.17%   37.04%31.82%   41,14%   34.28%</td><td rowspan=1 colspan=1>17.96%   33.57%   22.13%</td></tr><tr><td rowspan=1 colspan=1>22.40%   30.30%   24.55%</td></tr><tr><td rowspan=4 colspan=1></td><td rowspan=4 colspan=1>Sequential</td><td rowspan=4 colspan=1>GPT-4VGeminiVideo-LLaMA-2Chat-UniVi</td><td rowspan=1 colspan=1>63.94%   65.42%   62.99%</td><td rowspan=1 colspan=1>60.72%   24.43%   33.95%</td></tr><tr><td rowspan=1 colspan=1>43.80%   46.26%   43.15%</td><td rowspan=1 colspan=1>46.43%   38.13%   39.38%</td></tr><tr><td rowspan=2 colspan=1>13.41%   10.33%   11.15%35.40%   32.57%   32.39%</td><td rowspan=1 colspan=1>17.04%   8.96%    11.23%</td></tr><tr><td rowspan=1 colspan=1>32.24%   16.69%   21.14%</td></tr><tr><td rowspan=8 colspan=1>Robotics</td><td rowspan=8 colspan=1>Combined</td><td rowspan=8 colspan=1>GPT-4VGeminiChat-UniViLLaVa-1.5MiniGPT4MiniGPT5mPLUG_Owl-v2InstructBLIP</td><td rowspan=1 colspan=1>27.87%   31.86%   28.58%</td><td rowspan=1 colspan=1>44.72%   16.54%   23.58%</td></tr><tr><td rowspan=1 colspan=1>34.78%   41.66%   36.16%</td><td rowspan=1 colspan=1>47.29%   29.59%   34.17%</td></tr><tr><td rowspan=1 colspan=1>17.74%   18.32%   17.07%</td><td rowspan=1 colspan=1>19.81%   10.01%   12.54%</td></tr><tr><td rowspan=2 colspan=1>36.88%   46.62%   39.31%10.97%   7.28%    8.16%</td><td rowspan=1 colspan=1>25.27%   14.80%   17.95%</td></tr><tr><td rowspan=1 colspan=1>13.40%   5.88%    7.76%</td></tr><tr><td rowspan=1 colspan=1>9.75%    6.52%    7.16%</td><td rowspan=1 colspan=1>8.96%    4.53%    5.43%</td></tr><tr><td rowspan=2 colspan=1>19.75%   26.70%   21.99%17.96%   18.65%   17.29%</td><td rowspan=1 colspan=1>26.46%   16.59%   19.51%</td></tr><tr><td rowspan=1 colspan=1>31.41%   19.08%   22.69%</td></tr><tr><td rowspan=4 colspan=1></td><td rowspan=4 colspan=1>Sequential</td><td rowspan=4 colspan=1>GPT-4VGeminiVideo-LLaMA-2Chat-UniVi</td><td rowspan=1 colspan=1>49.53%   37.57%   41.71%</td><td rowspan=1 colspan=1>19.97%   17.29%   18.11%</td></tr><tr><td rowspan=1 colspan=1>38.57%   40.64%   38.53%</td><td rowspan=1 colspan=1>15.23%   19.11%   16.30%</td></tr><tr><td rowspan=2 colspan=1>20.26%   17.59%   18.09%28.04%   31.61%   28.13%</td><td rowspan=1 colspan=1>5.45%    11.07%    6.81%</td></tr><tr><td rowspan=1 colspan=1>10.42%   15.74%   11.97%</td></tr><tr><td rowspan=8 colspan=1>Comics</td><td rowspan=8 colspan=1>Combined</td><td rowspan=5 colspan=1>GPT-4VGeminiChat-UniViLLaVa-1.5MiniGPT4</td><td rowspan=2 colspan=1>29.23%   24.64%   25.90%41.25%   45.07%   41.18%</td><td rowspan=1 colspan=1>13.19%   13.09%   12.90%</td></tr><tr><td rowspan=1 colspan=1>15.37%   20.55%   16.42%</td></tr><tr><td rowspan=1 colspan=1>25.12%   28.08%   25.51%</td><td rowspan=1 colspan=1>8.85%    10.67%    9.31%</td></tr><tr><td rowspan=1 colspan=1>29.44%   35.61%   30.97%</td><td rowspan=1 colspan=1>8.63%   13.56%   10.27%</td></tr><tr><td rowspan=1 colspan=1>20.50%   13.94%   15.74%</td><td rowspan=1 colspan=1>7.95%    8.64%    7.98%</td></tr><tr><td rowspan=3 colspan=1>MiniGPT5mPLUG_Owl-v2InstructBLIP</td><td rowspan=1 colspan=1>22.94%   18.11%   19.42%</td><td rowspan=1 colspan=1>8.88%    11.92%    9.94%</td></tr><tr><td rowspan=1 colspan=1>26.82%   37.74%   29.49%</td><td rowspan=1 colspan=1>8.70%    20.85%   11.74%</td></tr><tr><td rowspan=1 colspan=1>25.02%   29.15%   25.10%</td><td rowspan=1 colspan=1>8.25%    10.48%    8.97%</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                151,
+                97,
+                838,
+                571
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                110,
+                575,
+                492,
+                882
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "MLLMs possess a much stronger ability on reasoning objects in image sequences than they do on reasoning behaviors. We find that all MLLM methods perform significantly better on the three metrics for objects than those for behaviors. Taking the best-performing GPT-4V as an example, it achieves over 50% on all three object metrics, with recall even reaching 60%, indicating it can effectively recognize the main objects in an image sequence. However, for behaviors, GPT-4V scores only around 30%, with the best recall metric barely exceeding 40%. Despite this, GPT-4V is still the best-performing MLLM in reasoning behaviors. This suggests that current MLLMs do not possess strong abilities to autonomously infer the behaviors from given sequential images, indicating the importance of our benchmark in highlighting the limitations in the reasoning abilities of MLLMs."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                890,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                575,
+                887,
+                834
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Reasoning capability of MLLMs varies across different domains. From Table 2, we find that black-box models perform best in the robotics domain across the three domains, while open-source models show relatively better performance in the daily-life domain. Analyzing each domain specifically, it is evident that in the daily-life domain, the performance of all methods, except for GPT-4V (s-input), does not vary significantly. The main reason for the performance gap between open-source MLLMs and black-box MLLMs is the noticeably lower metrics of open-source models compared to black-box models in the robotics and comics domains. The recall, precision, and F1 of both object and behavior for black-box MLLMs are almost more than double those of open-source models. We speculate that one reason for this phenomenon is the distribution shift between Mementos and the training data of open-source MLLMs. The limitations of the training data lead to weaker reasoning capability of open-source MLLMs."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                841,
+                887,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "421"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                515,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                490,
+                343
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.2 Analysis of Failure Reasoning"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                353,
+                396,
+                369
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we will provide reasons for failure reasoning results in current MLLMs, combining specific quantitative analyses and case studies. Since behavioral hallucination is a unique phenomenon in image sequence reasoning, and the causes of object hallucination are not significantly different from those in single image reasoning, we only present the reasons leading to behavioral hallucination in this paper. Due to space limitations, please refer to the Appendix E for specific case studies. The following are our main findings:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                375,
+                490,
+                551
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Interplay between object and behavioral hallucinations in MLLMs. A key hypothesis underpinning behavioral hallucination is that incorrect object identification leads to subsequent inaccuracies in behavior identification. To test this, we evaluated the correlation coefficients between object and behavioral hallucinations across different domains for various MLLMs, as detailed in Appendix B Table 4. Our findings reveal that, for most MLLMs, the correlation coefficients in the three domains fluctuate between 0.1 and 0.4, suggesting a weak yet present correlation. This outcome supports the hypothesis that object hallucination contributes to behavioral hallucination to some extent. Case studies further reveal that after an object hallucination occurs, MLLMs tend to describe behaviors related to the hallucinated object, even if these behaviors do not exist in the image sequence. As shown in Figure 5, after recognizing a scene as a tennis court, a MLLM might describe a person playing tennis. Interestingly, in the robotics domain, there is a negligible correlation between object and behavioral hallucinations in black-box MLLMs. This divergence is likely because behaviors in robotics are predominantly linked to robotic arms, which these MLLMs generally identify correctly."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                552,
+                492,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                884,
+                134
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/3b9afe50febcacd2ba226c26a2a4e2a0d4550a5fce6c27923d0ca27d068070d1.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 5: A sample of failure reasoning case in Dailylife domain. The failure reason is object hallucination, correlation between object hallucination and behavioral hallucination, and co-occurrence behavior. Following the object hallucination of tennis court, the LVLM subsequently exhibits behavioral hallucinations of holding a tennis racket (correlation between object hallucination and behavioral hallucination) and appears to be playing tennis (co-occurrence behavior)."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                546,
+                159,
+                847,
+                381
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The impact of co-occurrence on behavioral hallucination. In line with object hallucination phenomena, as noted in Li et al. (2023c) and Zhou et al. (2023a), MLLMs demonstrate a tendency to generate behaviors that are commonly paired together. This proclivity exacerbates the problem of behavioral hallucination, especially in the field of robotics. Consider the case in Figure 1 where a robotic arm is tasked with opening a drawer by grabbing its side. MLLMs might erroneously depict the sequence as the arm grabbing the handle first, followed by pulling the drawer open, since grabbing the handle is a more co-occurring behavior with ‘pull open’. Despite the final outcome being accurately described, such errors in key details are unacceptable in robotics. This issue is of particular concern given the growing inclination to utilize MLLMs as reward functions in robotic training (Ma et al., 2023; Sontakke et al., 2023; Rocamonde et al., 2023; Baumli et al., 2023). Such behavioral hallucinations can critically affect the quality of the reward function, leading to potential mislearning of behaviors in robotic systems. Detailed case studies are shown in Appendix E."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                536,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "422"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The Snowball effect in behavioral hallucinations. The Snowball effect is a well-documented phenomenon in machine learning, referring to the progressive accumulation or intensification of errors in a system, as discussed in Asadi et al. (2019); Zhang et al. (2023b); Wang et al. (2023c); Liu et al. (2023d). Zhang et al. (2023b) notably highlight this phenomenon in Large Language Models. Experiments on Mementos reveal that the snowball effect in both behavioral and object hallucinations becomes markedly pronounced when reasoning through image sequences. The temporal nature of image sequences, consisting of a series of frames rather than a solitary image, demands that MLLMs sequentially infer the narrative. This process makes models susceptible to exacerbating hallucinations if errors occur early in the sequence. We specifically examined the trend of object and behavioral hallucination in GPT-4V and LLaVA-1.5 within the daily-life domain, correlating it with the episode length. As shown in Figure 6, there is a noticeable decrease in object and behavior recall for both MLLMs as the episode length extends. This trend suggests a heightened susceptibility to hallucinations and a pronounced snowball effect in MLLMs when processing image sequences with a greater array of objects and behaviors. Detailed case studies can be found in Appendix E."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                84,
+                490,
+                535
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/3fc7df6f4c638f046f15e50d47787bf8634e5648e840183ef957f83743591d72.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(a) Object"
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                121,
+                536,
+                294,
+                609
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/a27955e3e397b36ac98bd358fbef428a4c560d3e6ca713a823dfbbf5bdb0f600.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(b) Behavior"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Figure 6: The trend of changes in object and behavior recall for GPT-4V and LLaVA-1.5 in the Daily-life domain as the episode length increases."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                304,
+                536,
+                475,
+                609
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4 Related work"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                682,
+                267,
+                697
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.1 Benchmarking in MLLMs"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                708,
+                369,
+                724
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The advent of MLLMs has prompted a reassessment of traditional benchmarks (Lin et al., 2014; Marino et al., 2019; Hudson and Manning, 2019). These benchmarks fail to sufficiently expose the hallucination issues in MLLMs. Consequently, there is a growing impetus to devise more challenging benchmarks. This trend spans various domains, from question and answering (QA) reasoning (Liu et al., 2023a; Yue et al., 2023), to optical character recognition (OCR) (Liu et al., 2023f), and extends to the study of hallucinations (Wang et al., 2023a), with benchmarks such as POPE (Li et al.,"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                730,
+                492,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "2023c) and Bingo (Cui et al., 2023). Additionally, comprehensive analyses of MLLMs, such as Mmbench (Liu et al., 2023e), Mm-vet(Yu et al., 2023b), LVLM-eHub(Xu et al., 2023), SEED(Li et al., 2023a), GAVIE(Liu et al., 2023b), and LAMM (Yin et al., 2023), are emerging."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                85,
+                887,
+                181
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our paper presents a novel benchmark using sequences from videos or comics to study behavioral hallucinations, diverging from single-image analysis. Unlike Chen et al. (2023a)’s vision QA tasks from uniformly sampled video frames, our benchmark challenges MLLMs to describe sequences without question guidance, offering a finer evaluation of hallucinations and reasoning in MLLMs."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                183,
+                887,
+                312
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.2 Hallucination in MLLMs"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                324,
+                756,
+                340
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Hallucinations in MLLMs, akin to those in Large Language Models (LLMs) (Zhang et al., 2023c; Li et al., 2023b; Zhou et al., 2024; Chen et al., 2023b), represent a significant challenge. In MLLMs, hallucinations are characterized by inconsistencies between the model’s output and the visual content (Rohrbach et al., 2018; Wang et al., 2023a). Recent studies have explored various aspects of hallucination in MLLMs, covering topics such as object hallucination (Li et al., 2023c), hallucination assessment in GPT-4V (Cui et al., 2023), and knowledge hallucination (Liu et al., 2023a)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                347,
+                887,
+                541
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "While there are methods proposed for mitigating hallucinations (Zhou et al., 2023a; Wang et al., 2023b; Leng et al., 2023; Zhou et al., 2023b; Chen et al., 2023c; Jiang et al., 2023; Huang et al., 2023; Yu et al., 2023a; Zhao et al., 2023), there is a noticeable gap in the literature regarding the study of behavioral hallucination. Moreover, the existing work does not offer a dedicated metric for evaluating behavioral hallucinations."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                542,
+                887,
+                687
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5 Conclusion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                701,
+                643,
+                717
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this paper, we present Mementos, a novel and challenging benchmark designed to assess the reasoning abilities of Multimodal Large Language Models (MLLMs) in interpreting image sequences. We conduct evaluations on nine most recent MLLMs using GPT-4-assisted evaluation procedure. Our findings indicate that all tested MLLMs struggle with significant behavioral and object hallucinations in generating descriptions for image sequences. Through a mix of quantitative analysis and case studies, we identify three primary factors contributing to these reasoning failures."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                730,
+                885,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "423"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Limitations"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                83,
+                221,
+                99
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Domain courage Mementos is consisted of 4,761 image sequences from three domains: Daily life, Robotics, and Comics. It would be interesting to include a broader variety of data types. This expansion could include first-person navigation experiences, sequential medical CT scans, and interactive gaming data. MLLMs could behave different types of hallucinations in image sequences from other domains"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                114,
+                489,
+                258
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Evaluation Process Our evaluation process focuses on the match of keywords to measure the reasoning ability of MLLMs. However, it would be possible that the MLLM generation is the same as human annotations in semantics but obtains low performance, since the generated tokens are not covered by our synonym graph. Future work could extend the evaluation method to semantic understanding rather than relying predominantly on keyword matching."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                260,
+                490,
+                420
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Hallucination Mitigation Our work identifies two kinds of hallucination: object and behavioral hallucinations and explore the failure reason of MLLMs. We have not yet proposed a mitigation method to reduce behavioral hallucinations. Future work could utilize the three causes of reasoning failures to bolster the reasoning faculties of MLLMs, making them more adept at accurately interpreting and describing complex image sequences."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                423,
+                489,
+                569
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Acknowledgement"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                585,
+                278,
+                601
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Wang, Zhou, Liu, Xu, and Huang are supported by National Science Foundation NSF-IIS FAI program, DOD-ONR-Office of Naval Research under award number N00014-22-1-2335, DOD-AFOSR-Air Force Office of Scientific Research under award number FA9550-23-1-0048, Capital One and JP Morgan faculty fellowships. Yao is supported by the Cisco Faculty Research Award. He also thanks Center for AI Safety and Google Cloud Research Credits program for supporting our computing needs. Bansal is supported by DARPA ECOLE Program No. HR00112390060 and ONR Grant N00014-23-1-2356."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                614,
+                490,
+                824
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "References"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                856,
+                215,
+                871
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kavosh Asadi, Dipendra Misra, Seungchan Kim, and Michel L. Littman. 2019. Combating the compounding-error problem with a multi-step model."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kate Baumli, Satinder Baveja, Feryal Behbahani, Harris Chan, Gheorghe Comanici, Sebastian Flennerhag, Maxime Gazeau, Kristian Holsheimer, Dan Horgan, Michael Laskin, et al. 2023. Vision-language models as a source of rewards. arXiv preprint arXiv:2312.09187."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xiuyuan Chen, Yuan Lin, Yuchen Zhang, and Weiran Huang. 2023a. Autoeval-video: An automatic benchmark for assessing large vision language models in open-ended video question answering. arXiv preprint arXiv:2311.14906."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yuyan Chen, Qiang Fu, Yichen Yuan, Zhihao Wen, Ge Fan, Dayiheng Liu, Dongmei Zhang, Zhixu Li, and Yanghua Xiao. 2023b. Hallucination detection: Robustly discerning reliable answers in large language models. In Proceedings of the 32nd ACM International Conference on Information and Knowledge Management, pages 245–255."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zhiyang Chen, Yousong Zhu, Yufei Zhan, Zhaowen Li, Chaoyang Zhao, Jinqiao Wang, and Ming Tang. 2023c. Mitigating hallucination in visual language models with visual supervision. arXiv preprint arXiv:2311.16479."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Open X-Embodiment Collaboration, Abhishek Padalkar, Acorn Pooley, Ajinkya Jain, Alex Bewley, Alex Herzog, Alex Irpan, Alexander Khazatsky, Anant Rai, Anikait Singh, Anthony Brohan, Antonin Raffin, Ayzaan Wahid, Ben Burgess-Limerick, Beomjoon Kim, Bernhard Schölkopf, Brian Ichter, Cewu Lu, Charles Xu, Chelsea Finn, Chenfeng Xu, Cheng Chi, Chenguang Huang, Christine Chan, Chuer Pan, Chuyuan Fu, Coline Devin, Danny Driess, Deepak Pathak, Dhruv Shah, Dieter Büchler, Dmitry Kalashnikov, Dorsa Sadigh, Edward Johns, Federico Ceola, Fei Xia, Freek Stulp, Gaoyue Zhou, Gaurav S. Sukhatme, Gautam Salhotra, Ge Yan, Giulio Schiavi, Hao Su, Hao-Shu Fang, Haochen Shi, Heni Ben Amor, Henrik I Christensen, Hiroki Furuta, Homer Walke, Hongjie Fang, Igor Mordatch, Ilija Radosavovic, Isabel Leal, Jacky Liang, Jaehyung Kim, Jan Schneider, Jasmine Hsu, Jeannette Bohg, Jeffrey Bingham, Jiajun Wu, Jialin Wu, Jianlan Luo, Jiayuan Gu, Jie Tan, Jihoon Oh, Jitendra Malik, Jonathan Tompson, Jonathan Yang, Joseph J. Lim, João Silvério, Junhyek Han, Kanishka Rao, Karl Pertsch, Karol Hausman, Keegan Go, Keerthana Gopalakrishnan, Ken Goldberg, Kendra Byrne, Kenneth Oslund, Kento Kawaharazuka, Kevin Zhang, Keyvan Majd, Krishan Rana, Krishnan Srinivasan, Lawrence Yunliang Chen, Lerrel Pinto, Liam Tan, Lionel Ott, Lisa Lee, Masayoshi Tomizuka, Maximilian Du, Michael Ahn, Mingtong Zhang, Mingyu Ding, Mohan Kumar Srirama, Mohit Sharma, Moo Jin Kim, Naoaki Kanazawa, Nicklas Hansen, Nicolas Heess, Nikhil J Joshi, Niko Suenderhauf, Norman Di Palo, Nur Muhammad Mahi Shafiullah, Oier Mees, Oliver Kroemer, Pannag R Sanketi, Paul Wohlhart, Peng Xu, Pierre Sermanet, Priya Sundaresan, Quan Vuong, Rafael Rafailov, Ran Tian, Ria Doshi, Roberto Martín-Martín, Russell Mendonca, Rutav Shah, Ryan Hoque, Ryan Julian, Samuel"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                881,
+                489,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "424"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Bustamante, Sean Kirmani, Sergey Levine, Sherry Moore, Shikhar Bahl, Shivin Dass, Shuran Song, Sichun Xu, Siddhant Haldar, Simeon Adebola, Simon Guist, Soroush Nasiriany, Stefan Schaal, Stefan Welker, Stephen Tian, Sudeep Dasari, Suneel Belkhale, Takayuki Osa, Tatsuya Harada, Tatsuya Matsushima, Ted Xiao, Tianhe Yu, Tianli Ding, Todor Davchev, Tony Z. Zhao, Travis Armstrong, Trevor Darrell, Vidhi Jain, Vincent Vanhoucke, Wei Zhan, Wenxuan Zhou, Wolfram Burgard, Xi Chen, Xiaolong Wang, Xinghao Zhu, Xuanlin Li, Yao Lu, Yevgen Chebotar, Yifan Zhou, Yifeng Zhu, Ying Xu, Yixuan Wang, Yonatan Bisk, Yoonyoung Cho, Youngwoon Lee, Yuchen Cui, Yueh hua Wu, Yujin Tang, Yuke Zhu, Yunzhu Li, Yusuke Iwasawa, Yutaka Matsuo, Zhuo Xu, and Zichen Jeff Cui. 2023. Open X-Embodiment: Robotic learning datasets and RT-X models. https://arxiv.org/abs/2310.08864."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Chenhang Cui, Yiyang Zhou, Xinyu Yang, Shirley Wu, Linjun Zhang, James Zou, and Huaxiu Yao. 2023. Holistic analysis of hallucination in gpt-4v (ision): Bias and interference challenges. arXiv preprint arXiv:2311.03287."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Wenliang Dai, Junnan Li, Dongxu Li, Anthony Meng Huat Tiong, Junqi Zhao, Weisheng Wang, Boyang Li, Pascale Fung, and Steven Hoi. 2023. Instructblip: Towards general-purpose vision-language models with instruction tuning."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Qidong Huang, Xiaoyi Dong, Pan Zhang, Bin Wang, Conghui He, Jiaqi Wang, Dahua Lin, Weiming Zhang, and Nenghai Yu. 2023. Opera: Alleviating hallucination in multi-modal large language models via over-trust penalty and retrospection-allocation. arXiv preprint arXiv:2311.17911."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Drew A Hudson and Christopher D Manning. 2019. Gqa: A new dataset for real-world visual reasoning and compositional question answering. In Proceedings ofthe IEEE/CVF conference on computer vision and pattern recognition, pages 6700–6709."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Chaoya Jiang, Haiyang Xu, Mengfan Dong, Jiaxing Chen, Wei Ye, Ming Yan, Qinghao Ye, Ji Zhang, Fei Huang, and Shikun Zhang. 2023. Hallucination augmented contrastive learning for multimodal large language model. arXiv preprint arXiv:2312.06968."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Peng Jin, Ryuichi Takanobu, Caiwan Zhang, Xiaochun Cao, and Li Yuan. 2023. Chat-univi: Unified visual representation empowers large language models with image and video understanding. arXiv preprint arXiv:2311.08046."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Sicong Leng, Hang Zhang, Guanzheng Chen, Xin Li, Shijian Lu, Chunyan Miao, and Lidong Bing. 2023. Mitigating object hallucinations in large visionlanguage models through visual contrastive decoding. arXiv preprint arXiv:2311.16922."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Bohao Li, Rui Wang, Guangzhi Wang, Yuying Ge, Yixiao Ge, and Ying Shan. 2023a. Seed-bench: Benchmarking multimodal llms with generative comprehension. arXiv preprint arXiv:2307.16125."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Junyi Li, Xiaoxue Cheng, Wayne Xin Zhao, Jian-Yun Nie, and Ji-Rong Wen. 2023b. Halueval: A largescale hallucination evaluation benchmark for large language models. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 6449–6464."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yifan Li, Yifan Du, Kun Zhou, Jinpeng Wang, Wayne Xin Zhao, and Ji-Rong Wen. 2023c. Evaluating object hallucination in large vision-language models. arXiv preprint arXiv:2305.10355."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Tsung-Yi Lin, Michael Maire, Serge Belongie, James Hays, Pietro Perona, Deva Ramanan, Piotr Dollár, and C Lawrence Zitnick. 2014. Microsoft coco: Common objects in context. In Computer Vision– ECCV 2014: 13th European Conference, Zurich, Switzerland, September 6-12, 2014, Proceedings, Part V 13, pages 740–755. Springer."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Fuxiao Liu, Tianrui Guan, Zongxia Li, Lichang Chen, Yaser Yacoob, Dinesh Manocha, and Tianyi Zhou. 2023a. Hallusionbench: You see what you think? or you think what you see? an image-context reasoning benchmark challenging for gpt-4v (ision), llava-1.5, and other multi-modality models. arXiv preprint arXiv:2310.14566."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Fuxiao Liu, Kevin Lin, Linjie Li, Jianfeng Wang, Yaser Yacoob, and Lijuan Wang. 2023b. Aligning large multi-modal model with robust instruction tuning. arXiv preprint arXiv:2306.14565."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Haotian Liu, Chunyuan Li, Yuheng Li, and Yong Jae Lee. 2023c. Improved baselines with visual instruction tuning."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xiaoyu Liu, Jiaxin Yuan, Bang An, Yuancheng Xu, Yifan Yang, and Furong Huang. 2023d. Cdisentanglement: Discovering causally-independent generative factors under an inductive bias of confounder. arXiv preprint arXiv:2310.17325."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yuan Liu, Haodong Duan, Yuanhan Zhang, Bo Li, Songyang Zhang, Wangbo Zhao, Yike Yuan, Jiaqi Wang, Conghui He, Ziwei Liu, et al. 2023e. Mmbench: Is your multi-modal model an all-around player? arXiv preprint arXiv:2307.06281."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yuliang Liu, Zhang Li, Hongliang Li, Wenwen Yu, Mingxin Huang, Dezhi Peng, Mingyu Liu, Mingrui Chen, Chunyuan Li, Lianwen Jin, et al. 2023f. On the hidden mystery of ocr in large multimodal models. arXiv preprint arXiv:2305.07895."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yecheng Jason Ma, William Liang, Vaidehi Som, Vikash Kumar, Amy Zhang, Osbert Bastani, and Dinesh Jayaraman. 2023. Liv: Language-image representations and rewards for robotic control. arXiv preprint arXiv:2306.00958."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kenneth Marino, Mohammad Rastegari, Ali Farhadi, and Roozbeh Mottaghi. 2019. Ok-vqa: A visual question answering benchmark requiring external knowledge. In Proceedings of the IEEE/cvf conference on computer vision and pattern recognition, pages 3195–3204."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                131,
+                85,
+                489,
+                322
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "425"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "OpenAI. 2023a. Gpt-4 technical report."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "OpenAI. 2023b. Gpt-4v(ision) system card."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Juan Rocamonde, Victoriano Montesinos, Elvis Nava, Ethan Perez, and David Lindner. 2023. Vision-language models are zero-shot reward models for reinforcement learning. arXiv preprint arXiv:2310.12921."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Anna Rohrbach, Lisa Anne Hendricks, Kaylee Burns, Trevor Darrell, and Kate Saenko. 2018. Object hallucination in image captioning. arXiv preprint arXiv:1809.02156."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Sumedh Anand Sontakke, Jesse Zhang, Séb Arnold, Karl Pertsch, Erdem Biyik, Dorsa Sadigh, Chelsea Finn, and Laurent Itti. 2023. Roboclip: One demonstration is enough to learn robot policies. In Thirtyseventh Conference on Neural Information Processing Systems."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Gemini Team. 2023. Gemini: A family of highly capable multimodal models."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Junyang Wang, Yiyang Zhou, Guohai Xu, Pengcheng Shi, Chenlin Zhao, Haiyang Xu, Qinghao Ye, Ming Yan, Ji Zhang, Jihua Zhu, et al. 2023a. Evaluation and analysis of hallucination in large vision-language models. arXiv preprint arXiv:2308.15126."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Lei Wang, Jiabang He, Shenshen Li, Ning Liu, and Ee-Peng Lim. 2023b. Mitigating fine-grained hallucination by fine-tuning large vision-language models with caption rewrites. arXiv preprint arXiv:2312.01701."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xiyao Wang, Ruijie Zheng, Yanchao Sun, Ruonan Jia, Wichayaporn Wongkamjan, Huazhe Xu, and Furong Huang. 2023c. Coplanner: Plan to roll out conservatively but to explore optimistically for model-based rl."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Junbin Xiao, Xindi Shang, Angela Yao, and Tat-Seng Chua. 2021. Next-qa: Next phase of questionanswering to explaining temporal actions. In Proceedings ofthe IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), pages 9777– 9786."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Peng Xu, Wenqi Shao, Kaipeng Zhang, Peng Gao, Shuo Liu, Meng Lei, Fanqing Meng, Siyuan Huang, Yu Qiao, and Ping Luo. 2023. Lvlm-ehub: A comprehensive evaluation benchmark for large visionlanguage models. arXiv preprint arXiv:2306.09265."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Qinghao Ye, Haiyang Xu, Jiabo Ye, Ming Yan, Haowei Liu, Qi Qian, Ji Zhang, Fei Huang, and Jingren Zhou. 2023. mplug-owl2: Revolutionizing multi-modal large language model with modality collaboration. arXiv preprint arXiv:2311.04257."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zhenfei Yin, Jiong Wang, Jianjian Cao, Zhelun Shi, Dingning Liu, Mukai Li, Lu Sheng, Lei Bai, Xiaoshui Huang, Zhiyong Wang, et al. 2023. Lamm: Language-assisted multi-modal instruction-tuning dataset, framework, and benchmark. arXiv preprint arXiv:2306.06687."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Qifan Yu, Juncheng Li, Longhui Wei, Liang Pang, Wentao Ye, Bosheng Qin, Siliang Tang, Qi Tian, and Yueting Zhuang. 2023a. Hallucidoctor: Mitigating hallucinatory toxicity in visual instruction data. arXiv preprint arXiv:2311.13614."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Weihao Yu, Zhengyuan Yang, Linjie Li, Jianfeng Wang, Kevin Lin, Zicheng Liu, Xinchao Wang, and Lijuan Wang. 2023b. Mm-vet: Evaluating large multimodal models for integrated capabilities. arXiv preprint arXiv:2308.02490."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xiang Yue, Yuansheng Ni, Kai Zhang, Tianyu Zheng, Ruoqi Liu, Ge Zhang, Samuel Stevens, Dongfu Jiang, Weiming Ren, Yuxuan Sun, et al. 2023. Mmmu: A massive multi-discipline multimodal understanding and reasoning benchmark for expert agi. arXiv preprint arXiv:2311.16502."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Hang Zhang, Xin Li, and Lidong Bing. 2023a. Videollama: An instruction-tuned audio-visual language model for video understanding. arXiv preprint arXiv:2306.02858."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Muru Zhang, Ofir Press, William Merrill, Alisa Liu, and Noah A. Smith. 2023b. How language model hallucinations can snowball."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yue Zhang, Yafu Li, Leyang Cui, Deng Cai, Lemao Liu, Tingchen Fu, Xinting Huang, Enbo Zhao, Yu Zhang, Yulong Chen, et al. 2023c. Siren’s song in the ai ocean: A survey on hallucination in large language models. arXiv preprint arXiv:2309.01219."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zhiyuan Zhao, Bin Wang, Linke Ouyang, Xiaoyi Dong, Jiaqi Wang, and Conghui He. 2023. Beyond hallucinations: Enhancing lvlms through hallucinationaware direct preference optimization. arXiv preprint arXiv:2311.16839."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kaizhi Zheng, Xuehai He, and Xin Eric Wang. 2023. Minigpt-5: Interleaved vision-and-language generation via generative vokens."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yiyang Zhou, Chenhang Cui, Jaehong Yoon, Linjun Zhang, Zhun Deng, Chelsea Finn, Mohit Bansal, and Huaxiu Yao. 2023a. Analyzing and mitigating object hallucination in large vision-language models. arXiv preprint arXiv:2310.00754."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yuhang Zhou, Suraj Maharjan, and Beiye Liu. 2023b. Scalable prompt generation for semi-supervised learning with language models. arXiv preprint arXiv:2302.09236."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yuhang Zhou, Paiheng Xu, Xiaoyu Liu, Bang An, Wei Ai, and Furong Huang. 2024. Explore spurious correlations at the concept level in language models for text classification."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Deyao Zhu, Jun Chen, Xiaoqian Shen, Xiang Li, and Mohamed Elhoseiny. 2023. Minigpt-4: Enhancing vision-language understanding with advanced large language models. arXiv preprint arXiv:2304.10592."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                85,
+                388,
+                102
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "426"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A Details of Open X-Embodiment Data Selection"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                84,
+                472,
+                116
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we provide the names of all subsets selected from Open X-Embodiment dataset and the corresponding sampling video numbers. For detailed information, please refer to Table 3."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                124,
+                489,
+                190
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "B Correlation Coefficients between Object and Behavioral Hallucinations"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                199,
+                478,
+                234
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we provide detailed correlation coefficients between object and behavioral hallucinations in Table 4."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                241,
+                489,
+                288
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "C Human Evaluation"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                299,
+                319,
+                316
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, to verify the reliability of the GPT-4 assisted evaluation procedure, we compare the results of GPT-4 assisted evaluation with those of human evaluation. We randomly select 200 image sequences from the entire Val set and manually extract object and behavior keyword lists for each image sequence’s AI-generated description and human-annotated description. Then, we calculate six metrics and compare them with the metrics obtained using keyword lists extracted by GPT-4. We choose the four MLLMs that performed best in reasoning on Mementos as representatives: GPT-4V (s-input), Gemini (s-input), Chat-UniVi (s-input), and LLaVA-1.5. The evaluation results are shown in Table 5."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                323,
+                490,
+                564
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "After comparison, we find that there is not a significant gap between the results of GPT-4 assisted evaluation and human evaluation, with the absolute value of the difference mostly ranging between 1% to 4%. For most metrics, the GPT-4 assisted evaluation tends to overestimate the performance of MLLMs, meaning the evaluation results are higher than those of human evaluation. However, the relative ranking among different MLLMs remains essentially unchanged. Overall, the GPT-4 assisted evaluation is quite reliable."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                565,
+                490,
+                744
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "D Prompt Details"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                753,
+                285,
+                770
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we provide all the prompts used in our paper, including those used to merge questions and answers from Daily-life videos into a single description, prompts for MLLMs to generate descriptions corresponding to image sequences, and prompts for extracting object and behavior keywords from both human-annotated and AIgenerated descriptions. The detailed prompts are showm in Table 6."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                777,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "E Case Study"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                83,
+                647,
+                101
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section, we present failure reasoning cases of different domains (Figure 7-22), with specific reasons for failure detailed in the captions of each figure."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                109,
+                884,
+                174
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "F Status of Exemption from Institutional Review Board"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                185,
+                882,
+                217
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Before starting any segments of the study involving human evaluation, the research team completed and submitted a “Human Subjects Research Determination\" form to the appropriate Institutional Review Board (IRB). We obtained a determination letter from the IRB before any human study activities commenced, indicating that our project proposal had been granted ‘Exempt’ status. This classification implies that the proposed research was deemed ‘Not Human Subjects Research’."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                228,
+                887,
+                390
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "427"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/c4e2bc5f2a7a555bf0a46fc758f42df319834c81306a45ac8c14022ce4273cce.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 7: A sample of failure reasoning case in Daily-life domain, we highlight the hallucination parts in yellow. Failure reason: co-occurrence behavior and Snowball."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                144,
+                89,
+                850,
+                405
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/cbb7843f565a43178f0caa500f998bd1cd86f1de7fbcd319d3a67b0bcef038c8.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 8: A sample of failure reasoning case in Daily-life domain, we highlight the hallucination parts in yellow. Failure reason: object hallucination, and correlation between object hallucination and behavioral hallucination."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                144,
+                468,
+                857,
+                870
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "428"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/643cb74d2b9c30974f3b6760e0d4bc41654a047a154e72b16ac221ad41abfd61.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 9: A sample of failure reasoning case in Daily-life domain, we highlight the hallucination parts in yellow. Failure reason: lack of common sense and Snowball."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                147,
+                159,
+                848,
+                401
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/034c327e7a5a5f03ea7650bb664db529778c0eaf5b4efd84ff768c61f8290187.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 10: A sample of failure reasoning case in Daily-life domain, we highlight the hallucination parts in yellow. Failure reason: object hallucination, correlation between object hallucination and behavioral hallucination, and co-occurrence behavior."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                141,
+                601,
+                852,
+                787
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "429"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/cc6b81c5d4464c89daf5dfce707d432588bd167937314d5a7485a1ff433c2b5a.jpg"
+                },
+                "image_caption": [],
+                "image_footnote": []
+            },
+            "bbox": [
+                151,
+                177,
+                843,
+                581
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "[GPT-4V]: In this sequence of images, we see a young child in pajamas with a playful design, pushing a large box of Huggies diapers along a tiled haliway. The child starts at one end of the haliway and makes their way towards the camera, showing determination and focus on the task. As the child progresses, a dog enters the scene, observing the child's actions with interest. The child continues to maneuver the box around, at times looking directly at the camera, possibly interacting with someone off-camera. Eventually, the child successfully navigates the box past the living area, where we can see an adult in the background, andheads towards a doorway at the end of the hallway, demonstrating persistence and mobility. Throughout the sequence, the child appears to be engaged in a playful activity, possibly turning a chore into a game, while the dog provides quiet companionship."
+                    }
+                ]
+            },
+            "bbox": [
+                151,
+                583,
+                843,
+                658
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "[Human annotation]: In the sequence of images, we see a baby in a living room pushing a box across the floor. As the baby walks along the corridor, he eventually sits down on the floor. After reaching the sofa, the baby turns around, presumably to walk back to where he started. Throughout this activity, a dog is present in the room, initially looking at the baby as he walks past and later walking towards the camera after the baby turns around. The baby resumes pushing the box back to the starting point."
+                    }
+                ]
+            },
+            "bbox": [
+                151,
+                665,
+                828,
+                713
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Figure 11: A sample of failure reasoning case in Daily-life domain, we highlight the hallucination parts in yellow. Failure reason: Snowball. In this case, we observe that in addition to the significant behavioral hallucinations caused by Snowball effect mentioned in Section 3.2, another result of Snowball is that LVLMs may not fully describe all episodes in an image sequence. That is, after a behavioral hallucination occurs, the LVLM might assume the episode has ended and stop describing. For instance, in this case, the LVLM stopped describing after mentioning the child reaching the living room and the adult leaving, without continuing to describe the child pushing the box back along the hallway."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                730,
+                885,
+                832
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "430"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/175019846a5e73474af20af5b411a89020ac714b1e7cd93de5e1c889fc31fde4.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 12: A sample of failure reasoning case in Robotics domain, we highlight the hallucination parts in yellow. Failure reason: co-occurrence behavior."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                137,
+                288,
+                858,
+                670
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "431"
+                    }
+                ]
+            },
+            "bbox": [
+                484,
+                928,
+                515,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/a40b9161ba8da752439dc376a501960063c269a0f08108c3b503db57a142c0d9.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 13: A sample of failure reasoning case in Robotics domain, we highlight the hallucination parts in yellow. Failure reason: Snowball. This case effectively demonstrates the lack of LVLM’s reasoning ability in image sequence comprehension. In the first image, the robotic arm indeed appears to be moving towards the cube, but from the second image, the arm lowers and moves towards the disc-shaped object. The LVLM failed to infer this behavior from the first two images and based its subsequent description solely on the understanding in the first image, leading to a Snowball effect."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                141,
+                233,
+                852,
+                671
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "432"
+                    }
+                ]
+            },
+            "bbox": [
+                484,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "[Prompt]: Write a description for the given image sequence in a single paragraph, what is happening in this episode?"
+                    }
+                ]
+            },
+            "bbox": [
+                147,
+                227,
+                843,
+                252
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/0265cfd1ee685e12d0b56db441f96493eb729c5c5859c90c025250ac12c6d6d5.jpg"
+                },
+                "image_caption": [],
+                "image_footnote": [
+                    {
+                        "type": "text",
+                        "content": "[GPT-4V]: In this sequence of images, we observe a robotic arm performing the task of cooking on a stove. Initialīy, the robotic arm is positioned above a pot on the stove, holding a cluster of brown objects that resemble sausages or some type of food. The arm then proceeds to lower the food into the pot. As the sequence progresses, the robotic arm releases the food into the pot and retracts, leaving the food' to presumably cook. The sequence ends with the food items inside the pot, and the robotic arm retracted to its initial position, having successfully placed the items into the pot for cooking. The images depict a demonstration of automation in a kitchen setting, showcasing how robotics can be used to handle cooking tasks."
+                    },
+                    {
+                        "type": "text",
+                        "content": "[Human annotation]: In this scene, there are two stoves and three switches. On the right stove, there is a silver pot, On the middle switch. there is a brown obiect. A robotic arm moves from the left stove to the middle switch. picks up the object, and places it into the siīver pot on the right stove. Afterwards, the arm picks up the pot with the object inside and places it on the left stove."
+                    }
+                ]
+            },
+            "bbox": [
+                196,
+                259,
+                800,
+                585
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Figure 14: A sample of failure reasoning case in Robotics domain, we highlight the hallucination parts in yellow. Failure reason: co-occurrence behavior and Snowball. This case also reflects another outcome of the Snowball effect that we mentioned in Figure 11. After assuming that the robotic arm is cooking, the LVLM do not continue to describe the behavior of the robotic arm moving the pot from the right stove to the left."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                721,
+                885,
+                781
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "433"
+                    }
+                ]
+            },
+            "bbox": [
+                484,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "[Prompt]: Write a description for the given image sequence in a single paragraph, what is happening in this episode?"
+                    }
+                ]
+            },
+            "bbox": [
+                147,
+                288,
+                843,
+                313
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/5b1609e83b54faaed9a25c2981c3a6a3b832d40eba192a822430c3d7768299fa.jpg"
+                },
+                "image_caption": [],
+                "image_footnote": []
+            },
+            "bbox": [
+                196,
+                321,
+                800,
+                565
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "[GPT-4V]: The sequence of images depicts a robotic arm performing a task of picking up a fork from a table. Initially, the table is set with a fork lying flat, a green cloth, and a green bulbous object. The robotic arm, equipped with a gripper, descends towards the fork. It adjusts its position and orientation to align with the fork. The gripper then closes around the fork's handle, securing it. Subsequently, the arm lifts the fork off the table, demonstrating a successful grasp. The sequence ends with the robotic arm holding the fork in the air, having completed the task of picking it up. Throughout the sequence, the green cloth and the green object remain undisturbed on the table, indicating that the robot's action was precise and targeted only at the fork."
+                    }
+                ]
+            },
+            "bbox": [
+                147,
+                574,
+                847,
+                638
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "[Human annotation]: In this scene, there is a blue fork, a green towel folded into a square, and a green pear toy on a blue table. A robotic arm picks up the fork from the table and places it to the right of the square towel."
+                    }
+                ]
+            },
+            "bbox": [
+                146,
+                648,
+                835,
+                669
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "text_list",
+                "attribute": "unordered",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Figure 15: A sample of failure reasoning case in Robotics domain, we highlight the hallucination parts in yellow."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Failure reason: Snowball."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                688,
+                885,
+                718
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "434"
+                    }
+                ]
+            },
+            "bbox": [
+                484,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/8691f28aef948e64b1d5ad0c0b52b2c3d708c421b2f8c67434361abb59a75d39.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 16: A sample of failure reasoning case in Robotics domain, we highlight the hallucination parts in yellow. Failure reason: object hallucination, correlation between object hallucination and behavioral hallucination, and Snowball."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                137,
+                272,
+                858,
+                671
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "435"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/f318c0906115ca3213110b89efb1c508536f71ff3e44298743fa9ef7dd278b63.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 17: A sample of failure reasoning case in Robotics domain, we highlight the hallucination parts in yellow. Failure reason: object hallucination, correlation between object hallucination and behavioral hallucination, and Snowball."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                136,
+                258,
+                858,
+                690
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "436"
+                    }
+                ]
+            },
+            "bbox": [
+                484,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/c693a715aec8de159bff21cfd195f1182c489ff21e575c5b9cca4818a1e61541.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 18: A sample of failure reasoning case in Comics domain, we highlight the hallucination parts in yellow. Failure reason: object hallucination, correlation between object hallucination and behavioral hallucination, and Snowball."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                137,
+                120,
+                855,
+                416
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/469ccc3bbe5b603f7c501bad3fa18e1cc8c3f9efb0211de460788763f95078e1.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 19: A sample of failure reasoning case in Comics domain, we highlight the hallucination parts in yellow. Failure reason: object hallucination, correlation between object hallucination and behavioral hallucination, and Snowball."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                137,
+                555,
+                858,
+                825
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "437"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/56d8f6f14f9b936d61f58369eea1dc9b945adbafe46446196bb672461e047c15.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 20: A sample of failure reasoning case in Comics domain, we highlight the hallucination parts in yellow. Failure reason: Snowball."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                137,
+                96,
+                857,
+                468
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/84336c488758b84b936f84787f8ce9d46f2ac52036b3e2df83f535af67b35c8e.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 21: A sample of failure reasoning case in Comics domain, we highlight the hallucination parts in yellow. Failure reason: object hallucination, correlation between object hallucination and behavioral hallucination, and Snowball."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                137,
+                546,
+                857,
+                845
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "438"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/b51fa87c59ede17ec35f11953eb91ed63dd3633274dd770bfa9122eae947bee2.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 3: Number of videos selected from each sub-dataset of Open X-Embodiment."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Sub-dataset name</td><td>Number of videos selected</td></tr><tr><td>fractal20220817_data</td><td>400</td></tr><tr><td>kuka</td><td>50</td></tr><tr><td>bridge</td><td>300</td></tr><tr><td>jaco_play</td><td>50</td></tr><tr><td>berkeley_autolab_ur5</td><td>50</td></tr><tr><td>toto</td><td>10</td></tr><tr><td>columbia_cairlab_pusht_real</td><td>5</td></tr><tr><td>stanford_hydra_dataset_converted_externally_to_rlds</td><td>5</td></tr><tr><td>ucsd_kitchen_dataset_converted_externally_to_rlds</td><td>50</td></tr><tr><td>bc_z</td><td>50</td></tr><tr><td>utokyo_pr2_opening_fridge_converted_externally_to_rlds</td><td>5</td></tr><tr><td>utokyo_pr2_tabletop_manipulation_converted_externally_to_rlds</td><td>10</td></tr><tr><td>utokyo_xarm_pick_and_place_converted_externally_to_rlds</td><td>1</td></tr><tr><td>utokyo_xarm_bimanual_converted_externally_to_rlds</td><td>5</td></tr><tr><td>dlr_sara_pour_converted_externally_to_rlds</td><td>5</td></tr><tr><td>dlr_edan_shared_control_converted_externally_to_rlds</td><td>100</td></tr><tr><td>asu_table_top_converted_externally_to_rlds</td><td>20</td></tr><tr><td>utaustin_mutex</td><td>30</td></tr><tr><td>berkeley_fanuc_manipulation</td><td>30</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                137,
+                127,
+                857,
+                467
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/06f72943cc474a18c645409da6be4f8503ce71e1fde2b3400b39e65e315b6dbe.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 22: A sample of failure reasoning case in Comics domain, we highlight the hallucination parts in yellow. Failure reason: object hallucination, correlation between object hallucination and behavioral hallucination, and Snowball."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                137,
+                526,
+                858,
+                835
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "439"
+                    }
+                ]
+            },
+            "bbox": [
+                484,
+                929,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/3490809701be6f442a6f1981cd239311d6c58312dc7b7a664e26bc6245cf6930.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 4: Correlation coefficient between behavioral hallucination and object hallucination of different MLLMs on Mementos."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=1 colspan=1>Domain</td><td rowspan=1 colspan=1>Input type</td><td rowspan=1 colspan=1>Model</td><td rowspan=1 colspan=1>Recall Precision   F1</td></tr><tr><td rowspan=12 colspan=1>Daily-life</td><td rowspan=4 colspan=1>Sequential</td><td rowspan=1 colspan=1>GPT-4V</td><td rowspan=1 colspan=1>0.120    0.188    0.132</td></tr><tr><td rowspan=3 colspan=1>GeminiVideo-LLaMA-2Chat-UniVi</td><td rowspan=1 colspan=1>0.165    0.179    0.146</td></tr><tr><td rowspan=1 colspan=1>0.197    0.067    0.125</td></tr><tr><td rowspan=1 colspan=1>0.138    0.178    0.137</td></tr><tr><td rowspan=8 colspan=1>Combined</td><td rowspan=3 colspan=1>GPT-4VGeminiChat-UniVi</td><td rowspan=1 colspan=1>0.242    0.182    0.199</td></tr><tr><td rowspan=1 colspan=1>0.158    0.179    0.152</td></tr><tr><td rowspan=1 colspan=1>0.127    0.184    0.172</td></tr><tr><td rowspan=5 colspan=1>LLaVa-1.5MiniGPT4MiniGPT5mPLUG_Owl-v2InstructBLIP</td><td rowspan=1 colspan=1>0.112    0.134    0.106</td></tr><tr><td rowspan=1 colspan=1>0.135    0.145    0.115</td></tr><tr><td rowspan=1 colspan=1>0.126    0.188    0.146</td></tr><tr><td rowspan=1 colspan=1>0.106    0.113    0.069</td></tr><tr><td rowspan=1 colspan=1>0.133    0.125    0.127</td></tr><tr><td rowspan=12 colspan=1>Robotics</td><td rowspan=4 colspan=1>Sequential</td><td rowspan=4 colspan=1>GPT-4VGeminiVideo-LLaMA-2Chat-UniVi</td><td rowspan=1 colspan=1>-0.012   0.022    0.011</td></tr><tr><td rowspan=1 colspan=1>0.027    0.144    0.101</td></tr><tr><td rowspan=1 colspan=1>0.107    0.107    0.109</td></tr><tr><td rowspan=1 colspan=1>0.038    0.121    0.089</td></tr><tr><td rowspan=8 colspan=1>Combined</td><td rowspan=1 colspan=1>GPT-4V</td><td rowspan=1 colspan=1>0.041    -0.022   0.008</td></tr><tr><td rowspan=1 colspan=1>Gemini</td><td rowspan=1 colspan=1>-0.049   -0.086   -0.106</td></tr><tr><td rowspan=1 colspan=1>Chat-UniVi</td><td rowspan=1 colspan=1>0.189    0.242    0.207</td></tr><tr><td rowspan=3 colspan=1>LLaVa-1.5MiniGPT4MiniGPT5</td><td rowspan=1 colspan=1>0.135    0.123    0.157</td></tr><tr><td rowspan=1 colspan=1>0.186    0.316    0.233</td></tr><tr><td rowspan=1 colspan=1>0.056    0.027    0.045</td></tr><tr><td rowspan=2 colspan=1>mPLUG_Owl-v2InstructBLIP</td><td rowspan=1 colspan=1>0.244    0.163    0.231</td></tr><tr><td rowspan=1 colspan=1>0.227    0.235    0.253</td></tr><tr><td rowspan=4 colspan=1></td><td rowspan=4 colspan=1>Sequential</td><td rowspan=4 colspan=1>GPT-4VGeminiVideo-LLaMA-2Chat-UniVi</td><td rowspan=1 colspan=1>0.045    0.225    0.158</td></tr><tr><td rowspan=1 colspan=1>0.176   0.081    0.144</td></tr><tr><td rowspan=1 colspan=1>0.261    0.280    0.299</td></tr><tr><td rowspan=1 colspan=1>0.239    0.331    0.221</td></tr><tr><td rowspan=8 colspan=1>Comics</td><td rowspan=8 colspan=1>Combined</td><td rowspan=1 colspan=1>GPT-4V</td><td rowspan=1 colspan=1>0.343    0.539    0.471</td></tr><tr><td rowspan=1 colspan=1>Gemini</td><td rowspan=1 colspan=1>0.187    0.121    0.167</td></tr><tr><td rowspan=1 colspan=1>Chat-UniVi</td><td rowspan=1 colspan=1>0.293    0.113    0.279</td></tr><tr><td rowspan=2 colspan=1>LLaVa-1.5MiniGPT4</td><td rowspan=1 colspan=1>0.062    0.101    0.088</td></tr><tr><td rowspan=1 colspan=1>0.199    0.134    0.213</td></tr><tr><td rowspan=1 colspan=1>MiniGPT5</td><td rowspan=1 colspan=1>0.324    0.366    0.339</td></tr><tr><td rowspan=1 colspan=1>mPLUG_Owl-v2</td><td rowspan=1 colspan=1>0.231   -0.043   0.157</td></tr><tr><td rowspan=1 colspan=1>InstructBLIP</td><td rowspan=1 colspan=1>0.288    0.005    0.262</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                235,
+                216,
+                764,
+                819
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "440"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/bf316829fd6c8152b47edd9dd799cfdcafb96035085e85b30c9648bb4cdb7eee.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 5: Human evaluation."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=\"2\">Model</td><td rowspan=\"2\">Eval type</td><td colspan=\"3\">Object</td><td colspan=\"3\">Behavior</td></tr><tr><td>Recall</td><td>Precision</td><td>F1</td><td>Recall</td><td>Precision</td><td>F1</td></tr><tr><td rowspan=\"2\">GPT-4V (s-input)</td><td>GPT-4</td><td>60.91%</td><td>51.04%</td><td>54.13%</td><td>38.02%</td><td>33.05%</td><td>34.12%</td></tr><tr><td>Human</td><td>57.69%</td><td>49.54%</td><td>52.01%</td><td>35.26%</td><td>31.60%</td><td>32.67%</td></tr><tr><td rowspan=\"2\">Gemini (s-input)</td><td>GPT-4</td><td>37.54%</td><td>39.43%</td><td>36.88%</td><td>23.38%</td><td>34.19%</td><td>24.02%</td></tr><tr><td>Human</td><td>35.82%</td><td>38.11%</td><td>37.09%</td><td>20.46%</td><td>33.72%</td><td>22.99%</td></tr><tr><td rowspan=\"2\">ChatUnivi (s-input)</td><td>GPT-4</td><td>40.32%</td><td>42.04%</td><td>39.52%</td><td>24.95%</td><td>28.06%</td><td>27.15%</td></tr><tr><td>Human</td><td>37.65%</td><td>38.59%</td><td>36.46%</td><td>25.73%</td><td>27.40%</td><td>26.64%</td></tr><tr><td rowspan=\"2\">LLaVA-1.5 (c-input)</td><td>GPT-4</td><td>35.77%</td><td>44.18%</td><td>38.09%</td><td>24.47%</td><td>38.79%</td><td>28.59%</td></tr><tr><td>Human</td><td>36.84%</td><td>41.37%</td><td>39.77%</td><td>22.95%</td><td>39.82%</td><td>29.18%</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                171,
+                419,
+                823,
+                600
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "441"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                515,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/369b9f5d4f4c008990fd84abf26ae6935a4b7d43bd27e5c3fc6ab01727bce1d9.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 6: All prompts used in our paper."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Prompt</td></tr><tr><td>Task: Rewrite questions and answers into a single paragraph</td></tr><tr><td>Image: &lt;Image sequence&gt; Text: &lt;Write a description for this image based on the following questions and answers in one paragraph. Please remember that some objects or actions in the following questions and answers may not be included in the images. Please do not include the excluded items in your description. Here are the</td></tr><tr><td>questions and answers: Question: {Question 1} Answer: {Answer 1} Question: {Question 2} Answer: {Answer 2} ... Question: {Question n} Answer: {Answer n }&gt; Task: Generate description for the given image sequence</td></tr><tr><td>Image: &lt;Image sequence&gt; Text: &lt;Write a description for the given image sequence in a single paragraph, what is happening in</td></tr><tr><td>this episode?&gt; Task: Extract object and behavior keywords</td></tr><tr><td>Text: &lt;I will provide you two paragraphs. The first paragraph is human-composed and the second paragraph is generated by AI models. I want to evaluate the hallucination in the second paragraph. Please extract the object and action words or phrases from the following text. The objects should have a tangible meaning and consist of no more than two words; non-tangible objects should not be extracted. The action words or phrases should only relate to the extracted objects. Also, you must convert the corresponding actions to their complete root form. Then, for the final answer, please examine 4 lists and must transfer the synonyms in 4 lists into the same word. Please directly output the final object and action lists in two paragraphs, respectively as in the form in the example below without any justifications or intermediate steps.</td></tr><tr><td>Here is an example: 1. The sequence of images captures a dog&#x27;s cautious interaction with a metal toy inside a house. The dog appears wary and maintains a distance from the unfamiliar object, barking to express its disapproval</td></tr><tr><td>and possibly intimidation. As the toy moves, the dog&#x27;s reaction is to bark and lean backward, showing a clear sign of being unsettled by the toy&#x27;s motion. When the toy momentarily ceases movement, the dog also stops, remaining alert and attentive. At the end of the image, when the toy comes to a halt, the dog looks up, still processing the strange encounter with the inanimate object. 2. The image is a collage of multiple pictures featuring two dogs playing with a toy alligator. The dogs</td></tr><tr><td>are in various positions, with some of them standing on the toy alligator, while others are interacting with it in different ways. The collage captures the dogs&#x27; playfulness and excitement as they engage with the toy alligator. The lists are Object list 1: [dog, toy, house] Action list 1: [interaction, bark, express intimidation, move, lean backward, stop, look up] Object list 2: [dog, toy] Action list 2: [play, stand, interaction] Here is the paragraphs: 1. {Human-annotated description}</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                115,
+                142,
+                880,
+                878
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "442"
+                    }
+                ]
+            },
+            "bbox": [
+                485,
+                928,
+                517,
+                942
+            ]
+        }
+    ]
+]
