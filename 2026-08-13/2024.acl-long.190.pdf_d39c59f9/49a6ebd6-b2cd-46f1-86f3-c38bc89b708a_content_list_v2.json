@@ -1,0 +1,4631 @@
+[
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Progressively Modality Freezing for Multi-Modal Entity Alignment"
+                    }
+                ],
+                "level": 1
+            },
+            "bbox": [
+                151,
+                89,
+                847,
+                111
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Yani Huang<sup>1</sup>, Xuefeng Zhang<sup>1</sup>, Richong Zhang<sup>1,2</sup>∗, Junfan Chen<sup>3</sup>, Jaein Kim<sup>1</sup> <sup>1</sup>CCSE, School of Computer Science and Engineering, Beihang University, Beijing, China <sup>2</sup>Zhongguancun Laboratory, Beijing, China <sup>3</sup>School of Software, Beihang University, Beijing, China {huangyn, zhangxf, jaein}@buaa.edu.cn {zhangrc, chenjf}@act.buaa.edu.cn"
+                    }
+                ]
+            },
+            "bbox": [
+                134,
+                124,
+                870,
+                227
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Abstract"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                260,
+                252,
+                342,
+                268
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Multi-Modal Entity Alignment aims to discover identical entities across heterogeneous knowledge graphs. While recent studies have delved into fusion paradigms to represent entities holistically, the elimination of features irrelevant to alignment and modal inconsistencies is overlooked, which are caused by inherent differences in multi-modal features. To address these challenges, we propose a novel strategy of progressive modality freezing, called PMF, that focuses on alignmentrelevant features and enhances multi-modal feature fusion. Notably, our approach introduces a pioneering cross-modal association loss to foster modal consistency. Empirical evaluations across nine datasets confirm PMF’s superiority, demonstrating stateof-the-art performance and the rationale for freezing modalities. Our code is available at https://github.com/ninibymilk/PMF-MMEA."
+                    }
+                ]
+            },
+            "bbox": [
+                141,
+                281,
+                462,
+                581
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "1 Introduction"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                115,
+                595,
+                260,
+                612
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Multi-modal Knowledge Graphs (MMKGs) integrate various modalities, including text, vision, and structural data, to provide comprehensive insights into knowledge. This integration underpins a range of applications, from question answering (Zhu et al., 2015) and information retrieval (Dietz et al., 2018; Yang, 2020), to recommendation systems (Sun et al., 2020a). Multi-Modal Entity Alignment (MMEA) aims to identify identical entities across heterogeneous MMKGs, which is essential for the integrity of the knowledge represented within these KGs. The essence of MMEA lies in identifying feature commonalities across entities from varied modalities to determine their alignment. The diversity in KG construction introduces potential mismatches in multi-modal features of entities meant to be aligned. For example,"
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                623,
+                492,
+                897
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/5f6ee4eb94734b28c8cf4724b6aba127db96ebb9fd6ac0bf019745ca5da57492.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 1: Illustration of irrelevant vs. relevant features in multi-modal knowledge graphs."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                515,
+                253,
+                877,
+                414
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Figure 1 depicts how the entity “Interstellar (film)” might be represented in one knowledge graph  by a poster image of a spaceship, whereas in another knowledge graph ′, by a portrait of Anne Hathaway, the starring actress. Although both images are related to “Interstellar (film)”, their disparate perspectives can weaken the semantic relationship, challenging the alignment task. This scenario underscores the problem of alignment-irrelevant features, distinctly different features that complicate accurate entity alignment. While recent studies (Lin et al., 2022; Chen et al., 2023a) have employed attention mechanisms to calculate crossmodal weights at both the KG and entity levels, they overlook the critical step of evaluating modality relevance, thereby neglecting to exclude these irrelevant features."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                482,
+                887,
+                757
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Another obstacle in MMEA involves ensuring semantic consistency across different modalities. Achieving consistent representations across modalities is crucial for effective entity alignment. Existing methods (Lin et al., 2022; Chen et al., 2023a,b) utilize contrastive learning to minimize the intra-modal inconsistencies among aligned entities, yet overlook the cross-modal inconsistencies. Furthermore, the presence of alignmentirrelevant features exacerbates these inconsistencies, complicating the task of achieving consistent representations across modalities."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                759,
+                889,
+                920
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "∗Corresponding author."
+                    }
+                ]
+            },
+            "bbox": [
+                141,
+                906,
+                290,
+                920
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 3477–3489 August 11-16, 2024 ©2024 Association for Computational Linguistics"
+                    }
+                ]
+            },
+            "bbox": [
+                89,
+                945,
+                907,
+                973
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3477"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                941
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                487,
+                117
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To address the aforementioned challenges, we propose a novel method for multi-modal entity alignment, named Progressive Modality Freezing (PMF), designed to effectively filter out irrelevant features. PMF is structured around three key parts: multi-modal entity encoders, progressive multimodality feature integration, and a unified training objective for MMEA. Initially, PMF separately encodes entity features from each modality, allowing for flexible adjustment of input modalities. Following this, the method employs a progressive approach to selectively freeze features deemed less relevant for alignment, simultaneously integrating valuable multi-modal features based on their alignment relevance. The culmination of our strategy is a unified training objective, aimed at minimizing the discrepancies both within individual KGs and across different modalities."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                117,
+                489,
+                407
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To encapsulate, our research contributes in the following three-folds:"
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                407,
+                487,
+                439
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• We propose the Progressive Modality Freezing (PMF) strategy to tackle the challenge of irrelevant features in MMEA. By assigning alignment-relevance scores to modalities, our method progressively freezes features that are alignment-irrelevant, while seamlessly integrating beneficial multi-modal information, ensuring the emphasis remains on features of utmost relevance."
+                    }
+                ]
+            },
+            "bbox": [
+                134,
+                450,
+                489,
+                596
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• We are at the forefront of employing contrastive learning to address modality consistency across multiple modalities, accompanied by a unified training objective to enhance cross-modal consistency."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                607,
+                490,
+                689
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• We confirm the effectiveness of PMF across diverse datasets and experimental settings, where it demonstrates superior performance, achieving state-of-the-art in the field. Our thorough analysis further elucidates the advantage of the feature-freezing strategy."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                699,
+                490,
+                797
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2 Related Work"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                808,
+                272,
+                825
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.1 Multi-modal Knowledge Graph Representation Learning"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                834,
+                410,
+                868
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The field of MMKG representation learning forms a critical foundation for tasks such as entity alignment and link prediction, transitioning from traditional single-modal knowledge graph methods to more complex that leverage diverse data types. Early efforts expanded upon established KG representation learning methods for singlemodal knowledge graphs, like those introduced by Xie et al. (2016) and Mousselly-Sergieh et al. (2018), adapting translational KG embedding techniques (Bordes et al., 2013) to incorporate multi-modal data effectively. Subsequent research has delved deeper into the impact of multi-modal information in representation learning. Pezeshkpour et al. (2018) implemented an adversarial method to tackle the challenge of missing data within MMKGs, while Fang et al. (2022) explored a contrastive learning approach to leverage the rich, varied data and heterogeneous structures in MMKGs. These advancements highlight the field’s move towards more sophisticated, datainclusive methodologies."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                872,
+                489,
+                921
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                887,
+                392
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.2 Multi-Modal Entity Alignment"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                407,
+                800,
+                424
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The exploration of MMEA began with MMKG (Liu et al., 2019), which provided a dataset facilitating entity embedding through linked images. Building on this, MMEA (Chen et al., 2020) advanced the field by fusing relational triples, images, and numerical attributes to generate entity embeddings."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                431,
+                887,
+                544
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Given the distinctiveness of images as a modality, utilizing visual data in alignment processes has emerged as a key focus in MMEA. For instance, EVA (Liu et al., 2021) exploited visual similarities for unsupervised entity alignment, while MSNEA (Chen et al., 2022) and UMAEA (Chen et al., 2023b) enhanced relational feature learning using visual cues to tackle the challenges posed by missing and ambiguous visual data."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                546,
+                887,
+                692
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Central to MMEA is the integration of multimodal information. MEAformer (Chen et al., 2023a) employed a dynamic weighting transformer for integration, whereas MCLEA (Lin et al., 2022) aimed at bridging the modality gap via contrastive learning. ACK-MMEA (Li et al., 2023) introduced a strategy for normalizing multi-modal attributes, ensuring consistency across modalities."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                693,
+                887,
+                838
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Iterative learning has emerged as a powerful strategy for refining entity alignment with methods like XGEA (Xu et al., 2023) and PSNEA (Ni et al., 2023) employing pseudo-labeling to mitigate scarcity of initial seeds."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                840,
+                887,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3478"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Despite these advancements, existing methods neglect the necessity of filtering out alignmentirrelevant features and addressing cross-modal inconsistencies. Our method addresses these gaps by selectively freezing less pertinent modalities within an entity to enhance the alignment process."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                85,
+                489,
+                183
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3 Model"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                192,
+                206,
+                209
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We propose a multi-modal entity alignment framework based on progressively freezing entities with irrelevant features and contrastive learning. As shown in Figure 2, the framework consists of three parts: multi-modal entity encoder, progressive multi-modality feature integration, and crossgraph contrastive learning. First, a multi-modal encoder is used to transform the raw input of each modality graph into entity embeddings. Then, we integrate modality features progressively during training, which gradually freezes alignmentirrelevant features and fuse the modality graphs. Finally, the model is optimized through contrastive loss between different knowledge graphs and different modality graphs."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                218,
+                490,
+                461
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.1 Preliminaries"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                472,
+                268,
+                487
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "MMKG Definition A multi-modal knowledge graph (MMKG) is defined as "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } = \\{ \\mathcal { E } , \\mathcal { R } , \\mathcal { T } , \\mathcal { A } \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": "where is a set of entities, is a set of relations between entities, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { T } \\subseteq \\mathcal { E } \\times \\mathcal { R } \\times \\mathcal { E }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "denotes a set of triples in the knowledge graph, and is a set of multi-modal attributes of entities (e.g., textual descriptions, images, etc.). For modality "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "m \\in { \\mathcal { M } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "where is the set of modalities, we define a modality graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "that captures a unique aspect pertinent to the knowledge graph. More specifically, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } = \\{ \\mathcal { E } , \\mathcal { R } , \\mathcal { T } , \\mathcal { A } _ { m } \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "A _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the set of attributes associated with modality m."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                492,
+                489,
+                687
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Task Description In the context of multi-modal entity alignment (MMEA), consider two MMKGs "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } = \\{ \\mathcal { E } , \\mathcal { R } , \\mathcal { T } , \\mathcal { A } \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } ^ { \\prime } = \\{ \\mathcal { E } ^ { \\prime } , \\mathcal { R } ^ { \\prime } , \\mathcal { T } ^ { \\prime } , \\mathcal { A } ^ { \\prime } \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The set "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { S } = \\{ ( e _ { i } , e _ { j } ) | e _ { i } \\in \\mathcal { E } , e _ { j } \\in \\mathcal { E } ^ { \\prime } \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": "denotes preestablished pairs of entities known to correspond to the same real-world object across both graphs. In a supervised learning setting, a model is trained with part of  and then tasked to predict the alignments of the remaining entity pairs."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                695,
+                489,
+                841
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.2 Multi-Modal Entity Encoder"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                851,
+                388,
+                866
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In the Multi-modal Entity Encoder module, we process the features of entities from each KG according to their respective modalities. Given an"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                872,
+                489,
+                921
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "entity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i } \\in \\mathcal { G } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", its feature is denoted by "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i } ^ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The encoding process for each modality of an entity is defined by the following equation:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                84,
+                884,
+                134
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "h _ { i } ^ { m } = \\mathrm { E N C } _ { m } ( \\Theta _ { m } , e _ { i } ^ { m } ) ,\\tag{1}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/ca4efb4c62c8e8410fca5867f9cf47669149199c4aa6af3c3b69e82a92916c89.jpg"
+                }
+            },
+            "bbox": [
+                603,
+                142,
+                788,
+                160
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { E N C } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "represents the encoder designed for modality m with its associated learnable parameter "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\Theta _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". While our framework allows the integration of any modality, for a fair comparison, we incorporate four modalities: structure (str), relation (rel), attribute (att), and image (img). Details of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { E N C } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are attached in Appendix A.1"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                168,
+                887,
+                282
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.3 Progressive Multi-Modality Feature Integration"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                291,
+                838,
+                324
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The process of integrating multi-modal features in a stepwise manner unfolds in three distinct phases. Initially, the process involves calculating an alignment-relevant score for each modality graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( \\boldsymbol { \\mathrm { e } } . \\boldsymbol { \\mathrm { g } } . , \\mathcal { G } _ { m } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "to discern features that are irrelevant for alignment from those that are crucial. Following this, certain features are selectively ‘frozen’ based on modality scores to mitigate the inclusion of extraneous features. Finally, features from various modality graphs are fused to align multi-modal entities. This approach is executed iteratively and progressively to identify and incorporate beneficial features into the alignment process throughout the training phase, ensuring a refined alignment outcome."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                329,
+                887,
+                570
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.3.1 Feature Relevance Measuring"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                579,
+                805,
+                594
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We assess the likelihood that features from a given modality of an entity will contribute to the alignment process, thereby enabling the identification of potential alignment-irrelevant features within each modality graph. The alignment-relevant scores for a modality graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are denoted as "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { W } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", calculated by the following equation:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                598,
+                885,
+                712
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathcal { W } _ { m } = \\mathrm { S C O R E } ( \\mathcal { G } _ { m } , \\mathcal { G } _ { m } ^ { \\prime } ) ,\\tag{2}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/f155fd2c951c3912fd56a7127734c063ee3fa078a06618ced1370e3c82c23973.jpg"
+                }
+            },
+            "bbox": [
+                576,
+                719,
+                779,
+                738
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where SCORE( ) represents a score function. Specifically, for an entity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i } ^ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "from "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and considering a corresponding modality graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { \\prime }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "from target knowledge graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } ^ { \\prime }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", the alignment-relevant score is computed as:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                746,
+                885,
+                827
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "w _ { i } ^ { m } ~ = ~ \\mathrm { R e l u } \\left( \\frac { \\alpha _ { i } ^ { m } - \\delta } { \\displaystyle \\operatorname* { m a x } _ { e _ { j } \\in \\mathcal { E } } ( \\alpha _ { j } ^ { m } ) - \\delta } \\right) ,\\tag{3}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/cc6e139aa5981642f9c46356e05d70c22cadb3e5a954599ac846f9c39ed25939.jpg"
+                }
+            },
+            "bbox": [
+                559,
+                835,
+                828,
+                885
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\alpha _ { i } ^ { m } = \\operatorname* { m a x } _ { e _ { k } \\in \\mathcal { E } ^ { \\prime } } \\left( \\frac { h _ { i } ^ { m } \\cdot h _ { k } ^ { m } } { | h _ { i } ^ { m } | | h _ { k } ^ { m } | } \\right) ,\\tag{4}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/185b4b89113b47274df1aba985f5fbb6d7a53bf8a857704caee6736231cd1843.jpg"
+                }
+            },
+            "bbox": [
+                561,
+                888,
+                788,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3479"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/aec7af0e430638765d23dae934a6b53cfde0f344f91dca5caf1cdfceef802708.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 2: Overview of the PMF Model. The framework consists of three components: the Multi-Modal Entity Encoder (&3.2), Progressive Multi-Modality Feature Integration (&3.3), and Cross-Graph Contrastive Learning (&3.4). At epoch t, the multi-modal encoder "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "E N C _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "transforms raw inputs from each modality graph into entity embeddings "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { H } _ { m } ^ { t } ."
+                    },
+                    {
+                        "type": "text",
+                        "content": "Progressive Feature Integration (&3.3.4) occurs during training, employing Irrelevant Feature Freezing (&3.3.2) and performing Relevant Feature Fusion (&3.3.3) guided by Relevant Feature Measuring (&3.3.1). The model is optimized using Cross-KG Alignment Loss "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { L } _ { C K G } ^ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "(&3.4.2) and Cross-Modality Association Loss "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { L } _ { C M } ^ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "(&3.4.1)."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                117,
+                84,
+                887,
+                252
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where δ is a dynamic threshold. The collection of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "w _ { i } ^ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "for all entities constitutes "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { W } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". In a parallel manner, the alignment-relevant scores "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "{ \\mathcal { W } } _ { m } ^ { \\prime }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "for "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { \\prime }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are computed similarly."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                390,
+                487,
+                454
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The underlying rationale for the alignmentrelevant score is to ascertain whether an entity from the current modality graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "exhibits similarity with entities from the modality graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { \\prime }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Should the features "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { i } ^ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "of an entity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "in "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "lack similar counterparts in "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { \\prime } ."
+                    },
+                    {
+                        "type": "text",
+                        "content": ", the correlation between "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { i } ^ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and the entity aligned with "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "in "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { \\prime }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "would consequently be weak. As such, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { i } ^ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is less likely to contribute positively to the alignment process. To facilitate a reasonable measurement of feature similarity within a modality, we normalize this metric using the highest similarity across all entities from the same modality graph. This alignment-relevant score is subsequently utilized to guide the processes of modality feature freezing and fusion."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                455,
+                490,
+                713
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.3.2 Irrelevant Feature Freezing"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                722,
+                393,
+                739
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To minimize the detrimental impact of alignmentirrelevant features on the training process, we introduce a feature-freezing strategy. This approach selectively prevents back-propagation for specific entities within particular modality graphs, thereby preserving the integrity of the training regime. Formally, we define "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "by extending "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "with a function "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { F } _ { m } ^ { t } : \\mathcal { E }  \\{ 0 , 1 \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", to characterize whether entity e is frozen at step t. More specifically, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { t } = \\{ \\mathcal { E } , \\mathcal { R } , \\mathcal { T } , \\mathcal { A } _ { m } , \\mathcal { F } _ { m } ^ { t } \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", where for each entity e in , e is frozen only if "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { F } _ { m } ^ { t } ( e ) = 0"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Correspondingly, we refer "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { H } _ { m } ^ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { W } _ { m } ^ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "to the representation of all entities and their alignment-relevant score at step t, respectively. All elements in vector "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { F } _ { m } ^ { 0 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are initialized as 1."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                743,
+                490,
+                921
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                388,
+                884,
+                454
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The formalization of the entity freezing process is given by:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                455,
+                882,
+                487
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathcal { F } _ { m } ^ { t } = \\mathrm { F R E E Z E } ( \\mathcal { W } _ { m } ^ { t } , \\mathcal { G } _ { m } ^ { t } ) .\\tag{5}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/13b3f866571119aaf1b5cd312e499e573b3da4b91ef591b5c518d8b0be6f9f16.jpg"
+                }
+            },
+            "bbox": [
+                588,
+                500,
+                803,
+                519
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "At step t, when the alignment-relevant score "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "w _ { i } ^ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "for entity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "from "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is zero, it is inferred that this entity does not contribute positively towards the training of the alignment model. Consequently, the gradient update for features "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { i } ^ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "associated with such an entity is halted during backpropagation. The freezing operation for an entity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i } ^ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", contingent upon its score "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "w _ { i } ^ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", is defined as:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                532,
+                885,
+                663
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathrm { F R E E Z E } ( e _ { i } ^ { m } ) = \\left\\{ \\begin{array} { l l } { { 0 } } & { { \\mathrm { i f } w _ { i } ^ { m } = 0 , } } \\\\ { { 1 } } & { { \\mathrm { o t h e r w i s e . } } } \\end{array} \\right. ,\\tag{6}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/3414c950a652e36455628d46ab98a2e1db855560e1000c71108010d6ad7633ac.jpg"
+                }
+            },
+            "bbox": [
+                557,
+                675,
+                833,
+                717
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where 0 indicates \"stop gradient\", ensuring that the gradient flow is interrupted for entities deemed irrelevant, with "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "w _ { i } ^ { m } \\ \\in \\ \\mathcal { W } _ { m } ^ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "FREEZE( ) systematically applies across all entities within "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "This feature freezing is enacted across all modality graphs of each KG (e.g.,  and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } ^ { \\prime } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "to optimize the alignment model’s focus on beneficial features."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                728,
+                885,
+                841
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.3.3 Relevant Feature Fusion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                852,
+                763,
+                868
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Recognizing that the significance of the features of each modality may vary across entities, we leverage the alignment-relevant scores introduced in"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                872,
+                887,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3480"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Eq. 3 as a guide during the fusion process."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                85,
+                430,
+                101
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathcal { H } _ { j o i n t } ^ { t } = \\mathrm { C O N C A T } ( \\mathcal { W } _ { m } ^ { t } , \\mathcal { G } _ { m } ^ { t } ) ,\\tag{7}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/0fde92b1db8fb529e9dba3436e15ac730732af09b34d8e02cbf4c68b454f09af.jpg"
+                }
+            },
+            "bbox": [
+                178,
+                111,
+                421,
+                137
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where CONCAT( ) symbolizes the fusion operator acting on all modality graphs "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { t } ."
+                    },
+                    {
+                        "type": "text",
+                        "content": ", integrating them into a joint representation "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { H } _ { j o i n t } ^ { t }"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                149,
+                489,
+                198
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In practice, for each entity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i } ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": "the representations "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { i } ^ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are weighted by their respective confidence "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "w _ { i } ^ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", ensuring that modalities with higher relevance scores have a greater influence in the fused representation. Accordingly, at step t, this fusion process is defined as follows:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                198,
+                489,
+                294
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "h _ { i } ^ { j o i n t } = \\bigoplus _ { m \\in \\mathcal { M } } ( [ w _ { i } ^ { m } \\cdot h _ { i } ^ { m } ] ) ,\\tag{8}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/4a8476f6406b075c12d817e32525e32a24f878bd342b5aa96c9dbc4e48999138.jpg"
+                }
+            },
+            "bbox": [
+                196,
+                305,
+                403,
+                332
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where denotes the vector concatenation operation, and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { i } ^ { j o i n t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "represents the composite feature embedding for entity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i } ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": "synthesized from all modalities. The collective "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { i } ^ { j o i { \\bar { n } } t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "across all entities at step t forms "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { H } _ { j o i n t } ^ { t }"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                343,
+                489,
+                425
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.3.4 Progressive Feature Integration"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                434,
+                425,
+                449
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "By integrating information from each modality graph, we can progressively optimize entity alignment. This is done by iteratively refining feature relevance, and gradually isolating alignmentirrelevant features from overt to subtle ones. Initially, basic representations are used to gauge modality confidence and selectively freeze modality features, employing a lower threshold to exclude overtly irrelevant features due to nascent modality representations. As training advances, the model accumulates a deeper understanding of modal information, systematically increasing the threshold to prune less obvious features independent of alignment goals."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                453,
+                490,
+                677
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The process unfolds as follows: Assuming the model has been trained for t epochs, in epoch "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "t + 1"
+                    },
+                    {
+                        "type": "text",
+                        "content": "we compute the alignment-relevant scores "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { W } _ { m } ^ { t + 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "using the current stage of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { ' t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Concurrently, the threshold δ for discerning feature relevance is increased at a predefined rate. Based on the newly calculated scores "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { W } _ { m } ^ { t + 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", entities are frozen to reflect the updated insights, updating each modality graph to "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { m } ^ { t + 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Subsequently, these refined modality graphs are merged, leveraging the latest alignment-relevant scores to produce the joint graph representation "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { H } _ { j o i n t } ^ { t + 1 } ."
+                    },
+                    {
+                        "type": "text",
+                        "content": ", as formalized in Equation (2), (5) and (7)."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                677,
+                489,
+                888
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Comparatively, alternatives like “early integration” or “late integration” present limitations."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                888,
+                490,
+                920
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Early integration might only freeze superficially irrelevant features due to the premature stage of training, which can be challenging to correct in later stages. Our progressive strategy synergistically blends the benefits of both approaches, ensuring a balanced and effective integration of modality information throughout the training lifecycle."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                84,
+                885,
+                198
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.4 Multi-Modal Entity Alignment Objective"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                211,
+                880,
+                228
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our framework adopts contrastive learning as a pivotal strategy to extract and leverage alignment information across knowledge graphs and to discern semantic associations between various modality graphs. To accomplish this, we have developed a composite loss function that integrates both cross-KG alignment and cross-modality association within a unified learning objective. The overall loss function at step t is defined as follows:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                234,
+                887,
+                380
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\begin{array} { r } { \\mathcal { L } ^ { t } = \\mathcal { L } _ { \\mathrm { C M } } ^ { t } + \\mathcal { L } _ { \\mathrm { C K G } } ^ { t } , } \\end{array}\\tag{9}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/45b4218a9b90f20cd524248075a3319b4277e16d3b40752ac1ad3bc25ae40378.jpg"
+                }
+            },
+            "bbox": [
+                616,
+                397,
+                776,
+                417
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { L } _ { \\mathrm { C K G } } ^ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the alignment loss across different "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\operatorname { K G s } ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { L } _ { \\mathrm { C M } } ^ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "denotes the association loss across modalities within each KG."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                426,
+                884,
+                474
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.4.1 Cross-Modality Association Loss"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                488,
+                828,
+                504
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "One significant source of inconsistencies across modalities is alignment-irrelevant features. Freezing features within each modality graph allows our framework to more effectively draw together the remaining modal features that are beneficial for alignment."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                508,
+                885,
+                605
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Specifically for each entity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i } ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", we compute the contrastive loss between pairs of modality graphs "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { p }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { q }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The loss function aims to minimize the distance between positive pairs "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( e _ { i } ^ { p } , e _ { i } ^ { q } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and maximize the separation between negative pairs "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( e _ { i } ^ { p } , e _ { j } ^ { q } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( e _ { j } ^ { p } , e _ { i } ^ { q } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Here "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { j }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are entities in the same knowledge graph . For each positive pair "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( e _ { i } ^ { p } , e _ { i } ^ { q } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "the cross-modality loss at step t is defined as:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                606,
+                884,
+                736
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "l _ { \\mathrm { C M } } ^ { t } ( e _ { i } ^ { p } , e _ { i } ^ { q } ) = \\frac { \\exp ( h _ { i } ^ { p } \\cdot h _ { j } ^ { q } / \\tau ) } { \\exp ( h _ { i } ^ { p } \\cdot h _ { j } ^ { q } / \\tau ) + \\displaystyle \\sum _ { ( e _ { j } ^ { p } , e _ { k } ^ { q } ) \\in N _ { i , p , q } ^ { - } } ( h _ { i } ^ { p } \\cdot h _ { j } ^ { q } / \\tau ) } ,\\tag{10}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/4dd9b296dee4278ad2e14c8f8c5ef3c7a85146896f2fa10476afea0bf4ad8e97.jpg"
+                }
+            },
+            "bbox": [
+                515,
+                749,
+                873,
+                794
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "h _ { i } ^ { p } \\in \\mathcal { H } _ { p } ^ { t } , h _ { j } ^ { q } \\in \\mathcal { H } _ { q } ^ { t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", and exp "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( h _ { i } ^ { p } { \\cdot } h _ { j } ^ { q } / \\tau )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are scaled by a temperature factor τ , and set "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "N _ { i , p , q } ^ { - }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "represents negative samples, encompassing all other entity pairs from the modality graphs "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { p }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { q }"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                802,
+                885,
+                871
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The framework computes the contrastive loss for entities across each modality graph of the two KGs. The final cross-modality loss is then deter-"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                872,
+                885,
+                920
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3481"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                519,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "mined by:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                85,
+                194,
+                99
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathcal { L } _ { \\mathrm { C M } } ^ { t } = \\sum _ { p , q \\in \\mathcal { M } } \\sum _ { e _ { i } \\in \\mathcal { E } \\cup \\mathcal { E } ^ { \\prime } } \\beta _ { p } \\beta _ { q } \\left( - \\log l _ { \\mathrm { C M } } ^ { t } ( e _ { i } ^ { p } , e _ { i } ^ { q } ) \\right) ,\\tag{11}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/2424d5e6191d035df172183132903c615caad06f7cffbd1e9db678191e303e98.jpg"
+                }
+            },
+            "bbox": [
+                129,
+                104,
+                443,
+                134
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\beta _ { p }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\beta _ { q }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are hyper-parameters associated with modality p and q, adjusting the learning rate for features of the corresponding modality."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                140,
+                489,
+                189
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.4.2 Cross-KG Alignment Loss"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                196,
+                384,
+                211
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Pre-aligned entity pairs serve as crucial supervision signals in multi-modal entity alignment. Our approach employs supervised contrastive learning to elucidate the alignment relations between entities from corresponding modality graphs of different KGs. We formalized this supervised contrastive learning process at step t as follows:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                215,
+                490,
+                329
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "l _ { c k g } ^ { t } ( e _ { i } ^ { m } , e _ { j } ^ { m } ) = \\frac { \\exp ( h _ { i } ^ { m } { \\cdot } h _ { j } ^ { m } / \\tau ) } { \\exp ( h _ { i } ^ { m } { \\cdot } h _ { j } ^ { m } / \\tau ) + \\displaystyle \\sum _ { e _ { k } \\in N _ { i } ^ { - } } \\exp ( h _ { i } ^ { m } { \\cdot } h _ { k } ^ { m } / \\tau ) } ,\\tag{12}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/dada9a91fed78b3180eb168b1ccc6025cff02b2b7bd8003fbffdb7843033d23b.jpg"
+                }
+            },
+            "bbox": [
+                117,
+                332,
+                480,
+                373
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "N _ { i } ^ { - }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "encompasses a set of in-batch negative samples for "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i } ^ { m }"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                386,
+                487,
+                418
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Given the undirected nature of entity alignment, we compute the contrastive loss considering both directions across KGs, which is defined as:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                418,
+                489,
+                467
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathcal { L } _ { C K G } ^ { t } = \\sum _ { m \\in \\mathcal { M } ^ { + } } \\sum _ { ( e _ { i } , e _ { j } ) \\in \\mathcal { S } } - \\frac { 1 } { 2 } \\log \\left( l _ { c k g } ^ { t } ( e _ { i } ^ { m } , e _ { j } ^ { m } ) \\right.\\tag{13}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/e4d58bcf8262a92531bd643e698cd874ec781f286bf48b19bab34a0488b2633d.jpg"
+                }
+            },
+            "bbox": [
+                119,
+                485,
+                478,
+                549
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } ^ { + }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the set of modalities, including and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { \\ddot { \\rho } } j o i n t ^ { \\mathbf { \\vec { \\rho } } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "as a special modality that encapsulates the fusion features of multi-modal information. Note that the representations of modality “joint” is taken from "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { H } _ { j o i n t } ^ { t } ."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                560,
+                490,
+                643
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.5 Alignment Prediction"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                650,
+                332,
+                665
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The alignment of entities is executed sequentially, focusing on the similarity between their fused multi-modal embeddings. Specifically, for each entity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "within the joint modality graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } _ { j o i n t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "that remains unaligned, we seek its counterpart, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { j }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "in the corresponding joint modality graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\begin{array} { r l } { \\mathscr { G } _ { j o i n t } ^ { \\prime } . } \\end{array}"
+                    },
+                    {
+                        "type": "text",
+                        "content": "The sequence in which entities are aligned follows a greedy strategy. The chosen "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { j }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the unaligned entity that exhibits the highest cosine similarity score with "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i }"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                670,
+                490,
+                833
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4 Experiment"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                843,
+                253,
+                859
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.1 Experiment Setup"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                866,
+                305,
+                883
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Datasets To evaluate the effectiveness of our proposed method, we utilized three publicly available MMEA datasets. MMKG (Liu et al., 2019) features two subsets extracted from Freebase, YAGO, and DBpedia. Multi-OpenEA (Sun et al., 2020b), augmented with entity images from Google search queries, includes two multilingual subsets and two monolingual subsets. DBP15K (Sun et al., 2017; Liu et al., 2021) comprises three subsets from DBpedia’s multilingual version. Seed alignments are designated for 20% of MMKG and Multi-OpenEA entity pairs and 30% for DBP15K entity pairs, aligning with proportions used in prior studies (Chen et al., 2020; Liu et al., 2021; Lin et al., 2022; Chen et al., 2023a,b)."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                888,
+                490,
+                921
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                84,
+                887,
+                311
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Baselines We compare our approach against six leading multi-modal alignment methods: MMEA (Chen et al., 2020), EVA (Liu et al., 2021), MSNEA (Chen et al., 2022), MCLEA (Lin et al., 2022), MEAformer (Chen et al., 2023a), and UMAEA (Chen et al., 2023b). We replicated MEAformer and UMAEA using their publicly available code to establish robust baselines. Although other notable methods like ACK-MMEA (Li et al., 2023) exist, their exclusion was due to the lack of open-source code, ensuring fairness in our comparisons."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                319,
+                887,
+                514
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Evaluation Metrics We employ two metrics for evaluation. Hits@1 (abbreviated as H@1) measures the accuracy of top-one predictions. Mean Reciprocal Rank (MRR) assesses the average inverse rank of the correct entity. Higher values of H@1 and MRR indicate better performance."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                523,
+                887,
+                621
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Implement Details The total training epochs are set to 250, with an option for an additional 500 epochs using an iterative training strategy. Our training regimen incorporates a cosine warm-up schedule (15% step for LR warm-up), early stopping, and gradient accumulation, utilizing the AdamW optimizer with a consistent batch size of 3500. Details of the experimental setup are available in the Appendix A."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                629,
+                885,
+                775
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.2 Overall Results"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                785,
+                680,
+                801
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Table 1 shows a comprehensive comparison between iterative and non-iterative methods across the three datasets, showcasing our model outperforms all nine sub-datasets."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                807,
+                887,
+                871
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our approach significantly surpasses other noniterative methods across various datasets. Specifically, on DBP15K, we see an improvement in"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                872,
+                887,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3482"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/230efbb33a42be77bc10a0c8fff4a3e2850030d86871477db3b5d01277face9c.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 1: Comparison of overall performance presenting both non-iterative and iterative results. The highestperforming baseline results are underlined, and any instances where our method sets a new state-of-the-art are highlighted in bold. Results with an asterisk (*) indicate our reproduction under identical settings."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=\"2\"></td><td rowspan=\"2\">Model</td><td colspan=\"4\">MMKG</td><td colspan=\"7\">Multi-OpenEA</td><td colspan=\"6\">DBP15K</td></tr><tr><td colspan=\"2\">FBDB15K</td><td colspan=\"2\">FBYG15K</td><td colspan=\"2\">EN-FR-V1</td><td colspan=\"2\">EN-DE-V1</td><td colspan=\"2\">D-W-V1</td><td colspan=\"2\">D-W-V2</td><td colspan=\"2\">ZH-EN</td><td colspan=\"2\">JA-EN FR-EN</td></tr><tr><td></td><td>H@1</td><td>MRR</td><td></td><td>H@1 MRR</td><td>H@1</td><td>MRR</td><td>H@1</td><td>MRR</td><td>H@1</td><td>MRR</td><td>H@1</td><td>MRR</td><td>H@1</td><td>MRR</td><td>H@1 MRR</td><td>H@1</td><td>MRR</td></tr><tr><td rowspan=\"9\">noattve</td><td>MMEA</td><td>.265</td><td>.357</td><td>.234</td><td>.317</td><td>=</td><td></td><td>=</td><td>=</td><td></td><td>m</td><td></td><td></td><td>=</td><td></td><td></td><td></td><td>=</td></tr><tr><td>MSNEA</td><td>.114</td><td>.175</td><td>.103</td><td>.153</td><td>.692</td><td>.734</td><td>.753 .804</td><td>.800</td><td>.826</td><td>.838</td><td>.873</td><td>.609</td><td>.685</td><td>.541</td><td>.620</td><td>.557</td><td>.643</td></tr><tr><td>EVA</td><td>.199</td><td>.283</td><td>.153</td><td>.224</td><td>.785</td><td>.836</td><td>.922 .945</td><td>.858</td><td>.891</td><td>.890</td><td>.922</td><td>.683</td><td>.762</td><td>.669</td><td>.752</td><td>.686</td><td>.771</td></tr><tr><td>MCLEA</td><td>.295</td><td>.393</td><td>.254</td><td>.332</td><td>.819</td><td>.864</td><td>.939 .957</td><td>.881</td><td>.908</td><td>.928</td><td>.949</td><td>.726</td><td>.796</td><td>.719</td><td>.789</td><td>.719</td><td>.792</td></tr><tr><td>MEAformer*</td><td>.418</td><td>.519</td><td>.327</td><td>.418</td><td>.836</td><td>.882</td><td>.954</td><td>.971</td><td>.909 .933</td><td>.944</td><td>.962</td><td>.771</td><td>.835</td><td>.764</td><td>.834</td><td>.772</td><td>.841</td></tr><tr><td>UMAEA*</td><td>.454</td><td>.552</td><td>.355</td><td>.451</td><td>.847</td><td>.891</td><td>.955</td><td>.970 .905</td><td>.930</td><td>.948</td><td>.967</td><td>.800</td><td>.860</td><td>.801</td><td>.862</td><td>.818</td><td>.877</td></tr><tr><td>PMF</td><td>.539</td><td>.620</td><td>.459</td><td>.539</td><td>.912</td><td>.942</td><td>.973 .983</td><td>.955</td><td>.970</td><td>.981</td><td>.989</td><td>.835</td><td>.884</td><td>.835</td><td>.885</td><td>.850</td><td>.898</td></tr><tr><td>improve</td><td>8.5%</td><td>6.8%</td><td>10.4%</td><td>8.8%</td><td>6.5%</td><td>5.1%</td><td>1.8% 1.2%</td><td>4.6%</td><td>3.7%</td><td>3.3%</td><td>2.2%</td><td>3.5%</td><td>2.4%</td><td>3.4%</td><td>2.3%</td><td>3.2%</td><td>2.1%</td></tr><tr><td>MSNEA</td><td>.149</td><td>.232</td><td>.138</td><td>.210</td><td>.699</td><td>.742</td><td>.788 .835</td><td>.809</td><td>.836</td><td>.862</td><td>.894</td><td>.648</td><td>.728</td><td>.557</td><td>.643</td><td>.583</td><td>.672</td></tr><tr><td rowspan=\"7\">teatitve</td><td>EVA</td><td>.231</td><td>.318</td><td>.188</td><td>.260</td><td>.849</td><td>.896</td><td>.956</td><td>.968</td><td>.915</td><td>.942</td><td>.925 .951</td><td>.750</td><td>.810</td><td>.741</td><td>.807</td><td>.765</td><td>.831</td></tr><tr><td>MCLEA</td><td>.395</td><td>.487</td><td>.322</td><td>.400</td><td>.888</td><td>.924</td><td>.969</td><td>.979</td><td>.944</td><td>.963</td><td>.969 .982</td><td>.811</td><td>.865</td><td>.805</td><td>.863</td><td>.808</td><td>.867</td></tr><tr><td>MEAformer*</td><td>.578</td><td>.661</td><td>.444</td><td>.529</td><td>.903</td><td>.935</td><td>.963</td><td>.977 .954</td><td>.970</td><td>.969</td><td>.981</td><td>.847</td><td>.892</td><td>.842</td><td>.892</td><td>.845</td><td>.894</td></tr><tr><td>UMAEA*</td><td>.561</td><td>.660</td><td>.463</td><td>.560</td><td>.895</td><td>.931</td><td>.974</td><td>.984 .945</td><td>.965</td><td>.973</td><td>.984</td><td>.856</td><td>.900</td><td>.857</td><td>.904</td><td>.873</td><td>.917</td></tr><tr><td></td><td>.624</td><td>.702</td><td>.543</td><td>.620</td><td>.923</td><td>.950</td><td>.980</td><td>.988 .960</td><td>.973</td><td>.986</td><td>.992</td><td>.867</td><td>.908</td><td>.866</td><td>.909</td><td>.879</td><td></td></tr><tr><td>PMF</td><td>4.6%</td><td>4.1%</td><td>8.1%</td><td></td><td>2.0%</td><td>1.5%</td><td>0.6% 0.4%</td><td>0.6%</td><td>0.3%</td><td>1.3%</td><td>0.8%</td><td>1.1%</td><td>0.8%</td><td>0.9%</td><td>0.5%</td><td></td><td>.921</td></tr><tr><td>improve</td><td></td><td></td><td></td><td>6.0%</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>0.6%</td><td>0.4%</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                115,
+                145,
+                880,
+                322
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/758634fe689f96f7936c7f4465781218dea1ce5c82f9b3351f74c761e76c5c82.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 2: Non-iterative model performance comparison utilizing surface information on DBP15K."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=\"2\">Model</td><td colspan=\"5\">DBP15K</td></tr><tr><td>ZH-EN</td><td></td><td>JA-EN</td><td></td><td>FR-EN</td></tr><tr><td rowspan=\"3\">MSNEA EVA</td><td>H@1</td><td>MRR</td><td>H@1</td><td>MRR</td><td>H@1</td><td>MRR</td></tr><tr><td>.929</td><td>.951</td><td>.964</td><td>.976</td><td>.990</td><td>.994</td></tr><tr><td>.887</td><td>.913</td><td>.938</td><td>.955</td><td>.969</td><td>.980</td></tr><tr><td>MCLEA</td><td>.926</td><td>.946</td><td>.961</td><td>.973</td><td>.987</td><td>.992</td></tr><tr><td>MEAformer*</td><td>.944</td><td>.962</td><td>.976</td><td>.985</td><td>.990</td><td>.994</td></tr><tr><td>UMAEA*</td><td>.945</td><td>.963</td><td>.978</td><td>.986</td><td>.990</td><td>.994</td></tr><tr><td>PMF</td><td>.958</td><td>.973</td><td>.985</td><td>.990</td><td>.992</td><td>.995</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                129,
+                382,
+                472,
+                488
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "H@1 of up to 3.5% over the nearest competitor. The Multi-OpenEA datasets show enhancements in the range of 1.8% to 6.5%, while the FBDB15K and FBYG15K datasets experience substantial gains, with increases up to 10.4%. These improvements highlight our method’s capability to effectively filter out conflicting and lowerquality modality information, enhancing overall alignment accuracy."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                514,
+                490,
+                659
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To assess our model’s performance with added textual data, we initialized text modality embeddings using surface representations from (Lin et al., 2022). The incorporation of textual information markedly enhances entity alignment, as evidenced by the results in Table 2 for the DBP15K dataset. Despite all models benefiting from this supervisory signal, our method outperforms the baselines and demonstrates its robustness in leveraging textual data for improved alignment."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                661,
+                490,
+                822
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.3 Ablation Study"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                834,
+                280,
+                850
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To assess the contribution of various components within our framework, we introduce five variants: Feature Relevance Measuring (FRM), Irrelevant Feature Freezing (IFF), Relevant Feature"
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                856,
+                490,
+                921
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/d0dfcc9292b010ee9075f3df14cbe4543cb5b214a42497326a359d2681106f2b.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 3: Comparison of variants of PMF on DBP15K in terms of H@1."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                510,
+                344,
+                882,
+                447
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Fusion (RFF), Progressive Integration (PI), and Cross-Modality Association Loss "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( \\mathcal { L } _ { \\mathrm { C M } } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". By individually removing or modifying these components, their contributions to the performance were assessed. As depicted in Figure 3, the omission of the FRM component leads to a significant drop in H@1 performance across all datasets. For example, H@1 fell from 0.835 to 0.749 on "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { D B P 1 5 K _ { Z H - E N } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The influence of FRM extends to both IFF and RFF components, with RFF showing a more significant impact on performance due to its integral role in modality fusion and its effect on the overall training loss."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                537,
+                887,
+                747
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Further, replacing our \"progressive\" integration strategy with a \"static\" one, where FRM occurs only once, resulted in a marked performance downturn. This underscores the significance of progressively identifying alignment-irrelevant features, a task challenging to accomplish in a single iteration. Eliminating "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { L } _ { C M }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "also led to a decline in model performance. This underlines the effectiveness of cross-modality loss in fostering consistent entity representation learning across modalities."
+                    }
+                ]
+            },
+            "bbox": [
+                505,
+                759,
+                887,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3483"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.4 Modality Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                85,
+                304,
+                99
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.4.1 Impact of Different Modality"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                104,
+                403,
+                121
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/4af9d2041d77166e744efc493aa238b2143c0baae7a23fc7e47a67d9a12e874a.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 4: Impact of various modalities on DBP15K in terms of H@1."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                115,
+                133,
+                473,
+                236
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We examined the influence of modality information on entity alignment on DBP15K, as depicted in Figure 4. The absence of any modality notably hinders performance, with structure and image modalities showing the most significant effect. The foundational role of structures in KGs and the distinctive features provided by images underscore their importance in alignment."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                290,
+                490,
+                418
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "A slight drop in performance is observed when either relation or attribute is excluded, attributed to the typically lower count of attributes and relations compared to entities, which may lead to attribute or relation overlaps among different entities. Conversely, a notable performance drop occurs when both are removed. This suggests a complementary relationship between attributes and relations that enhances alignment."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                418,
+                489,
+                564
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.4.2 Distribution of Modality Scores"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                570,
+                423,
+                587
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/fa432e79cf059a2317927233f034152b3f99a2e9b4c36a1521ff59b62bb43ed1.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 5: Distribution of relevance scores across modalities for pre-aligned entity pairs in "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { D B P 1 5 K _ { F R - E N } }"
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                119,
+                600,
+                484,
+                815
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We examined the distribution of modality scores to understand the contribution of different modalities to entity alignment, as depicted in Figure 5. Each point in the figure represents an aligned entity pair, with axes reflecting their modality scores across source and target KGs."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                872,
+                490,
+                921
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                84,
+                884,
+                133
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Attributes, relations, and structures show a widespread and increased distribution of scores, indicating their positive impact on alignment. Conversely, image modality shows a distinct, concentrated pattern, highlighting the variability in image features between aligned entities due to the limited scope of images and inconsistencies in KG construction. This underscores the benefit of excluding less reliable image features. Moreover, the presence of data points near the axes suggests challenges with one-sided visual information. Interestingly, a strong positive correlation emerges between modality scores of aligned entities, validating our modality scoring approach. This correlation implies that when a modality is less helpful for one entity in an aligned pair, it tends to be similarly low for the counterpart."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                134,
+                887,
+                409
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.5 Parameters Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                420,
+                719,
+                437
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/72e90eb531ffc66bf376232328a35beef13b79f45c337bfe478f6d4346313019.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 6: Impact of varying threshold δ on frozen ratio and H@1 performance: the x-axis represents δ values ranging from 0.1 to 0.95."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                510,
+                456,
+                882,
+                575
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To further investigate the impact of parameters on integration, we analyze how varying the threshold parameter δ impacts the frozen ratio in image modality and alignment performance on DBP15K. Figure 6 shows that when δ is below 0.4, minimal changes are observed in both the ratio and H@1 performance, likely due to the absence of images for certain entities. Beyond this point, as δ ascends, we note a gradual increase in the frozen ratio, paralleled by an improvement in H@1, despite the initial decline. This underscores the benefits of selectively and gradually freezing entities. A notable drop in H@1 performance for some datasets occurs at "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\delta = 0 . 9 5"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", indicating that images are beneficial for alignment and should not be frozen excessively."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                645,
+                887,
+                903
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Further experimental analysis results of the"
+                    }
+                ]
+            },
+            "bbox": [
+                526,
+                904,
+                884,
+                920
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3484"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/f6b60110b62d203416fd76577982e6da089eaaba37bfeab18881340c441192fd.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 3: Case study of representative frozen images on "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { D B P 1 5 K _ { F R - E N } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "during training."
+                    },
+                    {
+                        "type": "text",
+                        "content": "feature-freezing process of PMF, including additional experiments, are available in Appendix B."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=2 colspan=1></td><td rowspan=1 colspan=2>Source-KG(French)</td><td rowspan=1 colspan=2>Target-KG(English)</td></tr><tr><td rowspan=1 colspan=1>Entity</td><td rowspan=1 colspan=1>Image</td><td rowspan=1 colspan=1>Entity</td><td rowspan=1 colspan=1>Image</td></tr><tr><td rowspan=4 colspan=1>Earyozen</td><td rowspan=1 colspan=1>Louis XV</td><td rowspan=1 colspan=1><img src=\"images/6a8953149d956b73bab952bb14153d898080d7f709cc10a89731aba79c2f24d0.jpg\"/></td><td rowspan=1 colspan=1>Louis XV ofFrance</td><td rowspan=1 colspan=1><img src=\"images/0baf9151c0c43c9d491523fe3ff27cfdbbf37fe2ded3b7046f44f6949c39b548.jpg\"/></td></tr><tr><td rowspan=1 colspan=1>Président duMexique</td><td rowspan=1 colspan=1><img src=\"images/50005061b550ba5226a7bfdeb0df21a2ad6f47cb5619a2c48aa4b5420317f45b.jpg\"/></td><td rowspan=1 colspan=1>President ofMexico</td><td rowspan=1 colspan=1><img src=\"images/b8209e43d5c352d13129110b9e837e2a8edc2fa6831e16acb0dc033c65e6c1d0.jpg\"/></td></tr><tr><td rowspan=1 colspan=1>UniversitéStanford</td><td rowspan=1 colspan=1><img src=\"images/8dde02a834b319fdabb224fa0f4ddd6882c4e1e248594b6cb74d645f893df166.jpg\"/></td><td rowspan=1 colspan=1>StanfordUniversity</td><td rowspan=1 colspan=1><img src=\"images/1677f1798cef0b990060f51562b267ce5239ac686f2ddeb7ce572567fbc70fc8.jpg\"/></td></tr><tr><td rowspan=1 colspan=1>Disquecompact</td><td rowspan=1 colspan=1><img src=\"images/398a69679d76227c6cdc90ac12392e540db1529487846f1ce9c40a43e46f9f64.jpg\"/></td><td rowspan=1 colspan=1>Compactdisc</td><td rowspan=1 colspan=1><img src=\"images/6b5d4c9cb3697d90dd7b58734b7322c4e5684df27622acf7e48ea7f6f6818b05.jpg\"/></td></tr><tr><td rowspan=4 colspan=1>Late ozen</td><td rowspan=1 colspan=1>Juliana oftheNetherlands</td><td rowspan=1 colspan=1><img src=\"images/55f3dfc224b32ba1bf8ce317b5413463b26da4a3e785fdea7673e5c3465093b9.jpg\"/></td><td rowspan=1 colspan=1>Juliana oftheNetherlands</td><td rowspan=1 colspan=1><img src=\"images/4e8031b5fef804b3e23ab103d153d533919bbc87b7e3e2990da8a4e8d6aa5f96.jpg\"/></td></tr><tr><td rowspan=1 colspan=1>Brampton(Ontario)</td><td rowspan=1 colspan=1><img src=\"images/3529d281b5e32c26c865dee19b2d7ecde6e797b47a3c405fc276af9889225881.jpg\"/></td><td rowspan=1 colspan=1>Brampton</td><td rowspan=1 colspan=1><img src=\"images/ba3a6aef64d712153f4d67fd6e4ef28af1d73e277d196055054b2a22c250ef45.jpg\"/></td></tr><tr><td rowspan=1 colspan=1>STS-129</td><td rowspan=1 colspan=1><img src=\"images/6ee5b6672a88f005fd8cf2bde2b64951037c1ccb3f50ddc27a46024a0ba52d71.jpg\"/></td><td rowspan=1 colspan=1>STS-129</td><td rowspan=1 colspan=1><img src=\"images/07471ccf9dc6466c229f031e34988404f1a3cb45de9f0c975bc8efb54684de20.jpg\"/></td></tr><tr><td rowspan=1 colspan=1>Queens ofthe StoneAge</td><td rowspan=1 colspan=1><img src=\"images/c969bc92f45795745dd056ebc9827df0df14581bacd696f63de92a05324c9319.jpg\"/></td><td rowspan=1 colspan=1>Queens ofthe StoneAge</td><td rowspan=1 colspan=1></td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                121,
+                121,
+                478,
+                543
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.6 Case Study"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                609,
+                252,
+                625
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To illustrate differences in features frozen at different stages, in Table 3, we select frozen image information during training in the "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { D B P 1 5 K _ { F R - E N } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "dataset arranged in a time series. Early frozen image pairs show significant differences. For example, the \"President_of_Mexico\" entity corresponds to a presidential portrait in the "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { D B P } _ { \\mathrm { F R } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "but to a national flag image in the "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { D B P _ { E N } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Images will not benefit the process of alignment in this case. After several epochs of training, the differences between frozen image pairs frozen later are smaller. For example, the \"Juliana_of_the_Netherlands\" entity, where the image in "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { D B P } _ { \\mathrm { F R } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is a photo of the queen in her youth, while in "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { D B P _ { E N } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", it is a photo of the queen in her old age. These cases reflect the process of effectively detecting alignment-irrelevant features based on the principle of progressing from easy to difficult cases."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                630,
+                490,
+                921
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5 Conclusion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                83,
+                643,
+                99
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this study, we presented the Progressive Modality Freezing (PMF) model to advance Multi-Modal Entity Alignment. By measuring and evaluating the relevance of various modalities, PMF progressively freezes features deemed less critical, thereby facilitating the integration and consistency of multi-modal features. Furthermore, we introduced a unified training objective tailored to foster a harmonious contrast between KGs and modalities. Empirical evaluations on nine sub-datasets affirm the superiority of PMF and validate the rationale behind the selective freezing of modalities."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                109,
+                887,
+                303
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Limitations"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                312,
+                616,
+                328
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "PMF marks a significant advancement in MMEA, yet it encounters limitations in two main aspects."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                336,
+                885,
+                369
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "First, the method for measuring the alignment relevance of modal features by evaluating their usefulness in identifying similar traits across KGs sometimes shows inconsistent reliability. As shown in Figure 6, a minor decline in H@1 when δ is below 0.5 suggesting that essential modal information may be prematurely frozen. Future work should aim to refine the approach for scoring alignment relevance, ensuring a more consistent and accurate identification of pertinent features."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                370,
+                887,
+                530
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Second, our model predominantly exhibits efficiency in non-iterative learning settings, with its performance often unstable under iterative learning frameworks. This limitation stems from the model’s initial design, which is inherently optimized for non-iterative settings, limiting the effectiveness of incorporating iterative strategies like pseudo seeds for enhancing progressive freezing. Further attempts will explore improved ways to integrate iterative learning with progressive freezing for enhanced results."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                530,
+                889,
+                708
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Acknowledgments"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                718,
+                673,
+                736
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "This work was supported by the National Science and Technology Major Project under Grant 2022ZD0120202, in part by the National Natural Science Foundation of China (No. U23B2056), in part by the Fundamental Research Funds for the Central Universities, in part by the State Key Laboratory of Complex & Critical Software Environment, and in part by the Shanxi Province Special Support for Science and Technology Cooperation and Exchange (202204041101020)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                743,
+                887,
+                906
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3485"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "References"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                84,
+                215,
+                99
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Antoine Bordes, Nicolas Usunier, Alberto Garcia-Duran, Jason Weston, and Oksana Yakhnenko. 2013. Translating embeddings for modeling multirelational data. Advances in neural information processing systems, 26."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Liyi Chen, Zhi Li, Yijun Wang, Tong Xu, Zhefeng Wang, and Enhong Chen. 2020. Mmea: entity alignment for multi-modal knowledge graph. In Knowledge Science, Engineering and Management: 13th International Conference, KSEM 2020, Hangzhou, China, August 28–30, 2020, Proceedings, Part I 13, pages 134–147. Springer."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Liyi Chen, Zhi Li, Tong Xu, Han Wu, Zhefeng Wang, Nicholas Jing Yuan, and Enhong Chen. 2022. Multimodal siamese network for entity alignment. In Proceedings of the 28th ACM SIGKDD conference on knowledge discovery and data mining, pages 118– 126."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zhuo Chen, Jiaoyan Chen, Wen Zhang, Lingbing Guo, Yin Fang, Yufeng Huang, Yichi Zhang, Yuxia Geng, Jeff Z Pan, Wenting Song, et al. 2023a. Meaformer: Multi-modal entity alignment transformer for meta modality hybrid. In Proceedings ofthe 31st ACM International Conference on Multimedia, pages 3317– 3327."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zhuo Chen, Lingbing Guo, Yin Fang, Yichi Zhang, Jiaoyan Chen, Jeff Z Pan, Yangning Li, Huajun Chen, and Wen Zhang. 2023b. Rethinking uncertainly missing and ambiguous visual modality in multi-modal entity alignment. In International Semantic Web Conference, pages 121–139. Springer."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Laura Dietz, Alexander Kotov, and Edgar Meij. 2018. Utilizing knowledge graphs for text-centric information retrieval. In The 41st international ACM SIGIR conference on research & development in information retrieval, pages 1387–1390."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Quan Fang, Xiaowei Zhang, Jun Hu, Xian Wu, and Changsheng Xu. 2022. Contrastive multi-modal knowledge graph representation learning. IEEE Transactions on Knowledge and Data Engineering."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2016. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision andpattern recognition, pages 770– 778."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Qian Li, Shu Guo, Yangyifei Luo, Cheng Ji, Lihong Wang, Jiawei Sheng, and Jianxin Li. 2023. Attribute-consistent knowledge graph representation learning for multi-modal entity alignment. arXiv preprint arXiv:2304.01563."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zhenxi Lin, Ziheng Zhang, Meng Wang, Yinghui Shi, Xian Wu, and Yefeng Zheng. 2022. Multi-modal contrastive representation learning for entity alignment. arXiv preprint arXiv:2209.00891."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Fangyu Liu, Muhao Chen, Dan Roth, and Nigel Collier. 2021. Visual pivoting for (unsupervised) entity alignment. In Proceedings of the AAAI conference on artificial intelligence, volume 35, pages 4257– 4266."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ye Liu, Hui Li, Alberto Garcia-Duran, Mathias Niepert, Daniel Onoro-Rubio, and David S Rosenblum. 2019. Mmkg: multi-modal knowledge graphs. In The Semantic Web: 16th International Conference, ESWC 2019, Portorož, Slovenia, June 2–6, 2019, Proceedings 16, pages 459–474. Springer."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Xin Mao, Wenting Wang, Yuanbin Wu, and Man Lan. 2021. From alignment to assignment: Frustratingly simple unsupervised entity alignment. arXiv preprint arXiv:2109.02363."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Hatem Mousselly-Sergieh, Teresa Botschen, Iryna Gurevych, and Stefan Roth. 2018. A multimodal translation-based approach for knowledge graph representation learning. In Proceedings of the Seventh Joint Conference on Lexical and Computational Semantics, pages 225–234."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Wenxin Ni, Qianqian Xu, Yangbangyan Jiang, Zongsheng Cao, Xiaochun Cao, and Qingming Huang. 2023. Psnea: Pseudo-siamese network for entity alignment between multi-modal knowledge graphs. In Proceedings of the 31st ACM International Conference on Multimedia, pages 3489–3497."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Pouya Pezeshkpour, Liyan Chen, and Sameer Singh. 2018. Embedding multimodal relational data for knowledge base completion. arXiv preprint arXiv:1809.01341."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. 2021. Learning transferable visual models from natural language supervision. In International conference on machine learning, pages 8748–8763. PMLR."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Karen Simonyan and Andrew Zisserman. 2014. Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Rui Sun, Xuezhi Cao, Yan Zhao, Junchen Wan, Kun Zhou, Fuzheng Zhang, Zhongyuan Wang, and Kai Zheng. 2020a. Multi-modal knowledge graphs for recommender systems. In Proceedings of the 29th ACM international conference on information & knowledge management, pages 1405–1414."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zequn Sun, Wei Hu, and Chengkai Li. 2017. Cross-lingual entity alignment via joint attributepreserving embedding. In The Semantic Web–ISWC 2017: 16th International Semantic Web Conference, Vienna, Austria, October 21–25, 2017, Proceedings, Part I 16, pages 628–644. Springer."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zequn Sun, Qingheng Zhang, Wei Hu, Chengming Wang, Muhao Chen, Farahnaz Akrami, and Chengkai Li. 2020b. A benchmarking study of"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                108,
+                489,
+                174
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3486"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                929,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "embedding-based entity alignment for knowledge graphs. arXiv preprint arXiv:2003.07743."
+                    }
+                ]
+            },
+            "bbox": [
+                131,
+                85,
+                487,
+                114
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ruobing Xie, Zhiyuan Liu, Huanbo Luan, and Maosong Sun. 2016. Image-embodied knowledge representation learning. arXiv preprint arXiv:1609.07028."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Baogui Xu, Chengjin Xu, and Bing Su. 2023. Crossmodal graph attention network for entity alignment. In Proceedings of the 31st ACM International Conference on Multimedia, pages 3715–3723."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Zuoxi Yang. 2020. Biomedical information retrieval incorporating knowledge graph for explainable precision medicine. In Proceedings of the 43rd International ACM SIGIR Conference on Research and Development in Information Retrieval, pages 2486– 2486."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yuke Zhu, Ce Zhang, Christopher Ré, and Li Fei-Fei. 2015. Building a large-scale multimodal knowledge base system for answering visual queries. arXiv preprint arXiv:1507.05670."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                124,
+                487,
+                177
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Appendix"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                412,
+                205,
+                430
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A Detailed setup"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                439,
+                277,
+                455
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A.1 Encoders of each modality"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                466,
+                373,
+                481
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We incorporate four modalities, including structure, image, relationship, and attribute, to implement and evaluate the proposed method. The settings of encoders for each modality are as follows."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                487,
+                490,
+                551
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The modality of structures describes the topological structure of entities in the knowledge graph. Specifically, the input of structural modal is the connections between various entities in the knowledge graph. The connections can be described by the adjacency matrix of the knowledge graph. Let the adjacency matrix of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "be "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "A ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", we use graph attention networks (GAT) to encode structural information. Therefore, we define:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                552,
+                490,
+                697
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "{ h _ { i } } ^ { s t r } = \\mathbf { G } \\mathbf { A } \\mathbf { T } ( A , \\mathbf { e } _ { i } ^ { s t r } ) ,\\tag{14}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/0ff6869e02fb001903b973db75196b58e1e90c8c05413ab1172cbb203f11dc40.jpg"
+                }
+            },
+            "bbox": [
+                213,
+                711,
+                388,
+                728
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { e } _ { i } ^ { s t r }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the randomly initialized representation of the entity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i }"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                741,
+                489,
+                774
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The modality of relations consists of the relationships related to each entity in text form. The relational feature of entity "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the set of relation names from all the triples in which "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "e _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "occurs. Since the number of relations is limited, we use the bag-of-words method to process input features. "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "{ \\bf e } _ { i } ^ { r e l }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is defined as a one-hot vector, and the dimension is determined by the number of relations. "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { E N C } _ { \\mathrm { r e l } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "consists of a fully connected layer."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                776,
+                490,
+                921
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Similarly, textual entity attributes constitute an independent modality. Since the number of attributes is also limited, we adopt a processing method similar to the modality of relations. Specifically, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { E N C } _ { \\mathrm { a t t } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is a fully connected layer, and the input "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { e } _ { i } ^ { a t t }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is defined as a one-hot vector, and the dimension depends on the number of attributes."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                85,
+                887,
+                212
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The image modality is composed of the visual entity attributes. Encoding images is usually difficult and requires a large amount of images for pretraining. Therefore, we first use a fixed pre-trained vision model (Simonyan and Zisserman, 2014; He et al., 2016; Radford et al., 2021), to convert the original pixel information into a vector representation "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "{ \\bf e } _ { i } ^ { i m g }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Then, a trainable fully connected layer is used as ENC<sub>img</sub>."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                214,
+                887,
+                359
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The encoder of relations, attributes, and images can be expressed by:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                359,
+                884,
+                391
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "{ h _ { i } } ^ { m } = \\mathbf { F C _ { m } } ( \\mathbf { e } _ { i } ^ { m } ) ,\\tag{15}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/53e18df4aff30dbd36602b2ec55988631c79ff21f1715569a90797f2f2aa772f.jpg"
+                }
+            },
+            "bbox": [
+                623,
+                400,
+                768,
+                418
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathbf { F C _ { m } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is a trainable fully connected layer, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "m \\in \\{ r e l , a t t r , i m g \\}"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                429,
+                885,
+                461
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A.2 Dataset Statistics"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                472,
+                697,
+                487
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Statistics for DBP15K, Multi-OpenEA, and MMKG are presented in Table 4. The column named \"EA pairs\" indicates pre-aligned entity pairs. Note that not every entity is paired with images or counterparts in the alternate KG."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                492,
+                887,
+                574
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A.3 Metric Details"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                583,
+                675,
+                598
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We evaluate the performance of entity alignment tasks using two common metrics: Hits@n and MRR."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                604,
+                884,
+                650
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Hits@n is a widely used performance metric in entity alignment tasks. It is calculated as follows: Given a total number of entity pairs N, for each entity in graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "{ \\mathcal { G } } ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": "compute its similarity with potential matching entities in graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G } ^ { \\prime }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and rank them according to their scores. If the correct entity’s rank is within the top n positions, the Hits@n count is incremented. The value of Hits@n is the percentage of the Hits@n count out of the total number of entity pairs N. Higher Hits@n values indicate better alignment performance."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                652,
+                887,
+                829
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "H i t s @ n = \\frac { 1 } { N } \\sum _ { i = 1 } ^ { N } I ( r a n k _ { i } \\le n )\\tag{16}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/aa61ab0aa86451ffe2300f3966e255e981227c7cfedcb818b2277739c70896d4.jpg"
+                }
+            },
+            "bbox": [
+                571,
+                841,
+                821,
+                883
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "MRR (Mean Reciprocal Rank) is a general evaluation metric for search algorithms and, when applied to entity alignment tasks, calculates the similarity between each entity in graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { G }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and potential matching entities in graph "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "{ \\mathcal { G } } ,"
+                    },
+                    {
+                        "type": "text",
+                        "content": "ranking them according to their scores. If the correct entity is ranked n, the score is "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\textstyle { \\frac { 1 } { n } }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The sum of scores for all entities yields the MRR score. MRR reflects the overall performance of the entity alignment algorithm, with higher MRR scores indicating better alignment results."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                888,
+                887,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3487"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/111a20b0890cec23e3d9523babbd067ddd89ece2430f177a402ae4ce317c70db.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 4: Statistical details for MMEA datasets."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Dataset</td><td>KG</td><td># Ent.</td><td># Rel.</td><td># Attr.</td><td># Rel. Triples</td><td># Attr. Triples</td><td># Image</td><td># EA pairs</td></tr><tr><td rowspan=\"2\">DBP15KZH-EN</td><td>ZH (Chinese)</td><td>19388</td><td>1701</td><td>8111</td><td>70414</td><td>248035</td><td>15912 14125</td><td rowspan=\"2\">15000</td></tr><tr><td>EN (English)</td><td>19572</td><td>1323 7173</td><td></td><td>95142</td><td>343218</td></tr><tr><td rowspan=\"2\">DBP15KJA-EN</td><td>JA (Japanese)</td><td>19814</td><td>1299</td><td>5882</td><td>77214</td><td>248991</td><td>12739</td><td rowspan=\"2\">15000</td></tr><tr><td>EN (English)</td><td>19780 1153</td><td>6066</td><td></td><td>93484</td><td>320616</td><td>13741</td></tr><tr><td rowspan=\"2\">DBP15KFR-EN</td><td>FR (French)</td><td>19661</td><td>903</td><td>4547</td><td>105998</td><td>273825</td><td>14174</td><td rowspan=\"2\">15000</td></tr><tr><td>EN (English)</td><td>19993</td><td>1208</td><td>6422</td><td>115722</td><td>351094</td><td>13858</td></tr><tr><td rowspan=\"2\">Multi-OpenEAEN-FR</td><td>EN (English)</td><td>15000</td><td>267</td><td>308</td><td>47334</td><td>73121</td><td>15000</td><td rowspan=\"2\">15000</td></tr><tr><td>FR (French)</td><td>15000 210</td><td></td><td>404</td><td>40864</td><td>67167</td><td>15000</td></tr><tr><td rowspan=\"2\">Multi-OpenEAEN-DE</td><td>EN (English)</td><td>15000</td><td>215</td><td>286</td><td>47676</td><td>83755</td><td>15000</td><td rowspan=\"2\">15000</td></tr><tr><td>DE (German)</td><td>15000 131</td><td></td><td>194</td><td>50419</td><td>156150</td><td>15000</td></tr><tr><td rowspan=\"2\">Multi-OpenEADW-V1</td><td>DBpedia</td><td>15000</td><td>248</td><td>342</td><td>38265</td><td>68258</td><td>15000</td><td rowspan=\"2\">15000</td></tr><tr><td>Wikidata</td><td>15000 169</td><td></td><td>649</td><td>42746</td><td>138246</td><td>15000</td></tr><tr><td rowspan=\"2\">Multi-OpenEADW-V2</td><td>DBpedia</td><td>15000</td><td>167</td><td>175</td><td>73983</td><td>66813</td><td>15000</td><td rowspan=\"2\">15000</td></tr><tr><td>Wikidata</td><td>15000</td><td>121</td><td>457</td><td>83365</td><td>175686</td><td>15000</td></tr><tr><td rowspan=\"2\">FBDB15K</td><td>FB15K</td><td>14951</td><td>1345</td><td>116</td><td>592213</td><td>29395</td><td>13444</td><td rowspan=\"2\">12846</td></tr><tr><td>DB15K</td><td>12842</td><td>279</td><td>225</td><td>89197</td><td>48080</td><td>12837</td></tr><tr><td rowspan=\"2\">FBYG15K</td><td>FB15K</td><td>14951</td><td>1345</td><td>116</td><td>592213</td><td>29395</td><td>13444</td><td rowspan=\"2\">11199</td></tr><tr><td></td><td></td><td></td><td></td><td>122886</td><td>23532</td><td></td></tr><tr><td></td><td>YAGO15K</td><td>15404</td><td>32</td><td>7</td><td></td><td></td><td>11194</td><td></td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                114,
+                108,
+                921,
+                351
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                378,
+                490,
+                524
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "M R R = \\frac { 1 } { N } \\sum _ { i = 1 } ^ { N } \\frac { 1 } { r a n k _ { i } }\\tag{17}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/cae53fa9163911d9d745d0937f1222b0a550cce44bbef5e1876205ad44255828.jpg"
+                }
+            },
+            "bbox": [
+                210,
+                530,
+                389,
+                573
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A.4 Implementation Details"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                577,
+                351,
+                594
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "For a fair comparison with recent works (Chen et al., 2023a,b), we have standardized our experimental setup as follows:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                599,
+                489,
+                648
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Iterative Learning: We adopt the approach of (Lin et al., 2022) and employ a probation method for iterative training. This method collects pairs of mutual nearest entities every 5 epochs. Pairs that consistently remain nearest neighbors for 10 rounds are added to the training set."
+                    }
+                ]
+            },
+            "bbox": [
+                134,
+                653,
+                490,
+                768
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Multi-modal Encoders: For relations and attributes, we use the Bag-of-Words (BoW) model to encode relations (x ) and attributes "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( x _ { a } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "as fixed-length vectors with a dimension of "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "d _ { r } ~ = ~ 1 0 0 0"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". For entity names’ surface information, we use 300-dimensional GloVe vectors and character bigrams. We enhance this method by applying machine translations to entity names, following (Mao et al.,"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                775,
+                492,
+                921
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "2021). For images, we use ResNet-152 (He et al., 2016) as pre-trained visual encoders with a vision feature dimension "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( d _ { v } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "of 2048 in DBP15K. For Multi-OpenEA, CLIP (Radford et al., 2021) is used with "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "d _ { v } = 5 1 2"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". In FBDB15K/FBYG15K, VGG-16 (Simonyan and Zisserman, 2014) is employed with "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "d _ { v } ="
+                    },
+                    {
+                        "type": "text",
+                        "content": "4096. It should be noted that we assign a zero vector as the embedding for missing images to minimize their impact on cross-modal learning."
+                    }
+                ]
+            },
+            "bbox": [
+                544,
+                378,
+                887,
+                557
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Hyper Parameters: We unify the hidden layer dimensions across all networks to 300. The parameter τ is set to 0.05 to emphasize challenging negative samples in the contrast loss. The dynamic threshold δ in Eq. 3 for progressively freezing entities begins at 0.1 and increases by 1.2 until it reaches a maximum of 0.9. For the structure, relation, attribute, and image modalities, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\beta _ { m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "values in Eq. 11 are respectively set to 0.1, 0.1, 0.1, and 10, scaling the learning rate of modality features."
+                    }
+                ]
+            },
+            "bbox": [
+                531,
+                568,
+                887,
+                762
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Computational Overhead: Our experiments, conducted on a Tesla V100 SXM2 32GB GPU, demonstrate the superior efficiency of our model, which completes training in only 20 minutes. This is notably faster than the baseline model, MEAformer (Chen et al., 2023a), at 33 minutes, and UMAEA (Chen et al., 2023b) at 29 minutes. The number of learnable parameters is 13.1M for DBP15K and Multi-OpenEA, and 9.9M for MMKG."
+                    }
+                ]
+            },
+            "bbox": [
+                529,
+                775,
+                887,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3488"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                149,
+                84,
+                489,
+                116
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "B Detailed analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                127,
+                299,
+                143
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "B.1 Low Resource"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                152,
+                277,
+                167
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/bf85cf08afe6b71cc0e50d40a3a92b740ef0ff915d547fe796d247da5cdfa9dd.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 7: H@1 performance with different ratios of seed alignments ranging from 0.01 to 0.3 on DPB1 "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "5 \\mathsf { K } _ { Z H - E N }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "(left) and FBDB15K (right). The xaxis denotes ratios and the y-axis denotes H@1."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                114,
+                179,
+                484,
+                304
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To assess the stability of the proposed method under conditions of limited seed alignments, we conducted evaluations on two distinct datasets– "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathrm { D B P 1 5 K } _ { Z H - E N }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and FBDB15K, using seed alignment ratios varying from 0.01 to 0.30. Figure 7 illustrates a clear gap between performances as the ratio escalates. Notably, with merely 1% seed alignments in the DBP1 "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "5 { \\mathrm { K } } _ { Z H - E N }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "dataset, our model was able to achieve a H@1 score of .648, markedly outperforming the MEAformer, which scored .456. This result highlights the model’s robustness and its considerable promise for applications in few-shot entity alignment."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                388,
+                490,
+                599
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "B.2 Analysis of Freezing Process"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                607,
+                388,
+                623
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/66efbad09bcf965d8733e7e48610a6299e34880b32e19165815aa0d355323798.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 8: The ratio of entities with images that are frozen during the training epochs in DBP15K."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                119,
+                638,
+                484,
+                833
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To delve deeper into the impacts of the progressive manner, we take the freezing process of image modality on the DBP15K dataset as an example, analyzing the trend of the proportion of entities being frozen as training epochs change. Figure 8 indicates that as training epochs increase, the proportion of entities frozen shows an exponential rising trend, ultimately stabilizing at about 55%. The high rate of frozen images is partly due to a high image missing rate of up to 30% in the DBP15K dataset, and it also reflects high ambiguity in image information within multi-modal knowledge graphs."
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                889,
+                492,
+                921
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                887,
+                263
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3489"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ]
+]

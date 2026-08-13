@@ -1,0 +1,1370 @@
+[
+    {
+        "type": "text",
+        "text": "Llama2Vec: Unsupervised Adaptation of Large Language Models for Dense Retrieval",
+        "text_level": 1,
+        "bbox": [
+            139,
+            78,
+            858,
+            118
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Zheng Liu<sup>2,4</sup>†, Chaofan Li<sup>1</sup>†∗, Shitao Xiao<sup>2</sup>†, Yingxia Shao<sup>1</sup>‡, Defu Lian<sup>3</sup>",
+        "bbox": [
+            189,
+            124,
+            811,
+            142
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1: Beijing University of Posts and Telecommunications",
+        "bbox": [
+            275,
+            142,
+            729,
+            160
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2: Beijing Academy of Artificial Intelligence",
+        "bbox": [
+            314,
+            159,
+            689,
+            175
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3: University of Science and Technology of China 4: The Hong Kong Polytechnic University",
+        "bbox": [
+            295,
+            175,
+            707,
+            209
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "zhengliu1026@gmail.com cfli, shaoyx @bupt.edu.cn stxiao@baai.ac.cn liandefu@ustc.edu.cn",
+        "bbox": [
+            198,
+            210,
+            805,
+            242
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            260,
+            252,
+            342,
+            268
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Dense retrieval calls for discriminative embeddings to represent the semantic relationship between query and document. It may benefit from the using of large language models (LLMs), given LLMs’ strong capability on semantic understanding. However, the LLMs are learned by auto-regression, whose working mechanism is completely different from representing whole text as one discriminative embedding. Thus, it is imperative to study how to adapt LLMs properly so that they can be effectively initialized as the backbone encoder for dense retrieval.",
+        "bbox": [
+            141,
+            280,
+            462,
+            453
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "In this paper, we propose a novel approach, called Llama2Vec, which performs unsupervised adaptation of LLM for its dense retrieval application. Llama2Vec consists of two pretext tasks: EBAE (Embedding-Based Auto-Encoding) and EBAR (Embedding-Based Auto-Regression), where the LLM is prompted to reconstruct the input sentence and predict the next sentence based on its text embeddings. Llama2Vec is simple, lightweight, but highly effective. It is used to adapt LLaMA-2-7B on the Wikipedia corpus. With a moderate steps of adaptation, it substantially improves the model’s fine-tuned performances on a variety of dense retrieval benchmarks. Notably, it results in the new state-of-the-art performances on popular benchmarks, such as passage and document retrieval on MSMARCO, and zero-shot retrieval on BEIR. The model and source code will be made publicly available to facilitate the future research. Our model is available at https://github.com/FlagOpen/FlagEmbedding.",
+        "bbox": [
+            141,
+            457,
+            462,
+            772
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            114,
+            784,
+            260,
+            800
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Dense retrieval is a new paradigm of IR empowered by deep neural networks. It represents query and document as embeddings within the same latent space, where the semantic relationship between query and document can be reflected by their embedding similarity. Nowadays, dense retrieval has been a critical component in many real-world scenarios, like open-domain QA, fact verification, and retrieval-augmented generation (Karpukhin et al., 2020; Thorne et al., 2018; Lewis et al., 2020; Wang et al., 2022a; Dolci et al., 2023).",
+        "bbox": [
+            112,
+            810,
+            489,
+            875
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            253,
+            887,
+            366
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "The capacity of text encoder is a critical factor of dense retrieval. In the past few years, the pretrained language models, e.g., BERT (Devlin et al., 2019), RoBERTa (Liu et al., 2019), T5 (Raffel et al., 2020), were widely applied to generate high-quality representations for query and document, which substantially contributed to the accuracy and generalizability of dense retrieval. Besides, it was also found that dense retrieval’s performance can further benefit from the continual growth of model size and training scale (Ni et al., 2021; Izacard et al., 2021; Wang et al., 2022c; Xiao et al., 2023). Recently, large language models (LLMs) have emerged as a unified foundation for general NLP tasks (Brown et al., 2020; Wei et al., 2021; Chowdhery et al., 2023). Given the LLMs’ superior capability on semantic understanding, it will be promising to take advantage of such powerful models as new backbones for dense retrieval. With this consideration, there have been pioneering efforts where LLMs are trained to generate discriminative text embeddings to facilitate the retrieval tasks in many different scenarios (Muennighoff, 2022; Neelakantan et al., 2022; Ma et al., 2023; Zhang et al., 2023).",
+        "bbox": [
+            507,
+            368,
+            887,
+            757
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Despite the preliminary progress, it remains an open problem to fully unleash the LLM’s underlying potential for dense retrieval. Particularly, the typical LLMs are pre-trained by text generation tasks, especially auto-regression, where the text embeddings are learned to predict the next tokens. Consequently, the LLMs’ text embeddings will focus on representing the local (i.e. the next step) semantic of the context. However, dense retrieval calls for text embeddings to represent the global semantic about the query and document. Such a big discrepancy will severely restrict the direct application of LLMs for dense retrieval.",
+        "bbox": [
+            507,
+            759,
+            887,
+            921
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": ". Co-first authors and major contributors of techniques",
+        "bbox": [
+            114,
+            883,
+            470,
+            897
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": ". Major contributor of engineering",
+        "bbox": [
+            115,
+            896,
+            351,
+            908
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "‡<sup>.</sup> <sup>Corresponding</sup> <sup>author.</sup>",
+        "bbox": [
+            115,
+            907,
+            287,
+            920
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "3490",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 3490–3500 August 11-16, 2024 ©2024 Association for Computational Linguistics",
+        "bbox": [
+            89,
+            945,
+            909,
+            973
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/b1db0d3c32bdbbc8bd609b5ac273bc4403dd534568e57cce651f176e50d8be3e.jpg",
+        "image_caption": [
+            "Figure 1: Llama2Vec. The LLM is prompted to generate the inductive embedding for EBAE (green), where the original sentence is predicted, and the deductive embedding for EBAR (blue), where the next sentence is predicted."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            119,
+            80,
+            878,
+            315
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            376,
+            489,
+            424
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "To address the above problem, we propose a novel approach Llama2Vec (Figure 1), which performs unsupervised adaptation of LLMs to facilitate their usage in dense retrieval. Llama2Vec works as a continuation of pre-training. On top of the tailored unsupervised learning tasks, it transforms the LLM’s text embeddings to represent the global semantic about the input text, which makes the LLM a better initialized encoder for dense retrieval. Llama2Vec is made up of two pretext training tasks: EBAE (embedding-based auto-encoding) and EBAR (embedding-based autoregression). On top of EBAE, the LLM is prompted to generate the inductive text embedding, which can be used to predict the vocabularies of the input sentence itself. With EBAR, the LLM is prompted to generate the deductive text embedding, which can be used to predict the vocabularies for the next sentence.",
+        "bbox": [
+            112,
+            431,
+            490,
+            738
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "The joint conduct of the above pretext tasks bring forth two benefits. Firstly, the text embeddings from LLM can be adapted from local semantic representation (predicting the next tokens) to global semantic representation (predicting the sentencelevel features), which aligns with the expected property of dense retrieval. Secondly, by learning to generate inductive and deductive text embeddings with different prompts, the LLM-based retriever can flexibly handle diversified semantic relationships about correlation (e.g., QA) and paraphrasing (e.g., NLI), which presents a strong foundation to develop versatile retrieval models. It’s worth noting that the prediction is realized in the form of multi-classification, where the LLM’s text embedding is the input and the vocabularies within the target sentence are employed as the labels. Therefore, Llama2Vec is extremely lightweight and simple to realize based on the existing auto-regression pipeline.",
+        "bbox": [
+            112,
+            743,
+            490,
+            922
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            376,
+            887,
+            523
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "We apply Llama2Vec for LLaMA-2-7B (base) (Touvron et al., 2023) over the Wikipedia corpus, where it substantially improves the LLM’s downstream retrieval performance. With standard finetuning, the well-adapted model is able to notably outperform all existing dense retrieval methods, where it establishes new state-of-the-art performances on a variety of popular benchmarks, including the supervised tasks like passage and document retrieval of MSMARCO (Nguyen et al., 2016), and the zero-shot retrieval of BEIR (Thakur et al., 2021).",
+        "bbox": [
+            507,
+            527,
+            887,
+            721
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "To summarize, our work is highlighted by the following technical contributions. 1) We propose a new unsupervised learning method Llama2Vec. To the best of our knowledge, this is the first research work which explores the adaptation of LLMs for dense retrieval. 2) Llama2Vec is designed with simple but effective pretext tasks, which substantially improves the quality of LLM-based dense retriever in a cost-effective way. 3) The empirical studies verify the effectiveness of Llama2Vec, where substantial improvements can be achieved for both supervised and zero-shot retrieval tasks.",
+        "bbox": [
+            507,
+            727,
+            887,
+            921
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "3491",
+        "bbox": [
+            480,
+            928,
+            519,
+            942
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Related Works",
+        "text_level": 2,
+        "bbox": [
+            114,
+            83,
+            278,
+            99
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "In this section, the related works are discussed from two perspectives: the background of dense retrieval, and the previous efforts on leveraging the LLMs for dense retrieval applications.",
+        "bbox": [
+            112,
+            112,
+            489,
+            177
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Dense retrieval. Dense retrieval is to represent query and document as embeddings within the same latent space, where relevant documents can be retrieved by embedding similarity. Nowadays, it is widely utilized in many important applications, such as open-domain QA and retrieval-augmented generation (Karpukhin et al., 2020; Lewis et al., 2020). The performance of dense retrieval is influenced by many factors. For example, dense retrieval models are learned by contrastive learning, where the discriminativeness of text embeddings are largely influenced by the scale and hardness of negative sample (Qu et al., 2020; Izacard et al., 2021; Xiong et al., 2020). Besides, the learning of dense retrieval models can benefit from knowledge distillation, where fine-grained teacher labels are derived from the ranking models (Hofstatter et al.¨ , 2021; Ren et al., 2021). Apart from the above training algorithms, the backbone architecture is one decisive factor for dense retrieval. In the past few years, pre-trained language models (PLMs), like BERT (Devlin et al., 2019), RoBERTa (Liu et al., 2019), T5 (Raffel et al., 2020), have been widely adopted for the encoding of query and documents. Thanks to the large-scale model architec ture and pre-training, PLMs were able to produce fine-grained semantic representation of input data, which substantially benefit the quality of dense retrieval. Besides, it was found that with the expansion of model and training scale, and the optimization of pre-training algorithm, the accuracy and generality of the PLM-based dense retrieval can be further improved. (Ni et al., 2021; Izacard et al., 2021; Wang et al., 2022c; Xiao et al., 2023; Gao and Callan, 2021; Liu and Shao, 2022; Liu et al., 2023; Wang et al., 2022b).",
+        "bbox": [
+            110,
+            178,
+            490,
+            758
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Dense retrieval with LLM. The LLMs have been a unified foundation for many NLP tasks because of its superior capabilities. As a result, it is instinctive to leverage such powerful models to facilitate dense retrieval. LLMs can substantially contribute to many critical aspects of dense retrieval. For example, it can help to model the complex relationship between query and document considering LLMs’ strong semantic understanding capability (Brown et al., 2020; Chowdhery et al., 2023;",
+        "bbox": [
+            112,
+            759,
+            490,
+            921
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Touvron et al., 2023). Besides, it will benefit the learning of multi-task retrievers because of LLMs’ versatility and instruction following capability (Wei et al., 2021; Chung et al., 2022). It also presents a powerful foundation to develop long-document retrievers, given its dramatically extended context lengths. Recently, there have been several preliminary works which made important progresses on LLM-based dense retrieval (Muennighoff, 2022; Neelakantan et al., 2022; Ma et al., 2023; Zhang et al., 2023). However, the existing methods simply made direct use of LLMs. Because of the discrepancy between language modeling and text embedding, much of the LLMs’ underlying potential is unexploited. In fact, it is still an open problem to study the proper adaptation of LLMs so that they can better contribute to dense retrieval.",
+        "bbox": [
+            507,
+            84,
+            885,
+            359
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3 Llama2Vec",
+        "text_level": 2,
+        "bbox": [
+            509,
+            369,
+            643,
+            385
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3.1 Preliminary",
+        "text_level": 2,
+        "bbox": [
+            509,
+            393,
+            652,
+            409
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Dense retrieval utilizes a text embedding model to produce the query and document’s embedding: $e _ { q }$ and $e _ { d } .$ . The relevance of query and document is reflected by their embedding similarity: $\\langle e _ { q } , e _ { d } \\rangle$ As such, the relevant documents for the query $( D _ { q } )$ can be retrieved via the ANN search within the embedding space: $D _ { q } \\gets \\mathrm { T o p } { - } k \\big ( \\{ d : \\langle e _ { q } , e _ { d } \\rangle | D \\} \\big )$ .",
+        "bbox": [
+            507,
+            414,
+            885,
+            529
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "The pre-trained language models used to be the backbone architecture of the embedding model. Take BERT as an example. The input text is tokenized as the sequence $T )$ : [CLS], t1, ..., tN, [EOS]. Then, the tokenized sequence is encoded by BERT, where the output embeddings are integrated as the text embedding. There are two common options to perform the integration: [CLS], or mean-pooling:",
+        "bbox": [
+            507,
+            527,
+            885,
+            658
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "img_path": "images/17df259c2b2ea646831d4874c654a18ad4d0fe5f6d6d83edaf9f19f21e1bf86c.jpg",
+        "text": "$$\n\\begin{array} { r } { \\pmb { e _ { t } } \\gets \\mathrm { B E R T } ( T ) [ \\mathrm { C L S } ] o r \\mathrm { A V G } \\big ( \\mathrm { B E R T } ( T ) \\big ) . } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            532,
+            664,
+            857,
+            682
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "When using LLMs as the encoding architecture, the text embedding needs to be generated in a different way. Since the existing LLMs mainly use the decoder-only architecture (Brown et al., 2020; Chowdhery et al., 2023; Touvron et al., 2023), the global context can only be accessed by the very last tokens of the input sequence. Therefore, the output embedding from the special token $\\langle \\rangle \\mathrm { s } \\rangle$ or [EOS] is utilized to represent the input text (Zhang et al., 2023; Ma et al., 2023). Taking LLaMA (Touvron et al., 2023) as the example, we have the following updated form of text embedding:",
+        "bbox": [
+            507,
+            690,
+            885,
+            884
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "img_path": "images/7a03bb1de38db14e736ecd7769c79c80b23536fd32bd43dc18914de50c244077.jpg",
+        "text": "$$\n\\begin{array} { r } { \\pmb { e } _ { t } \\gets \\mathrm { L L a M A } ( T ) [ \\langle \\backslash \\mathsf { s } \\rangle ] . } \\end{array}\\tag{1}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            603,
+            890,
+            788,
+            909
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "3492",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "chart",
+        "img_path": "images/a437fd3675ccb8c9a55242ce4c59370480c81785eb11e14164e00cee049f5b4e.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 2: The attention scheme of Llama2Vec."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            163,
+            84,
+            420,
+            258
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.2 Unsupervised Adaptation",
+        "text_level": 2,
+        "bbox": [
+            114,
+            291,
+            363,
+            307
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "As introduced, the LLM’s output embedding tends to foucs on local semantic, that is the prediction of the next token, because of its language modelingbased pre-training. To facilitate the application in dense retrieval, we perform unsupervised adaptation of LLM, where the LLM’s text embedding can be transformed into a semantic representation of the global context.",
+        "bbox": [
+            112,
+            311,
+            489,
+            441
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Objective. The retrieval tasks can be roughly divided into two types. One is to find the correlated data, e.g., question-answering (QA). The other one is to identify paraphrasing data, e.g., natural language inference (NLI). To confront these tasks, text embeddings are expected to fulfill two objectives:",
+        "bbox": [
+            112,
+            441,
+            489,
+            538
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "• Induction. The representation of global semantic about the input text itself.",
+        "bbox": [
+            122,
+            546,
+            490,
+            579
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "• Deduction. The representation of global semantic for the correlated text of the input.",
+        "bbox": [
+            124,
+            589,
+            489,
+            621
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Pretext tasks. With the above objectives, we present two pretext training tasks of Llama2Vec. One is called EBAE (Embedding-based Auto-Encoding), where the text embedding $e _ { t }$ is used to induct the sentence-level feature about input sentence itself. The other one is called EBAR (Embedding-based Auto-Regression), where the text embedding $e _ { t }$ is used to deduct the sentencelevel feature for the next sentence of the input. We argue that the strong induction and deduction capability of text embedding will be sufficient to handle the diversified retrieval scenarios, considering that arbitrary correlations can always be abstracted into the general form of input (e.g., question), retrieval purpose (e.g., get its answer), next sentence (e.g, answer).",
+        "bbox": [
+            110,
+            631,
+            490,
+            888
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Text Embedding. The LLM is prompted by two different templates to generate the text embeddings for EBAE and EBAR (Figure 1). For EBAE, the LLM is prompted by: “[Placeholder for input] $| { \\_ } \\mathrm { S E L F { \\_ } } \\langle \\backslash \\mathrm { s } \\rangle ^ { \\ast }$ , where the inductive text embedding is generated by the following function:",
+        "bbox": [
+            112,
+            888,
+            490,
+            921
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            84,
+            885,
+            149
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/c9e5544a4c2b137617b6452c5828d39d7aab9ecefa6accd598bcb95b03592b16.jpg",
+        "text": "$$\n\\begin{array} { r } { e _ { t } ^ { \\alpha } \\gets \\mathrm { L L a M A } ( T , \\mathrm { S E L F } , \\langle \\backslash \\mathrm { s } \\rangle ) [ - 1 ] . } \\end{array}\\tag{2}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            559,
+            156,
+            830,
+            174
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "SELF stands for the prompt of EBAE: “The input sentence $\\mathrm { i } \\mathrm { s } { : } ^ { \\mathrm { 9 } }$ . For EBAR, the LLM is prompted by template: “[Placeholder for input] $\\mathrm { \\Gamma { N E X T } { \\_ } } \\langle \\backslash \\mathrm { { s } } \\rangle ^ { \\ast }$ based on which the deductive text embedding is generated by the following function:",
+        "bbox": [
+            507,
+            181,
+            884,
+            265
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/9123d7cd668905dfaaab7770d992c701921d63d97d54cbc92de044713150c778.jpg",
+        "text": "$$\n\\begin{array} { r } { \\pmb { e } _ { t } ^ { \\beta } \\gets \\mathrm { L L a M A } ( T , \\mathrm { N E X T } , \\langle \\backslash \\mathsf { s } \\rangle ) [ - 1 ] , } \\end{array}\\tag{3}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            556,
+            268,
+            833,
+            288
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "In this place, NEXT stands for the prompt of EBAR: “The next sentence $\\mathrm { i } \\mathrm { s } { : } ^ { \\mathsf { P } }$",
+        "bbox": [
+            507,
+            297,
+            885,
+            328
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "The direct computation of the two embeddings will lead to substantial unnecessary costs because the input text $T$ is repetitively processed for two times. To alleviate this problem, we propose to compute ${ e } _ { t } ^ { \\alpha }$ and $e _ { t } ^ { \\beta }$ in one pass. Particularly, the prompts of EBAE and EBAR are merged into one joint prompt for LLM: “[Placeholder for input] $\\mathrm { . S E L F { \\_ } } \\langle \\backslash \\mathrm { s } \\rangle \\mathrm { { \\_ N E X T \\_ } } \\langle \\backslash \\mathrm { s } \\rangle ^ { \\mathrm { , } }$ . Because the two text embeddings need to be computed independently, we modify the typical attention mask of casual language modeling, where ${ } ^ { \\mathrm { \\left. } } \\mathrm { S E L F \\_ } \\langle \\backslash \\mathrm { s } \\rangle ^ { \\mathrm { \\right. } }$ and $ { \\mathrm { \\Sigma ^ { * } N E X T } } \\_ { \\mathrm { \\Sigma } } \\langle  { \\mathrm { \\Sigma } } \\rangle ^ { , }$ are mutually invisible (Figure 2). Now, the output embeddings of the first and second $\\langle \\rangle \\mathrm { s } \\rangle$ tokens are used for $e _ { t } ^ { \\alpha }$ and $e _ { t } ^ { \\beta }$ , respectively. Given that the input text $T$ account for the majority of length for the joint prompt, such an operation will save almost 50% of the computation cost compared with the naive method.",
+        "bbox": [
+            507,
+            329,
+            885,
+            619
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Training. As introduced, the text embeddings of Llama2Vec are adapted to capture the global semantic of the input sentence itself and the next sentence of the input. In this place, we propose a simple but effective training objective to accomplish such an adaptation. We argue that if one embedding is able to accurately predict the vocabularies in a specific context all by itself, the embedding must be a strong representation of the global semantic for the corresponding context. Based on this fundamental principle, the training of text embedding is formulated as a multi-classification problem. It linearly projects the text embedding into the vocabulary space, where the vocabulary IDs of all tokens within the target context are predicted. Specifically, the objective function of this problem is derived as:",
+        "bbox": [
+            507,
+            619,
+            887,
+            877
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/d7518434df6eba7bfa197b25af3823adda8c6eedfc9fc31e596ce89d218a8a1c.jpg",
+        "text": "$$\n\\operatorname* { m i n } . - \\frac { 1 } { | T | } \\sum _ { t \\in \\mathcal { T } } l o g \\frac { \\exp { ( e ^ { T } W _ { t } ) } } { \\sum _ { v \\in V } \\exp { ( e ^ { T } W _ { v } ) } } .\\tag{4}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            529,
+            883,
+            840,
+            922
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_number",
+        "text": "3493",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "table",
+        "img_path": "images/0d9a45d1fca0f0d31b84736edf72df8fcdcba430b220f2a5cd8f0c738ecb8b42.jpg",
+        "table_caption": [],
+        "table_footnote": [
+            "Table 1: MS MARCO passage retrieval (performance measured by MRR@10, Recall@1000, NDCG@10)."
+        ],
+        "table_body": "<table><tr><td rowspan=1 colspan=5></td><td rowspan=1 colspan=2>Dev</td><td rowspan=1 colspan=1>DL&#x27;19</td><td rowspan=1 colspan=1>DL&#x27;20</td></tr><tr><td rowspan=1 colspan=3>Method</td><td rowspan=1 colspan=1>Size</td><td rowspan=1 colspan=1>FT.</td><td rowspan=1 colspan=1>M@10</td><td rowspan=1 colspan=1>R@1000</td><td rowspan=1 colspan=1>N@10</td><td rowspan=1 colspan=1>N@10</td></tr><tr><td rowspan=16 colspan=3>BM25 (Lin et al., 2021)ANCE (Xiong et al., 2020)ADORE (Zhan et al., 2021)Condenser (Gao and Callan, 2021)coCondenser (Gao and Callan, 2022)TAS-B (Hofstätter et al., 2021)RocketQAv2 (Ren et al., 2021)AR2+SimANS (Zhou et al., 2022)GTR-XXL (Ni et al., 2021)SimLM (Wang et al., 2022b)SimLM+distill (Wang et al., 2022b)RetroMAE (Liu and Shao, 2022)RetroMAE+distill (Liu and Shao, 2022)RetroMAEv2+distll (Liu et al., 2023)LLaMA2-RepLLaMA (Ma et al., 2023)OpenAI-Ada-002 (Neelakantan et al., 2022)</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>18.4</td><td rowspan=1 colspan=1>85.3</td><td rowspan=1 colspan=1>50.6</td><td rowspan=1 colspan=1>48.0</td></tr><tr><td rowspan=1 colspan=1>125M</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>33.0</td><td rowspan=1 colspan=1>95.9</td><td rowspan=1 colspan=1>64.8</td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>34.7</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>68.3</td><td rowspan=1 colspan=1>一</td></tr><tr><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>36.6</td><td rowspan=1 colspan=1>97.4</td><td rowspan=1 colspan=1>69.8</td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>38.2</td><td rowspan=1 colspan=1>98.4</td><td rowspan=1 colspan=1>71.7</td><td rowspan=1 colspan=1>68.4</td></tr><tr><td rowspan=1 colspan=1>55M</td><td rowspan=1 colspan=1>distill</td><td rowspan=1 colspan=1>34.3</td><td rowspan=1 colspan=1>97.6</td><td rowspan=1 colspan=1>72.2</td><td rowspan=1 colspan=1>69.2</td></tr><tr><td rowspan=1 colspan=2></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>distill</td><td rowspan=1 colspan=1>38.8</td><td rowspan=1 colspan=1>98.1</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>distill</td><td rowspan=1 colspan=1>40.9</td><td rowspan=1 colspan=1>98.7</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1>4.8B</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>38.8</td><td rowspan=1 colspan=1>99.0</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>39.1</td><td rowspan=1 colspan=1>98.6</td><td rowspan=1 colspan=1>69.8</td><td rowspan=1 colspan=1>69.2</td></tr><tr><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>distill</td><td rowspan=1 colspan=1>41.1</td><td rowspan=1 colspan=1>98.7</td><td rowspan=1 colspan=1>71.4</td><td rowspan=1 colspan=1>69.7</td></tr><tr><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>39.3</td><td rowspan=1 colspan=1>98.5</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>一</td></tr><tr><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>distill</td><td rowspan=1 colspan=1>41.6</td><td rowspan=1 colspan=1>98.8</td><td rowspan=1 colspan=1>68.1</td><td rowspan=1 colspan=1>一</td></tr><tr><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>distill</td><td rowspan=1 colspan=1>42.6</td><td rowspan=1 colspan=1>98.9</td><td rowspan=1 colspan=1>75.1</td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1>7B</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>41.2</td><td rowspan=1 colspan=1>99.4</td><td rowspan=1 colspan=1>74.3</td><td rowspan=1 colspan=1>72.1</td></tr><tr><td rowspan=1 colspan=1>一</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>34.4</td><td rowspan=1 colspan=1>98.6</td><td rowspan=1 colspan=1>70.4</td><td rowspan=1 colspan=1>67.6</td></tr><tr><td rowspan=1 colspan=3>LLaMA2-Llama2Vec</td><td rowspan=1 colspan=1>7B</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>43.1</td><td rowspan=1 colspan=1>99.5</td><td rowspan=1 colspan=1>73.4</td><td rowspan=1 colspan=1>72.9</td></tr></table>",
+        "bbox": [
+            127,
+            80,
+            865,
+            375
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "In this place, $W \\in \\mathbb { R } ^ { d \\times | V | }$ is the projection head of LLM; V indicates the vocabulary space; $\\tau$ stands for the collection of tokens of the target context (input text itself for ${ e } _ { t } ^ { \\alpha }$ , the next sentence for $e _ { t } ^ { \\beta } )$ The above training objective is lightweight and simple to realize, which can be directly conducted based on the typical language modeling pipeline.",
+        "bbox": [
+            112,
+            407,
+            489,
+            521
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Fine-Tuning. The well-adapted LLM from Llama2Vec is fine-tuned for dense retrieval applications through contrastive learning. Because the majority of the fine-tuning datasets for dense retrieval are collected for correlation scenarios, such as QA (Nguyen et al., 2016) and Natural Question (Kwiatkowski et al., 2019), which are made up of tuples of (query, answer), we can derive the following general form of objective function:",
+        "bbox": [
+            112,
+            521,
+            490,
+            667
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/4aceeadae991eadfbb42f80e034209a041f1edaa9d595e1da107c4c03f884635.jpg",
+        "text": "$$\n\\operatorname* { m i n } \\sum _ { q } - \\log \\frac { \\exp ( \\langle e _ { q } ^ { \\alpha } , e _ { a } ^ { \\beta } \\rangle ) } { \\sum _ { a ^ { \\prime } \\in A ^ { \\prime } } \\exp ( \\langle e _ { q } ^ { \\alpha } , e _ { a ^ { \\prime } } ^ { \\beta } \\rangle ) } ,\\tag{5}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            152,
+            674,
+            447,
+            718
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where $e _ { q } ^ { \\alpha }$ is the query’s embedding prompted by NEXT, and $e _ { a } ^ { \\beta }$ is the answer’s embedding prompted by SELF. Despite the fixed formulation during training, the prompt scheme can be flexibility adjusted for each individual downstream scenario. Particularly, when dealing with the correlation relationships, e.g., question-answering, we hold on to NEXT and SELF to prompt the query and answer’s embeddings. However, when handling other situations about paraphrasing relationships, the prompt scheme is as follows. To analyze the paraphrasing relationship between two long documents, we use",
+        "bbox": [
+            110,
+            724,
+            490,
+            921
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "SELF to prompt the query and answer’s embeddings given its nature of summarizing the semantic of complex input. Meanwhile, we employ NEXT as the prompt for both inputs when dealing with two short sentences because of its nature of deducting the semantic for the related texts.",
+        "bbox": [
+            507,
+            409,
+            887,
+            506
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "4 Experiment",
+        "text_level": 2,
+        "bbox": [
+            509,
+            517,
+            648,
+            535
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "4.1 Settings",
+        "text_level": 2,
+        "bbox": [
+            509,
+            543,
+            621,
+            560
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "The experimental study is performed to explore three important issues: 1) Llama2Vec’s retrieval performance after fine-tuning, 2) Llama2Vec’s generalization across diversified scenarios, 3) the impact of technical factors in Llama2Vec. With such objectives, we use the MS MARCO (Nguyen et al., 2016) as our fine-tuning dataset, and perform the evaluation on the passage retrieval and document retrieval task. We also take advantage of the BEIR benchmark (Thakur et al., 2021), where the finetuned retriever from MS MARCO is evaluated under the zero-shot setting to analyze its generalization capability.",
+        "bbox": [
+            507,
+            565,
+            887,
+            775
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Training. Llama2Vec is applied to the LLaMA-2-7B (base) model. The unsupervised adaptation is performed based on the unlabeled corpus of Wikipedia curated by DPR (Karpukhin et al., 2020). We perform 10,000 steps of Llama2Vec adaptation in total, with a batch size of 256, a sequence length of 1024, and a learning rate of 1e-5. Llama2Vec is fine-tuned based on the training recipe presented by RepLLaMA (Ma et al., 2023):",
+        "bbox": [
+            507,
+            776,
+            887,
+            921
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_number",
+        "text": "3494",
+        "bbox": [
+            480,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "table",
+        "img_path": "images/a7854eb1ae6b2c8f900b86f924bac1762b81c62a575142d52363509618f76e6b.jpg",
+        "table_caption": [
+            "Table 2: MS MARCO document retrieval"
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=6></td><td rowspan=1 colspan=2>Dev</td><td rowspan=1 colspan=1>DL&#x27;19</td><td rowspan=1 colspan=1>DL&#x27;20</td></tr><tr><td rowspan=1 colspan=4>Method</td><td rowspan=1 colspan=1>Size</td><td rowspan=1 colspan=1>FT.</td><td rowspan=1 colspan=1>MRR@100</td><td rowspan=1 colspan=1>R@100</td><td rowspan=1 colspan=1>NDCG@10</td><td rowspan=1 colspan=1>NDCG@10</td></tr><tr><td rowspan=11 colspan=4>BM25 (Lin et al., 2021)PROP (Ma et al., 2021a)B-PROP (Ma et al., 2021b)COIL (Gao et al., 2021)ANCE (first-p) (Xiong et al., 2020)ANCE (max-p) (Xiong et al., 2020)ADORE (Zhan et al., 2021)COSTA (Ma et al., 2022)LLaMA2-RepLLaMA (Ma et al., 2023)</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>一</td><td rowspan=1 colspan=1>27.7</td><td rowspan=1 colspan=1>80.9</td><td rowspan=1 colspan=1>51.9</td><td rowspan=1 colspan=1>52.9</td></tr><tr><td rowspan=2 colspan=2></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td rowspan=1 colspan=2></td><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>39.4</td><td rowspan=1 colspan=1>88.4</td><td rowspan=1 colspan=1>59.6</td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=2></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>39.5</td><td rowspan=1 colspan=1>88.3</td><td rowspan=1 colspan=1>60.1</td><td rowspan=3 colspan=1></td></tr><tr><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>39.7</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>63.6</td></tr><tr><td rowspan=1 colspan=1>125M</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>37.7</td><td rowspan=1 colspan=1>89.3</td><td rowspan=1 colspan=1>61.5</td></tr><tr><td rowspan=1 colspan=1>125M</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>38.4</td><td rowspan=1 colspan=1>90.6</td><td rowspan=1 colspan=1>62.8</td><td rowspan=4 colspan=1>63.2</td></tr><tr><td rowspan=1 colspan=2></td><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>40.5</td><td rowspan=1 colspan=1>91.9</td><td rowspan=1 colspan=1>62.8</td></tr><tr><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>42.2</td><td rowspan=1 colspan=1>91.9</td><td rowspan=1 colspan=1>62.6</td></tr><tr><td rowspan=1 colspan=1>7B</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>45.6</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>65.0</td></tr><tr><td rowspan=1 colspan=4>LLaMA2-Llama2Vec</td><td rowspan=1 colspan=1>7B</td><td rowspan=1 colspan=1>hard</td><td rowspan=1 colspan=1>47.9</td><td rowspan=1 colspan=1>94.1</td><td rowspan=1 colspan=1>68.2</td><td rowspan=1 colspan=1>63.6</td></tr></table>",
+        "bbox": [
+            117,
+            80,
+            880,
+            263
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "it leverages LoRA (Hu et al., 2021) for the parameter efficient training of LLM, and simply relies on the ANN hard negatives (Xiong et al., 2020) to fine-tune the embedding model with contrastive learning.",
+        "bbox": [
+            112,
+            304,
+            490,
+            386
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.2 Supervised Performance",
+        "text_level": 2,
+        "bbox": [
+            114,
+            397,
+            354,
+            412
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "First of all, we analyze the supervised retrieval quality of Llama2Vec, where the model is finetuned with the training queries from MS MARCO passage and document retrieval, respectively.",
+        "bbox": [
+            112,
+            419,
+            489,
+            483
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Passage Retrieval. The experiment results on MS MARCO passage retrieval are shown in Table 1. We make comparison with a wide variety of baseline methods on passage retrieval, which include the following categories: 1) basic lexical retriever: BM25 (Lin et al., 2021); 2) dense retrievers fine-tuned from BERT or RoBERTa: ANCE (Xiong et al., 2020), ADORE (Zhan et al., 2021), AR2+SimANS (Zhou et al., 2022), RocketQAv2 (Ren et al., 2021); 3) dense retrievers finetuned from the enhanced PLMs: Condenser (Gao and Callan, 2021), coCondenser (Gao and Callan, 2022), RetroMAE (Liu and Shao, 2022; Liu et al., 2023), SimLM (Wang et al., 2022b); 4) dense retrievers based on LLMs: GTR-XXL based on T5- 4.8B (Ni et al., 2021), SGPT (Muennighoff, 2022) and OpenAI-Ada-002 (Neelakantan et al., 2022) based on GPT, RepLLaMA (Ma et al., 2023) based on LLaMA-2-7B. RepLLaMA is the closest baseline to our method, which directly fine-tunes the original LLaMA-2-7B backbone without any adaptation. There are two different fine-tuning methods (FT.): one is based on hard-negative sampling (hard): which is simple and low-cost; the other one is based on knowledge distillation (distill), which is accurate but expensive due to its demand of a precise ranker and complicated training process.",
+        "bbox": [
+            110,
+            486,
+            492,
+            922
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "The primary observations are presented as follows. First of all, Llama2Vec achieves a superior retrieval performance in every evaluation scenario. Remarkably, it achieves a MRR@10 of 43.1 and a Recall@1000 of 99.5, which notably improves the performance of the baselines and presents a new state-of-the-art result on the large-scale dev set. Its performance is also highly competitive on DL’19 and DL’20, though it’s slightly lower on DL’19 due to the randomness of the small test set. Besides, it leads to a notably improvement over the closest baseline RepLLaMA (based on the same backbone but without adaptation), which indicates the effect introduced by the adaptation of Llama2Vec. Finally, we can observe the the LLMbased retrievers’ overwhelming advantages in comparison with the previous ones based on smaller PLMs, despite that the they are usually fine-tuned with a relatively simple approach (hard). Compared with the best PLM baseline fine-tuned by hard negatives, RetroMAE+hard and SimLM+hard, the switch to Llama2Vec brings forth almost +4% gains in MRR@10. Such a dramatic improvement validates the LLMs’ huge potential for dense retrieval, and with proper adaptation, such a potential can be exploited more effectively.",
+        "bbox": [
+            507,
+            304,
+            887,
+            724
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Document Retrieval. We report the evaluation results on MS MARCO document retrieval in Table 2. We make comparison with popular document retrieval methods, including BM25 (Lin et al., 2021), ADORE (Zhan et al., 2021), ANCE first-p and max-p (Xiong et al., 2020), PROP (Ma et al., 2021a), B-PROP (Ma et al., 2021b), COIL (Gao et al., 2021), COSTA (Ma et al., 2022), RepLLaMA (Ma et al., 2023), which fall into the same categories as the passage retrievers.",
+        "bbox": [
+            507,
+            725,
+            887,
+            887
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Our observations on document retrieval is very similar with our previous result on passage retrieval.",
+        "bbox": [
+            509,
+            888,
+            887,
+            921
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "3495",
+        "bbox": [
+            480,
+            929,
+            521,
+            942
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "table",
+        "img_path": "images/97e8bb9828245e011c8236a88296432120002e010e821fcf85788ffc4683cce8.jpg",
+        "table_caption": [
+            "Table 3: Zero-shot retrieval on BEIR benchmark. (The performances are measured by NDCG@10)"
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=1>Method</td><td rowspan=1 colspan=1>BM25</td><td rowspan=1 colspan=1>BERT</td><td rowspan=1 colspan=1>GTR-XXL</td><td rowspan=1 colspan=1>CPT-XL</td><td rowspan=1 colspan=1>Ada-2</td><td rowspan=1 colspan=1>SGPT</td><td rowspan=1 colspan=1>RepLLaMA</td><td rowspan=1 colspan=1>Llama2Vec</td></tr><tr><td rowspan=1 colspan=1>Size</td><td rowspan=1 colspan=1>一</td><td rowspan=1 colspan=1>110M</td><td rowspan=1 colspan=1>4.8B</td><td rowspan=1 colspan=1>175B</td><td rowspan=1 colspan=1>一</td><td rowspan=1 colspan=1>5.8B</td><td rowspan=1 colspan=1>7B</td><td rowspan=1 colspan=1>7B</td></tr><tr><td rowspan=1 colspan=1>T-COVID</td><td rowspan=1 colspan=1>59.5</td><td rowspan=1 colspan=1>61.5</td><td rowspan=1 colspan=1>50.1</td><td rowspan=1 colspan=1>64.9</td><td rowspan=1 colspan=1>81.3</td><td rowspan=1 colspan=1>87.3</td><td rowspan=1 colspan=1>84.7</td><td rowspan=1 colspan=1>86.9</td></tr><tr><td rowspan=1 colspan=1>NFCorpus</td><td rowspan=1 colspan=1>32.2</td><td rowspan=1 colspan=1>26.0</td><td rowspan=1 colspan=1>34.2</td><td rowspan=1 colspan=1>40.7</td><td rowspan=1 colspan=1>35.8</td><td rowspan=1 colspan=1>36.2</td><td rowspan=1 colspan=1>37.8</td><td rowspan=1 colspan=1>38.2</td></tr><tr><td rowspan=1 colspan=1>NQ</td><td rowspan=1 colspan=1>30.6</td><td rowspan=1 colspan=1>46.7</td><td rowspan=1 colspan=1>56.8</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>48.2</td><td rowspan=1 colspan=1>52.4</td><td rowspan=1 colspan=1>62.4</td><td rowspan=1 colspan=1>64.6</td></tr><tr><td rowspan=1 colspan=1>HotpotQA</td><td rowspan=1 colspan=1>63.3</td><td rowspan=1 colspan=1>48.8</td><td rowspan=1 colspan=1>59.9</td><td rowspan=1 colspan=1>68.8</td><td rowspan=1 colspan=1>65.4</td><td rowspan=1 colspan=1>59.3</td><td rowspan=1 colspan=1>68.5</td><td rowspan=1 colspan=1>70.1</td></tr><tr><td rowspan=1 colspan=1>FiQA</td><td rowspan=1 colspan=1>23.6</td><td rowspan=1 colspan=1>25.2</td><td rowspan=1 colspan=1>46.7</td><td rowspan=1 colspan=1>51.2</td><td rowspan=1 colspan=1>41.1</td><td rowspan=1 colspan=1>37.2</td><td rowspan=1 colspan=1>45.8</td><td rowspan=1 colspan=1>48.5</td></tr><tr><td rowspan=1 colspan=1>ArguAna</td><td rowspan=1 colspan=1>39.7</td><td rowspan=1 colspan=1>26.5</td><td rowspan=1 colspan=1>54.0</td><td rowspan=1 colspan=1>43.5</td><td rowspan=1 colspan=1>56.7</td><td rowspan=1 colspan=1>51.4</td><td rowspan=1 colspan=1>48.6</td><td rowspan=1 colspan=1>56.5</td></tr><tr><td rowspan=1 colspan=1>Touche</td><td rowspan=1 colspan=1>44.2</td><td rowspan=1 colspan=1>25.9</td><td rowspan=1 colspan=1>25.6</td><td rowspan=1 colspan=1>29.1</td><td rowspan=1 colspan=1>28.0</td><td rowspan=1 colspan=1>25.4</td><td rowspan=1 colspan=1>30.5</td><td rowspan=1 colspan=1>34.2</td></tr><tr><td rowspan=1 colspan=1>Quora</td><td rowspan=1 colspan=1>78.9</td><td rowspan=1 colspan=1>78.7</td><td rowspan=1 colspan=1>89.2</td><td rowspan=1 colspan=1>63.8</td><td rowspan=1 colspan=1>87.6</td><td rowspan=1 colspan=1>84.6</td><td rowspan=1 colspan=1>86.8</td><td rowspan=1 colspan=1>88.3</td></tr><tr><td rowspan=1 colspan=1>DBPedia</td><td rowspan=1 colspan=1>31.8</td><td rowspan=1 colspan=1>31.4</td><td rowspan=1 colspan=1>40.8</td><td rowspan=1 colspan=1>43.2</td><td rowspan=1 colspan=1>40.2</td><td rowspan=1 colspan=1>39.9</td><td rowspan=1 colspan=1>43.7</td><td rowspan=1 colspan=1>45.9</td></tr><tr><td rowspan=1 colspan=1>SCIDOCS</td><td rowspan=1 colspan=1>14.1</td><td rowspan=1 colspan=1>11.3</td><td rowspan=1 colspan=1>16.1</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>18.6</td><td rowspan=1 colspan=1>19.7</td><td rowspan=1 colspan=1>18.1</td><td rowspan=1 colspan=1>18.9</td></tr><tr><td rowspan=1 colspan=1>FEVER</td><td rowspan=1 colspan=1>65.1</td><td rowspan=1 colspan=1>68.2</td><td rowspan=1 colspan=1>74.0</td><td rowspan=1 colspan=1>77.5</td><td rowspan=1 colspan=1>77.3</td><td rowspan=1 colspan=1>78.3</td><td rowspan=1 colspan=1>83.4</td><td rowspan=1 colspan=1>81.3</td></tr><tr><td rowspan=1 colspan=1>C-FEVER</td><td rowspan=1 colspan=1>16.5</td><td rowspan=1 colspan=1>18.7</td><td rowspan=1 colspan=1>26.7</td><td rowspan=1 colspan=1>22.3</td><td rowspan=1 colspan=1>23.7</td><td rowspan=1 colspan=1>30.5</td><td rowspan=1 colspan=1>31.0</td><td rowspan=1 colspan=1>38.2</td></tr><tr><td rowspan=1 colspan=1>SciFact</td><td rowspan=1 colspan=1>67.9</td><td rowspan=1 colspan=1>53.3</td><td rowspan=1 colspan=1>66.2</td><td rowspan=1 colspan=1>75.4</td><td rowspan=1 colspan=1>73.6</td><td rowspan=1 colspan=1>74.7</td><td rowspan=1 colspan=1>75.6</td><td rowspan=1 colspan=1>74.8</td></tr><tr><td rowspan=1 colspan=1>CQA</td><td rowspan=1 colspan=1>32.5</td><td rowspan=1 colspan=1>28.2</td><td rowspan=1 colspan=1>39.9</td><td rowspan=1 colspan=1>-</td><td rowspan=1 colspan=1>41.7</td><td rowspan=1 colspan=1>38.1</td><td rowspan=1 colspan=1>37.4</td><td rowspan=1 colspan=1>43.2</td></tr><tr><td rowspan=1 colspan=1>AVERAGE</td><td rowspan=1 colspan=1>42.9</td><td rowspan=1 colspan=1>39.3</td><td rowspan=1 colspan=1>48.6</td><td rowspan=1 colspan=1>一</td><td rowspan=1 colspan=1>51.4</td><td rowspan=1 colspan=1>52.1</td><td rowspan=1 colspan=1>53.9</td><td rowspan=1 colspan=1>56.4</td></tr></table>",
+        "bbox": [
+            115,
+            82,
+            892,
+            328
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/f8e4caddc040163a357b8dfc7f3de6942803ec5dfa15c91563301f02aef0e750.jpg",
+        "table_caption": [
+            "Table 4: Zero-shot retrieval on Llama Index."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=1>Method</td><td rowspan=1 colspan=1>MRR</td><td rowspan=1 colspan=1>Hit Rate</td></tr><tr><td rowspan=2 colspan=1>bge-m3OpenAI-TE3-S</td><td rowspan=1 colspan=1>69.67</td><td rowspan=1 colspan=1>88.94</td></tr><tr><td rowspan=1 colspan=1>65.69</td><td rowspan=1 colspan=1>89.42</td></tr><tr><td rowspan=1 colspan=1>OpenAI-TE3-L</td><td rowspan=1 colspan=1>67.37</td><td rowspan=1 colspan=1>90.38</td></tr><tr><td rowspan=1 colspan=1>RepLLaMA</td><td rowspan=2 colspan=1>68.4370.56</td><td rowspan=2 colspan=1>91.3592.31</td></tr><tr><td rowspan=1 colspan=1>Llama2Vec</td></tr></table>",
+        "bbox": [
+            132,
+            366,
+            465,
+            455
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "In particular, Llama2Vec achieves a superior empirical performance in every evaluation, where it notably improves the previous BERT-based methods by +5.7% point in MRR@100. Both LLM-based retrievers, RepLLaMA and Llama2Vec, are able to dominate the PLM-based baselines. Besides, Llama2Vec continues to outperform RepLLaMA, with a +2.3% improvement in MRR@100 on the large-scale dev set and consistent advantages on DL’19 and DL’20. The above observations further affirm our previous conclusions about the advantage of LLM backbone and the benefit from Llama2Vec. It’s worth noting that the LLM presents a powerful backbone to support document retrieval, because of not only its high expressiveness but also its long context, which enables the input document to be fully encoded instead of chunked into smaller segments.",
+        "bbox": [
+            110,
+            493,
+            492,
+            783
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4.3 Zero-shot Performance",
+        "text_level": 2,
+        "bbox": [
+            112,
+            800,
+            344,
+            814
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We further investigate Llama2Vec’s impact on the generalization. We leverage the BEIR benchmark and Llama Index for the evaluation of zero-shot performances, where the fine-tuned model from MS MARCO is directly applied to its included datasets (Table 3 and Table 4).",
+        "bbox": [
+            112,
+            824,
+            489,
+            921
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "The major observations about the BEIR evaluation result are presented as follows. First of all, Llama2Vec exhibits a remarkable performance on BEIR, where it achieves a average performance of 56.4. Such a performance is not only much higher than the rest of the baselines, but also establishes a new state-of-the-art result on BEIR (zeroshot). More impressively, it maintains the leading (bold) or the 2nd-place performance in almost every dataset, which indicates its superior versatility across different scenarios. Besides, Llama2Vec substantially outperforms RepLLaMA in most of the scenarios (12/14), which indicates the comprehensive improvement of the retriever’s generalization. It is also worth to emphasize the comparison between BM25 and dense retrievers. When the BEIR benchmark was first launched two years ago, none of the dense retrievers (BERT and many others) were able to outperform BM25 despite their competitive performances in the supervised scenarios. However, the previous situation has been largely overturned with the adoption of LLM-based text encoders, as Llama2Vec outperforms BM25 on 13/14 datasets and goes beyond its average performance by 31% relatively. The dramatic improvement can attribute to three merits of LLMs: 1) the superior expressiveness to model complex semantics, 2) the expanded context to handle long inputs, and 3) the rich knowledge to understand commonsense relationships.",
+        "bbox": [
+            507,
+            368,
+            889,
+            853
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Meanwhile, Llama2Vec exhibits exceptional performance on the Llama Index. Notably, Llama2Vec surpasses bge-m3 (Chen et al., 2024), OpenAI’s text-embedding-3 in both small and large embedding sizes, indicating that Llama2Vec is highly competitive compared to the universal models in the community. When compared to RepLLaMa, which is only fine-tuned on the MS MARCO passage dataset, Llama2Vec also demonstrates stronger generalization abilities, showing better performance in both MRR and Hit Rate.",
+        "bbox": [
+            507,
+            856,
+            887,
+            921
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "3496",
+        "bbox": [
+            480,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/8fdb2fdcc0d10f9efbe640e56e64890c5e6235d963414c407e0a2346e2b6a569.jpg",
+        "table_caption": [
+            "Table 5: Impact of the adaptive usage of prompt (Ada\\*) evaluated on BEIR."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Pro.</td><td>Avg</td><td>AR</td><td>CF</td><td>DB</td><td>FV</td><td>FQ</td><td>HQ</td><td>NF</td><td>NQ</td><td>QR</td><td>SD</td><td>SF</td><td>TO</td><td>TC</td><td>CQ</td></tr><tr><td>N2S</td><td>56.1</td><td>50.5</td><td>27.7</td><td>45.9</td><td>83.5</td><td>48.5</td><td>70.1</td><td>38.2</td><td>64.6</td><td>83.7</td><td>18.9</td><td>76.5</td><td>34.2</td><td>86.9</td><td>41.2</td></tr><tr><td>S2S</td><td>30.2</td><td>56.5</td><td>20.6</td><td>10.4</td><td>33.1</td><td>16.7</td><td>27.4</td><td>18.3</td><td>8.8</td><td>88.0</td><td>7.1</td><td>67.8</td><td>3.1</td><td>34.2</td><td>26.0</td></tr><tr><td>N2N</td><td>52.3</td><td>49.9</td><td>38.2</td><td>40.5</td><td>81.3</td><td>43.8</td><td>65.5</td><td>35.3</td><td>54.9</td><td>88.3</td><td>20.5</td><td>74.8</td><td>22.6</td><td>63.9</td><td>43.2</td></tr><tr><td>None</td><td>47.6</td><td>53.8</td><td>26.7</td><td>40.0</td><td>72.3</td><td>38.9</td><td>63.8</td><td>32.3</td><td>46.1</td><td>88.3</td><td>17.7</td><td>74.3</td><td>15.0</td><td>49.6</td><td>41.1</td></tr><tr><td>Ada*</td><td>57.4</td><td>56.5</td><td>38.2</td><td>45.9</td><td>81.3</td><td>48.5</td><td>70.1</td><td>38.2</td><td>64.6</td><td>88.3</td><td>18.9</td><td>74.8</td><td>34.2</td><td>86.9</td><td>43.2</td></tr></table>",
+        "bbox": [
+            115,
+            82,
+            884,
+            185
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/2aae2ffef8577091c1176bbad644d0f85a54a722e1b8f4dd6dc3aea7ced716cc.jpg",
+        "table_caption": [
+            "Table 6: Impact on lexical similarity."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Top-N</td><td>Initial</td><td>Adapt</td><td>Fine-Tune</td></tr><tr><td>10</td><td>1.85</td><td>2.74</td><td>13.83</td></tr><tr><td>100</td><td>18.01</td><td>47.68</td><td>84.08</td></tr><tr><td>500</td><td>93.68</td><td>205.42</td><td>307.30</td></tr><tr><td>1000</td><td>219.09</td><td>392.80</td><td>542.89</td></tr></table>",
+        "bbox": [
+            127,
+            218,
+            472,
+            305
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            337,
+            489,
+            451
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "4.4 Technical Factors",
+        "text_level": 2,
+        "bbox": [
+            114,
+            461,
+            302,
+            476
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Further study is made for three factors: unsupervised adaptation, prompt scheme, embedding size.",
+        "bbox": [
+            112,
+            482,
+            490,
+            513
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Adaptation. Our previous experiments verify the effectiveness of unsupervised adaptation given its substantial improvement over LLaMA-2-7B. In this place, we focus on exploring the the underlying reason of the empirical advantage. As introduced, the unsupervised adaptation is performed to transform the text embedding such that it can become a global semantic representation and make accurate predictions for the vocabularies within the target context (§3.2). We perform the following experiment on MS MARCO to evaluate the adaptation effect. Firstly, the query and answer embeddings are projected into distributions in the vocabulary space: $\\pmb { d } _ { q } \\in \\mathbb { R } ^ { | V | \\times 1 }  e _ { q } ^ { \\alpha T } \\pmb { W } , \\pmb { d } _ { a } \\in \\mathbb { R } ^ { | V | \\times 1 }  e _ { a } ^ { \\beta ^ { T } } \\pmb { W }$ (W is the decoding head of the LLM). Then, the top-N vocabs are predicted for the query and answer: ${ \\pmb v } _ { q } \\gets t o p \\_ N ( { \\pmb d } _ { q } ) , { \\pmb v } _ { a } \\gets t o p \\_ N ( { \\pmb d } _ { a } )$ . If the transformation works, there will be an increased lexical similarity between query and answer. In this place, we use BM25 to compute the similarity score: $\\mathrm { B M } _ { 2 5 } ( { \\pmb v } _ { q } , { \\pmb v } _ { a } )$ . As shown in Table 6, the adaptation (Adapt) exhibits a much higher vocab similarity over the initial LLaMA-2 backbone (Initial). Interestingly, we also observe that the lexical similarity can be improved by fine-tuning as well.",
+        "bbox": [
+            110,
+            514,
+            490,
+            921
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "table",
+        "img_path": "images/849f63d642a97e0932e8c53f9fe9cee6000fbd8c91080ebe2b5e60c63e6a0b60.jpg",
+        "table_caption": [
+            "Table 7: Impact of embedding dimension."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=1>Dim.</td><td rowspan=1 colspan=1>DimRed</td><td rowspan=1 colspan=1>DimRed*</td><td rowspan=1 colspan=3>Sparse</td></tr><tr><td rowspan=1 colspan=1>768</td><td rowspan=1 colspan=1>41.0</td><td rowspan=1 colspan=1>41.2</td><td rowspan=1 colspan=3>41.5</td></tr><tr><td rowspan=2 colspan=1>1024</td><td rowspan=2 colspan=1>41.0</td><td rowspan=2 colspan=1>41.3</td><td rowspan=2 colspan=2>41</td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1>+1.</td><td></td></tr><tr><td rowspan=1 colspan=1>2048</td><td rowspan=1 colspan=1>41.1</td><td rowspan=1 colspan=1>41.4</td><td rowspan=1 colspan=2>42.</td><td rowspan=2 colspan=1>43.1</td></tr><tr><td rowspan=1 colspan=1>4096</td><td rowspan=1 colspan=1>43.1</td><td rowspan=1 colspan=1>43.1</td><td></td><td></td></tr></table>",
+        "bbox": [
+            522,
+            217,
+            867,
+            305
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "In fact, the improved lexical similarity is beneficial to the performance of dense retrieval, as studied by previous works on query and document expansion (Nogueira et al., 2019; Mao et al., 2020). With the unsupervised adaptation, such a transformation is implicitly accomplished for the text embedding.",
+        "bbox": [
+            507,
+            340,
+            885,
+            436
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Prompt. The well-adapted LLM encoder is able to make adaptive usage of SELF and NEXT prompt to handle different correlation and paraphrasing relationships (Ada\\*). Particularly, NEXT-SELF (N2S) is used for correlation, SELF-SELF (S2S) is used for paraphrased documents, and NEXT-NEXT (N2N) is used for paraphrased short texts. The impact of prompt scheme is analyzed with BEIR, which contains retrieval tasks of diversified semantic relationships: for correlation, we have DBPedia (DB), FIQA (FQ), HotpotQA (HQ), NFCorpus (NF), NQ, SCIDOCS (SD), Touch (TO); for long-paraphrasing, we have Arguana (AR); for short paraphrasing, we have Climate-FEVER (CF), FEVER (FV), Quora (QR), SciFact (SF), CQADup-Stack(CQ). The result is shown in Table 5, where the prompt utilization exerts a major impact. The majority of tasks are about correlation; thus, N2S works the most effectively in those scenarios. In other paraphrasing cases, S2S (e.g., Arguana) and N2N (e.g., Quora) can help to achieve a better result.",
+        "bbox": [
+            507,
+            436,
+            887,
+            791
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Dimension. The LLMs are more expressive than smaller PLMs; however, they also come with higher costs in many perspectives. In this place, we focus on the impact from embedding size, i.e. dimension, which not only affects the computation but also determines the space cost of the vector database. We evaluate alternative dim reduction methods where the embedding size is gradually reduced from 4096 to 768 (Table 7). One is to jointly learn the LLM and a projection head during fine-tuning (DimRed); another one is to fixed the well fine-tuned LLM retriever and learn the projection head via distillation (Liu et al., 2022) (DimRed\\*). Unfortunately, both methods suffer from notably performance loss after dim reduction. We further replace linear projection with sparsification (Formal et al., 2021), where the top-N entries are selected for the embedding (Sparse). Compared with the first two options, sparsification turns out to be more effective in preserving retrieval performance. The above observations also suggest the necessity of light-weight processing of LLM-based retrievers in the future.",
+        "bbox": [
+            507,
+            793,
+            887,
+            921
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "3497",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            85,
+            490,
+            325
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "5 Conclusion",
+        "text_level": 2,
+        "bbox": [
+            114,
+            337,
+            247,
+            353
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "In this paper, we present Llama2Vec to enhance the LLM-based dense retrieval via unsupervised adaptation. Llama2Vec is composed of two pretext tasks, EBAE and EBAR, where the LLM is prompted to reconstruct the input sentence and predict the following sentence purely with its text embeddings. On top of the unsupervised adaptation, the LLM’s text embedding can be transformed into a strong representation of global context. By using suitable prompts, it can flexibly support the semantic matching of different correlation and paraphrasing relationships. The effectiveness of Llama2Vec is verified by comprehensive experiments, where the adapted LLM achieves new state-of-the-art performances in both supervised and zero-shot evaluations, indicating the substantial improvements on both accuracy and generalization capability of the retrieval model.",
+        "bbox": [
+            112,
+            363,
+            490,
+            653
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "6 Limitation",
+        "text_level": 2,
+        "bbox": [
+            114,
+            664,
+            243,
+            680
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "While Llama2Vec has made a substantial progress in adapting the LLM as a strong dense retriever, the current work can still be improved in the following ways. Firstly, the current method is only applied to a 7B model, it remain to explore its impact on larger LLMs. Secondly, the current model is for English centric scenario, it is necessary to make extensions for other languages. Thirdly, it is also important to find effective ways to maintain an efficient running cost for such large-scale embedding models.",
+        "bbox": [
+            110,
+            690,
+            489,
+            852
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "7 Ethical Consideration",
+        "text_level": 2,
+        "bbox": [
+            114,
+            863,
+            339,
+            878
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Llama2Vec is built upon LLaMA-2, it inherits potential biases, toxicity, and other problems present in the underlying LLM. Therefore, we do not recommend utilizing Llama2Vec for retrieval purposes in sensitive contexts. Moreover, the embedding may be influenced by the training data, potentially leading to biased or discriminatory results.",
+        "bbox": [
+            112,
+            888,
+            490,
+            920
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            85,
+            885,
+            166
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "8 Acknowledgements",
+        "text_level": 2,
+        "bbox": [
+            509,
+            179,
+            714,
+            196
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "This work is supported by the National Natural Science Foundation of China (Nos. 62272054, 62192784), Beijing Nova Program (No. 20230484319), Xiaomi Young Talents Program, and National Science and Technology Major Project (2023ZD0121504).",
+        "bbox": [
+            507,
+            205,
+            887,
+            304
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            510,
+            331,
+            610,
+            348
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. 2020. Language models are few-shot learners. Advances in neural information processing systems, 33:1877–1901.",
+            "Jianlv Chen, Shitao Xiao, Peitian Zhang, Kun Luo, Defu Lian, and Zheng Liu. 2024. Bge m3-embedding: Multi-lingual, multi-functionality, multi-granularity text embeddings through self-knowledge distillation.",
+            "Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, et al. 2023. Palm: Scaling language modeling with pathways. Journal ofMachine Learning Research, 24(240):1–113.",
+            "Hyung Won Chung, Le Hou, Shayne Longpre, Barret Zoph, Yi Tay, William Fedus, Yunxuan Li, Xuezhi Wang, Mostafa Dehghani, Siddhartha Brahma, et al. 2022. Scaling instruction-finetuned language models. arXiv preprint arXiv:2210.11416.",
+            "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: pre-training of deep bidirectional transformers for language understanding. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies,, pages 4171–4186. Association for Computational Linguistics.",
+            "Tommaso Dolci, Fabio Azzalini, and Mara Tanelli. 2023. Improving gender-related fairness in sentence encoders: A semantics-based approach. Data Science and Engineering, 8(2):177–195.",
+            "Thibault Formal, Carlos Lassance, Benjamin Piwowarski, and Stephane Clinchant. 2021. Splade´ v2: Sparse lexical and expansion model for information retrieval. arXiv preprint arXiv:2109.10086."
+        ],
+        "bbox": [
+            512,
+            356,
+            882,
+            435
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "3498",
+        "bbox": [
+            480,
+            929,
+            521,
+            942
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Luyu Gao and Jamie Callan. 2021. Condenser: a pre-training architecture for dense retrieval. arXiv preprint arXiv:2104.08253.",
+            "Luyu Gao and Jamie Callan. 2022. Unsupervised corpus aware language model pre-training for dense passage retrieval. In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 2843–2853, Dublin, Ireland.",
+            "Luyu Gao, Zhuyun Dai, and Jamie Callan. 2021. Coil: Revisit exact lexical match in information retrieval with contextualized inverted list. arXiv preprint arXiv:2104.07186.",
+            "Sebastian Hofstatter, Sheng-Chieh Lin, Jheng-Hong¨ Yang, Jimmy Lin, and Allan Hanbury. 2021. Efficiently teaching an effective dense retriever with balanced topic aware sampling. In SIGIR, pages 113– 122.",
+            "Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. 2021. Lora: Low-rank adaptation of large language models. arXiv preprint arXiv:2106.09685.",
+            "Gautier Izacard, Mathilde Caron, Lucas Hosseini, Sebastian Riedel, Piotr Bojanowski, Armand Joulin, and Edouard Grave. 2021. Unsupervised dense information retrieval with contrastive learning. arXiv preprint arXiv:2112.09118.",
+            "Vladimir Karpukhin, Barlas Oguz, Sewon Min, Patrick˘ Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, and Wen-tau Yih. 2020. Dense passage retrieval for open-domain question answering. arXiv preprint arXiv:2004.04906.",
+            "Tom Kwiatkowski, Jennimaria Palomaki, Olivia Redfield, Michael Collins, Ankur Parikh, Chris Alberti, Danielle Epstein, Illia Polosukhin, Jacob Devlin, Kenton Lee, et al. 2019. Natural questions: a benchmark for question answering research. Transactions of the Association for Computational Linguistics, 7:453– 466.",
+            "Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Kuttler, Mike Lewis, Wen-tau Yih, Tim¨ Rocktaschel, et al. 2020. Retrieval-augmented gen-¨ eration for knowledge-intensive nlp tasks. Advances in Neural Information Processing Systems, 33:9459– 9474.",
+            "Jimmy Lin, Xueguang Ma, Sheng-Chieh Lin, Jheng-Hong Yang, Ronak Pradeep, and Rodrigo Nogueira. 2021. Pyserini: A python toolkit for reproducible information retrieval research with sparse and dense representations. In Proceedings of the 44th International ACM SIGIR Conference on Research and Development in Information Retrieval, pages 2356– 2362.",
+            "Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A robustly optimized BERT pretraining approach. CoRR, abs/1907.11692.",
+            "Zheng Liu and Yingxia Shao. 2022. Retromae: Pretraining retrieval-oriented transformers via masked auto-encoder. arXiv preprint arXiv:2205.12035.",
+            "Zheng Liu, Shitao Xiao, Yingxia Shao, and Zhao Cao. 2023. Retromae-2: Duplex masked auto-encoder for pre-training retrieval-oriented language models. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 2635–2648.",
+            "Zhenghao Liu, Han Zhang, Chenyan Xiong, Zhiyuan Liu, Yu Gu, and Xiaohua Li. 2022. Dimension reduction for efficient dense retrieval via conditional autoencoder. arXiv preprint arXiv:2205.03284.",
+            "Xinyu Ma, Jiafeng Guo, Ruqing Zhang, Yixing Fan, and Xueqi Cheng. 2022. Pre-train a discriminative text encoder for dense retrieval via contrastive span prediction. In Proceedings of the 45th International ACM SIGIR Conference on Research and Development in Information Retrieval, pages 848–858.",
+            "Xinyu Ma, Jiafeng Guo, Ruqing Zhang, Yixing Fan, Xiang Ji, and Xueqi Cheng. 2021a. Prop: Pre-training with representative words prediction for ad-hoc retrieval. In Proceedings ofthe 14th ACM international conference on web search and data mining, pages 283–291.",
+            "Xinyu Ma, Jiafeng Guo, Ruqing Zhang, Yixing Fan, Yingyan Li, and Xueqi Cheng. 2021b. B-prop: bootstrapped pre-training with representative words prediction for ad-hoc retrieval. In Proceedings of the 44th International ACM SIGIR Conference on Research and Development in Information Retrieval, pages 1513–1522.",
+            "Xueguang Ma, Liang Wang, Nan Yang, Furu Wei, and Jimmy Lin. 2023. Fine-tuning llama for multi-stage text retrieval. arXiv preprint arXiv:2310.08319.",
+            "Yuning Mao, Pengcheng He, Xiaodong Liu, Yelong Shen, Jianfeng Gao, Jiawei Han, and Weizhu Chen. 2020. Generation-augmented retrieval for open-domain question answering. arXiv preprint arXiv:2009.08553.",
+            "Niklas Muennighoff. 2022. Sgpt: Gpt sentence embeddings for semantic search. arXiv preprint arXiv:2202.08904.",
+            "Arvind Neelakantan, Tao Xu, Raul Puri, Alec Radford, Jesse Michael Han, Jerry Tworek, Qiming Yuan, Nikolas Tezak, Jong Wook Kim, Chris Hallacy, et al. 2022. Text and code embeddings by contrastive pretraining. arXiv preprint arXiv:2201.10005."
+        ],
+        "bbox": [
+            114,
+            85,
+            487,
+            127
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "3499",
+        "bbox": [
+            480,
+            928,
+            521,
+            941
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Tri Nguyen, Mir Rosenberg, Xia Song, Jianfeng Gao, Saurabh Tiwary, Rangan Majumder, and Li Deng. 2016. Ms marco: A human generated machine reading comprehension dataset. choice, 2640:660.",
+            "Jianmo Ni, Chen Qu, Jing Lu, Zhuyun Dai, Gustavo Hernandez´ Abrego, Ji Ma, Vincent Y Zhao,<sup>´</sup> Yi Luan, Keith B Hall, Ming-Wei Chang, et al. 2021. Large dual encoders are generalizable retrievers. arXiv preprint arXiv:2112.07899.",
+            "Rodrigo Nogueira, Jimmy Lin, and AI Epistemic. 2019. From doc2query to doctttttquery. Online preprint, 6:2.",
+            "Yingqi Qu, Yuchen Ding, Jing Liu, Kai Liu, Ruiyang Ren, Wayne Xin Zhao, Daxiang Dong, Hua Wu, and Haifeng Wang. 2020. Rocketqa: An optimized training approach to dense passage retrieval for open-domain question answering. arXiv preprint arXiv:2010.08191.",
+            "Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, and Peter J Liu. 2020. Exploring the limits of transfer learning with a unified text-to-text transformer. The Journal of Machine Learning Research, 21(1):5485–5551.",
+            "Ruiyang Ren, Yingqi Qu, Jing Liu, Wayne Xin Zhao, Qiaoqiao She, Hua Wu, Haifeng Wang, and Ji-Rong Wen. 2021. Rocketqav2: A joint training method for dense passage retrieval and passage re-ranking. arXiv preprint arXiv:2110.07367.",
+            "Nandan Thakur, Nils Reimers, Andreas Ruckl¨ e, Ab-´ hishek Srivastava, and Iryna Gurevych. 2021. Beir: A heterogenous benchmark for zero-shot evaluation of information retrieval models. arXiv preprint arXiv:2104.08663.",
+            "James Thorne, Andreas Vlachos, Christos Christodoulopoulos, and Arpit Mittal. 2018. Fever: a large-scale dataset for fact extraction and verification. arXiv preprint arXiv:1803.05355.",
+            "Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. 2023. Llama 2: Open foundation and fine-tuned chat models, 2023. URL https://arxiv. org/abs/2307.09288.",
+            "Jiachen Wang, Jiajie Xu, Wei Chen, and Lei Zhao. 2022a. When research topic trend prediction meets fact-based annotations. Data Science and Engineering, 7(4):316–327.",
+            "Liang Wang, Nan Yang, Xiaolong Huang, Binxing Jiao, Linjun Yang, Daxin Jiang, Rangan Majumder, and Furu Wei. 2022b. Simlm: Pre-training with representation bottleneck for dense passage retrieval. arXiv preprint arXiv:2207.02578.",
+            "Liang Wang, Nan Yang, Xiaolong Huang, Binxing Jiao, Linjun Yang, Daxin Jiang, Rangan Majumder, and Furu Wei. 2022c. Text embeddings by weaklysupervised contrastive pre-training. arXiv preprint arXiv:2212.03533.",
+            "Jason Wei, Maarten Bosma, Vincent Y Zhao, Kelvin Guu, Adams Wei Yu, Brian Lester, Nan Du, Andrew M Dai, and Quoc V Le. 2021. Finetuned language models are zero-shot learners. arXiv preprint arXiv:2109.01652.",
+            "Shitao Xiao, Zheng Liu, Peitian Zhang, and Niklas Muennighof. 2023. C-pack: Packaged resources to advance general chinese embedding. arXiv preprint arXiv:2309.07597.",
+            "Lee Xiong, Chenyan Xiong, Ye Li, Kwok-Fung Tang, Jialin Liu, Paul Bennett, Junaid Ahmed, and Arnold Overwijk. 2020. Approximate nearest neighbor negative contrastive learning for dense text retrieval. arXiv preprint arXiv:2007.00808.",
+            "Jingtao Zhan, Jiaxin Mao, Yiqun Liu, Jiafeng Guo, Min Zhang, and Shaoping Ma. 2021. Optimizing dense retrieval model training with hard negatives. In SIGIR, pages 1503–1512.",
+            "Xin Zhang, Zehan Li, Yanzhao Zhang, Dingkun Long, Pengjun Xie, Meishan Zhang, and Min Zhang. 2023. Language models are universal embedders. arXiv preprint arXiv:2310.08232.",
+            "Kun Zhou, Yeyun Gong, Xiao Liu, Wayne Xin Zhao, Yelong Shen, Anlei Dong, Jingwen Lu, Rangan Majumder, Ji-Rong Wen, Nan Duan, et al. 2022. Simans: Simple ambiguous negatives sampling for dense text retrieval. arXiv preprint arXiv:2210.11773."
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            140
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "3500",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 10
+    }
+]

@@ -1,0 +1,2668 @@
+[
+    {
+        "type": "text",
+        "text": "Enhancing Large Language Models in Coding Through Multi-Perspective Self-Consistency",
+        "text_level": 1,
+        "bbox": [
+            258,
+            87,
+            739,
+            129
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Baizhou Huang <sup>1,2,</sup>∗ Shuai Lu <sup>3,</sup>† Xiaojun Wan <sup>1,2</sup> Nan Duan <sup>3</sup> Baizhou Huang Shuai Lu Xiaojun Wan Nan Duan",
+        "bbox": [
+            215,
+            141,
+            788,
+            159
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "<sup>1</sup>Wangxuan Institute of Computer Technology, Peking University <sup>2</sup>State Key Laboratory of Media Convergence Production Technology and Systems <sup>3</sup>Microsoft Research Asia",
+        "bbox": [
+            164,
+            152,
+            838,
+            210
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "{hbz19,wanxiaojun}@pku.edu.cn, {shuailu,nanduan}@microsoft.com",
+        "bbox": [
+            191,
+            210,
+            813,
+            227
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract",
+        "text_level": 2,
+        "bbox": [
+            260,
+            252,
+            342,
+            268
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Large language models (LLMs) have exhibited remarkable ability in code generation. However, generating the correct solution in a single attempt still remains a challenge. Prior works utilize verification properties in software engineering to verify and re-rank solutions in a majority voting manner. But the assumption behind them that generated verification properties have better qualities than solutions may not always hold. In this paper, we treat them equally as different perspectives of LLMs’ reasoning processes. We propose the Multi-Perspective Self-Consistency (MPSC) framework incorporating both inter- and intraconsistency across outputs from multiple perspectives. Specifically, we prompt LLMs to generate diverse outputs from three perspectives, Solution, Specification and Test case, constructing a 3-partite graph. With two measure functions of consistency, we embed both inter- and intra-consistency information into the graph. The optimal choice of solutions is then determined based on analysis in the graph. MPSC significantly boosts performance of foundation models (ChatGPT in this paper) on various benchmarks, including HumanEval (+15.91%), MBPP (+6.43%) and CodeContests (+9.37%), even surpassing GPT-4.<sup>1</sup>",
+        "bbox": [
+            141,
+            279,
+            462,
+            680
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction",
+        "text_level": 2,
+        "bbox": [
+            114,
+            690,
+            260,
+            707
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "In recent years, pre-trained large language models (LLMs) have demonstrated unprecedented proficiency in understanding, generating, and reasoning with human language (Brown et al., 2020; Chowdhery et al., 2022; OpenAI, 2023; Touvron et al., 2023). Among the diverse applications of LLMs, code generation stands out as pivotal task and has been acknowledged as a fundamental task for benchmarking (Liang et al., 2023). This task entails models to generate source codes from provided natural language intents. Many foundation models have exhibited remarkable zero-shot performance in code generation, such as ChatGPT and GPT4 (OpenAI, 2023), with successful deployments in real-world applications like Github Copilot.",
+        "bbox": [
+            112,
+            717,
+            490,
+            862
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "chart",
+        "img_path": "images/18c2461093b1ffbeac126b9b3a36d6a2723684c7e585e44b82eba0115fae53ce.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 1: Pass@1 of MPSC. With ChatGPT as the foundation model, MPSC even surpasses GPT-4 and achieves SOTA performance on all four benchmarks."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            527,
+            250,
+            867,
+            394
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            480,
+            885,
+            577
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Despite the remarkable abilities, LLMs often struggle to generate the correct code in a single attempt. Therefore, previous works sample diverse codes from LLMs and re-rank them by introducing verification properties from software engineering. For example, CodeT (Chen et al., 2022) generates test cases as a verification property, while ALGO (Zhang et al., 2023) generates oracles, the brute-force version of desired algorithms, as a verification property. These methods are essentially variants of majority voting, making the assumption that the correctness of experts (i.e. the verification properties) is better than that of choices (i.e. the desired code outputs). However, both verification properties and desired code outputs are usually generated by the identical model with respect to the same question, and hence the preference over verification properties is not always correct.",
+        "bbox": [
+            507,
+            579,
+            887,
+            870
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Instead, we believe that both desired code outputs and verification properties should be treated equally, since they are different perspectives of",
+        "bbox": [
+            509,
+            872,
+            887,
+            921
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "∗Work done during internship at Microsoft.",
+        "bbox": [
+            141,
+            868,
+            410,
+            881
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "†Corresponding author.",
+        "bbox": [
+            139,
+            881,
+            290,
+            895
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>1</sup> The code is available at https://github.com/skpig/ MPSC.",
+        "bbox": [
+            112,
+            894,
+            489,
+            920
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "1429",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Proceedings ofthe 62nd Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 1429–1450 August 11-16, 2024 ©2024 Association for Computational Linguistics",
+        "bbox": [
+            89,
+            945,
+            909,
+            973
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "LLM’s deliberate thinking process in face of identical questions. Aggregating various outputs from different perspectives can lead to a more credible result. To achieve this, we propose the Multi-Perspective Self-Consistency (MPSC) framework that incorporates both inter-consistency across multiple perspectives and intra-consistency within a single perspective. In this way, MPSC can fully leverage the consistency information within LLMs and select the model output with the most consistent functionality as the final answer.",
+        "bbox": [
+            112,
+            84,
+            490,
+            263
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "In our framework, various verification techniques from software engineering can be included as extended perspectives for better reasoning. Specifically, we prompt the LLM to simultaneously generate diverse outputs from three wellestablished perspectives in software engineering, namely Solution, Specification and Test case (Abrahamsson et al., 2017). Solutions implement the desired functionality, specifications demonstrate the intended properties in formal language, while test cases outline the expected behavior for some specific inputs. Then, we treat these model outputs as vertices in a graph, and establish connections (i.e. edges) based on the pairwise agreement of vertices from different perspectives. Our goal is to identify the most reliable output using a score function, which evaluates all vertices by considering both intra- and inter-consistency information encoded in the graph. Specifically, the intra-consistency information guides the function to favor the most internally consistent output within a single perspective, while inter-consistency ensures that the scores for two outputs from different perspectives are similar if they reach a consensus. We formalize the learning process of the score function as an optimization problem adhering to these two consistency criteria and leverage an iterative algorithm proposed by Zhou et al. (2003b) to achieve this goal.",
+        "bbox": [
+            110,
+            285,
+            492,
+            738
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "We evaluate MPSC on four widely used code generation benchmarks, including HumanEval (Chen et al., 2021), HumanEval+ (Liu et al., 2023), MBPP (Austin et al., 2021) and CodeContests (Li et al., 2022). Experimental results show that our method boosts the performance of ChatGPT by a large margin, 15.91% in HumanEval, 15.64% in HumanEval+, 6.43% in MBPP and 9.37% in Code-Contests. Our framework even surpasses GPT-4 (OpenAI, 2023) as shown in Figure 1.",
+        "bbox": [
+            112,
+            759,
+            490,
+            921
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2 Multi-Perspective Self-Consistency",
+        "text_level": 2,
+        "bbox": [
+            509,
+            83,
+            845,
+            101
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "A single perspective can often lead to an incomplete understanding of a problem, akin to the parable of “blind men describing an elephant\". The reasoning process of LLMs follows a similar pattern. LLMs generally cannot guarantee the correctness of generated output in a single attempt, especially in code generation, which necessitates proficient natural language understanding, deliberate reasoning and rigorous controllability.",
+        "bbox": [
+            507,
+            112,
+            885,
+            258
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "However, a key aspect of human intelligence is the ability to think from multiple perspectives, resulting in a more comprehensive understanding of situations and more accurate solutions to problems. Inspired by the human cognition process, we propose a novel code generation method by reasoning from three well-established perspectives, solutions, specifications and test cases. Although noisy outputs may inevitably be included in the generated outputs of every perspective, we can leverage both intra-consistency and inter-consistency among the diverse outputs to distinguish the best ones from the noise. An overview of our proposed MPSC method is illustrated in Figure 2.",
+        "bbox": [
+            507,
+            259,
+            887,
+            486
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2.1 Solution, Specification and Test Case",
+        "text_level": 2,
+        "bbox": [
+            509,
+            494,
+            845,
+            510
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Given a user intent in natural language, we introduce solution, specification and test case as three perspectives to describe the desired functionality. A solution is the source code implementing the functionality denoted as $g : \\mathbb { X } \\to \\mathbb { Y } .$ , which is also the target of code generation. A test case is a pair of valid input and output satisfying the required functionality denoted as $( x , y ) \\in \\mathbb { X } \\times \\mathbb { Y }$ Specification draws inspiration from Formal Verification in software engineering, which mathematically proves the correctness of one program by ensuring its satisfaction of some certain formal specifications. In the context of software engineering, formal verification is usually written in formal programming languages, e.g. Coq (Team, 2023) and Dafny (Leino, 2010), and conducted by accompanying verification tools. For the generalization of the proposed method in different program language scenarios, we adopt the idea of formal verification and limit the specifications within pre-conditions and post-conditions, which can be written as functions in the same programming language like solutions, without struggling with formal languages. Specifically, a pre-condition constrains the requirements that a valid input should satisfy, while a post-condition constrains the relationships that a pair of valid inputs and outputs should satisfy. We denote them as $h ^ { p r e } : \\mathbb { X }  \\{ F a l s e , T r u e \\}$ and $h ^ { p o s t } : \\mathbb { X } \\times \\mathbb { Y }  \\{ F a l s e , T r u e \\}$ . Detailed examples of outputs are shown in Figure 2.",
+        "bbox": [
+            507,
+            518,
+            889,
+            921
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "1430",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/99f0a78c2237d45040c5f29532e71bd20ba41c64b03715a3e5a3677da6a5196e.jpg",
+        "image_caption": [
+            "Figure 2: Overview of our MPSC code generation method. (a) Stage 1: we require a LLM to generate diverse solutions, specifications and test cases. A detailed example of the three perspectives of function median(l) from HumanEval is presented. (b) Stage 2: we construct a 3-partite graph based on the generated outputs and then calculate both inter- and intra-consistency measures over edges and vertices respectively. The magnitudes of measurements are demonstrated by the shade of colors. (c) Stage 3: Incorporating the multi-perspective consistency information, we then learn a score function to re-rank outputs within each perspective."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            122,
+            91,
+            860,
+            385
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            514,
+            489,
+            596
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2.2 Graph Construction",
+        "text_level": 2,
+        "bbox": [
+            114,
+            618,
+            322,
+            633
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "We require LLMs to generate diverse outputs from all three perspectives. We employ an 3-partite graph representation to capture the relationships among these generated outputs. Specifically, we represent the generated solutions $\\left\\{ g _ { 1 } , g _ { 2 } , . . . , g _ { I } \\right\\}$ with a vertex set $V ^ { f u n c }$ , the specification set $\\{ ( h _ { 1 } ^ { p r e } , h _ { 1 } ^ { p o s t } ) , . . . , ( h _ { J } ^ { p r e } , h _ { J } ^ { p o s t } ) \\}$ with $V ^ { s p e c }$ , the test case set $\\left\\{ ( x _ { 1 } , y _ { 1 } ) , . . . , ( x _ { K } , y _ { K } ) \\right\\}$ with $V ^ { t e s t } ,$ and hence construct a vertex set $V ~ = ~ V ^ { f u n c } \\cup$ $V ^ { s p e c } \\cup V ^ { t e s t }$ . With edges connecting each pair of vertices from two distinct sets, we construct an undirected 3-partite graph $\\mathcal { G } = ( V , E )$ . Our goal is to leverage the graph to encode the multiperspective consistency information, and then learn a score function $f ~ : ~ { \\cal V } ~  ~ \\mathbb R$ (also a vector f, $f _ { i } = f ( v _ { i } ) )$ from it to choose the most reliable output among all.",
+        "bbox": [
+            112,
+            646,
+            489,
+            921
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2.3 Inter-Consistency between Different Perspectives",
+        "text_level": 2,
+        "bbox": [
+            509,
+            514,
+            842,
+            546
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "We distinguish between two kinds of consistency based on the perspectives involved. Intraconsistency is defined as the degree to which a given output aligns with others within the same perspective, following the original definition in Wang et al. (2022). Conversely, inter-consistency is defined as the degree of consensus between a pair of outputs from two different perspectives.",
+        "bbox": [
+            507,
+            555,
+            887,
+            684
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "With the well-established definitions of these three perspectives in software engineering, each output implicitly describes a latent functionality regardless of whether it is a solution, a specification or a test case. Consequently, we define the inter-consistency between two vertices from different perspectives as the alignment of their latent functionalities. And the most appealing aspect is that we can quantify the alignments with a code interpreter in a deterministic manner<sup>2</sup>. We formalize the inter-consistency as a measure function $\\omega ( \\cdot , \\cdot ) : V \\times V \\to \\mathbb { R }$ (also the adjacency matrix",
+        "bbox": [
+            507,
+            686,
+            887,
+            879
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>2</sup>We provide the Python code snippets implementing the verification in Appendix B.",
+        "bbox": [
+            509,
+            892,
+            884,
+            920
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "1431",
+        "bbox": [
+            480,
+            928,
+            519,
+            942
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "W, where $W _ { i , j } = \\omega ( v _ { i } , v _ { j } ) )$ to weight different edges in different ways as shown in Table 1.",
+        "bbox": [
+            112,
+            83,
+            487,
+            117
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "table",
+        "img_path": "images/abf074877b1aab4892daf9e4ecdb00dc5c44f39051d05888dce7aa8c8bf29442.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Vertex Types</td><td>Expression of ω(vi, vj)</td></tr><tr><td> $v _ { i } \\in V ^ { f u n c } , v _ { j } \\in V ^ { s p e c }$ </td><td> $\\mathbb { E } _ { x \\in \\mathbb { X } } [ \\mathbf { 1 } _ { h _ { j } ^ { p r e } ( x )  h _ { j } ^ { p o s t } ( x , g _ { i } ( x ) ) } ]$ </td></tr><tr><td> $v _ { i } \\in V ^ { f u n c } , v _ { j } \\in V ^ { t e s t }$ </td><td> ${ \\mathbf { 1 } } _ { g _ { i } ( x _ { j } ) = y _ { j } }$ </td></tr><tr><td> $v _ { i } \\in V ^ { s p e c } , v _ { j } \\in V ^ { t e s t }$ </td><td> ${ \\mathbf { 1 } } _ { h _ { i } ^ { p r e } ( x _ { j } ) \\wedge h _ { i } ^ { p o s t } ( x _ { j } , y _ { j } ) }$ </td></tr><tr><td>otherwise</td><td>0</td></tr></table>",
+        "bbox": [
+            127,
+            129,
+            473,
+            214
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Table 1: Mathematical expressions of different interconsistency measures $\\omega ( \\cdot , \\cdot )$",
+        "bbox": [
+            112,
+            229,
+            489,
+            259
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We then derive an optimization objective based on inter-consistency measurements,",
+        "bbox": [
+            112,
+            258,
+            487,
+            290
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/3c15a376cff1eec10b82a3fb8f6dec1e33895ff003ba40680e6e4e72fa9d9f0a.jpg",
+        "text": "$$\n\\mathcal { L } _ { i n t e r } = \\sum _ { ( v _ { i } , v _ { j } ) \\in E } W _ { i , j } ( f ( v _ { i } ) - f ( v _ { j } ) ) ^ { 2 } = f ^ { T } L f\\tag{1}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            129,
+            300,
+            457,
+            332
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": ", where $\\pmb { L } = \\pmb { D } - \\pmb { W }$ is the laplacian matrix of the graph $\\mathcal { G } ^ { 3 }$ . The loss function is the weighted sum of the local variation of each edge on the graph. An underlying assumption is that a pair of outputs exhibiting consistency are either both correct or both incorrect. Therefore, the difference between scores of two connected vertices should be constrained by the penalty corresponding to the degree of consistency, i.e. edge weight.",
+        "bbox": [
+            110,
+            343,
+            490,
+            489
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "2.4 Intra-Consistency within the Same Perspective",
+        "text_level": 2,
+        "bbox": [
+            112,
+            500,
+            435,
+            532
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Following Wang et al. (2022), we define the intraconsistency of one generated output as its similarity to others within the same perspective, which is denoted as a function $\\varphi ( \\cdot ) : V \\to$ R (also a vector ${ \\mathbf { \\mathit { y } } } , y _ { i } = \\varphi ( v _ { i } ) )$",
+        "bbox": [
+            112,
+            537,
+            489,
+            618
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Wang et al. (2022) limits the consistency to mere equalities in final answers, thereby lacking efficacy when applied to open-form tasks. In the scenario of code generation, we extend the scope of intraconsistency to lexical and semantic similarities.",
+        "bbox": [
+            110,
+            618,
+            489,
+            700
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Lexical intra-consistency by Bayes risk. Minimum Bayes risk decoding (Kumar and Byrne, 2004) selects the hypothesis h H that minimizes the expected loss $R ( \\mathbf { h } ) = \\mathbb { E } _ { \\mathbf { y } \\sim P ( \\mathbf { y } ) } [ L ( \\mathbf { y } , \\mathbf { h } ) ]$ over the distribution of label y. Because of the unavailability of $P ( \\mathbf { y } ) , P ( \\mathbf { h } )$ is usually used as a proxy distribution in practice. Then the Bayes risk can be rewritten as $\\begin{array} { r } { R \\mathrm { ( h ) } = \\sum _ { \\mathrm { h ^ { \\prime } \\in \\mathbb { H } } } L \\mathrm { ( h ^ { \\prime } , h ) } \\cdot P \\mathrm { ( h ^ { \\prime } ) } } \\end{array}$ , which is in fact measure the consistency of h over the hypothesis space. Specifically, we utilize negative",
+        "bbox": [
+            110,
+            708,
+            490,
+            871
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "BLEU metrics (Papineni et al., 2002) as the loss function L aiming at lexical similarity and assume the hypothesis distribution is uniform, i.e.",
+        "bbox": [
+            507,
+            84,
+            884,
+            134
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/d9a8fdf961ba792dbae53ac40f1aa54ab3871c677dcec12eaf0cd1fb38536780.jpg",
+        "text": "$$\n\\varphi ( v _ { i } ) = C \\cdot \\sum _ { v _ { j } \\in K ( v _ { i } ) } { \\mathrm { B L E U } } ( v _ { i } , v _ { j } )\n$$",
+        "text_format": "latex",
+        "bbox": [
+            568,
+            145,
+            823,
+            180
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": ", where C is the normalizing constant so that measures of outputs in one perspective sum up to 1, $K ( v _ { i } )$ represents the other outputs within the same perspective as $v _ { i }$",
+        "bbox": [
+            507,
+            191,
+            887,
+            256
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Semantic intra-consistency by structural equivalence. In the realm of graph theory, two vertices are deemed structurally equivalent if they share identical weighted connections with the same thirdparty vertices. Utilizing this equivalence relation, we delineate $V ^ { f u n c } , \\bar { V } ^ { s p e c }$ , and $V ^ { t e s t }$ into their respective structural equivalence classes. Noted that the weights assigned to edges reflect the alignments of latent functionalities associated with the vertices, and hence outputs within each equivalence class can be regarded as exhibiting consistent functional behavior. Therefore, we define the intraconsistency measure based on the structural equivalence classes within each perspective. Suppose $v _ { i }$ belongs to the solution set $\\bar { V } ^ { f u n c }$ . The structural equivalence class of $v _ { i }$ is denoted as $S ( v _ { i } ) \\subset$ $V ^ { f u n c }$ , and neighbor sets of v<sub>i</sub> can be partitioned into two subsets $\\{ N _ { t } ( v _ { i } ) | t \\ \\in \\ \\{ s p e c , t e s t \\} \\}$ depending on the perspective they belong to. Overall, the lexical intra-consistency measure is defined as the multiplication of these three sets, i.e.",
+        "bbox": [
+            505,
+            265,
+            889,
+            604
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/c7ceaf1ff6c67986844610f2ea8f391cda67c28e932ee4f9f8fb79f5a24d7a58.jpg",
+        "text": "$$\n\\varphi ( v _ { i } ) = C \\cdot | S ( v _ { i } ) | \\cdot \\prod _ { t } | N _ { t } ( v _ { i } ) |\n$$",
+        "text_format": "latex",
+        "bbox": [
+            569,
+            614,
+            821,
+            645
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": ", where $C$ is the normalizing constant. The notation is similar when $v _ { i }$ belongs to other perspectives.",
+        "bbox": [
+            507,
+            652,
+            884,
+            684
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Intra-consistency is in fact an estimate of the LLM’s uncertainty (Kuhn et al., 2023; Xiong et al., 2023b) and reflects the confidence of the model on one specific output. Therefore, we can utilize the intra-consistency information as a supervision signal by ensuring the closeness between the score function $f$ and the intra-consistency measure $\\varphi$ with Mean Squared Error (MSE),",
+        "bbox": [
+            505,
+            686,
+            885,
+            814
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "img_path": "images/80ad1fe9d30424ed189a91bb786f304f7eb5263c414d82fa62699ac169e0fb94.jpg",
+        "text": "$$\n\\mathcal { L } _ { i n t r a } = \\frac { 1 } { 2 } \\sum _ { v _ { i } \\in V } | f ( v _ { i } ) - \\varphi ( v _ { i } ) | ^ { 2 } = \\frac { 1 } { 2 } | | f - y | | ^ { 2 }\\tag{2}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            529,
+            824,
+            847,
+            856
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "2.5 Optimization Formulation",
+        "text_level": 2,
+        "bbox": [
+            509,
+            866,
+            764,
+            883
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "After all, following the criteria of inter- and intraconsistency, we can then formulate the learning",
+        "bbox": [
+            507,
+            888,
+            887,
+            921
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>3</sup>In our experiment, we use the symmetric normalized Laplacian L<sup>sym</sup> = D− <sup>1</sup>2 LD− <sup>1</sup>2 for more robust performance.",
+        "bbox": [
+            110,
+            878,
+            489,
+            920
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "page_number",
+        "text": "1432",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "process of $f$ as an optimization problem that combines both $\\mathcal { L } _ { i n t e r } \\left( \\mathrm { E q . \\ 1 } \\right)$ and $\\mathcal { L } _ { i n t r a }$ (Eq. 2):",
+        "bbox": [
+            112,
+            84,
+            489,
+            117
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "img_path": "images/d2943c45004524b76e296a2035d75038af6cca2a38a9e7c30ccfa398bcba20f6.jpg",
+        "text": "$$\n\\operatorname* { m i n } _ { f : V \\to \\mathbb { R } } \\{ \\alpha \\cdot \\mathcal { L } _ { i n t e r } + ( 1 - \\alpha ) \\cdot \\mathcal { L } _ { i n t r a } \\}\\tag{3}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            178,
+            127,
+            423,
+            147
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "To solve this optimization problem on the graph, we adopt the iterative algorithm proposed by Zhou et al. (2003b). The details of the algorithm can be found in Appendix A.",
+        "bbox": [
+            112,
+            159,
+            489,
+            224
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "3 Experiment",
+        "text_level": 2,
+        "bbox": [
+            114,
+            235,
+            253,
+            252
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "3.1 Experiment Settings",
+        "text_level": 2,
+        "bbox": [
+            114,
+            261,
+            322,
+            278
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Dataset and metrics. We conduct experiments on four widely used Python code generation benchmarks, including HumanEval, HumanEval+, MBPP and CodeContests. HumanEval (Chen et al., 2021) and MBPP (Austin et al., 2021) are two hand-written Python programming problems. HumanEval+ (Liu et al., 2023) adds more unit tests based on HumanEval. CodeContests (Li et al., 2022) is a much more challenging dataset consisting of competition problems from the Codeforces platform. The evaluation metric is Pass@k (Chen et al., 2021), which is an unbiased estimator of the probability that at least one out of the k solutions generated by the model passes unit tests. Details about the metric can be found in Appendix C.",
+        "bbox": [
+            110,
+            282,
+            490,
+            525
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Implementation and baselines. We compare several baselines from different LLMs for code like ChatGPT<sup>4</sup> (i.e. GPT-3.5-Turbo), GPT-4 (OpenAI, 2023), Code Llama (Rozière et al., 2024), WizardCoder (Luo et al., 2023) and Deepseek Coder (Guo et al., 2024), to other post-hoc approaches enhancing LLMs during inference, including Selfconsistency (Wang et al., 2022), MBR-EXEC (Shi et al., 2022), CodeT (Chen et al., 2022) and Selfcollaboration (Dong et al., 2023). For both MPSC and other post-hoc augmentation approaches, we employ GPT-3.5-Turbo as the foundation model to generate 200 solutions. MPSC additionally generates 50 specifications and 100 test cases for each problem. Following the original setting in Chen et al. (2022), we additionally generate 500 test cases for other baselines.",
+        "bbox": [
+            110,
+            532,
+            490,
+            808
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Variants of MPSC. As shown in Eq.2, the intraconsistency measure $\\varphi ( \\cdot )$ is essentially used as a supervision signal without leveraging the semantics of “consistency\". Therefore, we include two variants in our experiments: (1) MPSC-Uniform is the baseline without any prior intra-consistency information and treats every vertex equally, i.e. $\\varphi ( v _ { i } ) = C$ . (2) MPSC-Label includes the public example test cases in docstrings as silver labels, i.e. $\\varphi ( v _ { i } ) = C \\cdot 1 _ { v _ { i } { \\mathrm { i s } } \\mathrm { l a b e l } } ^ { } ^ { 5 }$ . Further details regarding the implementation of our method and baselines are provided in Appendix E.",
+        "bbox": [
+            112,
+            815,
+            490,
+            898
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            84,
+            887,
+            198
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "3.2 Main Results",
+        "text_level": 2,
+        "bbox": [
+            509,
+            212,
+            662,
+            228
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "The experimental results on the four benchmarks are presented in Table 2. We observe that MPSC consistently enhances the code generation capabilities of the foundation model (i.e. GPT-3.5- Turbo) across all benchmarks with a remarkable margin of improvement. Particularly, when k is set to 1, which is the most prevalent scenario in real-world applications, the performance improvement is notably significant (+15.91% on HumanEval, +15.64% on HumanEval+, +6.43% on MBPP and +9.37% on CodeContests). With the foundation model GPT-3.5-Turbo, our MPSC can even outperform GPT-4 in Pass@1 across all bench marks. Compared to other post-hoc augmentation approaches, even though they utilize more test cases, our MPSC still shows consistent advantages in all benchmarks, excluding the Pass@5 score in MBPP benchmark. MPSC-Uniform serves as the bottom line of MPSC framework and still achieves great gains for the foundation model, which demonstrates that relying on inter-consistency proves to be entirely effective. Moreover, incorporating various types of intra-consistency information leads to further improvements. Specifically, MPSC-Label and MPSC-Semantic exhibit particularly strong results. They are two representative approaches leveraging the external supervision signals or the internal consistency information respectively. Surprisingly, MPSC-Semantic can match or even surpass MPSC Label in some benchmarks, which further highlights the significance of consistency information in LLMs. Besides, we also note that the perfor mance of MPSC-Semantic and MPSC-Lexical remains largely unchanged as k increases. This phe nomenon aligns with the nature of MPSC, which assesses solutions based on their consistency within the foundation model. It implies that top-ranked solutions exhibit semantic similarity and are consistently either correct or incorrect. This reaffirms the capability of our proposed MPSC to effectively aggregate consistency information within LLMs, thereby selecting the most consistent answers. We have a more detailed discussion about this phenomenon in Appendix C.",
+        "bbox": [
+            505,
+            236,
+            889,
+            882
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>4</sup>https://chat.openai.com/",
+        "bbox": [
+            136,
+            906,
+            294,
+            920
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>5</sup>The number of example test cases is two in average. Noted that MBPP doesn’t provide test cases in docstrings.",
+        "bbox": [
+            509,
+            892,
+            885,
+            920
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "footer",
+        "text": "1433",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 4
+    },
+    {
+        "type": "table",
+        "img_path": "images/dbb8dab807e92af0b141d3498732ddcaebf1b6e47d6c6d4f1c295ae5bf263e79.jpg",
+        "table_caption": [
+            "Table 2: The results on four code generation benchmarks. The foundation model for MPSC, Self-consistency, MBR-EXEC, CodeT, Self-collaboration are all GPT-3.5-Turbo. The improvements are calculated between methods and GPT-3.5-Turbo. The best and second best performance for each dataset are shown in bold and underline."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Benchmark</td><td colspan=\"3\">HumanEval</td><td colspan=\"3\">HumanEval+</td></tr><tr><td>Metric</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td></tr><tr><td>GPT4</td><td>81.48</td><td>86.31</td><td>90.46</td><td>70.52</td><td>75.48</td><td>79.54</td></tr><tr><td>GPT-3.5-Turbo</td><td>68.38</td><td>76.24</td><td>83.15</td><td>58.75</td><td>66.58</td><td>73.96</td></tr><tr><td>DeepSeekCoder</td><td>79.30</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>WizardCoder</td><td>73.20</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>Code Llama</td><td>62.20</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>Self-consistency</td><td> $7 3 . 8 6 _ { + 5 . 4 8 }$ </td><td> $7 3 . 9 3 _ { - 2 . 3 1 }$ </td><td> $7 4 . 1 0 _ { - 9 . 0 5 }$ </td><td> $6 3 . 5 0 _ { + 4 . 7 5 }$ </td><td> $6 4 . 7 0 _ { - 1 . 8 8 }$ </td><td> $6 5 . 6 7 _ { - 8 . 2 9 }$ </td></tr><tr><td>MBR-EXEC</td><td> $7 2 . 9 6 _ { + 4 . 5 8 }$ </td><td> $7 6 . 4 7 _ { + 0 . 2 3 }$ </td><td> $7 9 . 0 0 _ { - 4 . 1 5 }$ </td><td> $6 2 . 1 2 _ { + 3 . 3 7 }$ </td><td> $6 7 . 0 8 _ { + 0 . 5 0 }$ </td><td> $7 1 . 3 8 . 2 . 5 8 $ </td></tr><tr><td>CodeT</td><td> $7 8 . 0 5 _ { + 9 . 6 7 }$ </td><td> $7 8 . 0 5 _ { + 1 . 8 1 }$ </td><td> $7 8 . 3 0 _ { - 4 . 8 5 }$ </td><td> $6 7 . 8 7 _ { + 9 . 1 2 }$ </td><td> $6 8 . 7 5 _ { + 2 . 1 7 }$ </td><td> $6 9 . 6 5 _ { - 4 . 3 1 }$ </td></tr><tr><td>Self-collaboration</td><td> $7 4 . 4 0 _ { + 6 . 0 2 }$ </td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>MPSC-Uniform</td><td> $7 4 . 1 7 _ { + 5 . 7 9 }$ </td><td> $7 7 . 0 2 _ { + 0 . 7 8 }$ </td><td> $7 8 . 5 3 _ { - 4 . 6 2 }$ </td><td> $6 5 . 0 5 _ { + 6 . 3 0 }$ </td><td> $6 9 . 7 6 _ { + 3 . 1 8 }$ </td><td> $7 1 . 7 2 . 2 . 2 4 $ </td></tr><tr><td>MPSC-Lexical</td><td> $8 2 . 3 2 _ { + 1 3 . 9 4 }$ </td><td> $8 4 . 7 6 _ { + 8 . 5 2 }$ </td><td> $8 6 . 4 8 _ { + 3 . 3 3 }$ </td><td> $7 4 . 3 9 _ { + 1 5 . 6 4 }$ </td><td> $7 5 . 0 0 _ { + 8 . 4 2 }$ </td><td> $7 7 . 2 4 _ { + 3 . 2 8 }$ </td></tr><tr><td>MPSC-Semantic</td><td> $8 3 . 3 8 _ { + 1 5 . 0 0 }$ </td><td> $8 4 . 2 5 _ { + 8 . 0 1 }$ </td><td> $8 4 . 4 5 _ { + 1 . 3 0 }$ </td><td> $2 3 . 5 4 _ { + 1 4 . 7 9 }$ </td><td> $7 4 . 4 6 _ { + 7 . 8 8 }$ </td><td> $7 5 . 2 6 _ { + 1 . 3 0 }$ </td></tr><tr><td>MPSC-Label</td><td> $\\overline { { 8 4 . 2 9 _ { + 1 5 . 9 1 } } }$ </td><td> $\\mathbf { 8 6 . 7 9 _ { + 1 0 . 5 5 } }$ </td><td> $\\underline { { 8 7 . 1 3 _ { + 3 . 9 8 } } }$ </td><td> $7 3 . 4 7 _ { + 1 4 . 7 2 }$ </td><td> $\\mathbf { 7 6 . 6 6 _ { + 1 0 . 0 8 } }$ </td><td> $7 7 . 2 5 _ { + 3 . 2 9 }$ </td></tr><tr><td>Benchmark</td><td colspan=\"3\">MBPP</td><td colspan=\"3\">CodeContests</td></tr><tr><td>Metric</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td></tr><tr><td>GPT-4</td><td>71.26</td><td>74.27</td><td>76.99</td><td>6.1</td><td>8.28</td><td>11.72</td></tr><tr><td>GPT-3.5-Turbo</td><td>66.80</td><td>72.34</td><td>76.60</td><td>2.57</td><td>4.22</td><td>7.16</td></tr><tr><td>DeepseekCoder</td><td>70.00</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>WizardCoder</td><td>61.20</td><td></td><td></td><td>2.15</td><td>3.40</td><td>5.37</td></tr><tr><td>Code Llama</td><td>61.20</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>Self-consistency</td><td> $7 1 . 7 0 _ { + 4 . 9 0 }$ </td><td> $7 1 . 7 3 . 0 . 6 1$ </td><td> $7 1 . 8 2 _ { - 4 . 7 8 }$ </td><td> $8 . 1 0 _ { + 5 . 5 3 }$ </td><td> $8 . 4 2 _ { + 4 . 2 0 }$ </td><td> $8 . 4 8 _ { + 1 . 3 2 }$ </td></tr><tr><td>MBR-EXEC</td><td> $7 0 . 7 9 _ { + 3 . 9 9 }$ </td><td> $7 3 . 1 4 _ { + 0 . 8 0 }$ </td><td> $7 4 . 8 5 _ { - 1 . 7 5 }$ </td><td> $8 . 2 5 _ { + 5 . 6 8 }$ </td><td> $8 . 8 7 _ { + 4 . 6 5 }$ </td><td> $9 . 0 8 _ { + 1 . 9 2 }$ </td></tr><tr><td>CodeT</td><td> $7 1 . 9 0 _ { + 5 . 1 0 }$ </td><td> $7 1 . 9 5 . 0 . 3 9 $ </td><td> $7 2 . 0 2 . 4 . 5 8 $ </td><td> $9 . 9 2 _ { + 7 . 3 5 }$ </td><td> $1 0 . 1 8 _ { + 5 . 9 6 }$ </td><td> $\\underline { { 1 0 . 3 0 . } } 3 . 1 4$ </td></tr><tr><td>Self-collaboration</td><td> $\\overline { { 6 8 . 2 0 _ { + 1 . 4 0 } } }$ </td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>MPSC-Uniform</td><td> $6 9 . 3 4 _ { + 2 . 5 4 }$ </td><td> $7 0 . 0 6 _ { - 2 . 2 8 }$ </td><td> $7 1 . 8 5 _ { - 4 . 7 5 }$ </td><td> $4 . 7 1 _ { + 2 . 1 4 }$ </td><td> $6 . 6 5 _ { + 2 . 4 3 }$ </td><td> $8 . 3 1 _ { + 1 . 1 5 }$ </td></tr><tr><td>MPSC-Lexical</td><td> $6 8 . 3 8 _ { + 1 . 5 8 }$ </td><td> $7 0 . 2 6 . 2 . 0 8$ </td><td> $7 1 . 4 3 . 5 . 1 7$ </td><td> $5 . 4 5 _ { + 2 . 8 8 }$ </td><td> $5 . 4 5 _ { + 1 . 2 3 }$ </td><td> $6 . 0 6 _ { - 1 . 1 0 }$ </td></tr><tr><td>MPSC-Semantic</td><td> $7 3 . 2 3 _ { + 6 . 4 3 }$ </td><td> $\\underline { { 7 3 . 2 9 _ { + 0 . 9 5 } } }$ </td><td> $7 3 . 5 5 _ { - 3 . 0 5 }$ </td><td> $\\underline { { 1 0 . 0 9 _ { + 7 . 5 2 } } }$ </td><td> $\\underline { { 1 0 . 2 9 _ { + 6 . 0 7 } } }$ </td><td> $\\underline { { 1 0 . 3 0 _ { + 3 . 1 4 } } }$ </td></tr><tr><td>MPSC-Label</td><td></td><td></td><td></td><td> $\\overline { { 1 1 . 9 4 _ { + 9 . 3 7 } } }$ </td><td> $\\overline { { 1 5 . 5 5 _ { + 1 1 . 3 3 } } }$ </td><td> $\\overline { { 1 8 . 2 0 _ { + 1 1 . 0 4 } } }$ </td></tr></table>",
+        "bbox": [
+            184,
+            82,
+            813,
+            514
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            590,
+            490,
+            656
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "3.3 Further Analysis",
+        "text_level": 2,
+        "bbox": [
+            112,
+            668,
+            297,
+            683
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Ablation study. We conduct an ablation study to examine the impact of different perspectives on MPSC. The results are presented in Table 4. Evidently, both the specification and test case perspectives play crucial roles in our framework. Additionally, test cases contribute more to the improvements than specifications. We attribute the observation to the better quality of test cases, as generating an accurate test case is considerably simpler than abstracting a comprehensive and sound specification.",
+        "bbox": [
+            110,
+            690,
+            490,
+            853
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Qualities of three perspectives. We present the accuracy<sup>6</sup> of generated solutions, specifications and test cases in Table 5. The quality of all three perspectives is insufficient individually. Indeed, the generated verification properties (i.e. specifications and test cases) are even poorer than the generated solutions. It implies that prior works (Zhang et al., 2023; Chen et al., 2022) relying on generated verification properties as experts for majority voting on solutions may fail, as these experts perform worse than the choices (i.e. solutions) themselves. Additionally, it indicates that the significant improvements brought by MPSC do not solely depend on the high quality of verification properties. The improvements come from the consistency information within LLMs, which helps to distinguish noise from high-quality solutions.",
+        "bbox": [
+            112,
+            862,
+            489,
+            895
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            590,
+            887,
+            834
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Generalization over different LLMs. MPSC is designed as a model-agnostic framework that assumes black-box access to the underlying foundation model. In assessing the extent of MPSC’s generalization, we employ many other LLMs in addition to ChatGPT as foundation models. In specific, we consider the strongest model, GPT4, and three highly proficient open-source coding LLMs, Code Llama, WizardCoder and DeepSeek Coder in Python. The experimental results presented in Table 3 show that MPSC consistently yields significant improvements across all models, which demonstrates the robust generalization capabilities embedded in our proposed framework.",
+        "bbox": [
+            507,
+            854,
+            887,
+            921
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>6</sup>Accuracy is equal to pass@1.",
+        "bbox": [
+            136,
+            906,
+            322,
+            920
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "page_number",
+        "text": "1434",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 5
+    },
+    {
+        "type": "table",
+        "img_path": "images/22b77abd02243eb349d2879da4dcdc4bcc6719c0b3159b02aaf8f99eb2aae386.jpg",
+        "table_caption": [
+            "Table 3: The performance of MPSC-Semantic with different foundation models. †: We use nucleus sampling with temperature as 0.2 instead of greedy generation in this experiment. The best performance is shown in bold."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Benchmark</td><td colspan=\"3\">HumanEval</td><td colspan=\"3\">HumanEval+</td></tr><tr><td>Metric</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td></tr><tr><td>GPT-4 (gpt4-0614) +MPSC</td><td>81.48  $\\mathbf { 9 2 . 1 5 _ { + 1 0 . 6 7 } }$ </td><td>86.31  $\\mathbf { 9 1 . 6 2 _ { + 5 . 3 1 } }$ </td><td>90.46  $\\mathbf { 9 1 . 8 0 _ { + 1 . 3 4 } }$ </td><td>70.52  $\\mathbf { 8 1 . 7 2 _ { + 1 1 . 2 } }$ </td><td>75.48  $\\mathbf { 8 1 . 7 7 _ { + 6 . 2 9 } }$ </td><td>79.54  $\\mathbf { 8 2 . 1 2 } _ { + 2 . 5 8 }$ </td></tr><tr><td>WizzardCoder-34B† +MPSC</td><td>67.84  $\\mathbf { 7 4 . 0 6 _ { + 6 . 2 2 } }$ </td><td>72.12  $7 5 . 0 0 _ { + 2 . 8 8 }$ </td><td>75.98  $7 5 . 0 7 _ { - 0 . 9 1 }$ </td><td>58.70  $\\mathbf { 6 5 . 4 5 _ { + 6 . 7 5 } }$ </td><td>62.88  ${ \\bf 6 5 . 7 1 _ { + 2 . 8 3 } }$ </td><td>66.88  $6 6 . 1 9 _ { - 0 . 6 9 }$ </td></tr><tr><td>Code Llama-34B +MPSC</td><td>51.78  $\\mathbf { 7 0 . 9 7 _ { + 1 9 . 1 9 } }$ </td><td>59.24  $\\mathbf { 7 0 . 5 5 _ { + 1 1 . 3 1 } }$ </td><td>67.07  ${ \\bf 7 1 . 3 6 _ { + 4 . 2 9 } }$ </td><td>41.49  $\\mathbf { 5 8 . 4 4 _ { + 1 6 . 9 5 } }$ </td><td>48.30  $\\mathbf { 5 9 . 0 0 _ { + 1 0 . 7 0 } }$ </td><td>55.93  ${ \\bf 6 0 . 0 2 } _ { + 4 . 0 9 }$ </td></tr><tr><td>WizzardCoder-13B +MPSC</td><td>60.35  $7 3 . 6 0 _ { + 1 3 . 2 5 }$ </td><td>66.10  $\\mathbf { 7 4 . 9 6 _ { + 8 . 8 6 } }$ </td><td>72.01  $7 4 . 5 7 _ { + 2 . 5 6 }$ </td><td>50.25  $\\mathbf { 6 1 . 3 3 _ { + 1 1 . 0 8 } }$ </td><td>56.00  ${ \\bf 6 2 . 9 9 _ { + 6 . 9 9 } }$ </td><td>61.98 62.67+0.69</td></tr><tr><td>Code Llama-13B</td><td>44.63</td><td>50.99</td><td>57.86</td><td>35.93</td><td>41.71</td><td>48.19</td></tr><tr><td>+MPSC</td><td> $\\mathbf { 6 2 . 9 4 _ { + 1 8 . 3 1 } }$ </td><td> $\\mathbf { 6 4 . 9 3 _ { + 1 3 . 9 4 } }$ </td><td> $\\mathbf { 6 4 . 6 6 _ { + 6 . 8 0 } }$ </td><td> $\\mathbf { 5 0 . 0 4 _ { + 1 4 . 1 1 } }$ </td><td> ${ 5 1 . 2 4 . 9 . 5 3 }$ </td><td> ${ \\bf 5 1 . 3 6 _ { + 3 . 1 7 } }$ </td></tr><tr><td>WizzardCoder-7B +MPSC</td><td>53.81</td><td> $5 9 . 6 2 $ </td><td> $6 6 . 0 6$ </td><td> $4 5 . 0 6$ </td><td>50.83</td><td>57.69</td></tr><tr><td></td><td> ${ \\bf 6 3 . 8 5 _ { + 1 0 . 0 4 } }$ </td><td> ${ \\bf 6 4 . 0 4 } _ { + 4 . 4 2 }$ </td><td> $\\mathbf { 6 7 . 3 2 _ { + 1 . 2 6 } }$ </td><td> $5 3 . 6 9 _ { + 8 . 6 3 }$ </td><td> ${ 5 5 . 0 7 } _ { + 4 . 2 4 }$ </td><td> $\\pmb { 5 9 . 4 5 } _ { + 1 . 7 6 }$ </td></tr><tr><td>Code Llama-7B</td><td> $3 9 . 3 8$ </td><td> $4 5 . 1 8$ </td><td> $5 2 . 7 9$ </td><td> $3 4 . 3 3$ </td><td> $3 9 . 1 8$ </td><td> $4 5 . 2 5$ </td></tr><tr><td>+MPSC</td><td> ${ \\bar { 5 } } 8 . { \\bar { 5 } } 4 _ { + 1 9 . 1 6 }$ </td><td> ${ \\pmb 5 } 7 . { \\pmb 8 } { \\pmb 3 } _ { + 1 2 . 6 5 }$ </td><td> ${ \\bf 5 9 . 3 1 _ { + 6 . 5 2 } }$ </td><td> $\\mathbf { 4 9 . 0 4 _ { + 1 4 . 7 1 } }$ </td><td> $\\mathbf { 4 9 . 9 6 _ { + 1 0 . 7 8 } }$ </td><td> $\\mathbf { 5 0 . 4 6 _ { + 5 . 2 1 } }$ </td></tr><tr><td>Deepseek Coder-6.7B</td><td>71.73</td><td>80.92</td><td> $\\mathbf { 8 6 . 7 3 }$ </td><td> $6 1 . 7 2$ </td><td></td><td></td></tr><tr><td>+MPSC</td><td> $\\mathbf { 8 2 . 3 8 _ { + 1 0 . 6 5 } }$ </td><td> $\\mathbf { 8 3 . 9 2 } _ { + 3 . \\mathbf { 0 0 } }$ </td><td></td><td></td><td> $7 1 . 4 2$ </td><td>78.54</td></tr><tr><td></td><td></td><td></td><td> $8 4 . 7 1 . _ { 2 . 0 2 }$ </td><td> $\\mathbf { 7 0 . 0 4 } _ { + 8 . 3 2 }$ </td><td> $7 2 . 1 2 _ { + 0 . 7 0 }$ </td><td> $7 3 . 9 6 _ { - 4 . 5 8 }$ </td></tr></table>",
+        "bbox": [
+            174,
+            83,
+            823,
+            372
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/e6587f94099f8adfa36b07da06d52a4c833c4a07809a92f5ba51716612c78179.jpg",
+        "table_caption": [
+            "Table 4: The ablation study results (Pass@1) on four benchmarks."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Benchmark</td><td>HumanEval</td><td>HumanEval+</td><td>MBPP</td><td>CodeContests</td></tr><tr><td>Ours</td><td>83.38</td><td>73.54</td><td>73.23</td><td>10.09</td></tr><tr><td>w/o Specification</td><td>82.32</td><td>73.52</td><td>70.18</td><td>9.17</td></tr><tr><td>w/o Test case</td><td>78.30</td><td>68.49</td><td>72.00</td><td>8.71</td></tr><tr><td>w/o Both</td><td>68.38</td><td>58.75</td><td>66.80</td><td>2.57</td></tr></table>",
+        "bbox": [
+            117,
+            430,
+            484,
+            485
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/5514d6a8d9eb78183e560c84fbf852663eace144d4d5f16739fa55411c85536e.jpg",
+        "table_caption": [
+            "Table 5: Accuracy of solutions, specifications and test cases generated by GPT-3-Turbo."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Perspective</td><td>Solution</td><td>Specification</td><td>Test Case</td></tr><tr><td>HumanEval</td><td>68.38</td><td>45.93</td><td>63.82</td></tr><tr><td>MBPP</td><td>66.80</td><td>53.70</td><td>34.64</td></tr></table>",
+        "bbox": [
+            129,
+            542,
+            473,
+            593
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            663,
+            490,
+            826
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "chart",
+        "img_path": "images/e1cc60f866760c69607b6ed2ac68d79c1f19e9eed2a4cac18861fa40536cec52.jpg",
+        "content": "",
+        "chart_caption": [
+            "Figure 3: The correlation between the performance of MPSC and the edge density."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            524,
+            438,
+            867,
+            587
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Impact of edge sparsity. Our framework significantly depends on the inter-consistency information between model outputs, which is represented as edges within the constructed graph. A critical question arises concerning the impact of edge sparsity on the framework’s efficacy. To address this, we categorize all queries in the dataset into distinct bins based on the total edge weights in their corresponding graphs and compute the perfect performance ratio (i.e. Pass@1=100) for each bin. In this experiment, we employ the MPSC-Uniform configuration<sup>7</sup>. Figure 3 illustrates the correlation between edge density and performance. The results clearly demonstrate a positive correlation between the number of edges and the overall performance of our framework.",
+        "bbox": [
+            110,
+            839,
+            492,
+            921
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            643,
+            887,
+            820
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Impact of sampling number. To examine the effect of the sampling number of different perspectives, we conduct an analysis experiment by varying the numbers of generated specifications and test cases. As shown in Table 6, MPSC constantly brings significant performance gains with varied specifications and test cases. We note that MPSC generally suffers a slight degradation in performance when fewer specifications or test cases are used, which is consistent with our intuition. But the performance decline is relatively small (about 4% with only 10% of specifications and test cases retained). The observation indicts the remarkable performance and efficiency of MPSC, suggesting the potential for real-world application with reduced computational costs.",
+        "bbox": [
+            507,
+            832,
+            887,
+            882
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>7</sup>The Uniform configuration is utilized to eliminate the influence of intra-consistency information.",
+        "bbox": [
+            509,
+            892,
+            885,
+            920
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "page_number",
+        "text": "1435",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 6
+    },
+    {
+        "type": "table",
+        "img_path": "images/c4cc4fe450790c9909f628d601dcf8c3a595f2daaa3e7e911ea000af9aeb524b.jpg",
+        "table_caption": [
+            "Table 6: Pass@1 of MPSC-Semantic with different sampling numbers on HumanEval."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=\"2\">#Specification</td><td colspan=\"5\">#Test Case</td></tr><tr><td>10</td><td>20</td><td>50</td><td>100</td><td>200</td></tr><tr><td>10</td><td> $7 8 . 9 3 _ { + 1 0 . 5 5 }$ </td><td> $8 0 . 0 8 _ { + 1 1 . 7 }$ </td><td> $8 3 . 8 2 _ { + 1 5 . 4 4 }$ </td><td> $8 3 . 9 6 _ { + 1 5 . 5 8 }$ </td><td> $8 4 . 1 7 _ { + 1 5 . 7 9 }$ </td></tr><tr><td>20</td><td> $7 7 . 1 7 _ { + 8 . 7 9 }$ </td><td> $8 0 . 1 3 _ { + 1 1 . 7 5 }$ </td><td> $8 3 . 8 2 _ { + 1 5 . 4 4 }$ </td><td> $8 3 . 4 2 _ { + 1 5 . 0 4 }$ </td><td> $8 5 . 4 4 _ { + 1 7 . 0 6 }$ </td></tr><tr><td>50</td><td> $8 0 . 2 3 _ { + 1 1 . 8 5 }$ </td><td> $8 0 . 2 4 _ { + 1 1 . 8 6 }$ </td><td> $8 2 . 2 4 _ { + 1 3 . 8 6 }$ </td><td> $8 3 . 3 8 _ { + 1 5 . 0 0 }$ </td><td> $8 3 . 5 7 _ { + 1 5 . 1 9 }$ </td></tr><tr><td>100</td><td> $8 0 . 3 9 _ { + 1 2 . 0 1 }$ </td><td> $8 0 . 9 _ { + 1 2 . 5 2 }$ </td><td> $8 0 . 9 2 _ { + 1 2 . 5 4 }$ </td><td> $8 1 . 5 5 _ { + 1 3 . 1 7 }$ </td><td> $8 4 . 1 7 _ { + 1 5 . 7 9 }$ </td></tr></table>",
+        "bbox": [
+            117,
+            82,
+            484,
+            147
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            110,
+            215,
+            490,
+            426
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "4 Related Work",
+        "text_level": 2,
+        "bbox": [
+            114,
+            439,
+            272,
+            456
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Prompting techniques on consistency. Based on Chain-of-thought mechanism (Wei et al., 2022), previous works have adopted various prompting techniques and decoding strategies to reveal the consistency of LLM outputs and further enhance the capabilities of LLMs. One line of approaches decodes multiple times from the same perspective and aggregate the results (Wang et al., 2022; Zhou et al., 2022; Jung et al., 2022; Sun et al., 2022; Chen et al., 2023a). For example, Wang et al. (2022) targets tasks with fixed answer sets and scores each answer based on the output frequency. Building on this, Sun et al. (2022) introduces recitation as context for augmentation. While Jung et al. (2022) focus on the two-value entailment relations (True or False) between statements and explanations. They treat the inference process as a weighted MAX-SAT problem and utilize a logistic solver to solve it. Another line draws inspiration from the “Dual Process\" in cognitive science, which posits that human reasoning is dominated by System 1 and System 2 (Daniel, 2017; Sloman, 1996). As a result, these approaches require LLMs to play different roles like generator (i.e. System 1) and verifier (i.e. System 2), and optimize the result iteratively by a conversational way (Madaan et al., 2023; Shinn et al., 2023; Zhu et al., 2023). Xiong et al. (2023a) also proposes the concept of \"inter-consistency\". Instead of referring to the consistency within the same LLM, they focus to tackle the inter-inconsistency problem between different models with a formal debate framework.",
+        "bbox": [
+            110,
+            468,
+            492,
+            922
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            84,
+            887,
+            149
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "LLM for code. LLMs pretrained on large-scale code data have demonstrated strong capabilities in the field of code generation, such as Codex (Chen et al., 2021), AlphaCode (Li et al., 2022), Code-Gen (Nijkamp et al., 2023), InCoder (Fried et al., 2022), StarCoder (Li et al., 2023), Code Llama (Rozière et al., 2023), WizardCoder (Luo et al., 2023), DeepSeekCoder (Guo et al., 2024). However, they remain unreliable, particularly in scenarios involving complex input-output mappings. Because of the low tolerance of compilers and operating systems for bugs, the instability makes LLMs hard to deploy into real-world applications. Several methods have been proposed to mitigate the phenomenon (Shi et al., 2022; Chen et al., 2022; Zhang et al., 2022; Key et al., 2022; Ni et al., 2023; Dong et al., 2023; Olausson et al., 2023; Chen et al., 2023b; Zhang et al., 2023). The line of work with the most direct relevance to ours is to re-rank generated solutions in a post-hoc manner. For example, Shi et al. (2022) matches the execution results of generated solutions for minimum Bayes risk selection. Zhang et al. (2022) prompts another model as a reviewer to check whether generated programs satisfy the given language instruction by measuring p(instruction program). CodeT (Chen et al., 2022) additionally generates test cases to verify the generated solutions. Similarly, ALGO (Zhang et al., 2023) additionally generates exhaustive search algorithms as oracle programs to generate high quality test cases for verification.",
+        "bbox": [
+            507,
+            160,
+            889,
+            661
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Ranking on graph. In our framework, the final stage is in fact a ranking problem in graph. There exists some renowned graph ranking algorithms like PageRank (Page et al., 1998) and HITS (Kleinberg, 1999). While our approach is inspired by manifold ranking (Zhou et al., 2003b), which is built upon a regularization framework on discrete spaces (i.e. graphs in this scenario) (Zhou et al., 2003a; Zhou and Schölkopf, 2004, 2005).",
+        "bbox": [
+            507,
+            670,
+            887,
+            816
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "5 Conclusion",
+        "text_level": 2,
+        "bbox": [
+            509,
+            828,
+            643,
+            845
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "In this paper, we present a novel code generation method, Multi-Perspective Self-Consistency (MPSC), aimed at enhancing the performance of LLMs in complex code generation tasks where a single attempt may not suffice to ensure the accuracy of the output. Our proposed MPSC strategy capitalizes on both intra- and inter-consistency across three perspectives, solutions, specifications and test cases, to identify the most reliable answer. We systematically validate the effectiveness of MPSC through comprehensive experiments conducted on four widely used code generation benchmarks. The evaluation results demonstrate that MPSC outperforms existing methods and achieves the state-of-the-art performance on all of them.",
+        "bbox": [
+            507,
+            856,
+            887,
+            921
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "page_number",
+        "text": "1436",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            85,
+            492,
+            262
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Limitations",
+        "text_level": 2,
+        "bbox": [
+            114,
+            273,
+            221,
+            288
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Evaluation in the wild. Even though MPSC has shown remarkable performance on most widely used code generation benchmarks, its effectiveness in real-world scenarios remains largely unexplored. Existing code generation benchmarks often present simplified code generation tasks compared to the intricacies encountered in actual code developments, where user intents are harder to understand and the desired functionalities are more complex.",
+        "bbox": [
+            112,
+            297,
+            490,
+            443
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Generalization to other tasks. Since our proposed MPSC framework is designed to be modelagnostic and task-agnostic. We only conduct experiments in the code generation task in this paper. Actually, MPSC can be applied to other textual generation tasks like math problem solving and question answering. However, unlike code generation, where code interpreter can measure the agreement between outputs in a deterministic way, assessing the agreement between natural language outputs is non-trivial. A general task-agnostic interconsistency measure is to solely rely on LLMs, whose evaluation ability for arbitrary textual inputs has been demonstrated recently. We leave it for future works to discuss.",
+        "bbox": [
+            112,
+            450,
+            490,
+            692
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Acknowledgments",
+        "text_level": 2,
+        "bbox": [
+            114,
+            702,
+            278,
+            719
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "This work was supported by National Key R&D Program of China (2021YFF0901502), Beijing Science and Technology Program (Z231100007423011) and Key Laboratory of Science, Technology and Standard in Press Industry (Key Laboratory of Intelligent Press Media Technology). We sincerely thank Xinyu Hu, Mingqi Gao, Xiao Pu and Xiang Chen for providing insightful advice about this work. We also appreciate the anonymous reviewers for their helpful comments.",
+        "bbox": [
+            110,
+            727,
+            489,
+            906
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "References",
+        "text_level": 2,
+        "bbox": [
+            510,
+            84,
+            610,
+            99
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Pekka Abrahamsson, Outi Salo, Jussi Ronkainen, and Juhani Warsta. 2017. Agile software development methods: Review and analysis.",
+            "Jacob Austin, Augustus Odena, Maxwell Nye, Maarten Bosma, Henryk Michalewski, David Dohan, Ellen Jiang, Carrie Cai, Michael Terry, Quoc Le, and Charles Sutton. 2021. Program Synthesis with Large Language Models.",
+            "Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. 2020. Language models are few-shot learners. Advances in neural information processing systems, 33:1877–1901.",
+            "Bei Chen, Fengji Zhang, Anh Nguyen, Daoguang Zan, Zeqi Lin, Jian-Guang Lou, and Weizhu Chen. 2022. CodeT: Code Generation with Generated Tests.",
+            "Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde de Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, Alex Ray, Raul Puri, Gretchen Krueger, Michael Petrov, Heidy Khlaaf, Girish Sastry, Pamela Mishkin, Brooke Chan, Scott Gray, Nick Ryder, Mikhail Pavlov, Alethea Power, Lukasz Kaiser, Mohammad Bavarian, Clemens Winter, Philippe Tillet, Felipe Petroski Such, Dave Cummings, Matthias Plappert, Fotios Chantzis, Elizabeth Barnes, Ariel Herbert-Voss, William Hebgen Guss, Alex Nichol, Alex Paino, Nikolas Tezak, Jie Tang, Igor Babuschkin, Suchir Balaji, Shantanu Jain, William Saunders, Christopher Hesse, Andrew N. Carr, Jan Leike, Josh Achiam, Vedant Misra, Evan Morikawa, Alec Radford, Matthew Knight, Miles Brundage, Mira Murati, Katie Mayer, Peter Welinder, Bob McGrew, Dario Amodei, Sam McCandlish, Ilya Sutskever, and Wojciech Zaremba. 2021. Evaluating Large Language Models Trained on Code.",
+            "Xinyun Chen, Renat Aksitov, Uri Alon, Jie Ren, Kefan Xiao, Pengcheng Yin, Sushant Prakash, Charles Sutton, Xuezhi Wang, and Denny Zhou. 2023a. Universal self-consistency for large language model generation.",
+            "Xinyun Chen, Maxwell Lin, Nathanael Schärli, and Denny Zhou. 2023b. Teaching Large Language Models to Self-Debug.",
+            "Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, Parker Schuh, Kensen Shi, Sasha Tsvyashchenko, Joshua Maynez, Abhishek Rao, Parker Barnes, Yi Tay, Noam Shazeer, Vinodkumar Prabhakaran, Emily Reif, Nan Du, Ben Hutchinson, Reiner Pope, James Bradbury, Jacob Austin, Michael Isard, Guy Gur-Ari, Pengcheng Yin, Toju Duke, Anselm Levskaya, Sanjay Ghemawat, Sunipa Dev, Henryk Michalewski, Xavier Garcia,"
+        ],
+        "bbox": [
+            510,
+            108,
+            882,
+            147
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "page_number",
+        "text": "1437",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Vedant Misra, Kevin Robinson, Liam Fedus, Denny Zhou, Daphne Ippolito, David Luan, Hyeontaek Lim, Barret Zoph, Alexander Spiridonov, Ryan Sepassi, David Dohan, Shivani Agrawal, Mark Omernick, Andrew M. Dai, Thanumalayan Sankaranarayana Pillai, Marie Pellat, Aitor Lewkowycz, Erica Moreira, Rewon Child, Oleksandr Polozov, Katherine Lee, Zongwei Zhou, Xuezhi Wang, Brennan Saeta, Mark Diaz, Orhan Firat, Michele Catasta, Jason Wei, Kathy Meier-Hellstern, Douglas Eck, Jeff Dean, Slav Petrov, and Noah Fiedel. 2022. PaLM: Scaling Language Modeling with Pathways.",
+        "bbox": [
+            131,
+            85,
+            490,
+            243
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "Kahneman Daniel. 2017. Thinking,fast and slow.",
+        "bbox": [
+            114,
+            253,
+            453,
+            267
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "Yihong Dong, Xue Jiang, Zhi Jin, and Ge Li. 2023. Self-collaboration Code Generation via ChatGPT.",
+        "bbox": [
+            115,
+            275,
+            489,
+            303
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Daniel Fried, Armen Aghajanyan, Jessy Lin, Sida Wang, Eric Wallace, Freda Shi, Ruiqi Zhong, Wen-tau Yih, Luke Zettlemoyer, and Mike Lewis. 2022. Incoder: A generative model for code infilling and synthesis. arXiv preprint arXiv:2204.05999.",
+            "Daya Guo, Qihao Zhu, Dejian Yang, Zhenda Xie, Kai Dong, Wentao Zhang, Guanting Chen, Xiao Bi, Y. Wu, Y. K. Li, Fuli Luo, Yingfei Xiong, and Wenfeng Liang. 2024. Deepseek-coder: When the large language model meets programming – the rise of code intelligence.",
+            "Jaehun Jung, Lianhui Qin, Sean Welleck, Faeze Brahman, Chandra Bhagavatula, Ronan Le Bras, and Yejin Choi. 2022. Maieutic prompting: Logically consistent reasoning with recursive explanations. arXiv preprint arXiv:2205.11822.",
+            "Darren Key, Wen-Ding Li, and Kevin Ellis. 2022. I Speak, You Verify: Toward Trustworthy Neural Program Synthesis.",
+            "Jon M. Kleinberg. 1999. Authoritative sources in a hyperlinked environment. J. ACM, 46(5):604–632.",
+            "Lorenz Kuhn, Yarin Gal, and Sebastian Farquhar. 2023. Semantic uncertainty: Linguistic invariances for uncertainty estimation in natural language generation.",
+            "Shankar Kumar and William Byrne. 2004. Minimum Bayes-Risk Decoding for Statistical Machine Translation. In Proceedings ofthe Human Language Technology Conference of the North American Chapter of the Association for Computational Linguistics: HLT-NAACL 2004, pages 169–176, Boston, Massachusetts, USA. Association for Computational Linguistics.",
+            "K. Rustan M. Leino. 2010. Dafny: An automatic program verifier for functional correctness. In Logicfor Programming, Artificial Intelligence, and Reasoning, pages 348–370, Berlin, Heidelberg. Springer Berlin Heidelberg.",
+            "Raymond Li, Loubna Ben Allal, Yangtian Zi, Niklas Muennighoff, Denis Kocetkov, Chenghao Mou, Marc Marone, Christopher Akiki, Jia Li, Jenny Chim, et al.",
+            "2023. Starcoder: may the source be with you! arXiv preprint arXiv:2305.06161.",
+            "Yujia Li, David Choi, Junyoung Chung, Nate Kushman, Julian Schrittwieser, Rémi Leblond, Tom Eccles, James Keeling, Felix Gimeno, Agustin Dal Lago, Thomas Hubert, Peter Choy, Cyprien de Masson d’Autume, Igor Babuschkin, Xinyun Chen, Po-Sen Huang, Johannes Welbl, Sven Gowal, Alexey Cherepanov, James Molloy, Daniel J. Mankowitz, Esme Sutherland Robson, Pushmeet Kohli, Nando de Freitas, Koray Kavukcuoglu, and Oriol Vinyals. 2022. Competition-Level Code Generation with AlphaCode. Science, 378(6624):1092–1097.",
+            "Percy Liang, Rishi Bommasani, Tony Lee, Dimitris Tsipras, Dilara Soylu, Michihiro Yasunaga, Yian Zhang, Deepak Narayanan, Yuhuai Wu, Ananya Kumar, Benjamin Newman, Binhang Yuan, Bobby Yan, Ce Zhang, Christian Cosgrove, Christopher D. Manning, Christopher Ré, Diana Acosta-Navas, Drew A. Hudson, Eric Zelikman, Esin Durmus, Faisal Ladhak, Frieda Rong, Hongyu Ren, Huaxiu Yao, Jue Wang, Keshav Santhanam, Laurel Orr, Lucia Zheng, Mert Yuksekgonul, Mirac Suzgun, Nathan Kim, Neel Guha, Niladri Chatterji, Omar Khattab, Peter Henderson, Qian Huang, Ryan Chi, Sang Michael Xie, Shibani Santurkar, Surya Ganguli, Tatsunori Hashimoto, Thomas Icard, Tianyi Zhang, Vishrav Chaudhary, William Wang, Xuechen Li, Yifan Mai, Yuhui Zhang, and Yuta Koreeda. 2023. Holistic evaluation of language models.",
+            "Jiawei Liu, Chunqiu Steven Xia, Yuyao Wang, and Lingming Zhang. 2023. Is your code generated by chatgpt really correct? rigorous evaluation of large language models for code generation. arXiv preprint arXiv:2305.01210.",
+            "Ziyang Luo, Can Xu, Pu Zhao, Qingfeng Sun, Xiubo Geng, Wenxiang Hu, Chongyang Tao, Jing Ma, Qingwei Lin, and Daxin Jiang. 2023. Wizardcoder: Empowering code large language models with evolinstruct. arXiv preprint arXiv:2306.08568.",
+            "Aman Madaan, Niket Tandon, Prakhar Gupta, Skyler Hallinan, Luyu Gao, Sarah Wiegreffe, Uri Alon, Nouha Dziri, Shrimai Prabhumoye, Yiming Yang, Shashank Gupta, Bodhisattwa Prasad Majumder, Katherine Hermann, Sean Welleck, Amir Yazdanbakhsh, and Peter Clark. 2023. Self-Refine: Iterative Refinement with Self-Feedback.",
+            "Ansong Ni, Srini Iyer, Dragomir Radev, Veselin Stoyanov, Wen-tau Yih, Sida Wang, and Xi Victoria Lin. 2023. Lever: Learning to verify language-to-code generation with execution. In International Conference on Machine Learning, pages 26106–26128. PMLR.",
+            "Erik Nijkamp, Bo Pang, Hiroaki Hayashi, Lifu Tu, Huan Wang, Yingbo Zhou, Silvio Savarese, and Caiming Xiong. 2023. CodeGen: An Open Large Language Model for Code with Multi-Turn Program Synthesis."
+        ],
+        "bbox": [
+            115,
+            312,
+            489,
+            379
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "page_number",
+        "text": "1438",
+        "bbox": [
+            480,
+            929,
+            521,
+            942
+        ],
+        "page_idx": 9
+    },
+    {
+        "type": "list",
+        "sub_type": "ref_text",
+        "list_items": [
+            "Theo X. Olausson, Jeevana Priya Inala, Chenglong Wang, Jianfeng Gao, and Armando Solar-Lezama. 2023. Demystifying GPT Self-Repair for Code Generation.",
+            "R OpenAI. 2023. Gpt-4 technical report. arXiv, pages 2303–08774.",
+            "Lawrence Page, Sergey Brin, Rajeev Motwani, and Terry Winograd. 1998. The PageRank Citation Ranking: Bringing Order to the Web. Technical report, Stanford Digital Library Technologies Project.",
+            "Kishore Papineni, Salim Roukos, Todd Ward, and Wei-Jing Zhu. 2002. Bleu: a method for automatic evaluation of machine translation. In Proceedings ofthe 40th Annual Meeting of the Association for Computational Linguistics, pages 311–318, Philadelphia, Pennsylvania, USA. Association for Computational Linguistics.",
+            "Baptiste Rozière, Jonas Gehring, Fabian Gloeckle, Sten Sootla, Itai Gat, Xiaoqing Ellen Tan, Yossi Adi, Jingyu Liu, Tal Remez, Jérémy Rapin, et al. 2023. Code llama: Open foundation models for code. arXiv preprint arXiv:2308.12950.",
+            "Baptiste Rozière, Jonas Gehring, Fabian Gloeckle, Sten Sootla, Itai Gat, Xiaoqing Ellen Tan, Yossi Adi, Jingyu Liu, Romain Sauvestre, Tal Remez, Jérémy Rapin, Artyom Kozhevnikov, Ivan Evtimov, Joanna Bitton, Manish Bhatt, Cristian Canton Ferrer, Aaron Grattafiori, Wenhan Xiong, Alexandre Défossez, Jade Copet, Faisal Azhar, Hugo Touvron, Louis Martin, Nicolas Usunier, Thomas Scialom, and Gabriel Synnaeve. 2024. Code llama: Open foundation models for code.",
+            "Freda Shi, Daniel Fried, Marjan Ghazvininejad, Luke Zettlemoyer, and Sida I. Wang. 2022. Natural Language to Code Translation with Execution. In Proceedings ofthe 2022 Conference on Empirical Methods in Natural Language Processing, pages 3533– 3546, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics.",
+            "Noah Shinn, Beck Labash, and Ashwin Gopinath. 2023. Reflexion: An autonomous agent with dynamic memory and self-reflection.",
+            "Steven A Sloman. 1996. The empirical case for two systems of reasoning. Psychological bulletin, 119(1):3.",
+            "Zhiqing Sun, Xuezhi Wang, Yi Tay, Yiming Yang, and Denny Zhou. 2022. Recitation-Augmented Language Models. In The Eleventh International Conference on Learning Representations.",
+            "The Coq Development Team. 2023. The coq proof assistant.",
+            "Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al. 2023. Llama: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971.",
+            "Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc Le, Ed Chi, Sharan Narang, Aakanksha Chowdhery, and Denny Zhou. 2022. Self-Consistency Improves Chain of Thought Reasoning in Language Models.",
+            "Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou, et al. 2022. Chain-of-thought prompting elicits reasoning in large language models. Advances in Neural Information Processing Systems, 35:24824–24837.",
+            "Kai Xiong, Xiao Ding, Yixin Cao, Ting Liu, and Bing Qin. 2023a. Examining the Inter-Consistency of Large Language Models: An In-depth Analysis via Debate.",
+            "Miao Xiong, Zhiyuan Hu, Xinyang Lu, Yifei Li, Jie Fu, Junxian He, and Bryan Hooi. 2023b. Can llms express their uncertainty? an empirical evaluation of confidence elicitation in llms.",
+            "Kexun Zhang, Danqing Wang, Jingtao Xia, William Yang Wang, and Lei Li. 2023. ALGO: Synthesizing Algorithmic Programs with Generated Oracle Verifiers.",
+            "Tianyi Zhang, Tao Yu, Tatsunori B. Hashimoto, Mike Lewis, Wen-tau Yih, Daniel Fried, and Sida I. Wang. 2022. Coder Reviewer Reranking for Code Generation.",
+            "D. Zhou and B. Schölkopf. 2004. A Regularization Framework for Learning from Graph Data. In ICML 2004 Workshop on Statistical Relational Learning and Its Connections to Other Fields (SRL 2004), pages 132–137.",
+            "Dengyong Zhou, Olivier Bousquet, Thomas Lal, Jason Weston, and Bernhard Schölkopf. 2003a. Learning with Local and Global Consistency. In Advances in Neural Information Processing Systems, volume 16. MIT Press.",
+            "Dengyong Zhou and Bernhard Schölkopf. 2005. Regularization on Discrete Spaces. In Pattern Recognition, Lecture Notes in Computer Science, pages 361–368, Berlin, Heidelberg. Springer.",
+            "Dengyong Zhou, Jason Weston, Arthur Gretton, Olivier Bousquet, and Bernhard Schölkopf. 2003b. Ranking on Data Manifolds. In Advances in Neural Information Processing Systems, volume 16. MIT Press.",
+            "Denny Zhou, Nathanael Schärli, Le Hou, Jason Wei, Nathan Scales, Xuezhi Wang, Dale Schuurmans, Claire Cui, Olivier Bousquet, Quoc Le, et al. 2022. Least-to-most prompting enables complex reasoning in large language models. arXiv preprint arXiv:2205.10625.",
+            "Xinyu Zhu, Junjie Wang, Lin Zhang, Yuxiang Zhang, Yongfeng Huang, Ruyi Gan, Jiaxing Zhang, and Yujiu Yang. 2023. Solving Math Word Problems via Cooperative Reasoning induced Language Models. In Proceedings of the 61st Annual Meeting of the Associationfor Computational Linguistics (Volume 1: Long Papers), pages 4471–4485."
+        ],
+        "bbox": [
+            115,
+            85,
+            489,
+            139
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "page_number",
+        "text": "1439",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "A Details of the Iterative Algorithm",
+        "text_level": 2,
+        "bbox": [
+            114,
+            83,
+            442,
+            101
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Description of algorithm. The iterative algorithm is shown in Algorithm 1.",
+        "bbox": [
+            112,
+            109,
+            489,
+            141
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "code",
+        "sub_type": "algorithm",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "Algorithm 1: Iterative Optimization   \nInput: degree matrix   \n$D = \\mathrm { d i a g } ( d _ { 1 } , . . . , d _ { N } )$ , initialization   \nscore vector y, weighted adjacency   \nmatrix $W ,$ , threshold ϵ   \nOutput: optimal confidence score vector   \n$f ^ { * }$   \nbegin   \n$\\mathbf { \\Delta } f ^ { ( 0 ) } \\longleftarrow y$   \n$\\pmb { T } \\longleftarrow \\pmb { D } ^ { - \\frac 1 2 } \\pmb { W D } ^ { - \\frac 1 2 }$   \n$i \\longleftarrow 0$   \nDo   \n$\\mathbf { \\Delta } \\mathbf { f } ^ { ( i + 1 ) } \\longleftarrow \\alpha \\mathbf { T } \\mathbf { \\Delta } \\mathbf { f } ^ { ( i ) } + ( 1 - \\alpha ) \\mathbf { \\Delta } \\mathbf { y }$   \n$i \\longleftarrow i + 1$   \nWhile $| | \\pmb { f } ^ { ( i ) } - \\pmb { f } ^ { ( i - 1 ) } | | \\leq$ ϵ   \n$f ^ { * } \\longleftarrow f ^ { ( i ) }$   \nreturn $f ^ { * }$",
+        "bbox": [
+            115,
+            155,
+            485,
+            448
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Proof of Convergence We first expand the expression of $\\pmb { f } ^ { ( n ) }$ according to the recursive formula",
+        "bbox": [
+            112,
+            476,
+            490,
+            510
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "equation",
+        "img_path": "images/fdd3155d1e21c8db0e93aa2675791d77b212b256fd9fb4405650769324e74f63.jpg",
+        "text": "$$\n\\begin{array} { l } { { \\pmb f } ^ { ( n ) } = \\alpha { \\pmb T } { \\pmb f } ^ { ( n - 1 ) } + ( 1 - \\alpha ) { \\pmb y } } \\\\ { = ( \\alpha { \\pmb T } ) ^ { n - 1 } { \\pmb f } ^ { ( 0 ) } + ( 1 - \\alpha ) \\displaystyle \\sum _ { i = 0 } ^ { n - 1 } ( \\alpha { \\pmb T } ) ^ { i } { \\pmb y } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            134,
+            516,
+            468,
+            582
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Notice that $_ { \\pmb { T } }$ is similar to a stochastic matrix $\\begin{array} { c c c c } { { W D ^ { - 1 } } } & { { = } } & { { D ^ { \\frac { 1 } { 2 } } ( D ^ { - \\frac { 1 } { 2 } } W D ^ { - \\frac { 1 } { 2 } } ) D ^ { - \\frac { 1 } { 2 } } } } & { { = } } \\end{array}$ $D ^ { \\frac { 1 } { 2 } } T D ^ { - { \\frac { 1 } { 2 } } }$ . Therefore the eigenvalues of $\\alpha \\mathbf { T }$ are in $[ - \\alpha , \\alpha ]$ . With $\\alpha \\in ( 0 , 1 )$ , we have",
+        "bbox": [
+            112,
+            612,
+            489,
+            680
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "equation",
+        "img_path": "images/8351b103013c704efe5f402d49619607c1266be0562881601a52d9c49ccc0642.jpg",
+        "text": "$$\n\\begin{array} { c } { { \\displaystyle \\displaystyle \\operatorname* { l i m } _ { n  \\infty } ( \\alpha T ) ^ { n } = 0 } } \\\\ { { \\displaystyle \\operatorname* { l i m } _ { n  \\infty } \\sum _ { i = 0 } ^ { n - 1 } ( \\alpha T ) ^ { i } = ( I - \\alpha T ) ^ { - 1 } } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            181,
+            688,
+            420,
+            757
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Therefore",
+        "bbox": [
+            114,
+            764,
+            193,
+            780
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "equation",
+        "img_path": "images/fda7d4fba55b35f670ca0473cf5bae65e854abf50c43c674034c617283c5f55d.jpg",
+        "text": "$$\n\\pmb { f } ^ { * } = \\operatorname* { l i m } _ { n  \\infty } \\pmb { f } ^ { ( n ) } = ( 1 - \\alpha ) ( 1 - \\alpha T ) ^ { - 1 } \\pmb { y }\n$$",
+        "text_format": "latex",
+        "bbox": [
+            146,
+            788,
+            457,
+            814
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Proof of Equivalence Denote the optimization function as",
+        "bbox": [
+            112,
+            820,
+            487,
+            853
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "equation",
+        "img_path": "images/d50037485056b65c061d8c7b9ccc49f571b0725b17aa19f72dbe1cc86342c115.jpg",
+        "text": "$$\n\\begin{array} { l } { \\displaystyle \\mathcal { F } = \\alpha f ^ { T } ( { \\boldsymbol { I } } - { \\boldsymbol { D } } ^ { - \\frac { 1 } { 2 } } W { \\boldsymbol { D } } ^ { \\frac { 1 } { 2 } } ) { \\boldsymbol { f } } + \\frac { ( 1 - \\alpha ) } { 2 } ( { \\boldsymbol { f } } - { \\boldsymbol { y } } ) ^ { 2 } } \\\\ { \\displaystyle = \\alpha f ^ { T } ( { \\boldsymbol { I } } - { \\boldsymbol { T } } ) { \\boldsymbol { f } } + \\frac { ( 1 - \\alpha ) } { 2 } ( { \\boldsymbol { f } } - { \\boldsymbol { y } } ) ^ { 2 } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            112,
+            858,
+            500,
+            922
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Differentiate $\\mathcal { F }$ with respect to $f ,$ we have",
+        "bbox": [
+            526,
+            84,
+            847,
+            101
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "equation",
+        "img_path": "images/554e9042ab07fce6b5e8f254ea6aa21885a16fb02e0fe9e6a444e99d8f82b1ab.jpg",
+        "text": "$$\n\\frac { \\partial \\mathcal { F } } { \\partial \\pmb { f } } = \\alpha ( \\pmb { I } - \\pmb { T } ) \\pmb { f } + ( 1 - \\alpha ) ( \\pmb { f } - \\pmb { y } )\n$$",
+        "text_format": "latex",
+        "bbox": [
+            551,
+            109,
+            840,
+            145
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Let the derivatives to 0, the solution $\\begin{array} { r l } { f ^ { \\prime } } & { { } = } \\end{array}$ $( 1 - \\alpha ) ( I - \\alpha T ) ^ { - 1 } y = f ^ { * }$ . Therefore, the iterative algorithm is actually optimizing the objective function.",
+        "bbox": [
+            507,
+            154,
+            885,
+            219
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "Results of closed-form solution. Despite the existence of a closed-form solution for the optimization problem, the required matrix inversion operation is computationally expensive. Conversely, the iterative algorithm exhibits rapid convergence and demonstrates strong empirical performance. Consequently, we employ the iterative algorithm in our experiments. Additionally, we provide the performance of the closed-form solution in Table 7. Our results indicate that the iterative algorithm achieves a performance on par with that of the direct computation of the closed-form solution.",
+        "bbox": [
+            507,
+            228,
+            887,
+            423
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "table",
+        "img_path": "images/42dd1f1ba9ead6586d2ff2a67728760365e5c605a3d72ce5458d892d6631ac9c.jpg",
+        "table_caption": [
+            "Table 7: Performance of MPSC optimized by the iterative algorithm or calculating closed-form solution directly. The results are presented in form of (iterative algorithm / closed-form solution)."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Metric</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td></tr><tr><td colspan=\"4\">HumanEval</td></tr><tr><td>MPSC-Lexical MPSC-Semantic</td><td>82.32/82.32 83.38/83.46</td><td>84.76/84.76 84.25/84.15</td><td>86.48/86.59 84.45/84.45</td></tr><tr><td colspan=\"4\">HumanEval+</td></tr><tr><td>MPSC-Lexical</td><td>74.39/74.39</td><td>75.00/75.00</td><td>77.24/77.34</td></tr><tr><td>MPSC-Semantic</td><td>73.54/73.97</td><td>74.46/75.04</td><td>75.26/75.96</td></tr><tr><td colspan=\"4\">CodeContests</td></tr><tr><td>MPSC-Lexical MPSC-Semantic</td><td>5.45/5.45 10.09/10.26</td><td>5.45/5.45 10.29/10.30</td><td>6.06/6.06 10.30/10.30</td></tr><tr><td colspan=\"4\">MBPP</td></tr><tr><td>MPSC-Lexical</td><td>68.38/68.38</td><td>70.26/70.26</td><td>71.43/71.43</td></tr><tr><td>MPSC-Semantic</td><td>73.23/73.27</td><td>73.29/73.55</td><td>73.55/73.56</td></tr></table>",
+        "bbox": [
+            514,
+            434,
+            892,
+            652
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "page_number",
+        "text": "1440",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "B Implementation of Inter-Consistency",
+        "text_level": 2,
+        "bbox": [
+            114,
+            83,
+            472,
+            102
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "We present the code snippets measuring the interconsistency between each pair of perspectives in Listing 1, 2, 3. After execution with Python interpreter, the final\\_result is acquired as ω(v<sub>i</sub>, v<sub>j</sub>).",
+        "bbox": [
+            112,
+            115,
+            489,
+            181
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "code",
+        "sub_type": "code",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "```python\nGenerated specifications\n# Pre - conditions\n3 def preconditions ( input ):\n4\n5\n6 # Post - conditions\n7 def postconditions (input , output ):\n8\n9\n10 \"\"\" Generated test cases \"\"\"\n11 test_case = {'input ': ... ,\n12 'output ': ...}\n13\n14 \"\"\" Check inter - consistency \"\"\"\n15 def check () :\n16 pass_result = None\n17 try :\n18 preconditions ( test_case ['input '\n])\n19 postconditions ( test_case ['input\n] , test_case ['output '])\n20 pass_result = True\n21 except Exception as e:\n22 pass_result = False\n23 return pass_result\n24 global final_result\n25 final_result = check ()\n```",
+        "bbox": [
+            97,
+            189,
+            484,
+            511
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Listing 1: Inter-consistency between specifications and test cases.",
+        "bbox": [
+            112,
+            516,
+            487,
+            546
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "code",
+        "sub_type": "code",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "```python\n11 Generated solutions\n2 def entry_point ( input ) :\n3\n4\n5 \"\"\" Generated specifications \"\"\"\n6 # Pre - conditions\n7 def preconditions ( input ):\n8\n9\n10 # Post - conditions\n11 def postconditions (input , output ) :\n12\n13\n14 \"\"\" Generated casual inputs \"\"\"\n15 casual_inputs = [...]\n16\n17 \"\"\" Check inter - consistency \"\n18 def check () :\n19 pass_result = []\n20 for ci in casual_inputs :\n21 try :\n22 output = entry_point (ci)\n23 postconditions (ci , output )\n24 pass_result . append ( True )\n25 except Exception as e:\n26 pass_result . append ( False )\n27 return sum ( pass_result ) / len (\npass_result )\n28 global final_result\n```",
+        "bbox": [
+            97,
+            573,
+            485,
+            921
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Listing 2: Inter-consistency between solutions and specifications.",
+        "bbox": [
+            507,
+            103,
+            884,
+            134
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "code",
+        "sub_type": "algorithm",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "Generated solutions   \n2 def entry\\_point ( input ):   \n3   \n4   \n5 \"\"\" Generated test cases \"\"\"   \n6 test\\_case = {'input ': ... ,   \n7 'output ': ...}   \n8   \n9 \"\"\" Check inter - consistency \"\"\"   \n10 def check ():   \n11 try :   \n12 output = entry\\_point ( test\\_case [   \ninput '])   \n13 pass\\_result = ( output ==   \ntest\\_case ['output '])   \n14 except Exception as e:   \n15 pass\\_result = False   \n16 return pass\\_result   \n17 global final\\_result   \n18 final\\_result = check ()   \nListing 3: Inter-consistency between solutions and test   \ncases.",
+        "bbox": [
+            494,
+            148,
+            882,
+            422
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "page_number",
+        "text": "1441",
+        "bbox": [
+            480,
+            928,
+            519,
+            942
+        ],
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "C Discussion about Pass@k",
+        "text_level": 2,
+        "bbox": [
+            114,
+            83,
+            369,
+            99
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "In this section, we discuss the flaws of Pass@k in Chen et al. (2021) and propose a variant for evaluating methods involved selection and filtering.",
+        "bbox": [
+            112,
+            103,
+            489,
+            151
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Chen et al. (2021) propose an unbiased estimator called Pass@k, which estimates the probability of a model passing unit tests within k attempts. In specific, Chen et al. (2021) first samples a total of $n$ solutions with c of them are correct, randomly samples k solutions for testing, and use the probability of passing tests for estimation,",
+        "bbox": [
+            112,
+            152,
+            489,
+            265
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "img_path": "images/e43b58261c4fdca50ada07590a42c5b56e1a98485933565d93b51563c4b52c92.jpg",
+        "text": "$$\n\\begin{array} { r } { \\operatorname { P a s s } \\ @ k = 1 - \\frac { { \\binom { n - c } { k } } } { { \\binom { n } { k } } } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            216,
+            263,
+            381,
+            303
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Although their implementation serves as an effective measure of the code generation ability of different foundation models (referred to as the first category of methods in the following), it is not suitable to evaluate methods involving filtering or selection during the inference stage (Li et al., 2022; Chen et al., 2022) (referred to as the second category of methods in the following), as the n generated solutions are identical.",
+        "bbox": [
+            112,
+            307,
+            490,
+            453
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "To address the limitation, we implement a variant of Pass@k. We assume each method provides a score function over the n generated solutions, which provides a unified view for the two method categories and hence enables a fair comparison. The first category can be regarded as assigning an identical score to each solution. Similar to the original definition of Pass@k, we evaluate the method by testing the top-k solutions with the highest scores. As the score function may assign the same score to multiple solutions, the test result of the top-k is not deterministic but an expected value.",
+        "bbox": [
+            112,
+            453,
+            490,
+            645
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Mathematically, let’s assume that a method sequentially arranges outputs into an ordered list $\\{ s _ { 1 } , . . . , s _ { n } \\}$ , such that $\\forall i \\ > \\ j , s _ { i } \\ \\preceq \\ s _ { j }$ according to their scores. We define a set of solutions $\\mathbb { S } ^ { k } = \\{ s _ { i } | s _ { k } \\preceq s _ { i } \\}$ , which represents the solution set selected by the method. Suppose the cardinalily of $\\mathbb { S } ^ { k }$ is $\\hat { n } .$ , the number of correct solutions within $\\mathbb { S } ^ { k }$ is ${ \\hat { c } } .$ Noted that ${ \\hat { n } } \\geq k .$ , and thus we uniformly sample k solutions $\\{ s _ { 1 } ^ { \\prime } , . . . , s _ { k } ^ { \\prime } \\}$ from $\\mathbb { S } ^ { k }$ for estimation,",
+        "bbox": [
+            112,
+            645,
+            489,
+            807
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "img_path": "images/c45f9cf7dc5560940948841b24b1917625acfe2919ce2e78263bd2b66474ce32.jpg",
+        "text": "$$\n\\begin{array} { r l } & { \\mathrm { P a s s @ } k \\mathrm { ~ ( O u r s ) } = \\mathbb { E } _ { s _ { 1 } ^ { \\prime } , \\ldots , s _ { k } ^ { \\prime } } [ \\mathbf { 1 } _ { \\cup _ { i = 1 } ^ { k } s _ { i } ^ { \\prime } \\mathrm { ~ i s ~ c o r r e c t } } ] } \\\\ & { \\qquad = \\mathrm { P r } ( \\cup _ { i = 1 } ^ { k } s _ { i } ^ { \\prime } \\mathrm { ~ i s ~ c o r r e c t } ) } \\\\ & { \\qquad = 1 - \\mathrm { P r } ( \\cap _ { i = 1 } ^ { k } s _ { i } ^ { \\prime } \\mathrm { ~ i s ~ i n c o r r e c t } ) } \\\\ & { \\qquad = 1 - \\frac { \\binom { \\hat { n } - \\hat { c } } { k } } { \\binom { \\hat { n } } { k } } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            127,
+            810,
+            472,
+            917
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "For a the first category of methods, nˆ equals n since it treats each solution equally. As a result, our implementation of Pass@k is identical to the original implementation in Chen et al. (2021).",
+        "bbox": [
+            507,
+            89,
+            885,
+            154
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Pass@k of MPSC when k is large As shown in Table 2, the performance of MPSC-Semantic and MPSC-Lexical remains largely unchanged as k increases. This phenomenon aligns with the nature of MPSC, which assesses solutions based on their consistency, hence assigning similar scores to solutions with similar semantics. Consequently, all solutions will aggregate into many clusters depending on whether the assigned scores are identical, resulting in a lack of diversity within each cluster. Therefore, the pass rate of solutions selected by MPSC will remains constant even in more attempts (i.e. varying k), if the number of attempts is still less than the top-ranked cluster size. A trivial method to address the problem is to increase the diversity by adopting a round-robin selection from all clusters, rather than selecting solutions according to scores from highest to lowest. The corresponding results are presented in Table 8. We can see the performance of Pass@5 is improved compared with that of Table 2.",
+        "bbox": [
+            507,
+            161,
+            887,
+            500
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "images/2b8f0c3cd45a413671930a48d77133ed5936ed9badcb3a75f04938cff0497be3.jpg",
+        "table_caption": [
+            "Table 8: Performance of MPSC evaluated by the Pass@k metric in a round-robin way."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Method</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td></tr><tr><td colspan=\"4\">HumanEval</td></tr><tr><td>GPT-3.5-Turbo</td><td>68.38</td><td>76.24</td><td>83.15</td></tr><tr><td>MPSC-Lexical</td><td>82.32</td><td>84.76</td><td>86.59</td></tr><tr><td>MPSC-Semantic</td><td>83.35</td><td>86.08</td><td>89.75</td></tr><tr><td colspan=\"4\">HumanEval+</td></tr><tr><td>GPT-3.5-Turbo</td><td>58.75</td><td>66.58</td><td>73.96</td></tr><tr><td>MPSC-Lexical</td><td>74.39</td><td>75.0</td><td>77.44</td></tr><tr><td>MPSC-Semantic</td><td>73.08</td><td>77.89</td><td>83.20</td></tr><tr><td colspan=\"4\">MBPP</td></tr><tr><td>GPT-3.5-Turbo</td><td>66.80</td><td>72.34</td><td>76.60</td></tr><tr><td>MPSC-Lexical</td><td>68.38</td><td>70.26</td><td>71.43</td></tr><tr><td>MPSC-Semantic</td><td>73.24</td><td>74.46</td><td>78.01</td></tr><tr><td colspan=\"4\">CodeContests</td></tr><tr><td>GPT-3.5-Turbo</td><td>2.57</td><td>4.22</td><td>7.16</td></tr><tr><td>MPSC-Lexical</td><td>5.45</td><td>5.45</td><td>6.06</td></tr><tr><td>MPSC-Semantic</td><td>10.07</td><td>10.18</td><td>11.39</td></tr><tr><td>MPSC</td><td>74.17</td><td>77.02</td><td>78.53</td></tr><tr><td>+ 1 test case</td><td>85.37</td><td>86.59</td><td>85.13</td></tr><tr><td>+ 2 test cases</td><td>85.98</td><td>86.18</td><td>85.36</td></tr><tr><td>+ 5 test cases</td><td>88.41</td><td>89.23</td><td>88.69</td></tr><tr><td>+ 10 test cases</td><td>89.02</td><td>90.24</td><td>88.81</td></tr><tr><td colspan=\"4\">HumanEval+</td></tr><tr><td>MPSC</td><td>65.05</td><td>69.76</td><td>71.72</td></tr><tr><td>+ 1 test case</td><td>85.37</td><td>86.59</td><td>85.13</td></tr><tr><td>+ 2 test cases</td><td>85.98</td><td>86.18</td><td>85.36</td></tr><tr><td>+ 5 test cases</td><td>88.41</td><td>89.23</td><td>88.69</td></tr><tr><td>+ 10 test cases</td><td>89.02</td><td>90.24</td><td>88.81</td></tr><tr><td colspan=\"4\">MBPP</td></tr><tr><td>MPSC</td><td>69.34</td><td>70.06</td><td>71.85</td></tr><tr><td>+ 1 test case</td><td>69.85</td><td>71.99</td><td>72.69</td></tr><tr><td>+ 2 test cases</td><td>70.78</td><td>72.46</td><td>73.04</td></tr><tr><td>+ 5 test cases</td><td>71.25</td><td>72.93</td><td>73.47</td></tr><tr><td>+ 10 test cases</td><td>71.72</td><td>73.4</td><td>73.27</td></tr></table>",
+        "bbox": [
+            531,
+            510,
+            862,
+            777
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "page_number",
+        "text": "1442",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 13
+    },
+    {
+        "type": "table",
+        "img_path": "",
+        "table_caption": [],
+        "table_footnote": [],
+        "bbox": [
+            134,
+            82,
+            467,
+            361
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Table 9: Performance of MPSC with different numbers of golden test cases.",
+        "bbox": [
+            112,
+            374,
+            487,
+            404
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "C.1 Analysis of Other Perspectives",
+        "text_level": 2,
+        "bbox": [
+            114,
+            444,
+            405,
+            460
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "MPSC not only selects the optimal output from the target perspective but also chooses outputs from auxiliary perspectives, thereby generating corresponding by-products. In the context of code generation, which is the primary focus of this paper, MPSC can additionally identify more reliable test cases and specifications. We evaluate the quality of these by-products and present the results in Table 11. The experimental results demonstrate that MPSC is proficient in selecting high-quality outputs across all relevant perspectives.",
+        "bbox": [
+            110,
+            470,
+            490,
+            650
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D More Analysis",
+        "text_level": 2,
+        "bbox": [
+            112,
+            668,
+            280,
+            684
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D.1 MPSC with User-provided Test Cases",
+        "text_level": 2,
+        "bbox": [
+            112,
+            700,
+            460,
+            717
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "In practical applications of code generation, users often provide a limited number of test cases to outline the desired functionality, thereby assisting the model in generating code that aligns with the requirements. In Table 2, MPSC-Label has shown remarkable performance. In this study, we investigate the potential performance improvements of the method in such scenarios by incorporating various quantities of golden test cases. These golden test cases are generated and then validated using canonical solutions provided in the benchmarks. We conduct experiments on the HumanEval and MBPP dataset <sup>8</sup> and present the results in Table 9. The substantial performance enhancements achieved with the inclusion of merely five golden test cases underscore the feasibility of implementing MPSC in user-interactive application scenarios.",
+        "bbox": [
+            110,
+            727,
+            492,
+            921
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "table",
+        "img_path": "images/839d55aa22608d0989d62dbbe7779590396ed27b8fc0ab0936143ec8dce42d5e.jpg",
+        "table_caption": [
+            "Table 10: The average performance of MPSC with three sample sets under different random seeds. We use MPSC-Semantic configuration in this experiment."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Metric</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td></tr><tr><td colspan=\"4\">HumanEval</td></tr><tr><td>WizzardCoder-34B</td><td> $6 6 . 0 4 { \\scriptstyle \\pm 1 . 2 7 }$ </td><td> $7 0 . 9 5 { \\scriptstyle \\pm 0 . 8 4 }$ </td><td> $7 5 . 5 1 { \\scriptstyle \\pm 0 . 4 3 }$ </td></tr><tr><td>+MPSC</td><td> $7 6 . 3 2 _ { \\pm 1 . 8 2 }$ </td><td> $7 6 . 5 0 { \\scriptstyle \\pm 1 . 2 0 }$ </td><td> $7 5 . 9 3 _ { \\pm 0 . 6 8 }$ </td></tr><tr><td>WizzardCoder-13B</td><td> $5 8 . 6 2 _ { \\pm 1 . 2 3 }$ </td><td> $6 5 . 0 5 _ { \\pm 0 . 7 5 }$ </td><td> $7 1 . 8 1 _ { \\pm 0 . 1 4 }$ </td></tr><tr><td>+MPSC</td><td> $7 4 . 9 6 _ { \\pm 0 . 9 6 }$ </td><td> $7 5 . 5 1 _ { \\pm 0 . 4 4 }$ </td><td> $7 5 . 3 3 _ { \\pm 0 . 5 7 }$ </td></tr><tr><td>WizzardCoder-7B</td><td> $5 2 . 2 0 { \\scriptstyle \\pm 2 . 1 7 }$ </td><td> $5 8 . 1 6 _ { \\pm 1 . 9 4 }$ </td><td> $6 4 . 7 3 { \\scriptstyle \\pm 1 . 6 8 }$ </td></tr><tr><td>+MPSC</td><td> $6 5 . 0 9 { \\scriptstyle \\pm 1 . 8 3 }$ </td><td> $6 5 . 5 4 { \\scriptstyle \\pm 1 . 3 8 }$ </td><td> $6 6 . 5 1 { \\scriptstyle \\pm 0 . 8 3 }$ </td></tr><tr><td colspan=\"4\">HumanEval+</td></tr><tr><td>WizzardCoder-34B</td><td> $5 6 . 1 2 _ { \\pm 1 . 8 3 }$ </td><td> $6 0 . 5 4 _ { \\pm 1 . 6 6 }$ </td><td> $6 4 . 6 7 _ { \\pm 1 . 5 6 }$ </td></tr><tr><td>+MPSC</td><td> $6 5 . 2 1 _ { \\pm 0 . 2 0 }$ </td><td> $6 4 . 8 5 _ { \\pm 1 . 1 0 }$ </td><td> $6 4 . 7 4 _ { \\pm 1 . 3 6 }$ </td></tr><tr><td>WizzardCoder-13B</td><td> $4 9 . 4 2 _ { \\pm 0 . 5 9 }$ </td><td> $5 4 . 9 1 _ { \\pm 0 . 7 7 }$ </td><td> $6 0 . 8 1 _ { \\pm 0 . 8 3 }$ </td></tr><tr><td>+MPSC</td><td> $6 3 . 1 2 { \\scriptstyle \\pm 1 . 3 5 }$ </td><td> $6 3 . 6 8 { \\scriptstyle \\pm 0 . 6 3 }$ </td><td> $6 3 . 7 7 { \\scriptstyle \\pm 0 . 9 4 }$ </td></tr><tr><td>WizzardCoder-7B</td><td> $4 3 . 7 4 _ { \\pm 2 . 3 4 }$ </td><td> $4 9 . 4 8 _ { \\pm 2 . 3 7 }$ </td><td> $5 6 . 2 6 { \\scriptstyle \\pm 2 . 3 0 }$ </td></tr><tr><td>+MPSC</td><td> $5 4 . 6 4 _ { \\pm 1 . 2 1 }$ </td><td> $5 6 . 5 5 { \\scriptstyle \\pm 1 . 0 5 }$ </td><td> $5 8 . 2 1 _ { \\pm 0 . 8 8 }$ </td></tr><tr><td></td><td></td><td></td><td></td></tr></table>",
+        "bbox": [
+            510,
+            82,
+            899,
+            330
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            507,
+            412,
+            885,
+            494
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D.2 Time Overhead",
+        "text_level": 2,
+        "bbox": [
+            509,
+            505,
+            684,
+            520
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "The additional time overhead imposed by MPSC mainly comes from inter-consistency measurements and the iterative algorithm (Alg. 1). For the former, we need to process a total of $( 2 0 0 \\times 5 0 +$ $5 0 \\times 1 0 0 + 1 0 0 \\times 2 0 0 ) = 3 5 0 0 0$ edges with a time limit of 0.001 seconds per edge. In contrast, CodeT (Chen et al., 2022), the strongest baseline, requires to process a total of $2 0 0 \\times 5 0 0 = 1 0 0 0 0 0$ edges. Moreover, this process can be fully parallelized. For the latter, the iterative algorithm converges rapidly, typically within an average of about 50 rounds, requiring less than 0.1 second. Overall, the time overhead of MPSC is acceptable in most code development scenarios, laying the groundwork for real-world deployments.",
+        "bbox": [
+            507,
+            526,
+            887,
+            770
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "D.3 Stability of MPSC",
+        "text_level": 2,
+        "bbox": [
+            509,
+            781,
+            705,
+            797
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "We explore the stability of MPSC with respect to the sampling process. We conduct the sampling process of WizardCoder with three random seeds and then assess the performance of MPSC on the generated solutions. The average results are shown in Table 10. It is evident that the improvement brought by MPSC is very stable.",
+        "bbox": [
+            507,
+            803,
+            885,
+            885
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_footnote",
+        "text": "<sup>8</sup>CodeContests doesn’t provide canonical solutions. Therefore, we cannot conduct evaluation of test cases.",
+        "bbox": [
+            509,
+            892,
+            885,
+            920
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "page_number",
+        "text": "1443",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 14
+    },
+    {
+        "type": "table",
+        "img_path": "images/3a183ef000adf498ac466b6a65272185397967c53553f5066d4d64134e27b93c.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Benchmark</td><td colspan=\"3\">HumanEval</td><td colspan=\"3\">MBPP</td></tr><tr><td>Metric</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td></tr><tr><td colspan=\"9\">Specification</td></tr><tr><td>GPT-3.5-Turbo</td><td>45.93</td><td>58.76</td><td>72.26</td><td>53.7</td><td>62.37</td><td>70.60</td></tr><tr><td>MPSC</td><td>73.58</td><td>73.59</td><td>74.38</td><td>71.86</td><td>71.38</td><td>73.40</td></tr><tr><td colspan=\"9\"></td></tr><tr><td>GPT-3.5-Turbo</td><td>63.83</td><td>80.71</td><td>93.23</td><td>34.64</td><td>44.32</td><td>53.19</td></tr><tr><td>MPSC</td><td>96.95</td><td>96.95</td><td>96.95</td><td>55.72</td><td>55.95</td><td>57.18</td></tr></table>",
+        "bbox": [
+            263,
+            82,
+            737,
+            224
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/9144d6bba8cf39a692f474a7ad50b462fe2a24be8455f2f0a9fac13ca83a7545.jpg",
+        "table_caption": [
+            "Table 11: The quality of specifications and test cases selected by MPSC. They can also be evaluated in Pass@k. We use MPSC-Semantic configuration in this experiment.",
+            "Table 12: The performance of MPSC-Semantic with different foundation models. †: We use nucleus sampling with temperature as 0.2 instead of greedy generation in this experiment. The best performance is shown in bold."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Benchmark</td><td colspan=\"3\">HumanEval</td><td colspan=\"3\">HumanEval+</td></tr><tr><td>Metric</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td><td> $\\mathrm { P a s s } @ 1$ </td><td>Pass@2</td><td>Pass@5</td></tr><tr><td>WizzardCoder-34B†</td><td> $6 7 . 8 4 $ </td><td> $7 2 . 1 2$ </td><td>75.98</td><td>58.70</td><td>62.88</td><td>66.88</td></tr><tr><td>+CodeT</td><td> $7 3 . 1 7 _ { + 5 . 3 3 }$ </td><td> $7 3 . 1 7 _ { + 1 . 0 5 }$ </td><td> $7 2 . 0 3 _ { - 3 . 9 5 }$ </td><td> $6 4 . 2 1 _ { + 5 . 5 1 }$ </td><td> $6 4 . 3 6 _ { + 1 . 4 8 }$ </td><td> $6 3 . 4 1 _ { - 3 . 4 7 }$ </td></tr><tr><td>+MPSC</td><td> $7 4 . 0 6 _ { + 6 . 2 2 }$ </td><td> $7 5 . 0 0 _ { + 2 . 8 8 }$ </td><td> $7 5 . 0 7 _ { - 0 . 9 1 }$ </td><td> $\\mathbf { 6 5 . 4 5 _ { + 6 . 7 5 } }$ </td><td> ${ \\bf 6 5 . 7 1 _ { + 2 . 8 3 } }$ </td><td> $6 6 . 1 9 _ { - 0 . 6 9 }$ </td></tr><tr><td>Code Llama-34B</td><td> $5 1 . 7 8$ </td><td>59.24</td><td> $6 7 . 0 7$ </td><td> $4 1 . 4 9$ </td><td>48.30</td><td>55.93</td></tr><tr><td>+CodeT</td><td> $6 7 . 9 9 _ { + 1 6 . 2 1 }$ </td><td> $6 8 . 1 7 _ { + 8 . 9 3 }$ </td><td> $6 8 . 2 8 _ { + 1 . 2 1 }$ </td><td> $5 5 . 2 6 _ { + 1 3 . 7 7 }$ </td><td> $5 6 . 7 0 _ { + 8 . 4 }$ </td><td> $5 7 . 9 0 _ { + 1 . 9 7 }$ </td></tr><tr><td>+MPSC</td><td> $\\mathbf { 7 0 . 9 7 _ { + 1 9 . 1 9 } }$ </td><td> $\\mathbf { 7 0 . 5 5 _ { + 1 1 . 3 1 } }$ </td><td> ${ \\bf 7 1 . 3 6 _ { + 4 . 2 9 } }$ </td><td> ${ \\pmb { 5 8 . 4 4 _ { + 1 6 . 9 5 } } }$ </td><td> $\\mathbf { 5 9 . 0 0 _ { + 1 0 . 7 0 } }$ </td><td> ${ \\bf 6 0 . 0 2 } _ { + 4 . 0 9 }$ </td></tr><tr><td>WizzardCoder-13B</td><td>60.35</td><td>66.10</td><td> $7 2 . 0 1 $ </td><td>50.25</td><td>56.00</td><td>61.98</td></tr><tr><td>+CodeT</td><td> $6 6 . 8 6 _ { + 6 . 5 1 }$ </td><td> $6 7 . 1 8 _ { + 1 . 0 8 }$ </td><td> $6 7 . 9 3 _ { - 4 . 0 8 }$ </td><td> $5 8 . 2 3 _ { + 7 . 9 8 }$ </td><td> $5 8 . 7 2 _ { + 2 . 7 2 }$ </td><td> $5 8 . 9 9 _ { - 2 . 9 9 }$ </td></tr><tr><td>+MPSC</td><td> $7 3 . 6 0 _ { + 1 3 . 2 5 }$ </td><td> $\\mathbf { 7 4 . 9 6 _ { + 8 . 8 6 } }$ </td><td> $7 4 . 5 7 _ { + 2 . 5 6 }$ </td><td> $\\mathbf { 6 1 . 3 3 _ { + 1 1 . 0 8 } }$ </td><td> $\\mathbf { 6 2 . 9 9 _ { + 6 . 9 9 } }$ </td><td> ${ \\bf 6 2 . 6 7 _ { + 0 . 6 9 } }$ </td></tr><tr><td>Code Llama-13B</td><td> $4 4 . 6 3$ </td><td>50.99</td><td> $5 7 . 8 6 $ </td><td> $3 5 . 9 3 $ </td><td> $4 1 . 7 1$ </td><td> $4 8 . 1 9$ </td></tr><tr><td>+CodeT</td><td> $5 7 . 9 9 _ { + 1 3 . 3 6 }$ </td><td> $5 8 . 2 5 _ { + 7 . 2 6 }$ </td><td> $5 7 . 9 1 _ { + 0 . 0 5 }$ </td><td> $5 0 . 0 3 _ { + 1 4 . 1 }$ </td><td> $5 0 . 4 6 _ { + 8 . 7 5 }$ </td><td> $5 0 . 4 8 _ { + 2 . 2 9 }$ </td></tr><tr><td>+MPSC</td><td> $\\mathbf { 6 2 . 9 4 _ { + 1 8 . 3 1 } }$ </td><td> $\\mathbf { 6 4 . 9 3 _ { + 1 3 . 9 4 } }$ </td><td> $\\mathbf { 6 4 . 6 6 _ { + 6 . 8 0 } }$ </td><td> ${ \\pmb 5 0 . 0 4 } _ { + 1 4 . 1 1 }$ </td><td> ${ \\bf 5 1 . 2 4 _ { + 9 . 5 3 } }$ </td><td> ${ \\bf 5 1 . 3 6 _ { + 3 . 1 7 } }$ </td></tr><tr><td>WizzardCoder-7B</td><td> $5 3 . 8 1 $ </td><td> $5 9 . 6 2 $ </td><td> $6 6 . 0 6$ </td><td> $4 5 . 0 6$ </td><td> $5 0 . 8 3$ </td><td> $5 7 . 6 9 $ </td></tr><tr><td>+CodeT</td><td> $6 3 . 1 7 _ { + 9 . 3 6 }$ </td><td> $6 3 . 3 6 _ { + 3 . 7 4 }$ </td><td> $6 3 . 4 1 _ { - 2 . 6 5 }$ </td><td> ${ \\bf 5 4 . 1 3 _ { + 9 . 0 7 } }$ </td><td> $5 5 . 0 5 _ { + 4 . 2 2 }$ </td><td> $5 5 . 7 4 _ { - 1 . 9 5 }$ </td></tr><tr><td>+MPSC</td><td> $\\mathbf { 6 3 . 8 5 _ { + 1 0 . 0 4 } }$ </td><td> ${ \\bf 6 4 . 0 4 } _ { + 4 . 4 2 }$ </td><td> ${ \\bf 6 7 . 3 2 _ { + 1 . 2 6 } }$ </td><td> $5 3 . 6 9 _ { + 8 . 6 3 }$ </td><td> ${ 5 5 . 0 7 } _ { + 4 . 2 4 }$ </td><td> $\\pmb { 5 9 . 4 5 _ { + 1 . 7 6 } }$ </td></tr><tr><td>Code Llama-7B</td><td> $3 9 . 3 8$ </td><td> $4 5 . 1 8$ </td><td> $5 2 . 7 9$ </td><td> $3 4 . 3 3 $ </td><td> $3 9 . 1 8$ </td><td> $4 5 . 2 5$ </td></tr><tr><td>+CodeT</td><td> $5 1 . 6 8 _ { + 1 2 . 3 0 }$ </td><td> $5 1 . 8 3 _ { + 6 . 6 5 }$ </td><td> $5 1 . 9 0 _ { - 0 . 8 9 }$ </td><td> $4 4 . 0 6 _ { + 9 . 7 3 }$ </td><td> $4 4 . 4 7 _ { + 5 . 2 9 }$ </td><td> $4 4 . 7 1 . 0 . 5 4 $ </td></tr><tr><td>+MPSC</td><td> ${ \\pmb { 5 8 . 5 4 _ { + 1 9 . 1 6 } } }$ </td><td> ${ \\pmb 5 7 . 8 3 _ { + 1 2 . 6 5 } }$ </td><td> ${ \\bf 5 9 . 3 1 _ { + 6 . 5 2 } }$ </td><td> $\\mathbf { 4 9 . 0 4 _ { + 1 4 . 7 1 } }$ </td><td> $\\mathbf { 4 9 . 9 6 _ { + 1 0 . 7 8 } }$ </td><td> $\\mathbf { 5 0 . 4 6 _ { + 5 . 2 1 } }$ </td></tr></table>",
+        "bbox": [
+            179,
+            279,
+            818,
+            579
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            638,
+            489,
+            671
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "E Experiment Settings and Baselines",
+        "text_level": 2,
+        "bbox": [
+            509,
+            638,
+            847,
+            655
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "D.4 MPSC with Limited API Calls",
+        "text_level": 2,
+        "bbox": [
+            112,
+            684,
+            405,
+            699
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "We here discuss another setting, where MPSC utilizes 100 solutions, 50 specifications and 50 test cases, requiring identical API calls to the foundation model baselines. The results shown in Table 13 again prove the supreme performance of MPSC over baselines under fair comparison.",
+        "bbox": [
+            110,
+            706,
+            490,
+            804
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "D.5 Comparison on Other Foundation Models",
+        "text_level": 2,
+        "bbox": [
+            112,
+            816,
+            489,
+            833
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Table 3 demonstrates the generalization of MPSC on other foundation models. We also conduct an experiment to compare MPSC with CodeT, the strongest baseline, under this setting. The results are presented in Table 12.",
+        "bbox": [
+            112,
+            839,
+            489,
+            921
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "We incorporate various baselines in code generation. First of all, we include many strong large language models like ChatGPT (gpt-3.5- turbo 0614 version), GPT-4 (gpt4-0614 version), Code Llama-Instruct-34B, WizardCoder-Python-34B and DeepSeekCoder-7B-Instruct. The specific hyper-parameters for inference of ChatGPT and GPT4 are shown in Table 14. MPSC requires an additional hyper-parameter α, which controls the balance between inter-consistency and intraconsistency in the algorithm. Given that the quality of inter-consistency significantly depends on the edge density of the graph, we utilize the mean edge weight to determine the value of α. Empirically, we assign a relatively small value of α (0.01) when the edges are sparse on the graph, indicated by the mean edge weight less than 0.16. Other, we assign a large value of α (0.95) otherwise to better leverage inter-consistency.",
+        "bbox": [
+            507,
+            662,
+            887,
+            921
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "page_number",
+        "text": "1444",
+        "bbox": [
+            480,
+            929,
+            522,
+            942
+        ],
+        "page_idx": 15
+    },
+    {
+        "type": "table",
+        "img_path": "images/fee774d4bcd1be9444f51220ac74b98574119b68279786869c0216d96824a761.jpg",
+        "table_caption": [
+            "Table 13: The performance of MPSC with 100 solutions, 50 specifications and 50 test cases"
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Benchmark</td><td colspan=\"3\">HumanEval</td><td colspan=\"3\">HumanEval+</td><td colspan=\"3\">MBPP</td><td colspan=\"3\">CodeContest</td></tr><tr><td>Metric</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td><td>Pass@1</td><td>Pass@2</td><td>Pass@5</td></tr><tr><td>GPT-3.5-Turbo</td><td>68.38</td><td>76.24</td><td>83.15</td><td>58.75</td><td>66.58</td><td>73.96</td><td>66.80</td><td>72.34</td><td>76.60</td><td>2.57</td><td>4.22</td><td>7.16</td></tr><tr><td>GPT-4</td><td>81.48</td><td>86.31</td><td>90.46</td><td>70.52</td><td>75.48</td><td>79.54</td><td>71.26</td><td>74.27</td><td>76.99</td><td>6.1</td><td>8.28</td><td>11.72</td></tr><tr><td>MPSC</td><td>81.5</td><td>83.7</td><td>91.05</td><td>72.18</td><td>75.2</td><td>81.22</td><td>72.78</td><td>74.24</td><td>78.25</td><td>10.77</td><td>12.64</td><td>13.84</td></tr></table>",
+        "bbox": [
+            132,
+            82,
+            867,
+            158
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            112,
+            210,
+            490,
+            259
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "table",
+        "img_path": "images/5d2e92cea0f9bf3d7edd22bfc338c51e203066ce516945118b32066e3200aad7.jpg",
+        "table_caption": [
+            "Table 14: The Inference hyper-parameters of LLMs."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td>Temperature</td><td>0.8</td></tr><tr><td>Top P</td><td>0.95</td></tr><tr><td>Frequency Penalty Presence Penalty</td><td>0 0</td></tr></table>",
+        "bbox": [
+            194,
+            271,
+            408,
+            347
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "oracle programs until they pass all public example test cases, whose complexity is unlimited.",
+        "bbox": [
+            507,
+            210,
+            884,
+            243
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "We also include several baselines like Self-Consistency MBR-EXEC, CodeT and Selfcollaboration, which enhance the inference capability of LLMs in a post-hoc manner.",
+        "bbox": [
+            112,
+            391,
+            490,
+            456
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "• CodeT: This baseline first uses generated test cases to verify each solution by code execution. Then it utilizes RANSAC algorithm to create consensus sets based on execution results. The size of consensus set is then used to rank solutions. We generate 500 test cases for CodeT following the original implementation in Chen et al. (2022).",
+        "bbox": [
+            124,
+            456,
+            490,
+            586
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "• Self-Consistency: We implement this baseline following Chen et al. (2022). If two solution pass the same set of generated test cases and specifications, we regard them “consistent”. Then we take a majority voting to rank solutions following Wang et al. (2022).",
+        "bbox": [
+            126,
+            590,
+            490,
+            688
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "• MBR-EXEC: This baseline ranks solutions by minimum Bayes risk decoding based on the execution results in the 500 generated test cases.",
+        "bbox": [
+            126,
+            692,
+            490,
+            740
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "For a fair comparison between our proposed MPSC and these baselines, we employ the same solutions generated by ChatGPT for them to rerank. In specific, we sample 200 solutions following the conventional setting. Since some methods leverage generated test cases and specifications as well, we use the same set of test cases and specifications generated by ChatGPT for both MPSC and these baselines.",
+        "bbox": [
+            112,
+            741,
+            490,
+            887
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "We don’t include ALGO (Zhang et al., 2023) as baseline, because it requires to keep generating",
+        "bbox": [
+            112,
+            888,
+            489,
+            921
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "page_number",
+        "text": "1445",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "F Prompt for MPSC",
+        "text_level": 2,
+        "bbox": [
+            114,
+            83,
+            310,
+            102
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Prompt for Generating Specifications",
+        "text_level": 2,
+        "bbox": [
+            141,
+            112,
+            421,
+            130
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "I want you to act as a python programmer. Given a docstring about a python method, you need to write its pre-conditions in one test function “def preconditions(input)\" and post-conditions in another test function “def postconditions(input, output):\". You should ensure invalid input or output of the method will raise error in the two test functions.",
+        "bbox": [
+            137,
+            137,
+            465,
+            286
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "{Demonstration Docstrings 1}",
+        "bbox": [
+            139,
+            316,
+            368,
+            334
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "#Pre-conditions",
+        "bbox": [
+            141,
+            348,
+            265,
+            365
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "{Demonstration Preconditions 1}",
+        "bbox": [
+            141,
+            365,
+            388,
+            381
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "#Post-conditions",
+        "bbox": [
+            141,
+            381,
+            272,
+            397
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "{Demonstration Postconditions 1}",
+        "bbox": [
+            141,
+            397,
+            394,
+            414
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "\\`\\`\\`Python",
+        "text_level": 2,
+        "bbox": [
+            141,
+            444,
+            223,
+            461
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "{Demonstration Docstrings 2}",
+        "bbox": [
+            139,
+            461,
+            366,
+            479
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "pass",
+        "bbox": [
+            141,
+            479,
+            179,
+            493
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "#Pre-conditions",
+        "bbox": [
+            141,
+            493,
+            263,
+            510
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "{Demonstration Preconditions 2}",
+        "bbox": [
+            141,
+            510,
+            388,
+            526
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "#Post-conditions",
+        "bbox": [
+            141,
+            526,
+            272,
+            542
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "{Demonstration Postconditions 2}",
+        "bbox": [
+            139,
+            541,
+            394,
+            560
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Prompt for Generating Solutions",
+        "text_level": 2,
+        "bbox": [
+            141,
+            688,
+            386,
+            705
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "I want you to act like a Python programmer. I will give you the declaration of a function and comments about its property. You need to implement the body of the function in the code block. Do not modify any code I provide. Do not provide any explanations.",
+        "bbox": [
+            139,
+            714,
+            465,
+            815
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Here is the question.",
+        "bbox": [
+            139,
+            826,
+            297,
+            845
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Prompt for Generating Test Cases",
+        "text_level": 2,
+        "bbox": [
+            536,
+            85,
+            791,
+            102
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "\\`\\`\\`Python Python",
+        "text_level": 2,
+        "bbox": [
+            537,
+            111,
+            620,
+            129
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "code",
+        "sub_type": "algorithm",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "# Given a docstring, continue to write the   \nfollowing code with 10 valid assertion   \nstatements to check the correctness of the   \nfunction. Provide diverse test cases.   \n{Docstrings}   \npass   \n# check the correctness of with 10   \ndifferent valid assertion statements in the   \nform of “assert {entry point}(...) == ...\"   \nassert",
+        "bbox": [
+            526,
+            117,
+            867,
+            340
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "G Case Study",
+        "text_level": 2,
+        "bbox": [
+            509,
+            354,
+            648,
+            374
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "We present some cases from HumanEval, MBPP, CodeContests in the following pages.",
+        "bbox": [
+            509,
+            380,
+            885,
+            416
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "page_number",
+        "text": "1446",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 17
+    },
+    {
+        "type": "code",
+        "sub_type": "code",
+        "code_caption": [
+            "Listing 4: Cases from HumanEval."
+        ],
+        "code_footnote": [],
+        "code_body": "```python\n\"\"\" User Intent \"\"\"\ndef get_row (lst , x):\n3\n4 You are given a 2 dimensional data , as a nested lists ,\nwhich is similar to matrix , however , unlike matrices ,\n6 each row may contain a different number of columns .\n7 Given lst , and integer x, find integers x in the list ,\n8 and return list of tuples , [(x1 , y1), (x2 , y2) ...] such that\n9 each tuple is a coordinate - (row , columns ), starting with 0.\n10 Sort coordinates initially by rows in ascending order .\n11 Also , sort coordinates of the row by columns in descending order .\n12\n13 Examples :\n14 get_row ([\n15 [1 ,2 ,3 ,4 ,5 ,6] ,\n16 [1 ,2 ,3 ,4 ,1 ,6] ,\n17 [1 ,2 ,3 ,4 ,5 ,1]\n18 ], 1) == [(0 , 0) , (1, 4) , (1, 0) , (2, 5) , (2, 0)]\n19 get_row ([] , 1) == []\n20 get_row ([[] , [1] , [1 , 2 , 3]] , 3) == [(2 , 2)]\n\" \"\n21\n22\n23\n24 \"\"\" Solution selected by MPSC \"\"\"\n25 def get_row (lst , x):\n26 result = []\n27 for row_index , row in enumerate (lst):\n28 for col_index , val in reversed ( list ( enumerate (row))):\n29 if val == x:\n30 result . append (( row_index , col_index ))\n31 result . sort ( key= lambda x: x [0])\n32 return result\n33\n34\n35 \"\"\" Solution selected by CodeT \"\"\"\n36 def get_row (lst , x):\n37 result = []\n38 for i, row in enumerate (lst ):\n39 if x in row :\n40 for j, val in sorted ( enumerate (row), key= lambda x: -x [1]) :\n41 if val == x :\n42 result . append (( i , j ) )\n43 return result\n```",
+        "bbox": [
+            95,
+            230,
+            756,
+            740
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "page_number",
+        "text": "1447",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 18
+    },
+    {
+        "type": "code",
+        "sub_type": "code",
+        "code_caption": [
+            "Listing 5: Cases from MBPP."
+        ],
+        "code_footnote": [],
+        "code_body": "```python\n\"\"\" User Intent \"\"\"\n2 def count_first_elements ( test_tup ):\n3\n4 Write a function to find the number of elements that occurs before the tuple\nelement in the given tuple .\n5\n6\n7\n8 \"\"\" Solution selected by MPSC \"\"\"\n9 def count_first_elements ( test_tup ) :\n10 count = 0\n11 for i in range (len ( test_tup )):\n12 if isinstance ( test_tup [i], tuple ):\n13 break\n14 count += 1\n15 return count\n16\n17\n18 \"\"\" Solution selected by CodeT \"\"\"\n19 def count_first_elements ( test_tup ):\n20 count = 0\n21 for i in range (len ( test_tup )):\n22 if test_tup [i] == test_tup [0]:\n23 break\n24 count += 1\n25 return count\n```",
+        "bbox": [
+            97,
+            330,
+            878,
+            643
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "page_number",
+        "text": "1448",
+        "bbox": [
+            480,
+            928,
+            521,
+            942
+        ],
+        "page_idx": 19
+    },
+    {
+        "type": "code",
+        "sub_type": "code",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "```python\n\"\"\" User Intent \"\"\"\ndef solution ( inputs : str ) -> str :\nYou are given an array a of length n.\nLet 's define the eversion operation . Let x = a_n. Then array a is partitioned\ninto two parts : left and right . The left part contains the elements of a that\nare not greater than x (<= x). The right part contains the elements of a that\nare strictly greater than x (> x). The order of elements in each part is kept\nthe same as before the operation , i. e. the partition is stable . Then the array\nis replaced with the concatenation of the left and the right parts .\n6 For example , if the array a is [2, 4, 1, 5, 3], the eversion goes like this : [2,\n4, 1, 5, 3] -> [2, 1, 3], [4, 5] -> [2, 1, 3, 4, 5].\nWe start with the array a and perform eversions on this array . We can prove that\nafter several eversions the array a stops changing . Output the minimum number k\nsuch that the array stops changing after k eversions .\n8\n9 Input :\n10 Each test contains multiple test cases . The first line contains the number of\ntest cases t (1 <= t <= 100) . Description of the test cases follows .\n11 The first line contains a single integer n (1 <= n <= 2 * 10^5) .\n12 The second line contains n integers a_1 , a_2 , ... , a_n (1 <= a_i <= 10^9) .\n13 It is guaranteed that the sum of n over all test cases does not exceed 2 * 10^5.\n14\n15 Output :\n16 For each test case print a single integer k - the number of eversions after\nwhich the array stops changing .\n17 Example\n18 assert solution ( '3\\ n5\\n2 4 1 5 3\\ n5\\n5 3 2 4 1\\ n4\\n1 1 1 1') == '1\\ n2\\n0 '\n19\n20 \"\"\" Solution selected by MPSC \"\"\"\n21 def solution ( inputs : str ) -> str :\n22 def eversion (a):\n23 n = len(a)\n24 l, r = [], []\n25 x = a[ -1]\n26 for i in range (n - 1):\n27 if a[i] <= x:\n28 l. append (a[i])\n29 else :\n30 r. append (a[i])\n31 return l + [x] + r\n32\n33 def is_same (a, b):\n34 return len (a) == len(b) and all(ai == bi for ai , bi in zip(a, b))\n35\n36 res = []\n37 inputs = inputs . strip (). split ('\\n')\n38 t = int ( inputs [0])\n39 idx = 1\n40 for _ in range (t):\n41 n = int( inputs [ idx ])\n42 a = list (map(int , inputs [ idx +1]. split ()))\n43 idx += 2\n44 cnt = 0\n45 while True :\n46 new_a = eversion (a)\n47 cnt += 1\n48 if is_same (a , new_a ) :\n49 break\n50 a = new_a\n51 res . append (str ( cnt - 1) )\n52 return '\\n'. join ( res )\n```",
+        "bbox": [
+            95,
+            129,
+            880,
+            868
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "page_number",
+        "text": "1449",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 20
+    },
+    {
+        "type": "code",
+        "sub_type": "code",
+        "code_caption": [],
+        "code_footnote": [],
+        "code_body": "```python\n53 \"\"\" Solution selected by CodeT \"\"\"\n54 def solution ( inputs : str ) -> str :\n55 # split the input into list of test cases\n56 test_cases = inputs . strip (). split ('\\n') [1:]\n57 result = []\n58\n59 # loop through each test case\n60 for i in range (0, len( test_cases ), 2):\n61 n = int( test_cases [i])\n62 a = list (map(int , test_cases [i +1]. split ()))\n63 k = 0\n64\n65 # perform eversion operation until array stops changing\n66 while True :\n67 x = a[ -1]\n68 left , right = [] , []\n69 for j in range (n -1) :\n70 if a[j] <= x:\n71 left . append ( a [ j ])\n72 else :\n73 right . append (a[j])\n74 new_a = left + [x] + right\n75 if new_a == a:\n76 break\n77 a = new_a\n78 k += 1\n79\n80 result . append (str(k))\n81\n82 # join the results and return\n83 return '\\n'. join ( result )\n```",
+        "bbox": [
+            94,
+            300,
+            880,
+            671
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "text",
+        "text": "Listing 6: Cases from CodeContests.",
+        "bbox": [
+            371,
+            676,
+            625,
+            692
+        ],
+        "page_idx": 21
+    },
+    {
+        "type": "page_number",
+        "text": "1450",
+        "bbox": [
+            480,
+            928,
+            522,
+            942
+        ],
+        "page_idx": 21
+    }
+]

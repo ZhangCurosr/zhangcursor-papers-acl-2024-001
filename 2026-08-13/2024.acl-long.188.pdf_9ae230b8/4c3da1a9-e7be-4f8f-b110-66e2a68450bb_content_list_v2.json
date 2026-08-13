@@ -1,0 +1,3370 @@
+[
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Collaboration or Corporate Capture? Quantifying NLP’s Reliance on Industry Artifacts and Contributions"
+                    }
+                ],
+                "level": 1
+            },
+            "bbox": [
+                137,
+                87,
+                860,
+                128
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Will Aitken<sup>1,2*</sup>, Mohamed Abdalla<sup>3</sup>, Karen Rudie<sup>1,2</sup>, Catherine Stinson<sup>4,5</sup>"
+                    }
+                ]
+            },
+            "bbox": [
+                183,
+                147,
+                818,
+                164
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>1</sup>Department of Electrical and Computer Engineering, Queen’s University"
+                    }
+                ]
+            },
+            "bbox": [
+                275,
+                179,
+                727,
+                193
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>2</sup>Ingenuity Labs Research Institute, Queen’s University"
+                    }
+                ]
+            },
+            "bbox": [
+                332,
+                193,
+                672,
+                206
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>3</sup>University of Alberta"
+                    }
+                ]
+            },
+            "bbox": [
+                431,
+                206,
+                573,
+                218
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>4</sup>School of Computing, Queen’s University"
+                    }
+                ]
+            },
+            "bbox": [
+                368,
+                218,
+                636,
+                233
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>5</sup>Department of Philosophy, Queen’s University"
+                    }
+                ]
+            },
+            "bbox": [
+                354,
+                231,
+                650,
+                246
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "{will.aitken, karen.rudie, c.stinson}@queensu.ca, mabdall2@ualberta.ca"
+                    }
+                ]
+            },
+            "bbox": [
+                184,
+                246,
+                823,
+                259
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Abstract"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                260,
+                286,
+                342,
+                302
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Impressive performance of pre-trained models has garnered public attention and made news headlines in recent years. Almost always, these models are produced by or in collaboration with industry. Using them is critical for competing on natural language processing (NLP) bench marks and correspondingly to stay relevant in NLP research. We surveyed 100 papers published at EMNLP 2022 to determine the degree to which researchers rely on industry models, other artifacts, and contributions to publish in prestigious NLP venues and found that the ratio of their citation is at least three times greater than what would be expected. Our work serves as a scaffold to enable future researchers to more accurately address whether: 1) Collaboration with industry is still collaboration in the absence of an alternative or 2) if NLP inquiry has been captured by the motivations and research direction of private corporations."
+                    }
+                ]
+            },
+            "bbox": [
+                141,
+                313,
+                462,
+                601
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "1 Introduction"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                115,
+                613,
+                260,
+                629
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Natural Language Processing (NLP) has seen rapid growth in recent years, attracting interest from large technology companies. Expediting the exploitation of emergent technologies is critical to industry success and this strategy has been applied to NLP, as is evident with the current influx of large language models (LLM), chatbots, and evaluation tools. These newfound business opportunities have brought industry to the forefront of NLP research. Industry presence in the Association of Computational Linguistics (ACL) Anthology has correspondingly increased 180% from 2017 to 2022 (Abdalla et al., 2023). The research community has taken notice: \"industry races ahead of academia\" was the top takeaway of the 2023 Artificial Intelligence (AI) Index Report (Maslej et al., 2023) and"
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                638,
+                490,
+                897
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/dac78fd004b7f82f000f8c815de1bd676e046c2b972ab8c54500302a9941710a.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 1: Percentage of surveyed EMNLP 2022 paper citations with industry affiliation smoothed with a 1D Gaussian Filter (σ = 2.5). The \"Expected\" line is the percentage of industry affiliation across the entire ACL anthology over time. One could expect cited papers of a given year to have the same degree of industry affiliation. The citations are split into the following types: Datasets, Pre-Trained Models, Prior Bests, and Full Setting scores (See § 3.3 for definitions of citation types)."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                515,
+                288,
+                875,
+                468
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "82% of NLP community survey respondents agreed with the statement \"Industry will produce the most widely-cited research\" (Michael et al., 2023). Public investment in AI has failed to keep up with industry: in 2021, Google’s funding of their subsidiary, DeepMind, alone surpassed the entirety of US non-military AI funding (Ahmed et al., 2023)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                643,
+                885,
+                756
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In parallel to increased industry presence, concerns have surfaced regarding the efficacy of research grounded on general purpose benchmark evaluation. Raji et al. (2021) note that widely-cited Natural Language Understanding (NLU) datasets used to verify general understanding of language models are subject to scope and subjectivity limitations. Despite these documented flaws, performance on held-out benchmark test sets is still the defacto standard used to establish publication validity (see § 3.2). The consensus from NLP researchers interviewed in a recent qualitative study (Gururaja et al., 2023) was that “improvements on benchmarks in NLP are the only results that are self-justifying to reviewers”. Furthermore, benchmark test sets favour institutes with higher computational budgets, since higher scores can sometimes be achieved via sheer computational power (Dodge et al., 2019)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                759,
+                887,
+                921
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "Corresponding Author."
+                    }
+                ]
+            },
+            "bbox": [
+                137,
+                906,
+                285,
+                920
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3433"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 3433–3448 August 11-16, 2024 ©2024 Association for Computational Linguistics"
+                    }
+                ]
+            },
+            "bbox": [
+                90,
+                946,
+                907,
+                973
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                490,
+                230
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "If substantial computer power is required to achieve state-of-the-art (SOTA) benchmark performance and thus publish in top venues (Dodge et al., 2019; Rogers, 2020), researchers with smaller budgets may find little room for contribution without relying on industry artifacts and contributions."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                233,
+                490,
+                329
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this work, we define reliance as needing something to a point such that, without it, one could not survive or be successful. Reliance enforces necessity which in turn minimizes the possibility of choosing an alternative. Instances of reliance have already been identified in NLP. For example, an NLP research community member notes regarding software tools: “You’re not gonna just build your own system that’s gonna compete on these major benchmarks yourself. You have to start [with] the infrastructure that is there” (Gururaja et al., 2023)."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                332,
+                490,
+                510
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Increased reliance on industry artifacts increases the risk of corporate capture – a phenomenon where private industry uses its influence to affect research direction and findings (i.e., Science Capture), policy (i.e, Policy Capture), or media coverage (i.e., Media Capture) (Miller and Harkins, 2010). Without provable intent (often obtained through litigation), or a counterfactual, it is exceedingly difficult to prove that ‘increased enmeshment of industry and academic research’ (Young et al., 2022) is industry capture instead of mutually beneficial collaboration."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                512,
+                490,
+                706
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The purpose of this work is to quantify academia’s increased reliance on industry artifacts. Since heavy reliance often co-occurs with capture, this is something we believe the field should study further. We note that our work is not proof of industry capture."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                708,
+                489,
+                804
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this study, we surveyed and collected metadata on 100 EMNLP 2022 papers. We found that across types of cited artifacts and contributions, the percentage that are industry affiliated is substantially higher than what would be expected relative to the collective ACL Anthology (Figure 1, § 4.1). Furthermore, the trend of industry affiliation has increased in recent years, culminating in the majority of all types of citations we recorded from 2022 being industry affiliated despite only 13.3% of papers published that year having industry affiliation."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                808,
+                490,
+                921
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                885,
+                149
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Along with determining the degree of reliance on industry (§ 4.1) we designed our EMNLP 2022 survey to address the following additional questions:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                151,
+                885,
+                215
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "1. What proportion of papers have industry affiliation? (§ 3.1)"
+                    }
+                ]
+            },
+            "bbox": [
+                524,
+                230,
+                885,
+                263
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "2. Are SOTA-pushing papers dominant? What other types of papers are being published and are their distributions different between academia and industry? (§ 3.2)"
+                    }
+                ]
+            },
+            "bbox": [
+                524,
+                277,
+                885,
+                343
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "3. For new SOTA papers, by how much are industry and academia improving over the prior best? (§ 4.2)"
+                    }
+                ]
+            },
+            "bbox": [
+                524,
+                356,
+                885,
+                406
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "4. What attributes of individual papers make them more or less favourable to achieving higher SOTA improvements? (§ 4.3)"
+                    }
+                ]
+            },
+            "bbox": [
+                524,
+                419,
+                884,
+                469
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The remainder of this paper is divided into related works (§ 2), survey methods (§ 3), results from analyzing the survey data (§ 4), and a corresponding discussion (§ 5). The survey and analysis code are available (for research purposes only) at https://github.com/Will-C-Aitken/ collaboration-or-corporate-captu re."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                483,
+                887,
+                613
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2 Related Works"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                627,
+                675,
+                644
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.1 Industry & Scientific Research"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                655,
+                798,
+                671
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Undoubtedly, there are benefits to the presence of and increased collaboration with industry sponsors. Gulbrandsen and Smeby (2005) found that industry-funded academics have higher publication productivity and that their funding sources enable them to examine both more novel and more interesting research topics. The outputs of industryfunded science are often more application focused and the well-defined design rules associated with this line of research need not be considered any less epistemically virtuous than a more theoretical approach (Wilholt, 2006). In general, Holman (2021) remarks that policy research tends to favour academia-industry ties while philosophy of science literature is more likely to condemn them."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                678,
+                887,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3434"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The ideal of value-free science is largely considered unrealistic in the philosophy of science community. Some degree of bias is inevitable (Wilholt, 2009). However, some biases are more damaging to research integrity than others. Examples include preference bias—“when a research result unduly reflects the researchers’ preference for it over other possible results” (Wilholt, 2009)— and sponsorship bias that leads to using insufficient evidence to support dubious scientific claims (Reutlinger, 2020)."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                85,
+                490,
+                262
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The proliferation of industry presence in AI research has also garnered internal criticism. Concerns regarding academic independence and integrity have been voiced by Abdalla and Abdalla (2021) and Whittaker (2021) by drawing parallels to tactics used by \"Big Tobacco\" and the US Military respectively to support their financial and political interests at the expense of public health and scientific transparency and soundness."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                266,
+                490,
+                412
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Supporting AI Ethics research has been described as a tactic used by tech firms to gain social capital and foster a favourable public image (Phan et al., 2022; Seele and Schultz, 2022). While this research can be beneficial, this practice can also have negative consequences. Some examples are how industry funding of digital rights civil society organizations can result in misrepresentation of public interests (Goldenfein and Mann, 2023) and how corporate capture of the ACM Fairness, Accountability, and Transparency (FAccT) conference led to conflicts of interest in the peer-review process (Young et al., 2022)."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                414,
+                490,
+                626
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.2 Benchmark Critiques"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                649,
+                332,
+                665
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The acceptance of a paper titled \"What Will it Take to Fix Benchmarking in Natural Language Understanding\" (Bowman and Dahl, 2021) to NAACL 2020 is strongly indicative of widespread benchmark dissent. The authors provide criteria that they believe future benchmarks should strive for. Raji et al. (2021) critique the generalizability of benchmarks by calling into question the validity of their constructs. Adjacently, through a microeconomics lens, Ethayarajh and Jurafsky (2020) argue that benchmark leaderboards fail to adequately capture model utility. Despite its shortcomings, benchmarking remains pervasive because it makes model comparison, evaluation of results, and quantification of progress straightforward."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                678,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2.3 Computing Power"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                84,
+                700,
+                101
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The resurgence of NLP in recent years can in part be attributed to increased computing power. Sharir et al. (2020) estimate the cost of training an 11Bparameter model (a modest size by today’s standards) to be well above $1.3 Million USD, a cost likely prohibitive in most academic settings. As a result, from 2010 to 2021, industry’s share of large AI models has increased from 11% to 96% (Ahmed et al., 2023)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                105,
+                887,
+                249
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The relationship of computing power to success in NLP has raised concerns regarding the dedemocritization and monopolization of AI (Ahmed and Wahed, 2020; Luitse and Denkena, 2021). Via case studies, Dodge et al. (2019) critique benchmark reporting metrics for unfairly favouring those who have the capacity to run more experiments. The greater resources available in industry labs may give them this advantage. Our survey analyzes whether this advantage leads to more substantial benchmark improvements."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                250,
+                887,
+                429
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3 Survey"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                439,
+                606,
+                456
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.1 Affiliation"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                464,
+                636,
+                479
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We randomly sampled 100 EMNLP 2022 papers from the main conference proceedings and classified their authors’ affiliations as either academic, non-profit, or industry. Government institutes were grouped with academia as both tend to serve the general public. Non-profits were self-reported as such and typically serve a subset of the public. Lastly, any for-profit institute that primarily serves private interests and shareholders was labelled as industry."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                485,
+                887,
+                645
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We then compressed the group of author’s affiliations into a single class. If all were from academia, the paper was labelled as such. If at least one affiliation was non-profit, the paper label was updated to non-profit. The same heuristic was used for industry with industry taking precedence over nonprofit. Our rationale was that if even one author was from industry or a non-profit, the team would likely have access to the resources of that institute. We replicated our main results with affiliation class determined using majority rule, with only minor variation in results (see Appendix A)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                648,
+                887,
+                840
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "It should be noted that even when an author’s affiliation is academic, this does not preclude them from having industry funding. We limited our analysis to affiliations explicitly stated in the paper’s authorship section and did not delve into acknowledgements or external CVs. Our analysis is therefore a lower bound on industry presence. The affiliation distribution of the surveyed papers is in Table 1."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                840,
+                887,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3435"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/02d64da2d18d618e4eaec63d6029f1b84540e3f3f90907ae325b40da781b915d.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 1: Affiliations of Surveyed EMNLP 2022 Papers."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td></td><td>Academia</td><td>Non-Profit</td><td>Industry</td><td>Total</td></tr><tr><td>Long</td><td>45</td><td>5</td><td>37</td><td>87</td></tr><tr><td>Short</td><td>5</td><td>1</td><td>7</td><td>13</td></tr><tr><td>Total</td><td>50</td><td>6</td><td>44</td><td>100</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                132,
+                82,
+                468,
+                151
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                203,
+                489,
+                266
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Corroborating the trend in (Abdalla et al., 2023), 44% of the surveyed EMNLP 2022 papers have industry affiliations, up from 24% over 2019-2021."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                268,
+                490,
+                317
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.2 Type"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                330,
+                201,
+                348
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We assigned each paper one or more type(s), most of which are self-explanatory. The type of paper can be thought of as the contribution(s) the authors are using to argue that their work is worthy of publication. Unique Setting SOTA is distinct from All-Time in that the authors are only looking at a constrained version of a dataset/benchmark. Examples include zero/few-shot, parameter-efficient tuning, and out-of-distribution robustness. Interpretability & Analysis papers dissect a pre-existing work or method to uncover additional insights. Split by institute type, Table 2 presents the types of papers surveyed."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                354,
+                490,
+                564
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Despite widespread criticism, performance on benchmarks remains critical to publishing in top venues with 73 SOTA claims appearing in the 100 papers. Industry also focuses on New Datasets. Bowman and Dahl (2021) detail the prohibitive cost of compiling and annotating an NLP dataset, likely making it a more viable endeavour for an industry budget. Likewise, industry produced over twice as many new Pre-Trained Models (PTMs). Academia focuses more on Interpetability & Analysis work—an inherently computationally conservative research direction."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                564,
+                490,
+                758
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Despite resource constraints, academia and industry published near identical quantities of both types of SOTA papers. One might expect the restricted environment of the Unique Setting to favour academia, both by limiting competition and possibly reducing computational requirements (e.g., parameter-efficient tuning), but this was not the case in our sample. A distinction between industry and academic SOTA advancements is, however, identifiable in terms of relative score improvement"
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                759,
+                490,
+                921
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/5fd69ea38f8d0c9d1ea1f79c41ae97cd679d68f4cadd97e5a242730e79923013.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 2: Types of Surveyed EMNLP 2022 Papers. Note that the columns do not sum to the amount of papers surveyed from each institution type since papers may be assigned more than one type."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Type</td><td>Academia</td><td>Non-Profit</td><td>Industry</td><td>Total</td></tr><tr><td>Unique Setting SOTA</td><td>18</td><td>4</td><td>17</td><td>39</td></tr><tr><td>All-Time SOTA</td><td>18</td><td>0</td><td>16</td><td>34</td></tr><tr><td>New Dataset</td><td>10</td><td>1</td><td>16</td><td>27</td></tr><tr><td>Interpretability &amp; Analysis</td><td>11</td><td>1</td><td>5</td><td>17</td></tr><tr><td>New Pre-Trained Model</td><td>2</td><td>0</td><td>5</td><td>7</td></tr><tr><td>New Metric</td><td>1</td><td>0</td><td>5</td><td>6</td></tr><tr><td>Ethics</td><td>2</td><td>0</td><td>1</td><td>3</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                512,
+                82,
+                882,
+                167
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "(see § 4.2)."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                265,
+                596,
+                281
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.3 Citations"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                296,
+                630,
+                311
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Research is an iterative collaborative effort that continually builds upon prior work. We recorded the cited works within each surveyed paper that have the most bearing on research direction and publication validity: PTMs, Datasets, Prior Best (for both All-Time and Unique Setting SOTA), and Full Setting (distinct to Unique Setting SOTA). For example, if a paper used the GLUE benchmark (Wang et al., 2018), we appended it to the list of that paper’s cited datasets. For each of these citations, we used the same heuristic as in § 3.1 to assign an affiliation label. Citations in appendices were excluded."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                321,
+                885,
+                529
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In addition to directly cited PTMs, if a PTM’s weights were initialized from an ancillary PTM, its citation was included as well. This recursive pattern was repeated until a PTM with weights initialized from scratch was identified. We ignored citations for model architectures since the architecture itself may not be computationally prohibitive while pre-training it often is. We did so to focus the survey on works that may not be computationally feasible for all researchers."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                530,
+                887,
+                692
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "All datasets, whether used for pre-training, finetuning, and/or scoring were recorded. When there was a resultant metric from training on and/or testing on a dataset, a Prior Best (and possible Full Setting) citation (if it existed) was associated with that specific metric. Multiple metrics may have been reported on a single dataset sometimes resulting in different Prior Bests being associated with the same dataset."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                693,
+                887,
+                838
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "For Unique Setting SOTA papers, the Full Setting is often included in the results section to provide an upper bound for comparison and we recorded these as well (e.g. the baseline of 100% parameters tuned in parameter-efficient tuning)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                839,
+                887,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3436"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Our goal was to determine which institute type usually owns this upper bound."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                85,
+                487,
+                117
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "For both Prior Best and Full Setting citations, we recorded the reported score associated with them. We use them to determine degree of improvement for SOTA claims (see § 4.2)."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                118,
+                490,
+                183
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.4 Miscellaneous"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                198,
+                273,
+                214
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To round out our survey, we recorded two miscellaneous variables: public code release and number of recorded metrics."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                222,
+                489,
+                269
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Reproducibility is a common but unevenly applied criterion for credibility in NLP and scientific research as a whole. Gundersen and Kjensmo (2018) grouped factors that assist in reproducing AI results into three categories and from surveying 400 research papers, determined that only 20–30% of them document such factors. One of these factors is the release of implementation code and data, a recommendation supported by Dodge et al. (2019) and included in the EMNLP 2022 Reproducibility Criteria. If a paper provided a link to their code and/or data (typically as a GitHub repository) the public code release variable was set to True."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                271,
+                490,
+                482
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In parallel to the citation recording process, we calculated the number of reported metrics per paper to determine whether industry’s increased computing capabilities would allow them to disseminate more results. This variable, along with the other miscellaneous variables are averaged over each institute type and presented in Table 3."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                483,
+                490,
+                595
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The percentage of publicly released code exhibits a downward trend across institution type. Given that reviewers were instructed to take into consideration a submission’s ability to meet Reproducibility Criteria, the acceptance of 15 papers with private implementations indicates that either these papers contribute exceptional methods that outweigh the negative consequences of their privacy or that the value placed on reproducibility is not uniform across reviewers. The usefulness of scientific results reported on closed models has been called into question (Rogers et al., 2023a) and whether research on private models is suitable for a public venue such as EMNLP is worthy of debate. Note that an \"Industry Track\" exists at EMNLP, which would seem like a natural fit for privatelyimplemented industry papers, however, they were submitted to the main track instead. We reflect further on the purpose of an Industry Track in § 5."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                596,
+                490,
+                903
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Academics and industry practitioners report nearly the same number of metrics per paper. This could be a result of limiting our survey to the main bodies of papers which have a fixed length and subsequently a relatively standard number of tables and figures. A future analysis including appendices may be more revealing."
+                    }
+                ]
+            },
+            "bbox": [
+                131,
+                904,
+                489,
+                921
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/cf16371da40f8b955d1f41c1279d2427fbe541956a3046e0b83b5241143669db.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 3: Miscellaneous survey elements averaged over all papers of each institution type."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td></td><td>Academia</td><td>Non-Profit</td><td>Industry</td><td>All</td></tr><tr><td>Public Code</td><td>94.0%</td><td>83.3%</td><td>75.0%</td><td>85.0%</td></tr><tr><td>Num. Metrics</td><td>14.0</td><td>4.5</td><td>15.5</td><td>14.0</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                519,
+                82,
+                872,
+                126
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                195,
+                885,
+                292
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4 Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                306,
+                620,
+                323
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Some research questions were not immediately answerable from the raw survey data and are addressed in this section via additional analysis."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                335,
+                887,
+                385
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.1 Reliance on Industry Artifacts and Contributions"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                397,
+                830,
+                430
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Having recorded the affiliations of each paper’s most important citations split by type (§ 3.3), we processed the data by binning citations by publication year. We did not split publications by the EMNLP 2022 paper’s affiliation for this analysis. We wanted to quantify reliance on industry for the entire NLP community. For each year with at least one citation, we determined what percentage of the citations were industry. Some years—especially the earlier ones—had no or few citations and the sparsity resulted in jagged impulses. We applied a 1D Gaussian filter<sup>1</sup> with its standard deviation, σ set to 2.5 to smooth the data and isolate a long-term trend."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                437,
+                885,
+                663
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "From Abdalla et al. (2023) we have access to the actual ACL Anthology industry affiliation rate over time and we plot it alongside the citation data. We label this line \"expected\" since one would expect the citations from each year to follow the same trend. Note that the ACL Anthology is not the publisher of every citation in EMNLP 2022. Image PTMs for example are typically published at other venues. However, the trend of increased industry presence at ACL generalizes to other major AI conferences (Ahmed and Wahed, 2020) and given that most NLP publications cite within the NLP community (Wahle et al., 2023) we believe it to be an adequate proxy of expectation."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                664,
+                885,
+                858
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>1</sup>SciPy Implementation (v1.10.1): https://docs.s cipy.org/doc/scipy-1.10.1/reference/gene rated/scipy.ndimage.gaussian_filter1d.ht ml"
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                869,
+                884,
+                919
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3437"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/27de4a060adbf15cea5b207d59412e8818fd8624f359e1b60bc251453803b839.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 4: Quantities of papers that used at least one PTM."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>PTM</td><td>Academia</td><td>Non-Profit</td><td>Industry</td><td>Total</td></tr><tr><td>Yes</td><td>43</td><td>6</td><td>38</td><td>87</td></tr><tr><td>No</td><td>7</td><td>0</td><td>6</td><td>13</td></tr><tr><td>Percent</td><td>86</td><td>100</td><td>86</td><td>87</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                134,
+                83,
+                467,
+                147
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                200,
+                487,
+                233
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The plot of both our citation data and expected industry presence is in Figure 1. Two observations are immediately clear: The citation of industry papers is well above expected for every year and the proportion is increasing. In fact, for Datasets, PTMs, Prior Bests, and Full Setting citations as of 2022, the majority are industry. This trend indicates a reliance on industry artifacts and contributions. While only 13.3% of published ACL Anthology papers were from industry in 2022, over three times that proportion were used as important citations."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                234,
+                489,
+                412
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In terms of artifacts, having the most used Datasets and PTMs coming from industry may limit the broader NLP community’s research directions to align with the publishing industry. Table 4 shows that while there is no explicit requirement that EMNLP papers use a PTM, the actuality that nearly all papers do implies otherwise. Since nearly all PTMs are produced by industry, it being a de facto standard to use them means that nearly all NLP research includes an industry component."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                412,
+                489,
+                574
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Industry’s majority claim on Prior Bests suggests that although they published less in the past, their publications are more likely to achieve and retain SOTA. The situation for Full Setting citations also supports a trend of industry reliance where the majority of Unique Setting works are at their onset looking up to industry as an impractical upper bound."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                575,
+                490,
+                703
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "For an analysis on how surveyed papers were predisposed to citing papers from within their own institute type, see Appendix B."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                706,
+                489,
+                755
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.2 Degree of SOTA Improvement"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                768,
+                400,
+                784
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "There was no clear distinction between quantities of SOTA papers published by industry and academia (§ 3.2). However, by analyzing the distribution of score increases over prior bests, a difference between institution types became evident. To do so, we averaged the relative improvements of individual metrics first over the dataset they were scored on, and then again over all datasets evaluated per paper. Equation 1 formalizes our approach:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                791,
+                490,
+                921
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/183685a112584ff8a1a44af88feed6352b6f410f0f21397cf7b0aaa4fc9187a9.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "All-Time"
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                526,
+                103,
+                872,
+                231
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/4a19b94a57b66de67da5eeadc2ae5c8e1a091125813945bdc73fa4606cdd015e.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Unique-Setting"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Figure 2: Per paper average relative score increase distributions grouped by institution type for All-Time (top) and Unique (bottom) Setting SOTA papers. No nonprofit papers surveyed claimed All-Time SOTA and the corresponding row is therefore excluded. Green triangles and orange vertical bars denote the mean and median respectively and the numerical value for the mean is labelled beneath it."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                519,
+                260,
+                873,
+                439
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                594,
+                885,
+                626
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\% \\Delta _ { p } = \\frac { 1 } { D } \\sum _ { d = 1 } ^ { D } \\frac { 1 } { M _ { d } } \\sum _ { m = 1 } ^ { M _ { d } } \\frac { n e w _ { d m } - o l d _ { d m } } { o l d _ { d m } }\\tag{1}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/f66fd4042b3f7a848d3af2a87f68e7409483eb026f41a1c7cc09f411d0a4911c.jpg"
+                }
+            },
+            "bbox": [
+                527,
+                653,
+                842,
+                699
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where D is the number of datasets a paper evaluated on, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "M _ { d }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the number of metrics per dataset, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "d , n e w _ { d m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the paper’s new score reported on d and metric, m, and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "o l d _ { d m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the Prior Best score on the same metric and dataset. For metrics where lower scores are preferable "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "n e w _ { d m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "o l d _ { d m }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "were swapped. Metrics with an old score of zero were automatically set to a relative increase of 100% regardless of new score. The papers’ average relative score increase were then grouped by institute. Outliers outside two times the standard deviation of each group were removed (see Appendix C) and the remaining points are plotted in Figure 2."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                711,
+                887,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3438"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/8d10c9a45097fb9608280446ea7bb735b4b8e4f956646b59565c6937b5eb0824.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 5: Top and bottom 10 Per Paper Average Relative Score Increase (§ 4.2). PB stands for prior best. Average number of prior bests is how many were compared to within the paper per metric, averaged over all metrics."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Rank</td><td>Score Inc.</td><td>Institute Type</td><td>SOTA Type</td><td>Paper Topic</td><td>Avg. Year of PB</td><td>Avg. Num. PBs</td></tr><tr><td>1</td><td>255%</td><td>Industry</td><td>Unique</td><td>Multilingual PTM</td><td>2020</td><td>1</td></tr><tr><td>2</td><td>148%</td><td>Academia</td><td>Unique</td><td>Retrieval-Based Dialogue Multi-View Response Selection</td><td>2019</td><td>9</td></tr><tr><td>3</td><td>108%</td><td>Industry</td><td>Unique</td><td>Continual Learning</td><td>2019</td><td>1</td></tr><tr><td>4</td><td>56.0%</td><td>Industry</td><td>All-Time</td><td>Written and Spoken Long Document Summarization</td><td>N/A2</td><td>6</td></tr><tr><td>5</td><td>55.6%</td><td>Industry</td><td>Unique</td><td>Aspect-Based Sentiment Analysis</td><td>2021</td><td>2</td></tr><tr><td>6</td><td>52.0%</td><td>Academia</td><td>All-Time</td><td>Knowledge Graph Completion</td><td>2018</td><td>25</td></tr><tr><td>7</td><td>48.6%</td><td>Non-Profit</td><td>Unique</td><td>Abstractive Text Summarization</td><td>2022</td><td></td></tr><tr><td>8 9</td><td>44.9%</td><td>Industry</td><td>Unique</td><td>Controllable Text Summarization</td><td>2019</td><td>1</td></tr><tr><td>10</td><td>43.3% 42.2%</td><td>Industry</td><td>Unique</td><td>Generative Language Decoding</td><td>2020</td><td>4</td></tr><tr><td></td><td></td><td>Industry</td><td>All-Time</td><td>Speaker Overlap-aware Neural Diarization</td><td>2022</td><td>3</td></tr><tr><td>58</td><td>1.16%</td><td>Industry</td><td>Both</td><td>Bilingual Lexicon Induction</td><td>2019</td><td>4</td></tr><tr><td>59</td><td>1.12%</td><td>Academia</td><td>Unique</td><td>Parameter Efficient Training</td><td>2021</td><td>2</td></tr><tr><td>60</td><td>1.06%</td><td>Industry</td><td>Unique</td><td>Transformer Model Compression</td><td>2020</td><td>1</td></tr><tr><td>61</td><td>1.04%</td><td>Academia</td><td>All-Time</td><td>Aspect Sentiment Triplet Extraction</td><td>2021</td><td>6</td></tr><tr><td>62</td><td>1.00%</td><td>Industry</td><td>Unique</td><td>Factual Consistency in Summarization</td><td>2021</td><td>3</td></tr><tr><td>63</td><td>0.99%</td><td>Industry</td><td>All-Time</td><td>Multi-Domain Machine Translation</td><td>2020</td><td>5</td></tr><tr><td>64</td><td>0.89%</td><td>Academia</td><td>All-Time</td><td>Text Style Transfer</td><td>2020</td><td>4</td></tr><tr><td>65</td><td>0.84%</td><td>Industry</td><td>Unique</td><td>Machine Translation</td><td>2022</td><td>1</td></tr><tr><td>66</td><td>0.81%</td><td>Academia</td><td>All-Time</td><td>Aspect Sentiment Triplet Extraction</td><td>2022</td><td>7</td></tr><tr><td>67</td><td>-18.8%</td><td>Academia</td><td>All-Time</td><td>Controllable Text Generation</td><td>2021</td><td>6</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                114,
+                82,
+                882,
+                304
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The means of industry SOTA improvements are over two times times higher than academia’s for both All-Time and Unique Setting. Academia’s negative data-point indicates that some academics are claiming SOTA despite failing to achieve a net score increase (more on this in § 4.3). Requirements to claim SOTA are not strictly defined and some metrics may be weighted higher than others in a paper, but this finding along with the overall lower means, suggests that academia’s SOTA claims are not as strong as industry’s. Although there were equal numbers of SOTA claims between institution types, academia’s weaker SOTA claims, as well as the disproportion of prior bests being from industry (§ 4.1), could result in a gradual exclusion of academia from future SOTA claims."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                369,
+                490,
+                627
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Unique Setting claims are more substantial than All-Time. By narrowing the problem to a Unique Setting, competition is automatically removed and it logically follows that higher score increases would be achievable. This pattern is noticeable for both academia and industry. The smaller advancements for All-Time claims supports the theory that benchmarks are saturated (Bowman and Dahl, 2021). There is less room for researchers to maneuver at the top of the leaderboards, decreasing the strength of new SOTA claims."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                629,
+                489,
+                806
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Relative score is biased toward increases where the old score is relatively low; a phenomenon more common to the Unique Setting. To contrast relative increase’s inherent bias we also plotted absolute score increase in Appendix D. In this case, academia captures SOTA equally as effectively as industry. Without the benefit of improving over small prior scores, industry’s apparent advantage disappears. This pattern could suggest that industry prefers or is more capable of addressing novel tasks (i.e. ones without much prior success, and hence low old scores) while academia sticks to safer, well-established benchmarks."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                807,
+                490,
+                921
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                369,
+                885,
+                467
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.3 Qualitative Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                478,
+                715,
+                493
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Individual SOTA papers with the greatest and lowest average relative score increases (see § 4.2 for formalization) are listed in Table 5. Only two of the top ten score increases are from academia despite the majority of surveyed papers being academic. Papers ranked 1, 3, and 9 all introduce new PTMs, none of which are from academia, possibly indicating that training a PTM is both more likely to produce impressive results and that industry is more likely to succeed at it."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                498,
+                887,
+                659
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The worst relative score improvement is -18.8% and comes from academia. This paper does not fall outside of the threshold for outliers (see Appendix C) and therefore cannot be ignored. On nearly every metric reported, the paper’s method performed worse than a prior best. Nevertheless, the authors still explicitly claim SOTA in the abstract. The paper proposes a novel method worthy of publication but an erroneous SOTA claim should not have been used to argue its validity. This could be an example of authors succumbing to the discourse within NLP of \"reject if not SOTA\" (Rogers, 2020). Only one of the four prior bests they are closest to are academic, indicating that this could be an area saturated with industry competition."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                659,
+                887,
+                885
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>2</sup>Prior bests in this paper were not always cited and therefore an average year could not be determined."
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                892,
+                885,
+                920
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3439"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                114,
+                85,
+                386,
+                99
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We recorded the final two columns of Table 5 to discern whether there is a distinction in prior best recency and quantities between the highest and lowest SOTA-achieving papers. The top 10 SOTA-increasing papers’ prior bests have an average publication date of January 2020 versus August 2020 for the bottom 10. The top 10 compare their new results to an average of 3.4 prior bests compared to 3.9 for the bottom 10. These statistics follow the logic that it would be easier to achieve higher SOTA gains when comparing to older and lower prior bests."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                102,
+                490,
+                296
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5 Discussion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                310,
+                242,
+                325
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Industry presence in NLP artifacts and contributions is common and well-above the expected margin. From the perspective of policy research and those who favour research productivity, this relationship may be seen as a purely positive collaboration (Gulbrandsen and Smeby, 2005; Holman, 2021). Industry has committed substantial financial resources to NLP and the entire research community benefits from more funding and greater professional demand (Maslej et al., 2023). It could be argued that the progress achieved in recent years would not have been possible without a high degree of industry involvement."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                337,
+                492,
+                548
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In contrast, those who consider objectivity as an important epistemic virtue of scientific research may be concerned with this trend. Abdalla and Abdalla (2021) compare the state of AI Ethics to the tobacco industry at its peak, a situation which in retrospect is usually cast in a negative light. In a few decades time, will we look back at NLP and AI research with similar collective disdain? Will our present efforts be overshadowed by a narrative of objectivity tainted by corporate capture? At the very least, whether for good or bad, publishing in top NLP venues such as EMNLP without using industry artifacts and contributions is becoming increasingly infeasible."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                549,
+                489,
+                774
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Regardless of viewpoint, all stakeholders relevant to this discussion benefit from increased transparency. Throughout our survey we identified areas that our research community could address to assist in quantifying industry presence and reducing barriers to publication. We suggest the following:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                775,
+                490,
+                873
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Authors should be required to list all sources of funding for their work. Without specifics, we had to rely on author affiliation to quantify industry presence. This is an imprecise method given that academia, non-profits, and for-profits all receive some proportion of public funding. Requiring an acknowledgement section listing all sources of funding would alleviate this issue without excessive overhead."
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                888,
+                489,
+                921
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                544,
+                85,
+                887,
+                198
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• In line with the above suggestion, tagging papers according to public, private, and/or a split of funding beside its link in the ACL Anthology would foster transparency. The tag could look similar to dataset, software, and best paper tags as in EACL 2023<sup>3</sup> and link to descriptions of each category of funding."
+                    }
+                ]
+            },
+            "bbox": [
+                531,
+                212,
+                887,
+                326
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• There already exists an \"Industry Track\" at *ACL conferences that calls for papers related to \"non-trival real-world systems\". However, authorship is not restricted to for-profit industry nor is industry excluded from the main track. This version of an Industry Track is misleading in that its title implies a separation by institute type, when in practice that sepration is non-existent. Future works should look into what inclusions and exclusions could be added to the Industry Track for it to better serve its expected purpose. For example, should private implementations be only acceptable in this track?"
+                    }
+                ]
+            },
+            "bbox": [
+                529,
+                340,
+                887,
+                565
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• Reserving a fixed proportion of publication slots for various hierarchies of computing capabilities could serve as an initial idea to equitably address the compute divide (Ahmed and Wahed, 2020). Coincidentally, doing so would help address the transparency concerns of evaluating on single scores (Dodge et al., 2019). How to disclose computing capabilities is not immediately obvious and we leave that to future work."
+                    }
+                ]
+            },
+            "bbox": [
+                531,
+                580,
+                887,
+                741
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• To support the validity of non-SOTA papers, *ACL conferences could reserve publication slots for them. The ACL 2023 Review Policy (Rogers et al., 2023b) discouraged review shortcuts such as \"reject if not SOTA\" but this discourse is pervasive and explicit support of non-SOTA papers may be necessary to overcome it."
+                    }
+                ]
+            },
+            "bbox": [
+                531,
+                756,
+                887,
+                884
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>3</sup>https://aclanthology.org/events/eacl -2023/"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                892,
+                882,
+                919
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3440"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "These suggestions each share the common goal of increasing transparency regarding funding sources and addressing the gap in computing resources between institutions. The compute divide is a well-understood phenomenon and yet it continues to be ignored when submitting and reviewing publications. Researchers with less funding are excluded from a subset of problems due to insufficient computing resources. They can only gain access by collaborating with industry, which may not align with their values or abilities<sup>4</sup>. Our main concern is ensuring that a space always exists for all NLP practitioners to contribute their work. Preserving institutional diversity in NLP will strengthen our collective research by ensuring that perspectives from stakeholders without conflicts of interest with industry are still heard."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                85,
+                490,
+                360
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "6 Conclusion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                373,
+                247,
+                390
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Industry has increased investment in AI research and specifically NLP in recent years. Our survey of 100 EMNLP 2022 papers found that the citation of industry artifacts and contributions is far greater than what would be expected based on yearly industry publication rates. This relationship indicates a reliance on industry. We conclude with a brief discussion highlighting possible positive and negative impacts of industry reliance and provide suggestions for navigating transparency and computing equity issues in NLP."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                401,
+                490,
+                580
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Limitations"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                112,
+                593,
+                221,
+                609
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Sample Size"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                621,
+                216,
+                638
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The most obvious limitation of our analysis is sample size. We studied a starting sample of 100 out of a possible 829 papers. Reading each paper and manually extracting the relevant citations (and reading those papers as well) was time consuming. We considered performing the data collection automatically with NLP solutions, but doing so would have likely required a pre-existing labelled dataset. Using the data we released with this paper for training an NLP model to do this type of analysis is an interesting line of future work. Regardless, our main results that identify a reliance on industry artifacts and citations (Figure 1) make use of several citations within each surveyed paper such that the sample size is far greater than 100. For exact numbers see Appendix B where the samples sizes for each citation type are reported in Figure 5 as “n”."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                644,
+                492,
+                871
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                887,
+                134
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Defining Institution Types"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                145,
+                721,
+                161
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "It is difficult to bin authors into clearly defined institute types from affiliation alone. Academics receive funding from industry scholarships and grants and conversely industry can be the beneficiary of public funding (in the forms of grants, tax rebates, credits, etc.). Additionally, some academic institutes are classified as private entities. The blurred line between public and private research makes disentangling them nearly impossible. Our analysis is therefore only an estimate based on information clearly presented in the authorship sections of papers. The implementation of our suggestion in § 5 regarding reporting funding sources explicitly in the Acknowledgements section of papers or something similar will improve precision in future studies."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                166,
+                887,
+                425
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Proving Capture"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                436,
+                648,
+                453
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "It is difficult for researchers to prove that the increased reliance demonstrated through our analysis is proof of corporate capture instead of mutually beneficial collaborations. That is, to formally prove ‘Science Capture’, we would need to demonstrate that this increased reliance has changed the research questions that would have been asked (without said reliance), or that the way research results and topics are discussed would have changed without the observed interactions. Without personal admissions from industry leaders, capture can be measured by diachronic analysis of NLP over time comparing research trajectories in eras with large and minimal industry presence (or different NLP subfields with various levels of industry presence). We hope future research can tackle this research goal."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                457,
+                887,
+                733
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Ethics Statement"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                744,
+                662,
+                760
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The information we collect and release in our survey is publicly available in the EMNLP 2022 Conference Proceedings<sup>5</sup> under a Creative Commons Attribution 4.0 International License and therefore did not qualify for internal ethics review. Furthermore, we do not identify specific papers by name in our work. However, it is likely possible to sort through the EMNLP 2022 proceedings to identify papers in Table 5. We discourage this practice. Our intention was to analyze patterns regarding broad institution types and not to call into question the contributions of individual scientists."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                770,
+                887,
+                884
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>4</sup>For example, universities without globally-recognized prestige may have a harder time attracting industry sponsorship."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                881,
+                489,
+                920
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>5</sup>https://aclanthology.org/events/emnl p-2022/"
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                894,
+                882,
+                919
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3441"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                489,
+                165
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Acknowledgements"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                177,
+                287,
+                192
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "For this research, WA was funded by a Natural Sciences and Engineering Research Council of Canada (NSERC) Canadian Graduate Scholarship - Master’s (CGS-M), KR was funded by an NSERC Discovery Grant, and CS was funded by the Office of the Privacy Commissioner of Canada; the views expressed herein are those of the authors and do not necessarily reflect those of the funders."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                200,
+                489,
+                330
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "References"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                355,
+                215,
+                370
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Mohamed Abdalla and Moustafa Abdalla. 2021. The grey hoodie project: Big tobacco, big tech, and the threat on academic integrity. In Proceedings of the 2021 AAAI/ACM Conference on AI, Ethics, and Soci ety, AIES ’21, page 287–297, New York, NY, USA. Association for Computing Machinery."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Mohamed Abdalla, Jan Philip Wahle, Terry Lima Ruas, Aurélie Névéol, Fanny Ducel, Saif Mohammad, and Karen Fort. 2023. The elephant in the room: Analyzing the presence of big tech in natural language processing research. In Proceedings ofthe 61st Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers), pages 13141– 13160, Toronto, Canada. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Nur Ahmed and Muntasir Wahed. 2020. The dedemocratization of AI: deep learning and the compute divide in artificial intelligence research. CoRR, abs/2010.15581."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Nur Ahmed, Muntasir Wahed, and Neil C. Thompson. 2023. The growing influence of industry in ai research. Science, 379(6635):884–886."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Samuel R. Bowman and George Dahl. 2021. What will it take to fix benchmarking in natural language understanding? In Proceedings ofthe 2021 Conference of the North American Chapter ofthe Associationfor Computational Linguistics: Human Language Technologies, pages 4843–4855, Online. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jesse Dodge, Suchin Gururangan, Dallas Card, Roy Schwartz, and Noah A. Smith. 2019. Show your work: Improved reporting of experimental results. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), pages 2185– 2194, Hong Kong, China. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kawin Ethayarajh and Dan Jurafsky. 2020. Utility is in the eye of the user: A critique of NLP leaderboards. In Proceedings ofthe 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 4846–4853, Online. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jake Goldenfein and Monique Mann. 2023. Tech money in civil society: whose interests do digital rights organisations represent? Cultural Studies, 37(1):88– 122."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Magnus Gulbrandsen and Jens-Christian Smeby. 2005. Industry funding and university professors’ research performance. Research Policy, 34(6):932–950."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Odd Erik Gundersen and Sigbjørn Kjensmo. 2018. State of the art: Reproducibility in artificial intelligence. Proceedings of the AAAI Conference on Artificial Intelligence, 32(1)."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Sireesh Gururaja, Amanda Bertsch, Clara Na, David Widder, and Emma Strubell. 2023. To build our future, we must know our past: Contextualizing paradigm shifts in natural language processing. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 13310–13325, Singapore. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Bennett Holman. 2021. What, me worry? research policy and the open embrace of industry-academic relations. Frontiers in Research Metrics and Analytics, 6."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Dieuwertje Luitse and Wiebke Denkena. 2021. The great transformer: Examining the role of large language models in the political economy of ai. Big Data & Society, 8(2):20539517211047734."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Nestor Maslej, Loredana Fattorini, Erik Brynjolfsson, John Etchemendy, Katrina Ligett, Terah Lyons, James Manyika, Helen Ngo, Juan Carlos Niebles, Vanessa Parli, Yoav Shoham, Russell Wald, Jack clark, and Raymond Perrault. 2023. The ai index 2023 annual report. Technical report, Stanford University, Stanford, CA."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Julian Michael, Ari Holtzman, Alicia Parrish, Aaron Mueller, Alex Wang, Angelica Chen, Divyam Madaan, Nikita Nangia, Richard Yuanzhe Pang, Jason Phang, and Samuel R. Bowman. 2023. What do NLP researchers believe? results of the NLP community metasurvey. In Proceedings ofthe 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 16334– 16368, Toronto, Canada. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "David Miller and Claire Harkins. 2010. Corporate strategy, corporate capture: food and alcohol industry lobbying and public health. Critical social policy, 30(4):564–589."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                378,
+                487,
+                456
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3442"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                929,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Thao Phan, Jake Goldenfein, Monique Mann, and Declan Kuch. 2022. Economies of virtue: The circulation of in big tech. Science as Culture, 31(1):121– 135."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Deborah Raji, Emily Denton, Emily M. Bender, Alex Hanna, and Amandalynne Paullada. 2021. Ai and the everything in the whole wide world benchmark. In Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks, volume 1. Curran."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Alexander Reutlinger. 2020. What is epistemically wrong with research affected by sponsorship bias? the evidential account. Forthcoming in the European Journal for Philosophy of Science."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Anna Rogers. 2020. Peer review in nlp: reject-if-notsota."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Anna Rogers, Niranjan Balasubramanian, Leon Derczynski, Jesse Dodge, Alexander Koller, Sasha Luccioni, Maarten Sap, Roy Schwartz, Noah A. Smith, and Emma Strubell. 2023a. Closed ai models make bad baselines."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Anna Rogers, Jordan Boyd-Graber, and Naoaki Okazaki, editors. 2023b. Proceedings ofthe 61st Annual Meeting ofthe Associationfor Computational Linguistics (Volume 1: Long Papers). Association for Computational Linguistics, Toronto, Canada."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Peter Seele and Mario D. Schultz. 2022. From greenwashing to machinewashing: A model and future directions derived from reasoning by analogy. Journal ofBusiness Ethics, 178(4):1063–1089."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Or Sharir, Barak Peleg, and Yoav Shoham. 2020. The cost of training NLP models: A concise overview. CoRR, abs/2004.08900."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jan Philip Wahle, Terry Ruas, Mohamed Abdalla, Bela Gipp, and Saif Mohammad. 2023. We are who we cite: Bridges of influence between natural language processing and other academic fields. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 12896–12913."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Alex Wang, Amanpreet Singh, Julian Michael, Felix Hill, Omer Levy, and Samuel Bowman. 2018. GLUE: A multi-task benchmark and analysis platform for natural language understanding. In Proceedings of the 2018 EMNLP Workshop BlackboxNLP: Analyzing and Interpreting Neural Networks for NLP, pages 353–355, Brussels, Belgium. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Meredith Whittaker. 2021. The steep cost of capture. Interactions, 28(6):50–55."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Torsten Wilholt. 2006. Design rules: Industrial research and epistemic merit. Philosophy of Science, 73(1):66–89."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Torsten Wilholt. 2009. Bias and values in scientific research. Studies in History and Philosophy of Science Part A, 40(1):92–101."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Meg Young, Michael Katell, and P.M. Krafft. 2022. Confronting power and corporate capture at the facct conference. In Proceedings ofthe 2022 ACM Conference on Fairness, Accountability, and Transparency, FAccT ’22, page 1375–1386, New York, NY, USA. Association for Computing Machinery."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                85,
+                490,
+                139
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "A Majority Affiliation Labelling"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                178,
+                806,
+                195
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In this section we re-report results using the majority institute type of authors to classify a paper as Academic, Non-Profit, or Industry. These results echo the findings of the original labelling heuristic of § 3.1 albeit less pronounced."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                203,
+                885,
+                285
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/3f630f76f6e9b9db13e09c57282a2f926e643b2a6d19d50183775d695bcc8717.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 6: Affiliations of Surveyed EMNLP 2022 Papers using majority labelling."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td></td><td>Academia</td><td>Non-Profit</td><td>Industry</td><td>Total</td></tr><tr><td>Long</td><td>66</td><td>4</td><td>17</td><td>87</td></tr><tr><td>Short</td><td>6</td><td>1</td><td>6</td><td>13</td></tr><tr><td>Total</td><td>72</td><td>5</td><td>23</td><td>100</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                529,
+                294,
+                863,
+                362
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/564bc2d185ad8648e71fedf1a91e76f9dba676c789cf8e15269cc0b618402bf1.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 7: Types of Surveyed EMNLP 2022 Papers, counted using majority labelling."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Type</td><td>Academia</td><td>Non-Profit</td><td>Industry</td><td>Total</td></tr><tr><td>Unique Setting SOTA</td><td>26</td><td>3</td><td>10</td><td>39</td></tr><tr><td>All-Time SOTA</td><td>29</td><td>0</td><td>5</td><td>34</td></tr><tr><td>New Dataset</td><td>16</td><td>1</td><td>10</td><td>27</td></tr><tr><td>Interpretability &amp; Analysis</td><td>14</td><td>1</td><td>2</td><td>17</td></tr><tr><td>New Pre-Trained Model</td><td>4</td><td>0</td><td>3</td><td>7</td></tr><tr><td>New Metric</td><td>3</td><td>0</td><td>3</td><td>6</td></tr><tr><td>Ethics</td><td>2</td><td>0</td><td>1</td><td>3</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                512,
+                430,
+                882,
+                516
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/8ce68734b980088be213a625cae9d63222bc58172da9f4a5536f1b682d01297b.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 8: Miscellaneous survey elements averaged over all papers of each institution type labelled using the majority heuristic."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td></td><td>Academia</td><td>Non-Profit</td><td>Industry</td><td>All</td></tr><tr><td>Public Code</td><td>86.1%</td><td>100%</td><td>78.2%</td><td>85.0%</td></tr><tr><td>Num. Metrics</td><td>13.6</td><td>4.0</td><td>17.4</td><td>14.0</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                510,
+                585,
+                880,
+                631
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3443"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/c021229b8a6e91b1b5b00c38490ac8e6b1fc9199be6d00df9c1657d961958821.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 3: Percentage of surveyed EMNLP 2022 paper citations with industry affiliation—labelled according to majority—smoothed with a 1D Gaussian Filter "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( \\sigma ="
+                    },
+                    {
+                        "type": "text",
+                        "content": "2.5). The \"Expected\" line uses the original heuristic for quantifying industry as specified in § 3.1 since that is how Abdalla et al. (2023) reported."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                121,
+                192,
+                480,
+                374
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/64549d1f16ebfa7833d4e1208e367f9712b9ee6d3b45c5477d830416a2d7e4cc.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 9: Quantities of majority-labelled papers that used at least one PTM."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>PTM</td><td>Academia</td><td>Non-Profit</td><td>Industry  Total</td><td></td></tr><tr><td>Yes</td><td>63</td><td>5</td><td>19</td><td>87</td></tr><tr><td>No</td><td>8</td><td>0</td><td>5</td><td>13</td></tr><tr><td>Percent</td><td>88.7</td><td>100</td><td>79.2</td><td>87</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                117,
+                696,
+                485,
+                768
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/1f13511327c574a25c1f6b34a4a6904887e087e82d8132f29d76bc3c166c344e.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "All-Time"
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                527,
+                291,
+                872,
+                420
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/cc72907574fcf1477f0cebe059933f6a9023a613eb0fb5cfa789574f916b752e.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Unique-Setting"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Figure 4: Per paper average relative score increase distributions grouped by institution type—labelled via majority heuristic—for All-Time (top) and Unique (bottom) Setting SOTA papers. Green triangles and orange vertical bars denote the mean and median respectively and the numerical value for the mean is labelled beneath it."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                519,
+                450,
+                873,
+                629
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3444"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/238d6d4c113d3565db9ea434f38ae2a23102c337b641e16b093bd8c74a51c4fc.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 10: Top and bottom 10 Per Paper Average Relative Score Increase (§ 4.2). In this version of the table, institute type is determined with majority labelling. PB stands for prior best. Average number of prior bests is how many were compared within the paper per metric, averaged over all metrics."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Rank</td><td>Score Inc.</td><td>Institute Type</td><td>SOTA Type</td><td>Paper Topic</td><td>Avg. Year of PB</td><td>Avg. Num. PBs</td></tr><tr><td>1</td><td>255%</td><td>Industry</td><td>Unique</td><td>Multilingual PTM</td><td>2020</td><td>1</td></tr><tr><td>2</td><td>148%</td><td>Academia</td><td>Unique</td><td>Retrieval-Based Dialogue Multi-View Response Selection</td><td>2019</td><td>9</td></tr><tr><td>3</td><td>108%</td><td>Academia</td><td>Unique</td><td>Continual Learning</td><td>2019</td><td>1</td></tr><tr><td>4</td><td>56.0%</td><td>Industry</td><td>All-Time</td><td>Written and Spoken Long Document Summarization</td><td>N/A</td><td>6</td></tr><tr><td>5</td><td>55.6%</td><td>Industry</td><td>Unique</td><td>Aspect-Based Sentiment Analysis</td><td>2021</td><td>2</td></tr><tr><td>6</td><td>52.0%</td><td>Academia</td><td>All-Time</td><td>Knowledge Graph Completion</td><td>2018</td><td>2</td></tr><tr><td>7</td><td>48.6%</td><td>Non-Profit</td><td>Unique</td><td>Abstractive Text Summarization</td><td>2022</td><td>5</td></tr><tr><td>8</td><td>44.9%</td><td>Industry</td><td>Unique</td><td>Controllable Text Summarization</td><td>2019</td><td>1</td></tr><tr><td>9</td><td>43.3%</td><td>Academia</td><td>Unique</td><td>Generative Language Decoding</td><td>2020</td><td>4</td></tr><tr><td>10</td><td>42.2%</td><td>Industry</td><td>All-Time</td><td>Speaker Overlap-aware Neural Diarization</td><td>2022</td><td>3</td></tr><tr><td>58</td><td>1.16%</td><td>Industry</td><td>Both</td><td>Bilingual Lexicon Induction</td><td>2019</td><td>4</td></tr><tr><td>59</td><td>1.12%</td><td>Academia</td><td>Unique</td><td>Parameter Efficient Training</td><td>2021</td><td>2</td></tr><tr><td>60</td><td>1.06%</td><td>Academia</td><td>Unique</td><td>Transformer Model Compression</td><td>2020</td><td>1</td></tr><tr><td>61</td><td>1.04%</td><td>Academia</td><td>All-Time</td><td>Aspect Sentiment Triplet Extraction</td><td>2021</td><td>6</td></tr><tr><td>62</td><td>1.00%</td><td>Industry</td><td>Unique</td><td>Factual Consistency in Summarization</td><td>2021</td><td>3</td></tr><tr><td>63</td><td>0.99%</td><td>Industry</td><td>All-Time</td><td>Multi-Domain Machine Translation</td><td>2020</td><td>5</td></tr><tr><td>64</td><td>0.89%</td><td>Academia</td><td>All-Time</td><td>Text Style Transfer</td><td>2020</td><td>4</td></tr><tr><td>65</td><td>0.84%</td><td>Industry</td><td>Unique</td><td>Machine Translation</td><td>2022</td><td>1</td></tr><tr><td>66</td><td>0.81%</td><td>Academia</td><td>All-Time</td><td>Aspect Sentiment Triplet Extraction</td><td>2022</td><td>7</td></tr><tr><td>67</td><td>-18.8%</td><td>Academia</td><td>All-Time</td><td>Controllable Text Generation</td><td>2021</td><td>6</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                115,
+                361,
+                882,
+                581
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3445"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "B Citation Predisposition"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                84,
+                352,
+                99
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We have established that there is an overall reliance on industry across publications, but still wanted to determine whether the reliance is equal across academia and industry. Figure 5 plots the same data as in Figure 1 but split by publishing institute type instead of citation year."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                109,
+                489,
+                205
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "With the exception of academic citations of Full Settings, for PTMs, Datasets, Prior Bests, and Full Settings, authors are predisposed to citing their own institute type (i.e. for each of those subplots, the largest bar for each cited institute type falls within that same publishing institute type). This result is unsurprising. Researchers are more likely to address problems relevant to their institute and use a similar subset of artifacts to model and evaluate."
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                206,
+                489,
+                350
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Regardless of predisposition, all groups are still overwhelmingly reliant on industry PTMs. Table 4 shows that the alternative of not using any PTM at all is largely infeasible with only 13 papers publishing without them. Even in this scenario, there may still be a dependency on computing power if the authors are training a large model from scratch."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                351,
+                489,
+                464
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "C Outliers"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                475,
+                226,
+                492
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Three papers were excluded from the relative score analysis in § 4.2 with increases of 2067%, 2150%, 3246%. Two were from industry and the other was from academia. The first score resulted from improving a privacy preserving algorithm from near constant leakage to near perfection. The second result was due to a comparison of a baseline that performed close to zero for few-shot and zero-setting, a scenario that naturally inflates relative score increase. The final score was boosted from comparing unsupervised setting results to a method that was not designed for that setting and correspondingly performed poorly. These three were not outliers in the absolute score analysis, emphasizing the balancing effect of using both analyses."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                501,
+                490,
+                745
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "D Absolute Score Improvement"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                755,
+                406,
+                771
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To contrast the bias relative score increase assigns to improvements over near-zero scores, we also plotted absolute score increase split by institution type which can be seen in Figure 6. In this scenario, industry and academia improvements are near identical. The distinction between the two is only noticeable in terms of relative improvement."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                780,
+                489,
+                894
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3446"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/f18bb37422cab5930d4a6b86bfd2315a6d874d14a979420799d1fff8ae51c58f.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                121,
+                250,
+                426,
+                461
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/e0bfbea99e305aae8d9526fb2fe3ee08b042391b066acd5f2d704602c9692213.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                443,
+                252,
+                749,
+                463
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/6d07a3f688a2d810b193f092d85018fe6afaa05f8dd5e0ac3633a12f39d19baa.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                119,
+                470,
+                428,
+                677
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/90115374123af622dde28680786d5156766f8f51efdc1fd495d5d3fec0167a05.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 5: Proportion of cited institute types split by EMNLP 2022 author affiliation. Citations are grouped by PTM (upper left), Datasets (upper right), Prior Bests (bottom left), and Full Settings (bottom right). n is the total number of citations per bar. The sum of n per subplot exceeds the 100 papers examined since each paper often cites more than one PTM or Dataset and reports more than one score for Prior Bests and Full Settings."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                445,
+                488,
+                747,
+                677
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3447"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/9db48d3299bc08fb4ca1ecd11889ab7224fe53c6c16d1da5e1f179882303440e.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "All-Time"
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                129,
+                311,
+                477,
+                443
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/3e1c866889af6b500fd98d0f2440a55431d212a59af5cd8f40247c5878ee1d58.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Unique-Setting"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Figure 6: Per paper average aboslute score increase distributions grouped by institution type for All-Time (top) and Unique (bottom) Setting SOTA papers."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                122,
+                470,
+                478,
+                650
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "3448"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                522,
+                942
+            ]
+        }
+    ]
+]
