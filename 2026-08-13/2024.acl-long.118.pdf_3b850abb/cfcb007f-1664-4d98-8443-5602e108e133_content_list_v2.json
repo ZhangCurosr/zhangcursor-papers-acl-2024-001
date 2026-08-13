@@ -1,0 +1,3408 @@
+[
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Open-Set Semi-Supervised Text Classification via Adversarial Disagreement Maximization"
+                    }
+                ],
+                "level": 1
+            },
+            "bbox": [
+                179,
+                89,
+                818,
+                129
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Junfan Chen<sup>1,2</sup>, Richong Zhang<sup>1,3</sup>*, Junchi Chen<sup>1</sup>, Chunming Hu<sup>1,2,3</sup>"
+                    }
+                ]
+            },
+            "bbox": [
+                201,
+                146,
+                800,
+                164
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>1</sup>CCSE, School of Computer Science and Engineering, Beihang University, Beijing, China"
+                    }
+                ]
+            },
+            "bbox": [
+                134,
+                164,
+                868,
+                181
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>2</sup>School of Software, Beihang University, Beijing, China"
+                    }
+                ]
+            },
+            "bbox": [
+                268,
+                180,
+                736,
+                197
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "<sup>3</sup>Zhongguancun Laboratory, Beijing, China"
+                    }
+                ]
+            },
+            "bbox": [
+                322,
+                197,
+                682,
+                214
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "chenjf, zhangrc @act.buaa.edu.cn, sy2206115, hucm @buaa.edu.cn"
+                    }
+                ]
+            },
+            "bbox": [
+                213,
+                214,
+                793,
+                231
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Abstract"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                262,
+                260,
+                342,
+                275
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Open-Set Semi-Supervised Text Classification (OSTC) aims to train a classification model on a limited set of labeled texts, alongside plenty of unlabeled texts that include both in-distribution and out-of-distribution examples. In this paper, we revisit the main challenge in OSTC, i.e., outlier detection, from a measurement disagreement perspective and innovatively propose to improve OSTC performance by directly maximizing the measurement disagreements. Based on the properties of in-measurement and crossmeasurements, we design an Adversarial Disagreement Maximization (ADM) model that synergeticly optimizes the measurement disagreements. In addition, we develop an abnormal example detection and measurement calibration approach to guarantee the effectiveness of ADM training. Experiment results and comprehensive analysis of three benchmarks demonstrate the effectiveness of our model."
+                    }
+                ]
+            },
+            "bbox": [
+                141,
+                287,
+                462,
+                574
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "1 Introduction"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                115,
+                586,
+                260,
+                601
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Text classification is a fundamental task in natural language processing. With the development of modern deep learning techniques, text classification has achieved significant advancement. However, deep learning models usually require substantial labeled data, which is expensive in many realworld applications. To tackle this problem, Semisupervised Text Classification (STC) has been proposed, which only needs a small set of labeled examples along with plenty of unlabeled examples (Lee et al., 2013; Tarvainen and Valpola, 2017; Meng et al., 2018; Gururangan et al., 2019; Chen et al., 2020; Lee et al., 2021; Tsai et al., 2022; Yang et al., 2023). By utilizing unlabeled texts in training machine learning models, these approaches reduce the need to expensively annotate abundant data. However, the STC assumption that all unlabeled texts are sampled within the intended scope is impractical in real-world applications. Therefore, researchers recently explored Open-set Semi-supervised Text Classification (OSTC) (Chen et al., 2023), which allows the inclusion of out-ofdistribution examples in the unlabeled text set."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                611,
+                490,
+                901
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                261,
+                887,
+                342
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The main challenge in OSTC is the commonly known false positive inference problem (Chen et al., 2023), which indicates a phenomenon that out-ofdistribution texts are prone to be recognized as an in-distribution class, leading to unsatisfactory OSTC outcomes. To address this issue, prior studies have integrated an STC model with different outlier detection techniques. For example, LMCL (Lin and Xu, 2019) and Softmax (Yan et al., 2020) learn discriminative embeddings and utilize local outlier factor (LOF) (Breunig et al., 2000) to identify in-distribution (ID) and out-of-distribution (OOD) examples. MSP (Hendrycks and Gimpel, 2017) and LOS (Chen et al., 2023) respectively employ maximum softmax probability and normalized entropy function to identify ID and OOD examples."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                343,
+                887,
+                600
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We provide a general understanding of existing OSTC models. Specifically, we revisit outlier detection in existing methods from a measurement disagreement perspective. It can be concluded that existing approaches are fundamentally grounded in the assumption that the differentiation between ID and OOD examples hinges on the presence of disagreement in specific measurements associated with the examples. For instance, the density measurement in LOF of LMCL and Softmax, and the confidence and entropy measurements in MSP and LOS. With this assumption, existing methods distinguish ID and OOD examples by setting certain thresholds on the measurement."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                601,
+                887,
+                825
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The above discussion motivates us to answer a question: Since ID and OOD examples can be more easily distinguished when the measurement disagreement is larger, can we improve outlier detection in OSTC by directly maximizing such measurement disagreement between ID and OOD examples? To answer this question, we make formal definitions and assumptions for measurement disagreements and reveal several useful properties: (1) the disagreement bounds can be increased by maximizing in-measurement disagreement between ID and OOD examples. (2) the comparative consistency assumption allows us to synergisticly optimize two different measurements. (3) the in-example consistency assumption enables us to detect abnormal examples and calibrate measurements."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                826,
+                887,
+                922
+            ]
+        },
+        {
+            "type": "page_footnote",
+            "content": {
+                "page_footnote_content": [
+                    {
+                        "type": "text",
+                        "content": "* Corresponding author"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                908,
+                287,
+                921
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2170"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                928,
+                522,
+                942
+            ]
+        },
+        {
+            "type": "page_footer",
+            "content": {
+                "page_footer_content": [
+                    {
+                        "type": "text",
+                        "content": "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 2170–2180 August 11-16, 2024 ©2024 Association for Computational Linguistics"
+                    }
+                ]
+            },
+            "bbox": [
+                89,
+                946,
+                909,
+                973
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                85,
+                490,
+                246
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Based on the above motivations, we propose an Adversarial Disagreement Maximization (ADM) model for OSTC. Concretely, we treat the crossentropy loss of the ID softmax classifier and the outlier detection confidence as two different measurements. To perform a synergistically measurement optimization, we leverage an adversarial learning approach to iteratively enlarge the disagreements of the two measurements. In addition, to guarantee the effectiveness of disagreement maximization, we design an abnormal-example detection approach to correct the measurement optimization direction."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                248,
+                490,
+                441
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "To summarize, we make the following contributions: (1) We provide a general understanding of outlier detection in OSTC and revisit it from a measurement disagreement perspective. (2) We propose an ADM model to directly maximize measurement disagreements combined with measurement calibration. (3) We evaluate our ADM model on three benchmark datasets and demonstrate its effectiveness by comprehensive analysis."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                442,
+                490,
+                588
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "2 Related Works"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                602,
+                278,
+                618
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Semi-supervised text classification (STC) trains a model with a few labeled texts and many unlabeled texts. Various regularization techniques, consistency training approach are developed for STC (Miyato et al., 2017; Gururangan et al., 2019; Liu et al., 2021; Li et al., 2021; Xu et al., 2022). Among these models, UDA (Xie et al., 2020) utilizes substituting noising operations to construct data augmentations combined with consistency training. MixText (Chen et al., 2020) design a novel text data augmentation method with Mixup and used in consistency training. Some other works leverage pseudo-labeling to annotate unlabeled texts as additional training data (Lee et al., 2013; Tarvainen and Valpola, 2017; Meng et al., 2018; Li et al., 2021; Lee et al., 2021; Li et al., 2022b)."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                631,
+                490,
+                889
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Open-set semi-supervised learning is understudied task. The pipeline approaches first filters out"
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                890,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "OOD examples and then conduct semi-supervised training with filtered data. These methods often design special outlier detectors (Saito et al., 2021; Huang et al., 2021; Liu et al., 2022) or build new optimization process (Yu et al., 2020; Zhu and Li, 2022; Li et al., 2022a). In recent work LOS (Chen et al., 2023), the authors design a set of pipeline methods utilizing different outlier detection approaches, including MSP (Hendrycks and Gimpel, 2017), DOC (Shu et al., 2017), LMCL (Lin and Xu, 2019) and LSoftmax (Yan et al., 2020). LOS unify semi-supervised training and outlier detection within probabilistic latent variable modeling. We understand OSTC in a new measurement disagreement perspective and leverages adversarial learning (Goodfellow et al., 2014) to achieve disagreement maximization."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                85,
+                887,
+                360
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3 Methodology"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                373,
+                660,
+                390
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.1 Prior Art"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                399,
+                633,
+                414
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Task Definition. In open-set semi-supervised text classification (OSTC), we expect to train a text classification model with a few labeled texts and many unlabeled texts. The unlabeled texts contain both in-distribution (ID) and out-of-distribution (OOD) examples. We will use "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { V }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "to denote the set of indistribution classes. We assume that we have access to a labeled text set "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { L } = \\{ ( x _ { l } , y _ { l } ) \\} _ { i = 1 } ^ { L }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "with each class involving k examples, an unlabeled text set "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { U } = ( \\mathcal { U } _ { + } , \\mathcal { U } _ { - } ) = \\{ x _ { i } \\} _ { i = 1 } ^ { n }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", which consists of an indistribution text set "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\ d \\mathcal { U } _ { + }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and an out-of-distribution text set . The goal of the OSTC task is to identify whether a given text in the test set is an ID or OOD example and predict the exact class type if the given text is an ID example."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                423,
+                887,
+                664
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Outlier Detection in OSTC. Outlier detection is a key component in OSTC. It contributes to model training and evaluation of OSTC. As demonstrated in previous work (Chen et al., 2023), the key challenge in OSTC is the false positive inference problem, which forces the OOD texts to be recognized as an ID class when conducting semi-supervised learning. An intuitive solution to this problem is utilizing outlier detection to filter unlabeled OOD examples during semi-supervised training. Second, the outlier detector is required to identify whether a given text is an ID or OOD example during evaluation. Considering the vital role of outlier detection in OSTC, in this work, we provide a general understanding of it and propose a novel optimization framework to improve its performance."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                665,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2171"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                519,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/6cd0d6173219fb970cfe8a22c0bc4432e9025b25010231d1209d30681a87b4ed.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 1: Analysis for Existing Outlier Detection Methods in OSTC"
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Outlier Detection Model</td><td> $\\mathcal { M } ( f ; x , \\mathcal { V } )$ </td><td>OOD Identification Condition</td></tr><tr><td>MSP (Hendrycks and Gimpel, 2017)</td><td> $\\displaystyle { \\operatorname* { m a x } _ { y \\in \\mathcal { y } } { \\frac { f ( x , y ) } { \\sum _ { c \\in \\mathcal { y } } { f ( x , c ) } } } }$ </td><td> $\\mathcal { M } ( f ; x , \\mathcal { Y } ) < \\eta _ { 1 }$ </td></tr><tr><td>DOC (Shu et al., 2017)</td><td> $\\operatorname* { m a x } _ { y \\in \\mathcal { Y } } f _ { y } ( x )$ </td><td> $\\mathcal { M } ( f ; x , \\mathcal { Y } ) < \\eta _ { 2 }$ </td></tr><tr><td>LMCL (Lin and Xu, 2019)</td><td> $\\sum _ { x ^ { \\prime } \\in N _ { k } ( x ) } f ( x ^ { \\prime } )$ </td><td> $\\mathcal { M } ( f ; x , \\mathcal { Y } ) > 1$ </td></tr><tr><td>LSoftmax (Yan et al., 2020)</td><td>|Nk(x)|·f(x)</td><td></td></tr><tr><td>LOS (Chen et al., 2023)</td><td> $\\mathcal { H } ^ { \\lambda } ( f ( x ) )$   $\\overline { { ( \\log | \\mathcal { V } | ) ^ { \\lambda } } }$ </td><td> $\\mathcal { M } ( f ; x , \\mathcal { Y } ) > 0 . 5$ </td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                131,
+                107,
+                865,
+                242
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.2 Motivation"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                267,
+                250,
+                282
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Revisit Outlier Detection from Measurement Disagreement Perspective. To tackle the false positive inference problem, existing works either adopt a pipeline approach that first trains an outlier detector to filter the OOD examples and then conducts semi-supervised training on the rest of unlabeled data (Shu et al., 2017; Yan et al., 2020) or integrate supervised training and outlier detection as a unified framework (Chen et al., 2023) during optimization. We provide a formal understanding of these outlier detection methods and reveal that all of these methods identify OOD examples following a measurement disagreement assumption. Formally, define a measurement "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } ( f ; x , \\mathcal { V } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "which involves an internal function f and two inputs: a text example "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x \\in \\mathcal { U }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and the in-distribution class set "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { V } ."
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Based on the specified measurement , existing outlier detection methods introduce a threshold to distinguish ID and OOD examples. Concretely, we give the measurement formulation and OOD identification condition for each outlier detection method in Table 4 and explain as follows:"
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                288,
+                490,
+                643
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• MSP: is the maximum softmax probability and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "f"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is specified as a softmax classifier, with a condition "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } < \\eta _ { 1 }"
+                    }
+                ]
+            },
+            "bbox": [
+                134,
+                648,
+                489,
+                697
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• DOC: is the maximum 1-vs-rest probability and each f is a 1-vs-rest sigmoid classifier, with a condition "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } < \\eta _ { 2 }"
+                    }
+                ]
+            },
+            "bbox": [
+                136,
+                706,
+                489,
+                755
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• LMCL and LSoftmax: is the Local Outlier Factor and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "f"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the local reachability density (Breunig et al., 2000). "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { N } _ { k }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are the knearest neighbors with a condition "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } > 1"
+                    }
+                ]
+            },
+            "bbox": [
+                134,
+                763,
+                490,
+                828
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "• LOS:  is the normalized entropy and f is a softmax classifier, with a condition "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } > 0 . 5"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the entropy function."
+                    }
+                ]
+            },
+            "bbox": [
+                134,
+                835,
+                489,
+                884
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The above analysis indicates that the OOD examples are detected under the assumption that the measurements of an ID example "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { + } ~ \\in \\mathcal { U } _ { + }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and an OOD example "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { - } \\in \\mathcal { U } _ { - }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "satisfy the following disagreement with some specified threshold "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\eta \\colon"
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                890,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                267,
+                884,
+                317
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\begin{array} { r } { \\left\\{ \\begin{array} { l l } { \\mathcal { M } ( f ; x _ { + } , \\mathcal { Y } ) < \\eta , } \\\\ { \\mathcal { M } ( f ; x _ { - } , \\mathcal { Y } ) \\geqslant \\eta . } \\end{array} \\right. _ { o r } \\left\\{ \\begin{array} { l l } { \\mathcal { M } ( f ; x _ { + } , \\mathcal { Y } ) > \\eta , } \\\\ { \\mathcal { M } ( f ; x _ { - } , \\mathcal { Y } ) \\leqslant \\eta } \\end{array} \\right. } \\end{array}\\tag{1}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/75836f71925f4b03fce1b436b1089109269a8908f0ad43d244b5ee5b50ddc72b.jpg"
+                }
+            },
+            "bbox": [
+                510,
+                323,
+                842,
+                365
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Formal Definitions for Measurement Disagreement. For the convenience of formal analysis, we make the following definitions:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                374,
+                885,
+                423
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Definition 1 Measurement Disagreement. For any ID example "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { + } \\in \\mathcal { U } _ { + }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and OOD example "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { - } \\in"
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { U } _ { - }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", given a specified measurement "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } ( f ; x , \\mathcal { V } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "we define the measurement disagreement ofthe two examples "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { + }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and x asfollows:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                425,
+                885,
+                507
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "d _ { \\mathcal { M } } ( x _ { + } , x _ { - } ) = \\vert \\mathcal { M } ( f ; x _ { + } , \\mathcal { V } ) - \\mathcal { M } ( f ; x _ { - } , \\mathcal { V } ) \\vert\\tag{2}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/c93684459907d95dc3a4f943b5f8c9dd3bcbe3a8c07d6cc412e5f5d7b92a156f.jpg"
+                }
+            },
+            "bbox": [
+                512,
+                518,
+                853,
+                536
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We will also call "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "d _ { \\mathcal { M } } ( x _ { + } , x _ { - } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "the in-measurement disagreement of examples "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { + }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { - }"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                546,
+                884,
+                580
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Definition 2 Cross-Measurement Disagreement. For any example "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x \\in \\mathcal { U }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and two different specified measurements "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 1 } ( f ; x , \\mathcal { V } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 } ( f ; x , y )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "we define the cross-measurement disagreement of example x under the two measurement asfollows:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                583,
+                887,
+                664
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "d ( x , \\mathcal { M } _ { 1 } , \\mathcal { M } _ { 2 } ) = | \\mathcal { M } _ { 1 } ( f ; x , \\mathcal { V } ) - \\mathcal { M } _ { 2 } ( f ; x , \\mathcal { V } ) | ( 3 )",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/c90640bab09251a3f6afded32ab48b6b3dd6172ba7bb4a199a3a1d2019f839b5.jpg"
+                }
+            },
+            "bbox": [
+                507,
+                675,
+                884,
+                693
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Definition 3 ϵ-Bounded Disagreement. For a real number "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\epsilon \\ \\geqslant \\ 0"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and a given measurement "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } ( f ; x , \\mathcal { V } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", we define that ID examples "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { + } \\in \\mathcal { U } _ { + }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and OOD examples "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { - } ~ \\in { \\mathrm { ~ } } \\mathcal { U } _ { - }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "has a ϵ-bounded disagreement, ifthe measurement disagreementfor each "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( x _ { + } , x _ { - } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "pair satisfy:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                703,
+                885,
+                803
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "d _ { \\mathcal { M } } ( x _ { + } , x _ { - } ) - \\epsilon \\geqslant 0\\tag{4}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/aab053b29203aa26d0f43230184abaa7634d652b5520f2a8ec4d58b1b6fa547a.jpg"
+                }
+            },
+            "bbox": [
+                613,
+                813,
+                779,
+                831
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Motivations from Measurement Disagreement. From Definition 1, we know that the measurement disagreement gives the amount of difference between the measurements of an ID and an OOD example. Thus, when the disagreement "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "d _ { \\mathcal { M } } ( x _ { + } , x _ { - } )"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                841,
+                887,
+                923
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2172"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "is larger, the model can distinguish "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { + }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { - }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "more easily. This motivates us to improve outlier detection in OSTC by enlarging the measurement disagreements. However, as existing outlier detection methods are trained with softmax or sigmoid classifiers and representation learning losses for LOF in a pipeline or unified framework, their training objectives are not developed to directly increase the measurement disagreements. This design overlooks the potential advantage of enlarging measurement disagreements over outlier detection."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                85,
+                489,
+                262
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Furthermore, based on Definition 3, if a measurement disagreement "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "d _ { \\mathcal { M } } ( x _ { + } , x _ { - } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "satisfy ϵ-bounded disagreement, the worst case disagreement it can reach is ϵ. Thus, if we want to increase the measurement disagreements for "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( x _ { + } , x _ { - } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "pairs, we may correspondingly maximize disagreement bound ϵ. From Formulation (1), we can easily derive that existing outlier detection methods only satisfy the 0-bounded disagreement, which significantly limits the models’ ability to distinguish ID and OOD examples. The above observations inspire us to ask: Can we increase the disagreement bounds of outlier detection by directly maximizing the measurement disagreements?"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                262,
+                489,
+                487
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Another motivation is that we may unleash the advantages of cross-measurement disagreement in the outlier detection of OSTC. To formally understand the potential of cross-measurement disagreement, we make the following assumptions:"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                488,
+                489,
+                569
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Assumption 1 Comparative Consistency. For two examples "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x , x ^ { \\prime } \\in \\mathcal { U }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and given two different measurements "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 1 } ( f ; x , \\mathcal { V } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 } ( f ; x , y )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", we assume the two measurements are comparative consistency. Namely, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "i f \\mathcal { M } _ { 1 } ( f ; x , \\mathcal { V } ) > \\mathcal { M } _ { 1 } ( f ; x ^ { \\prime } , \\mathcal { V } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "then "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 } ( f ; x , y ) > \\mathcal { M } _ { 2 } ( f ; x ^ { \\prime } , y )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is satisfied."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                574,
+                489,
+                671
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Under the above assumption, when comparing two different examples, different measurements demonstrate similar behavior. This property manifests that when one measurement is optimized on a set of examples, the other measurement may be accordingly optimized. Thus, we may jointly optimize two different measurements in a synergistic way to mutually maximize the measurement disagreements. However, existing methods only consider a single measurement, which overlooks the mutual enhancement between different measurements."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                676,
+                489,
+                853
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Assumption 2 In-Example Consistency. For any example "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x \\in \\mathcal { U }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and given two different measurements "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 1 } ( f ; x , \\mathcal { V } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 } ( f ; x , \\mathcal { V } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", we assume the two measurements satisfy in-example consistency. Namely, existing a small real value "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\delta"
+                    },
+                    {
+                        "type": "text",
+                        "content": "that lets all x satisfy "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "d ( x , { \\mathcal { M } } _ { 1 } , { \\mathcal { M } } _ { 2 } ) \\leqslant \\delta"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                858,
+                489,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                884,
+                117
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Under the in-example consistency assumption, we expect that different measurements are consistent on each example. However, this consistency may not be guaranteed when a misidentified ID or OOD example is sent for optimization, we name them abnormal examples. This motivates us to employ cross-measurement disagreements to detect abnormal examples and calibrate the measurements during training. However, existing OSTC methods overlook such availability and lack reliable mechanism to correct misidentified OOD examples during training. This motivates us to consider: How can we exploit the properties of cross-measurement disagreements to promote disagreement maximization and rectify abnormal examples?"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                126,
+                885,
+                367
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "3.3 Adversarial Disagreement Maximization"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                381,
+                877,
+                398
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "In light of the formal discussion on measurement disagreements, we present an Adversarial Disagreement Maximization (ADM) model for OSTC that effectively addresses the above questions. In ADM, we first specify two measurements using a crossentropy loss on the in-distribution classifier and confidence on the outlier detector. An adversarial learning approach is then proposed to synergistically maximize disagreements of the two measurements. To guarantee the optimization quality, we present an abnormal-example detection method to calibrate the disagreement maximization process. The entire structure of our ADM and its implementation process is shown in Figure 1."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                405,
+                887,
+                632
+            ]
+        },
+        {
+            "type": "image",
+            "content": {
+                "image_source": {
+                    "path": "images/71e834e280fd27a003a8683ab7c43588faa7ce6742a1e5e07db698cc1a4d405b.jpg"
+                },
+                "image_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 1: The implementation process of our Adversarial Disagreement Maximization (ADM) model."
+                    }
+                ],
+                "image_footnote": []
+            },
+            "bbox": [
+                517,
+                648,
+                870,
+                868
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2173"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Specification of Measurements. To perform OSTC, we build a softmax classifier on "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { V }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "to classify ID examples and a sigmoid outlier detector to identify OOD examples. Since OOD examples may cause larger cross-entropy losses of the classifier and lower outlier detection confidence, we naturally treat the cross-entropy loss and the confidence as measurements. Specifically, a pre-trained language model is first used to obtain text representations. For later use, we formulate this text representation process as function "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "f ."
+                    },
+                    {
+                        "type": "text",
+                        "content": "Then, we can define the measurement of the cross-entropy loss"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                84,
+                490,
+                278
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathcal { M } _ { 1 } ( f , \\Theta ; x , \\hat { y } ) = - \\log \\frac { \\theta _ { \\hat { y } } ^ { \\mathrm { T } } f ( x ) } { \\sum _ { y \\in \\mathcal { V } } \\theta _ { y } ^ { \\mathrm { T } } f ( x ) } ,\\tag{5}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/ad13c6bd0aaab9de532772a56a5fabc25a7bd8f74b88525a726c914447fe43c2.jpg"
+                }
+            },
+            "bbox": [
+                139,
+                290,
+                443,
+                330
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\Theta = \\{ \\theta _ { y } | y \\in \\mathcal { V } \\}"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the parameter in the softmax classifier on "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { V }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The measurement of the outlier-detection confidence is defined as"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                342,
+                487,
+                390
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\mathcal { M } _ { 2 } ( f , \\Phi ; x ) = \\sigma ( \\Phi ^ { \\mathrm { T } } f ( x ) ) ,\\tag{6}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/5f10ffe4a0cd51a1e26fc4eecf0f9144245429e077366f9a5a9ab8be39c4afb0.jpg"
+                }
+            },
+            "bbox": [
+                193,
+                405,
+                408,
+                424
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\Phi"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the parameter of the outlier detector and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\sigma"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is the logistic function. Now the two measurements "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "M _ { 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "M _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are specified."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                438,
+                489,
+                487
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Disagreement Maximization via Adversarial Learning. To synergistically maximize disagreements between the two measurements, we propose an adversarial learning approach to iteratively enlarge the two disagreements. Concretely, we define the following adversarial training process for OSTC"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                487,
+                489,
+                599
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\operatorname* { m i n } _ { \\Theta } \\operatorname* { m a x } _ { \\Phi } \\sum _ { i = 1 } ^ { n } ( - 1 ) ^ { \\lambda _ { i } } \\mathcal M _ { 2 } ( f , \\Phi ; x _ { i } ) \\mathcal M _ { 1 } ( f , \\Theta ; x _ { i } , \\hat { y } _ { i } )\\tag{7}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/2d6c801185821c5a708b2fc599600349fa8a164c087f83846dc18cdc26c36ab0.jpg"
+                }
+            },
+            "bbox": [
+                114,
+                609,
+                489,
+                650
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\lambda _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is a binary indicator that satisfies"
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                680,
+                431,
+                695
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\lambda _ { i } = \\left\\{ \\begin{array} { l l } { 1 , { \\mathcal { M } } _ { 2 } ( f , \\Phi ; x _ { i } ) > 0 . 5 , } \\\\ { 0 , o t h e r w i s e . } \\end{array} \\right.\\tag{8}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/3a05dd200f09281d228435cd39c8bbf4d4d08a64ad3e0cc5f999e3a449a4bb55.jpg"
+                }
+            },
+            "bbox": [
+                174,
+                708,
+                406,
+                749
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The above objective adopts a min-max optimization process. At the minimization step, the outlier detection confidence "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "performs as a weight on the cross-entropy loss "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\lambda _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "performs as a switcher to determine maximize or minimize "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Specifically, when "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\lambda _ { i } = 1 , x _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is treated as an ID example and the model minimizes its corresponding loss "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 1 } ( f , \\Theta ; x _ { i } , \\hat { y } _ { i } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Otherwise, when "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\lambda _ { i } = 0"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", x<sub>i</sub> is treated as an OOD example and the model minimizes the negative loss "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "- { \\mathcal { M } } _ { 1 } ( f , \\Theta ; x _ { i } , { \\hat { y } } _ { i } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", i.e., the model maximizes "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Similarly, At the maximization step, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "becomes a weight and the outlier detection confidence "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is accordingly maximized or minimized according to "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\lambda _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". In this way, the measurements "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "for ID examples and OOD examples are updated in opposite directions, thus maximize the in-measurement disagreements "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "d _ { \\mathcal { M } _ { 1 } } ( \\boldsymbol { x } _ { + } , \\boldsymbol { x } _ { - } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "d _ { \\mathcal { M } _ { 2 } } ( x _ { + } , x _ { - } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and therefore increase the disagreement bounds."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                760,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                885,
+                228
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Abnormal Example Detection and Measurement Calibration. According to Equation (8), the binary indicator "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\lambda _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "rely on the value of the outlier detector "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 } ( f , \\Phi ; x _ { i } )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". As in the adversarial training process, the outlier detector has no supervision signals, it inevitably produces error indicators. An incorrect indicator "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\lambda _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "will reverse the optimization direction and result in performance degradation. However, no information guides us to distinguish the examples that may lead to incorrect indicators."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                229,
+                885,
+                391
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Fortunately, the in-example consistency assumption provides us with an opportunity to mitigate the problem. Specifically, when an example is misclassified by the outlier detector, i.e., an abnormal example, it is likely to fail to satisfy in-example consistency. Thus, we use this property to detect abnormal examples and reverse corresponding indicator "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\lambda _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "to maintain a correct optimization direction. To realize abnormal example detection, we specify the cross-measurement disagreement as"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                392,
+                887,
+                552
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\begin{array} { r l } {  { d ( x _ { i } , \\mathcal { M } _ { 1 } , \\mathcal { M } _ { 2 } ) = } } \\\\ & { \\quad \\vert \\mathcal { M } _ { 2 } ( f , \\Phi ; x _ { i } ) - \\frac { \\mathcal { M } _ { 1 } ( f , \\Theta ; x _ { i } , \\hat { y } _ { i } ) } { \\operatorname* { m a x } _ { j } \\mathcal { M } _ { 1 } ( f , \\Theta ; x _ { j } , \\hat { y } _ { j } ) } \\vert } \\end{array}\\tag{9}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/013c3470737f6a50908af788d8d20f0a7d691fdffb9a3e504e7bc5d575335a02.jpg"
+                }
+            },
+            "bbox": [
+                524,
+                561,
+                847,
+                617
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "The measurement "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is normalized with maxnormalization to keep consistent scope "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "[ 0 , 1 ]"
+                    },
+                    {
+                        "type": "text",
+                        "content": "with measurement "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". Under this specification, we modify the adversarial learning objective to"
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                624,
+                885,
+                688
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\begin{array} { l } { \\displaystyle \\operatorname* { m i n } _ { \\Theta } \\displaystyle \\operatorname* { m a x } _ { \\Phi } \\sum _ { i = 1 } ^ { n } ( - 1 ) ^ { \\alpha _ { i } } ( - 1 ) ^ { \\lambda _ { i } } \\mathcal { M } _ { 2 } ( f , \\Phi ; x _ { i } ) } \\\\ { \\displaystyle \\quad \\cdot \\mathcal { M } _ { 1 } ( f , \\Theta ; x _ { i } , \\hat { y } _ { i } ) } \\end{array}\\tag{10}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/aeb13f3eab9c4d74725f700844659e0e5f72049588b0d15046f64daac7cdd79f.jpg"
+                }
+            },
+            "bbox": [
+                527,
+                697,
+                836,
+                757
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "where "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\alpha _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is a binary indicator that indicates whether "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is an abnormal example and its value is determined by whether "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "satisfies the in-example consistency. Namely, "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\alpha _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is computed by"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                766,
+                885,
+                832
+            ]
+        },
+        {
+            "type": "equation_interline",
+            "content": {
+                "math_content": "\\alpha _ { i } = \\left\\{ \\begin{array} { l l } { 0 , d ( x _ { i } , \\mathcal { M } _ { 1 } , \\mathcal { M } _ { 2 } ) > \\delta , } \\\\ { 1 , o t h e r w i s e . } \\end{array} \\right.\\tag{11}",
+                "math_type": "latex",
+                "image_source": {
+                    "path": "images/0509c092d4ca6f202a5d8ead88a3616b548e5d7f79eee8af9f037bebf76cc9e8.jpg"
+                }
+            },
+            "bbox": [
+                568,
+                840,
+                803,
+                882
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Note that as "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "are converse measurements, i.e., larger "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and smaller "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "indicate"
+                    }
+                ]
+            },
+            "bbox": [
+                509,
+                890,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2174"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "OOD examples, they are more consistent when a larger margin between "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 1 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { M } _ { 2 }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is presented, which is different from the isotropic measurements defined in Assumption 2. Under this design, when an example "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "x _ { i }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "is detected as an abnormal example, i.e., "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\alpha _ { i } = 1"
+                    },
+                    {
+                        "type": "text",
+                        "content": ", the model will reverse the optimization direction in the learning objective (10) and calibrate the measurements towards a correct optimization direction, which guarantees the effectiveness of adversarial disagreement maximization."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                85,
+                489,
+                246
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Optimization Process of ADM. We optimize ADM with the following three training stages:"
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                246,
+                487,
+                279
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Pre-stage1: To provide an initialized model, we pre-train the classifier using labeled texts in "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "\\mathcal { L }"
+                    },
+                    {
+                        "type": "text",
+                        "content": "with cross-entropy loss and treat labeled texts as ID examples and unlabeled texts in  as OOD examples to pre-train the outlier detector with BCE loss."
+                    }
+                ]
+            },
+            "bbox": [
+                114,
+                279,
+                489,
+                359
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Pre-stage2: Assign pseudo labels for unlabeled texts using the model trained in pre-stage1 and use the pseudo-labeled texts to further refine the classifier and outlier detector."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                360,
+                489,
+                424
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "ADM: Perform adversarial disagreement maximization to iteratively optimize the two measurements and further update the classifier and outlier detector combined with measurement calibration."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                425,
+                490,
+                489
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4 Experiment"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                502,
+                253,
+                519
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.1 Datasets and Experiment Setting"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                529,
+                420,
+                545
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Datasets. We use the 3 benchmark datasets created from existing text classification datasets in the previous work to evaluate OSTC (Chen et al., 2023), including AGNews (Radford et al., 2019), DBPedia (?) and Yahoo (Chang et al., 2008). These datasets are all widely used in text classification and includes enough amounts of common classes to evaluate OSTC models."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                551,
+                490,
+                681
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/860226dd025615f93386283feaa9a025b50ad75a92ae195e9e9c35442bc71633.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 2: The statistics of the datasets. # lab., #unl., #val. and #test respectively denote the labeled, unlabeled, validation and test texts for each class. #ID , #OOD denote the number of ID and OOD classes, respectively."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td>Dataset</td><td>#lab. #unl. #val. #test #ID #OOD</td></tr><tr><td>AGNews 10/50/100</td><td>5k 2k 1.9k 2 2</td></tr><tr><td>Yahoo 10/50/100</td><td>5k 2k 6k 6 4</td></tr><tr><td>DBPedia 10/50/100</td><td>5k 2k 5k 8 6</td></tr></table>",
+                "table_type": "simple_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                115,
+                759,
+                480,
+                838
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Dataset Construction and Experimental Settings. We follow the same dataset splitting setting in previous work (Chen et al., 2023). We use the same ID and OOD class sets and data for training, validation and test described in the previous work. The statistics of these benchmarks are shown in Table 2. We also follow the two metrics used in LOS to evaluate the OSTC performance. We use Acc and F1 to denote the overall accuracy and F1 value, which jointly evaluates a model’s performance in both ID classification and OOD detection."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                858,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                85,
+                887,
+                198
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.2 Implementation and Baseline Models"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                208,
+                850,
+                224
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Implementation. Our ADM model is implemented with PyTorch. We leverage the BERT encoder to build the Θ component and introduce an MLP with a sigmoid function to build the Φ component. When optimizing, we execute 100 updates for the first two pre-training stages respectively and choose model parameters with the best Acc on the validation set. During the ADM training stage, we iteratively execute 100 updates at the minimization step and 100 updates at the maximization step. The labeled training batch size is set to 4 and the unlabeled training batch size is set to 8. The learning rate of the model is set to "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "5 e - 5"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". The hyper-parameter δ is set to 0.25 on AGNews and Yahoo and is set to 0.15 on DBPedia. All hyper-parameters are selected by grid search on the validation set. We run each experiment 3 times and report the average result and standard deviation. We run all experiments on two NVIDIA Tesla A100 GPUs with 40GB memory."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                228,
+                887,
+                551
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Baseline Models ADM is compared with the following baselines:"
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                551,
+                885,
+                583
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "UDA+MSP, MixText+MSP: Pipeline OSTC models combine UDA (Xie et al., 2020), MixText (Chen et al., 2020) with maximum softmax probability to implement OOD detection (Hendrycks and Gimpel, 2017)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                583,
+                887,
+                663
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "UDA+LSoftmax, MixText+LSoftmax: Pipeline OSTC models combine UDA, MixText that learn discriminative text features with an uncomplicated softmax and achieve OOD detection using Local Outlier Factor (Yan et al., 2020)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                664,
+                885,
+                744
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "UDA+DOC, MixText+DOC: Pipeline models combine UDA, MixText with m 1-vs-rest sigmoid classifiers for OOD detection (Shu et al., 2017)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                745,
+                884,
+                793
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "UDA+LMCL, MixText+LMCL: Pipeline OSTC models combine UDA, MixText using large margin cosine loss for OOD detection (Lin and Xu, 2019). UDA+LOS, MixText+LOS: OSTC models unify semi-supervised training and outlier detection within probabilistic latent variable modeling which optimized with EM algorithm based on UDA and Mixtext (Chen et al., 2023)."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                793,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2175"
+                    }
+                ]
+            },
+            "bbox": [
+                480,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/a57239601f66173243d5a0c4877758f225b9c7d39a5475498b67134df89b4aa5.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 3: The open-set semi-supervised text classification results on AGNews, Yahoo and DBPedia."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=3 colspan=1>Method</td><td rowspan=1 colspan=6>AGNews</td><td rowspan=1 colspan=6>Yahoo</td><td rowspan=1 colspan=6>DBPedia</td></tr><tr><td rowspan=1 colspan=6>k = 10    k = 50    k = 100</td><td rowspan=1 colspan=6> $k = 1 0$     k = 50   k = 100</td><td rowspan=1 colspan=6> $k = 1 0$     k = 50    $k = 1 0 0$ </td></tr><tr><td rowspan=1 colspan=6>Acc F1  Acc  F1   Acc F1</td><td rowspan=1 colspan=6>Acc F1  Acc F1  Acc F1</td><td rowspan=1 colspan=6>Acc F1  Acc F1  Acc F1</td></tr><tr><td rowspan=1 colspan=1>UDA+MSP</td><td rowspan=1 colspan=6>35.1631.4250.8331.9060.5756.51</td><td rowspan=1 colspan=2>|40.9712.44</td><td rowspan=1 colspan=1>47.80</td><td rowspan=1 colspan=1>27.87</td><td rowspan=1 colspan=2>55.5144.84</td><td rowspan=1 colspan=4>|52.0637.1481.1483.31</td><td rowspan=1 colspan=2>81.5384.46</td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=2>(0.19)(0.34)(</td><td rowspan=1 colspan=2>1.25)(0.12)</td><td rowspan=1 colspan=2>(1.49)(2.40)</td><td rowspan=1 colspan=2>(0.28)(0.73)</td><td rowspan=1 colspan=1>(0.89)</td><td rowspan=1 colspan=1>(1.68)</td><td rowspan=1 colspan=1>(0.86)</td><td rowspan=1 colspan=1>(1.29)</td><td rowspan=1 colspan=2>(1.90)(2.43)</td><td rowspan=1 colspan=2>(1.44)(0.91)</td><td rowspan=1 colspan=1>(0.93)</td><td rowspan=1 colspan=1>(0.69)</td></tr><tr><td rowspan=1 colspan=1>UDA+LSoftmax</td><td rowspan=1 colspan=2>37.4935.93</td><td rowspan=1 colspan=2>38.7538.80</td><td rowspan=1 colspan=2>41.4539.63</td><td rowspan=1 colspan=2>38.9541.94</td><td rowspan=1 colspan=1>44.49</td><td rowspan=1 colspan=1>49.62</td><td rowspan=1 colspan=1>44.92</td><td rowspan=1 colspan=1>51.35</td><td rowspan=1 colspan=2>53.9665.01</td><td rowspan=1 colspan=2>55.4065.62</td><td rowspan=1 colspan=1>55.29</td><td rowspan=1 colspan=1>63.74</td></tr><tr><td rowspan=2 colspan=1>UDA+DOC</td><td rowspan=1 colspan=2>(0.91)(0.47)</td><td rowspan=1 colspan=2>(0.29)(0.29)</td><td rowspan=1 colspan=2>(1.79)(0.84)</td><td rowspan=1 colspan=2>(3.28)(1.21)</td><td rowspan=1 colspan=1>(0.96)</td><td rowspan=1 colspan=1>(0.85)</td><td rowspan=1 colspan=1>(0.08)</td><td rowspan=1 colspan=1>(0.96)</td><td rowspan=1 colspan=2>(1.40)(3.97)</td><td rowspan=1 colspan=2>(0.63)(2.37)</td><td rowspan=1 colspan=1>(0.53)</td><td rowspan=1 colspan=1>(0.86)</td></tr><tr><td rowspan=1 colspan=2>33.2630.89</td><td rowspan=1 colspan=1>49.95</td><td rowspan=1 colspan=1>26.39</td><td rowspan=1 colspan=2>60.5955.16</td><td rowspan=1 colspan=2>39.939.87</td><td rowspan=1 colspan=1>40.01</td><td rowspan=1 colspan=1>8.21</td><td rowspan=1 colspan=1>47.98</td><td rowspan=1 colspan=1>28.39</td><td rowspan=1 colspan=2>42.846.73</td><td rowspan=1 colspan=1>48.89</td><td rowspan=1 colspan=1>18.79</td><td rowspan=1 colspan=1>82.88</td><td rowspan=1 colspan=1>82.30</td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=2>(0.65)(1.11)(</td><td rowspan=1 colspan=1>0.33)</td><td rowspan=1 colspan=1>(0.73)</td><td rowspan=1 colspan=2>(2.29)(2.04)</td><td rowspan=1 colspan=2>(0.17)(0.40)</td><td rowspan=1 colspan=1>(0.07)</td><td rowspan=1 colspan=1>(0.02)</td><td rowspan=1 colspan=1>(0.62)</td><td rowspan=1 colspan=1>(1.27)</td><td rowspan=1 colspan=2>(0.07)(0.05)</td><td rowspan=1 colspan=1>(1.20)</td><td rowspan=1 colspan=1>(2.96)</td><td rowspan=1 colspan=2>(1.06)(1.36)</td></tr><tr><td rowspan=2 colspan=1>UDA+LMCL</td><td rowspan=1 colspan=2>35.2031.48</td><td rowspan=1 colspan=1>44.66</td><td rowspan=1 colspan=1>28.03</td><td rowspan=1 colspan=2>48.2641.98</td><td rowspan=1 colspan=2>41.9237.06</td><td rowspan=1 colspan=1>46.62</td><td rowspan=1 colspan=1>54.05</td><td rowspan=1 colspan=1>47.65</td><td rowspan=1 colspan=1>55.26</td><td rowspan=1 colspan=2>53.1359.46</td><td rowspan=1 colspan=1>56.16</td><td rowspan=1 colspan=1>69.94</td><td rowspan=1 colspan=1>56.34</td><td rowspan=1 colspan=1>69.79</td></tr><tr><td rowspan=1 colspan=2>(0.66)(0.50)(</td><td rowspan=1 colspan=1>1.61)</td><td rowspan=1 colspan=1>(7.69)</td><td rowspan=1 colspan=2>(6.82)(5.77)</td><td rowspan=1 colspan=2>(4.28)(20.49</td><td rowspan=1 colspan=1>(0.59))</td><td rowspan=1 colspan=1>(1.10)</td><td rowspan=1 colspan=1>(0.22)</td><td rowspan=1 colspan=1>(0.49)</td><td rowspan=1 colspan=2>(3.38)(12.82</td><td rowspan=1 colspan=1>(0.27))</td><td rowspan=1 colspan=1>(0.47)</td><td rowspan=1 colspan=1>(0.09)</td><td rowspan=1 colspan=1>(0.80)</td></tr><tr><td rowspan=1 colspan=1>MixText+MSP</td><td rowspan=1 colspan=2>35.1732.23</td><td rowspan=1 colspan=2>50.3928.40</td><td rowspan=1 colspan=2>63.0259.21</td><td rowspan=1 colspan=2>40.4910.41</td><td rowspan=1 colspan=1>48.26</td><td rowspan=1 colspan=1>28.32</td><td rowspan=1 colspan=1>54.30</td><td rowspan=1 colspan=1>42.63</td><td rowspan=1 colspan=2>53.0438.17</td><td rowspan=1 colspan=2>80.9682.97</td><td rowspan=1 colspan=1>80.77</td><td rowspan=1 colspan=1>83.83</td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>(0.89)</td><td rowspan=1 colspan=1>(0.40)</td><td rowspan=1 colspan=2>(0.49)(3.58)</td><td rowspan=1 colspan=2>(0.41)(1.35)</td><td rowspan=1 colspan=2>(0.37)(1.72)</td><td rowspan=1 colspan=1>(0.68)</td><td rowspan=1 colspan=1>(1.35)</td><td rowspan=1 colspan=1>(1.13)</td><td rowspan=1 colspan=1>(3.12)</td><td rowspan=1 colspan=2>(0.65)(1.70)</td><td rowspan=1 colspan=1>(0.57)</td><td rowspan=1 colspan=1>(0.36)</td><td rowspan=1 colspan=1>(0.83)</td><td rowspan=1 colspan=1>(0.29)</td></tr><tr><td rowspan=1 colspan=1>MixText+LSoftmax</td><td rowspan=1 colspan=1>37.93</td><td rowspan=1 colspan=1>37.80</td><td rowspan=1 colspan=2>39.5339.69</td><td rowspan=1 colspan=2>40.9839.41</td><td rowspan=1 colspan=2>43.1348.31</td><td rowspan=1 colspan=1>45.62</td><td rowspan=1 colspan=1>52.32</td><td rowspan=1 colspan=1>45.75</td><td rowspan=1 colspan=1>51.50</td><td rowspan=1 colspan=2>53.8465.80</td><td rowspan=1 colspan=1>56.64</td><td rowspan=1 colspan=1>67.21</td><td rowspan=1 colspan=1>57.83</td><td rowspan=1 colspan=1>64.93</td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=2>(1.15)(1.58)</td><td rowspan=1 colspan=1>(0.53)</td><td rowspan=1 colspan=1>(0.59)</td><td rowspan=1 colspan=2>(3.16)(2.61)</td><td rowspan=1 colspan=2>(2.12)(1.24)</td><td rowspan=1 colspan=1>(0.62)</td><td rowspan=1 colspan=1>(0.66)</td><td rowspan=1 colspan=1>(0.58)</td><td rowspan=1 colspan=1>(1.12)</td><td rowspan=1 colspan=2>(2.32)(2.92)</td><td rowspan=1 colspan=1>(1.71)</td><td rowspan=1 colspan=1>(3.36)</td><td rowspan=1 colspan=1>(2.03)</td><td rowspan=1 colspan=1>(0.98)</td></tr><tr><td rowspan=1 colspan=1>MixText+DOC</td><td rowspan=1 colspan=2>38.1736.54</td><td rowspan=1 colspan=1>50.10</td><td rowspan=1 colspan=1>22.56</td><td rowspan=1 colspan=2>58.4151.58</td><td rowspan=1 colspan=2>40.129.13</td><td rowspan=1 colspan=1>40.03</td><td rowspan=1 colspan=1>8.26</td><td rowspan=1 colspan=1>47.38</td><td rowspan=1 colspan=1>26.61</td><td rowspan=1 colspan=2>42.857.27</td><td rowspan=1 colspan=1>47.65</td><td rowspan=1 colspan=1>16.93</td><td rowspan=1 colspan=1>81.74</td><td rowspan=1 colspan=1>82.55</td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=2>(0.79)(1.89)</td><td rowspan=1 colspan=1>(0.04)(</td><td rowspan=1 colspan=1>0.13)</td><td rowspan=1 colspan=2>(1.27)(4.02)</td><td rowspan=1 colspan=2>(0.02)(0.07)</td><td rowspan=1 colspan=1>(0.44)</td><td rowspan=1 colspan=1>(1.00)</td><td rowspan=1 colspan=1>(0.79)</td><td rowspan=1 colspan=1>(1.89)</td><td rowspan=1 colspan=2>(0.02)(0.58)</td><td rowspan=1 colspan=1>(1.76)</td><td rowspan=1 colspan=1>(3.50)</td><td rowspan=1 colspan=1>(3.61)</td><td rowspan=1 colspan=1>(2.23)</td></tr><tr><td rowspan=1 colspan=1>MixText+LMCL</td><td rowspan=1 colspan=1>34.20</td><td rowspan=1 colspan=1>27.41</td><td rowspan=1 colspan=1>40.55</td><td rowspan=1 colspan=1>38.44</td><td rowspan=1 colspan=1>51.27</td><td rowspan=1 colspan=1>47.66</td><td rowspan=1 colspan=1>43.89</td><td rowspan=1 colspan=1>49.35</td><td rowspan=1 colspan=1>47.04</td><td rowspan=1 colspan=1>53.77</td><td rowspan=1 colspan=1>48.42</td><td rowspan=1 colspan=1>55.70</td><td rowspan=1 colspan=2>55.4069.79</td><td rowspan=1 colspan=1>56.05</td><td rowspan=1 colspan=1>70.24</td><td rowspan=1 colspan=1>56.24</td><td rowspan=1 colspan=1>72.08</td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>(0.93)</td><td rowspan=1 colspan=1>(3.78)</td><td rowspan=1 colspan=1>(8.87)</td><td rowspan=1 colspan=1>(11.91)</td><td rowspan=1 colspan=1>(10.70)</td><td rowspan=1 colspan=1>(7.06)</td><td rowspan=1 colspan=1>(2.65)</td><td rowspan=1 colspan=1>(2.56)</td><td rowspan=1 colspan=1>(0.17)</td><td rowspan=1 colspan=1>(0.79)</td><td rowspan=1 colspan=1>(0.63)</td><td rowspan=1 colspan=1>(1.12)</td><td rowspan=1 colspan=2>(0.08)(0.23)</td><td rowspan=1 colspan=1>(0.06)</td><td rowspan=1 colspan=1>(0.13)</td><td rowspan=1 colspan=1>(0.11)(</td><td rowspan=1 colspan=1>1.93)</td></tr><tr><td rowspan=4 colspan=1>UDA+LOSMixText+LOS</td><td rowspan=1 colspan=1>56.44</td><td rowspan=1 colspan=1>42.45</td><td rowspan=1 colspan=1>75.12</td><td rowspan=1 colspan=1>72.52</td><td rowspan=1 colspan=1>75.53</td><td rowspan=1 colspan=1>74.64</td><td rowspan=1 colspan=1>46.49</td><td rowspan=1 colspan=1>45.88</td><td rowspan=1 colspan=1>63.71</td><td rowspan=1 colspan=1>65.60</td><td rowspan=1 colspan=1>67.50</td><td rowspan=1 colspan=1>67.67</td><td rowspan=1 colspan=1>77.89</td><td rowspan=1 colspan=1>80.52</td><td rowspan=1 colspan=1>83.28</td><td rowspan=1 colspan=1>86.07</td><td rowspan=1 colspan=1>85.68</td><td rowspan=1 colspan=1>88.18</td></tr><tr><td rowspan=1 colspan=1>(0.84)</td><td rowspan=1 colspan=1>(6.24)</td><td rowspan=1 colspan=1>(3.48)</td><td rowspan=1 colspan=1>(3.10)</td><td rowspan=1 colspan=1>(1.72)</td><td rowspan=1 colspan=1>(1.37)</td><td rowspan=1 colspan=1>(1.00)</td><td rowspan=1 colspan=1>(3.57)</td><td rowspan=1 colspan=1>(1.65)</td><td rowspan=1 colspan=1>(1.01)</td><td rowspan=1 colspan=1>(2.38)</td><td rowspan=1 colspan=1>(1.67)</td><td rowspan=1 colspan=1>(3.99)</td><td rowspan=1 colspan=1>(3.55)</td><td rowspan=1 colspan=1>(1.57)</td><td rowspan=1 colspan=1>(0.65)</td><td rowspan=1 colspan=1>(3.24)</td><td rowspan=1 colspan=1>(3.41)</td></tr><tr><td rowspan=1 colspan=2>52.8931.80</td><td rowspan=1 colspan=1>69.11</td><td rowspan=1 colspan=1>62.04</td><td rowspan=1 colspan=1>76.60</td><td rowspan=1 colspan=1>73.33</td><td rowspan=1 colspan=1>57.19</td><td rowspan=1 colspan=1>51.07</td><td rowspan=1 colspan=1>66.57</td><td rowspan=1 colspan=1>66.18</td><td rowspan=1 colspan=1>68.09</td><td rowspan=1 colspan=1>66.99</td><td rowspan=1 colspan=1>76.67</td><td rowspan=1 colspan=1>79.23</td><td rowspan=1 colspan=1>91.92</td><td rowspan=1 colspan=1>92.91</td><td rowspan=1 colspan=1>88.31</td><td rowspan=1 colspan=1>90.33</td></tr><tr><td rowspan=1 colspan=3>(0.57)(1.54)(4.90)</td><td rowspan=1 colspan=1>(7.82)</td><td rowspan=1 colspan=2>(2.81)(3.83)</td><td rowspan=1 colspan=1>(0.35)</td><td rowspan=1 colspan=1>(0.41)</td><td rowspan=1 colspan=1>(0.09)</td><td rowspan=1 colspan=1>(0.54)</td><td rowspan=1 colspan=1>(0.49)</td><td rowspan=1 colspan=1>(0.94)</td><td rowspan=1 colspan=1>(4.48)</td><td rowspan=1 colspan=1>(4.23)</td><td rowspan=1 colspan=1>(3.88)</td><td rowspan=1 colspan=1>(3.05)</td><td rowspan=1 colspan=1>(9.57)</td><td rowspan=1 colspan=1>(7.39)</td></tr><tr><td rowspan=2 colspan=1>ADM</td><td rowspan=1 colspan=3>67.4762.3577.65</td><td rowspan=1 colspan=3>74.8479.9378.10</td><td rowspan=1 colspan=2>57.9554.11</td><td rowspan=1 colspan=1>68.08</td><td rowspan=1 colspan=1>66.07</td><td rowspan=1 colspan=1>67.67</td><td rowspan=1 colspan=1>66.34</td><td rowspan=1 colspan=2>|86.4985.52</td><td rowspan=1 colspan=3>91.5591.3390.75</td><td rowspan=1 colspan=1>90.50</td></tr><tr><td rowspan=1 colspan=3>(5.21) (3.76)(0.92)</td><td rowspan=1 colspan=3>(1.29)(1.09)(1.22)</td><td rowspan=1 colspan=1>(1.26)</td><td rowspan=1 colspan=1>(1.71)</td><td rowspan=1 colspan=1>(0.20)</td><td rowspan=1 colspan=1>(0.59)</td><td rowspan=1 colspan=1>(0.59)</td><td rowspan=1 colspan=1>(0.80)</td><td rowspan=1 colspan=2>(2.87)(3.36)</td><td rowspan=1 colspan=1>(1.60) ()</td><td rowspan=1 colspan=2>1.37) (1.23)</td><td rowspan=1 colspan=1>(0.40)</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                119,
+                107,
+                878,
+                406
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/33bc46c00ad5626fe4f15391a64358b2f3af100c74747951f5da68794607ee29.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 4: Ablation studies of ADM on the AGNews dataset."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=\"2\">Metric</td><td colspan=\"2\">ADM pre-stage1</td><td colspan=\"2\">ADM pre-stage2</td><td colspan=\"2\">ADM 0-threshold</td><td colspan=\"2\">ADM</td></tr><tr><td> $k = 1 0$ </td><td> $k = 5 0$ </td><td> $k = 1 0$ </td><td> $k = 5 0$ </td><td> $k = 1 0$ </td><td> $k = 5 0$ </td><td> $k = 1 0$ </td><td> $k = 5 0$ </td></tr><tr><td>Acc</td><td>53.97</td><td>56.22</td><td>54.07</td><td>69.14</td><td>50.52</td><td>68.67</td><td>67.47</td><td>77.65</td></tr><tr><td>F1</td><td>36.79</td><td>41.08</td><td>40.22</td><td>62.30</td><td>33.47</td><td>67.96</td><td>62.35</td><td>74.84</td></tr><tr><td>In</td><td>52.68</td><td>64.42</td><td>53.02</td><td>69.18</td><td>50.00</td><td>84.47</td><td>71.49</td><td>82.60</td></tr><tr><td>Out</td><td>58.88</td><td>60.51</td><td>60.21</td><td>76.50</td><td>55.78</td><td>74.64</td><td>79.70</td><td>85.32</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                122,
+                447,
+                875,
+                564
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.3 Experiment Results"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                590,
+                317,
+                606
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Main Results. The open-set semi-supervised text classification results on benchmark datasets are shown in Table 3. From the table, we observe that ADM achieves the best performance in all settings of the AGNews dataset and most of the settings on Yahoo and DBPedia datasets and ADM achieves more improvement when k is smaller. These results demonstrate that our adversarial disagreement maximization approach is effective in OSTC and it is more effective in a challenging setting. Another observation is that LOS combined with UDA and MixText significantly improve the performance over pipeline models and ADM further improves LOS in most of the settings. These results manifest that unified training of semi-supervised classification and outlier detection can be better adapted to OSTC than the pipeline approach and directly maximizing measurements disagreement is more effective than existing optimization methods in OSTC."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                617,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Ablation Study. To analyze the contributions of each component and each training stage in ADM, we make ablation studies. Specifically, we compare 3 ablated models: ADM pre-stage1, pre-stage1 and ADM 0-threshold that disables the abnormalexample detection module with a setting of δ = 0. The ablated results show that pre-stage1 provides an initialized model for ADM and the pre-stage2 further improves upon pre-stage1. However, when training ADM without abnormal example detection, ADM 0-threshold performs even worse than in prestage2. When employing an appropriate abnormalexample detection threshold, ADM significantly improves OSTC results. This result demonstrates that abnormal-example detection and measurement calibration guarantees the effectiveness of ADM. ID Classification and OOD Detection Results. To analyze the models’ ability to classify ID examples and detect OOD examples, we report the ID classification accuracy and OOD detection accuracy in Table 5. Metrics In and Out are introduced to denote the ID accuracy on only ID examples and outlier-detection accuracy on all examples, respectively. The results in the table show that our ADM model outperforms existing OSTC models with large margins on the outlier detection (Out) accuracy results in most of the settings. These results demonstrate that the superiority of ADM is dominated by its good performance on OOD detection although it sacrifices ID classification results in some settings. These results suggest that ADM is effective in alleviating false positive inference."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                590,
+                887,
+                913
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2176"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/124dc41ae91d9ee641b277b3de2949b04d687b37082aa4fdd241c29234557ad7.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 5: The evaluation results of accuracy on ID examples (In) and OOD detection accuracy on all examples (Out)."
+                    },
+                    {
+                        "type": "text",
+                        "content": "Table 6: Comparison with Large Language Models."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=\"3\">Method</td><td colspan=\"4\">AGNews</td><td colspan=\"4\">Yahoo</td><td colspan=\"5\">DBPedia</td></tr><tr><td> $k = 1 0$ </td><td colspan=\"3\"> $k = 5 0$ </td><td rowspan=\"2\"> $k = 1 0 0$ </td><td rowspan=\"2\"> $k = 1 0$ </td><td colspan=\"2\"> $k = 5 0$ </td><td rowspan=\"2\"> $k = 1 0 0$ </td><td colspan=\"2\"> $k = 1 0$ </td><td colspan=\"3\"> $k = 5 0$   $k = 1 0 0$ </td></tr><tr><td>In Out</td><td>In</td><td>Out In</td><td>Out</td><td>In Out</td><td>In Out</td><td>In Out</td><td>In Out</td><td>In</td><td>Out In</td></tr><tr><td>UDA+MSP</td><td>70.33</td><td>49.99 82.90</td><td>51.67</td><td>86.10</td><td>62.97</td><td>63.70 41.54</td><td>76.23</td><td>48.44 78.46</td><td>56.75|</td><td>|96.98 52.17</td><td>98.42</td><td>81.40</td><td>Out 98.55</td></tr><tr><td>UDA+LSoftmax</td><td>70.54 44.43</td><td></td><td>84.10 42.90</td><td>86.4746.37</td><td></td><td>63.8356.1277.66</td><td>55.58</td><td>79.53</td><td>55.94</td><td>96.98 55.38 98.52</td><td></td><td>56.06 98.57</td><td>81.82</td></tr><tr><td>UDA+DOC</td><td>66.2149.61</td><td>83.5</td><td>50.32</td><td>86.66 62.62</td><td></td><td>59.9540.70</td><td>75.91 40.01</td><td>78.7048.58</td><td>94.72 47.61</td><td>98.29</td><td>48.89</td><td>98.39</td><td>55.87</td></tr><tr><td>UDA+LMCL</td><td>70.4050.3383.55</td><td></td><td>47.19</td><td>86.07 51.10|</td><td></td><td>65.92 52.90 77.41</td><td>59.21</td><td>79.49 59.67</td><td>96.78 54.38</td><td></td><td></td><td></td><td>83.01</td></tr><tr><td>MixText+MSP</td><td></td><td>70.35 49.93 83.32 50.81</td><td></td><td>86.88 65.08</td><td></td><td></td><td></td><td>66.8240.7577.5448.9179.4855.72</td><td></td><td>95.79 53.23</td><td></td><td></td><td>98.45 57.02 98.49 57.20</td></tr><tr><td>MixText+LSoftmax</td><td></td><td>73.9044.2985.47</td><td>43.20</td><td>87.08</td><td>44.57</td><td>70.61 59.86 78.30</td><td></td><td>57.2879.13 56.84</td><td></td><td>97.26 55.13</td><td>97.9757.4798.32 58.53</td><td></td><td>98.10 81.30 98.3581.11</td></tr><tr><td>MixText+DOC</td><td></td><td>76.1749.9283.97</td><td>50.11</td><td>86.8260.48</td><td></td><td>64.5840.29</td><td>76.51 40.03</td><td>77.9347.90</td><td></td><td>95.7542.86 97.8847.6598.4681.90</td><td></td><td></td><td></td></tr><tr><td>MixText+LMCL</td><td>69.3545.1783.54 44.71</td><td></td><td></td><td>86.9755.01</td><td></td><td>67.86 55.15 78.50 59.88</td><td></td><td>879.9660.33</td><td></td><td>96.96 57.32</td><td>98.12 57.11 98.28 57.22</td><td></td><td></td></tr><tr><td>UDA+LOS</td><td>59.1860.3484.2377.78</td><td></td><td></td><td>86.2378.94</td><td></td><td>60.63 59.73</td><td>76.27</td><td>70.66 78.12 73.96</td><td></td><td>93.4979.53</td><td>96.06 84.40 97.55</td><td></td><td>86.40</td></tr><tr><td>MixText+LOS</td><td>61.9753.59</td><td>983.5070.48</td><td></td><td>87.27</td><td>77.97</td><td>69.3461.29</td><td>78.03 70.30</td><td>0 79.73 71.77</td><td></td><td>92.15 79.17</td><td>97.75</td><td>92.61 98.33</td><td>88.83</td></tr><tr><td>ADM</td><td></td><td>|71.49 79.70 82.60 85.32</td><td></td><td>84.62 87.06|</td><td></td><td>63.0372.8674.17</td><td></td><td>78.2176.82</td><td>77.71</td><td>95.16 88.20</td><td>97.78</td><td></td><td>92.54 97.71 91.90</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                117,
+                108,
+                878,
+                302
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                328,
+                490,
+                520
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Comparison with Large Language Models. We provide an empirical study using the large language model (LLM) LLaMA2-7B and in-context learning for OSTC in Table 6. Concretely, we design prompts that can guide the LLaMA2-7B model to complete classification and outlier detection, and we evaluate it in the 0-shot and 10-shot settings on the AGNews dataset. From the results, we can conclude that LLaMA2-7B can perform outlier detection and the OSTC task. However, in the 0-shot setting LLaMA2-7B, it performs poorly in both outlier detection and OSTC and achieves worse performance than baseline models. In the 10-shot setting of LLaMA2-7B, it achieves a good outlier detection result but a worse OSTC result than baseline models. And ADM outperforms LLaMA2-7B in both outlier detection and OSTC. These results demonstrate that in the OSTC task, carefully designed lightweight models may still be necessary and useful with the background of LLMs."
+                    }
+                ]
+            },
+            "bbox": [
+                110,
+                521,
+                490,
+                845
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.4 Experimental Analysis"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                853,
+                341,
+                869
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Analysis on the Adversarial Learning Process. To study how our adversarial learning process works, we make an analysis of the changes in the losses during training. Specifically, we record the loss values of the maximization and minimization steps during training on the k = 10 and "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "k = 5 0"
+                    },
+                    {
+                        "type": "text",
+                        "content": "settings of AGNews in Figure 2. From the figure, we observe that the loss values of the maximization and minimization steps respectively increase and decrease as the training progresses. These results demonstrate that our adversarial training approach is effective. Since the losses of the maximization and minimization steps can be respectively viewed as weighted summed measurements, the results demonstrate that the measurement disagreements are synergistically maximized."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                873,
+                490,
+                922
+            ]
+        },
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/6414ce8355e7df8eb8dacc6b0333e4eb85080ed50b9ac435d416eded5f82534c.jpg"
+                },
+                "table_caption": [],
+                "table_footnote": [],
+                "html": "<table><tr><td colspan=\"2\">Model Outlier Detection OSTC</td></tr><tr><td>LLaMA2-7B (0-shot)</td><td>49.6 25.4</td></tr><tr><td> $\\mathrm { L L a M A 2 { - } 7 B ( 1 0 { - } s h o t ) }$ </td><td>71.6 45.3</td></tr><tr><td> $\\mathrm { U D A + L O S } \\left( k = 1 0 \\right)$ </td><td>60.3 56.4</td></tr><tr><td>Mixtext+LOS (k = 10)</td><td>53.4 52.9</td></tr><tr><td>ADM (k = 10)</td><td>79.7 67.4</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                510,
+                353,
+                882,
+                468
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/2ce7812bfde2b82f3bac2532d7a166f884d87d6632bf87f265d70b825b6bf10b.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(a) AGNews 10"
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                509,
+                483,
+                692,
+                590
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/33351bd894dd7b1d76171b50cb6a051d264be9d05cec5bda25c55d2757171338.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(b) AGNews 50"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Figure 2: The smoothed loss values change trend in min-max optimization during training."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                689,
+                485,
+                875,
+                590
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                507,
+                681,
+                885,
+                889
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Analysis on the Abnormal-Example Detection Approach. In order to investigate the effectiveness of our abnormal-example detection approach during adversarial disagreement maximization, we report the percent of correctly identified normal and abnormal examples accumulated in previous training epochs in Figure 3. From the recording results, we observe that the percentage of correctly identified abnormal examples increase as the training progress. This result indicates that the abnormalexample detection approach is effective. In k = 10 setting, although the model sacrifices normal example identification performance, it significantly increase abnormal-example detection performance."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                890,
+                885,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2177"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "table",
+            "content": {
+                "image_source": {
+                    "path": "images/f832a5eb31fee4adb7ddc8396bfc855514552ebf13d425a8ffddb2f6aa645c55.jpg"
+                },
+                "table_caption": [
+                    {
+                        "type": "text",
+                        "content": "Table 7: Case study on four selected text examples from the AGNews dataset."
+                    }
+                ],
+                "table_footnote": [],
+                "html": "<table><tr><td rowspan=1 colspan=1>Id</td><td rowspan=1 colspan=1>Text</td><td rowspan=1 colspan=1>k</td><td rowspan=1 colspan=1>True Label</td><td rowspan=1 colspan=1>Pre-stage2</td><td rowspan=1 colspan=1>Initial M2</td><td rowspan=1 colspan=1>ADM M2</td></tr><tr><td rowspan=1 colspan=1>1</td><td rowspan=1 colspan=1>Jennifer Canada knew she was entering a boy&#x27;s club when she en-olled in Southern Methodist University&#x27;s Guildhall school of vi-deo game making.</td><td rowspan=1 colspan=1>10</td><td rowspan=1 colspan=1>Sci/Tech</td><td rowspan=1 colspan=1>1</td><td rowspan=1 colspan=1>0.0706</td><td rowspan=1 colspan=1>0.9771</td></tr><tr><td rowspan=1 colspan=1>2</td><td rowspan=1 colspan=1>AP - The smallest man on the court always seems to make the big-gest plays for the Washington Huskies.</td><td rowspan=1 colspan=1>10</td><td rowspan=1 colspan=1>\\</td><td rowspan=1 colspan=1>Business</td><td rowspan=1 colspan=1>0.8621</td><td rowspan=1 colspan=1>0.2369</td></tr><tr><td rowspan=1 colspan=1>3</td><td rowspan=1 colspan=1>The company said most cuts would come in its network operationsdivision, where work has become increasingly automated, and inthe customer service group.</td><td rowspan=1 colspan=1>50</td><td rowspan=1 colspan=1>Business</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>0.4134</td><td rowspan=1 colspan=1>0.9995</td></tr><tr><td rowspan=1 colspan=1>4</td><td rowspan=1 colspan=1>Myanmar&#x27;s Opposition National League for Democracy (NLD)party accused the military regime of endangering party leader AungSan Suu Kyi&#x27;s life by restricting her access to a doctor and non-juntasecurity.</td><td rowspan=1 colspan=1>50</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>Sci/Tech</td><td rowspan=1 colspan=1>0.9963</td><td rowspan=1 colspan=1>0.0174</td></tr></table>",
+                "table_type": "complex_table",
+                "table_nest_level": 1
+            },
+            "bbox": [
+                119,
+                107,
+                878,
+                269
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/ec91f127c1fdebaa7409cdab2414f1b669fee9d9907ca5d263570339ad935693.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(a) AGNews 10"
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                114,
+                292,
+                302,
+                399
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/5c90677dc4ee54dbd6c95aac6203ff61f7c2ba32e6b7cbca2144cecd56f12779.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "(b) AGNews 50"
+                    },
+                    {
+                        "type": "text",
+                        "content": "Figure 3: The percent of correctly identified normal and abnormal examples accumulated in previous training epochs in k = 10 and k = 50 settings of AGNews."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                300,
+                293,
+                489,
+                399
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": []
+            },
+            "bbox": [
+                112,
+                525,
+                490,
+                720
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Hyper-Parameter Analysis. To study how the hyper-parameters affect the training process, we make a hyper-parameter analysis. Specifically, we report the OSTC evaluation results of k = 10 and k = 50 settings on AGNews using different hyperparameter δ in Figure 4. From the results, we observe that the performance of ADM is sensitive to the hyper-parameter δ and an inappropriate configuration of δ may result in poor performance of ADM. This phenomenon indicates that abnormalexample detection and measurement calibration is necessary to guarantee the effectiveness of ADM."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                728,
+                490,
+                923
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/d2a647f5b25ffc8557226410df1b24455680817aa43b52615466d4823c4c6155.jpg"
+                },
+                "content": "",
+                "chart_caption": [],
+                "chart_footnote": []
+            },
+            "bbox": [
+                510,
+                294,
+                880,
+                395
+            ]
+        },
+        {
+            "type": "chart",
+            "content": {
+                "image_source": {
+                    "path": "images/06c263150802d9930d8ce757b74a666eb6ae1286414b30c51e64ee5677f49f74.jpg"
+                },
+                "content": "",
+                "chart_caption": [
+                    {
+                        "type": "text",
+                        "content": "Figure 4: Hyper-parameter analysis of δ on AGNews."
+                    }
+                ],
+                "chart_footnote": []
+            },
+            "bbox": [
+                504,
+                394,
+                880,
+                497
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "4.5 Case Study"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                557,
+                647,
+                574
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We make a case study in Table 7 on selected text examples to analyze the outlier detection ability of ADM. As shown in case 1 and case 3, the groundtrue labels are respectively Sci/Tech and Business, but the pre-stage2 model makes wrong predictions "
+                    },
+                    {
+                        "type": "equation_inline",
+                        "content": "( \\mathcal { M } _ { 2 } < 0 . 5 )"
+                    },
+                    {
+                        "type": "text",
+                        "content": ". After ADM training, the outlier detector successfully reverses the wrong predictions to the correct ones. Similarly, in case 2 and case 4, pre-stage2 incorrectly identifies the example as OOD. Nevertheless, ADM successfully rectifies the predictions, demonstrating its effectiveness."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                579,
+                885,
+                757
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "5 Conclusion"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                509,
+                766,
+                643,
+                783
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "We reveal the potential of measurement disagreement in OSTC. To fully employ the advantage of measurement disagreement in OSTC, we propose to directly maximize it and design a novel adversarial disagreement maximization (ADM) approach combined with abnormal-example detection to improve OSTC performance. Experiment results demonstrate the effectiveness of ADM."
+                    }
+                ]
+            },
+            "bbox": [
+                507,
+                793,
+                887,
+                922
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2178"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                928,
+                522,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "6 Limitations"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                84,
+                250,
+                99
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "Although our measurement disagreement maximization model is demonstrated effective, it may have two limitations. First, ADM relies on a twostage pre-training process to obtain an initialized ID classifier and outlier detector, which guarantees the effectiveness of the min-max optimization. Second, ADM requires the proposed abnormal-example detection and measurement calibration approach to guarantee the correct optimization direction."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                110,
+                490,
+                255
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "Acknowledgments"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                267,
+                277,
+                284
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": {
+                "paragraph_content": [
+                    {
+                        "type": "text",
+                        "content": "This work was supported by the National Science and Technology Major Project under Grant 2022ZD0120202, in part by the National Natural Science Foundation of China (No. U23B2056 and No. 62306026), in part by China Postdoctoral Science Foundation (No. 2023M740184), in part by the Fundamental Research Funds for the Central Universities, and in part by the State Key Laboratory of Complex & Critical Software Environment."
+                    }
+                ]
+            },
+            "bbox": [
+                112,
+                292,
+                490,
+                439
+            ]
+        },
+        {
+            "type": "title",
+            "content": {
+                "title_content": [
+                    {
+                        "type": "text",
+                        "content": "References"
+                    }
+                ],
+                "level": 2
+            },
+            "bbox": [
+                114,
+                464,
+                215,
+                480
+            ]
+        },
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Markus M. Breunig, Hans-Peter Kriegel, Raymond T. Ng, and Jörg Sander. 2000. LOF: identifying densitybased local outliers. In SIGMOD, pages 93–104. ACM."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ming-Wei Chang, Lev-Arie Ratinov, Dan Roth, and Vivek Srikumar. 2008. Importance of semantic representation: Dataless classification. In AAAI, volume 2, pages 830–835."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Jiaao Chen, Zichao Yang, and Diyi Yang. 2020. Mixtext: Linguistically-informed interpolation of hidden space for semi-supervised text classification. In ACL, pages 2147–2157."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Junfan Chen, Richong Zhang, Junchi Chen, Chunming Hu, and Yongyi Mao. 2023. Open-set semisupervised text classification with latent outlier softening. In KDD, pages 226–236."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ian J. Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron C. Courville, and Yoshua Bengio. 2014. Generative adversarial nets. In NIPS, pages 2672–2680."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Suchin Gururangan, Tam Dang, Dallas Card, and Noah A. Smith. 2019. Variational pretraining for semi-supervised text classification. In ACL, pages 5880–5894. Association for Computational Linguistics."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Dan Hendrycks and Kevin Gimpel. 2017. A baseline for detecting misclassified and out-of-distribution examples in neural networks. In ICLR."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Junkai Huang, Chaowei Fang, Weikai Chen, Zhenhua Chai, Xiaolin Wei, Pengxu Wei, Liang Lin, and Guanbin Li. 2021. Trash to treasure: Harvesting OOD data with cross-modal matching for open-set semisupervised learning. In ICCV, pages 8290–8299."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Dong-Hyun Lee et al. 2013. Pseudo-label: The simple and efficient semi-supervised learning method for deep neural networks. In Workshop on challenges in representation learning, ICML, volume 3, page 896."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ju Hyoung Lee, Sang-Ki Ko, and Yo-Sub Han. 2021. Salnet: Semi-supervised few-shot text classification with attention-based lexicon construction. In AAAI, pages 13189–13197."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Changchun Li, Ximing Li, and Jihong Ouyang. 2021. Semi-supervised text classification with balanced deep representation distributions. In ACL, pages 5044–5053."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Haoran Li, Chun-Mei Feng, Tao Zhou, Yong Xu, and Xiaojun Chang. 2022a. Prompt-driven efficient open-set semi-supervised learning. CoRR, abs/2209.14205."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Shujie Li, Min Yang, Chengming Li, and Ruifeng Xu. 2022b. Dual pseudo supervision for semi-supervised text classification with a reliable teacher. In SIGIR, pages 2513–2518."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ting-En Lin and Hua Xu. 2019. Deep unknown intent detection with margin loss. In ACL, pages 5491– 5496."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Chen Liu, Mengchao Zhang, Zhibing Fu, Panpan Hou, and Yu Li. 2021. Flitext: A faster and lighter semisupervised text classification with convolution networks. In EMNLP, pages 2481–2491."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yen-Cheng Liu, Chih-Yao Ma, Xiaoliang Dai, Junjiao Tian, Peter Vajda, Zijian He, and Zsolt Kira. 2022. Open-set semi-supervised object detection. In ECCV, pages 143–159."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Yu Meng, Jiaming Shen, Chao Zhang, and Jiawei Han. 2018. Weakly-supervised neural text classification. In CIKM, pages 983–992."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Takeru Miyato, Andrew M. Dai, and Ian J. Goodfellow. 2017. Adversarial training methods for semisupervised text classification. In ICLR."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al. 2019. Language models are unsupervised multitask learners. OpenAI blog, 1(8):9."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Kuniaki Saito, Donghyun Kim, and Kate Saenko. 2021. Openmatch: Open-set consistency regularization for semi-supervised learning with outliers. In NeurIPS."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Lei Shu, Hu Xu, and Bing Liu. 2017. DOC: deep open classification of text documents. In EMNLP, pages 2911–2916."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                488,
+                489,
+                541
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2179"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                928,
+                521,
+                942
+            ]
+        }
+    ],
+    [
+        {
+            "type": "list",
+            "content": {
+                "list_type": "reference_list",
+                "list_items": [
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Antti Tarvainen and Harri Valpola. 2017. Weightaveraged consistency targets improve semisupervised deep learning results. CoRR, abs/1703.01780."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Austin Cheng-Yun Tsai, Sheng-Ya Lin, and Li-Chen Fu. 2022. Contrast-enhanced semi-supervised text classification with few labels. In AAAI, pages 11394– 11402."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Qizhe Xie, Zihang Dai, Eduard H. Hovy, Thang Luong, and Quoc Le. 2020. Unsupervised data augmentation for consistency training. In NeurIPS."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Hai-Ming Xu, Lingqiao Liu, and Ehsan Abbasnejad. 2022. Progressive class semantic matching for semisupervised text classification. In NAACL, pages 3003– 3013."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Guangfeng Yan, Lu Fan, Qimai Li, Han Liu, Xiaotong Zhang, Xiao-Ming Wu, and Albert Y. S. Lam. 2020. Unknown intent detection using gaussian mixture model with an application to zero-shot intent classification. In ACL, pages 1050–1060."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Weiyi Yang, Richong Zhang, Junfan Chen, Lihong Wang, and Jaein Kim. 2023. Prototype-guided pseudo labeling for semi-supervised text classification. In ACL, pages 16369–16382."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Qing Yu, Daiki Ikami, Go Irie, and Kiyoharu Aizawa. 2020. Multi-task curriculum framework for open-set semi-supervised learning. In ECCV, volume 12357, pages 438–454."
+                            }
+                        ]
+                    },
+                    {
+                        "item_type": "text",
+                        "item_content": [
+                            {
+                                "type": "text",
+                                "content": "Ronghang Zhu and Sheng Li. 2022. Crossmatch: Crossclassifier consistency regularization for open-set single domain generalization. In ICLR."
+                            }
+                        ]
+                    }
+                ]
+            },
+            "bbox": [
+                115,
+                85,
+                489,
+                139
+            ]
+        },
+        {
+            "type": "page_number",
+            "content": {
+                "page_number_content": [
+                    {
+                        "type": "text",
+                        "content": "2180"
+                    }
+                ]
+            },
+            "bbox": [
+                478,
+                928,
+                522,
+                942
+            ]
+        }
+    ]
+]
