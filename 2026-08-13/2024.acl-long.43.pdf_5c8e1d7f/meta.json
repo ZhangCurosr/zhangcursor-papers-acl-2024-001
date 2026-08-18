@@ -3,5 +3,43 @@
  "batch_id": "5c8e1d7f-5b45-4009-aed0-ea85a2919157",
  "token": "sk-7NOZt17oN...",
  "created_at": "2026-08-13 02:44:59",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/304144cd-69f3-403a-a1cd-6d1a9a033691.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/304144cd-69f3-403a-a1cd-6d1a9a033691.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:02:34",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "data augmentation",
+    "low-resource NLU",
+    "AMR",
+    "generative augmentation",
+    "BART",
+    "abstract description",
+    "text expansion"
+   ],
+   "field": "低资源自然语言理解",
+   "innovations": [
+    "提出 Abstract-and-Expand 范式，通过 AMR 图编辑生成可控抽象描述再用 BART 扩展",
+    "设计 AMR 子图混合策略（Mixup on Graphs）提升多样性",
+    "无需为每个下游任务单独训练，仅需预训练 BART 即可无训练增强"
+   ],
+   "benchmarks": [
+    "Huffpost",
+    "Yahoo",
+    "IMDB",
+    "ATIS",
+    "MASSIVE",
+    "CoNLL-2003",
+    "MultiCoNER",
+    "OntoNotes-5.0",
+    "SQuAD",
+    "NewsQA",
+    "MRPC",
+    "QQP",
+    "SNLI",
+    "MNLI"
+   ]
+  }
+ }
 }

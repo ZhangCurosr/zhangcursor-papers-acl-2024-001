@@ -3,5 +3,30 @@
  "batch_id": "8699f3f2-eb04-4016-a2e3-759f2314841f",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 02:45:18",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a5c9a216-e81c-407c-b566-b8699333ffc7.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a5c9a216-e81c-407c-b566-b8699333ffc7.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:01:23",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Tool Learning",
+    "LLM Safety",
+    "Security Evaluation",
+    "Agent Safety",
+    "Tool Use",
+    "Jailbreak",
+    "Robustness"
+   ],
+   "field": "工具学习与大模型安全",
+   "innovations": [
+    "提出三阶段六场景的工具学习安全评估框架ToolSword",
+    "揭示工具调用会破坏LLM现有安全对齐机制",
+    "发现模型规模与工具学习安全性无正相关关系"
+   ],
+   "benchmarks": [
+    "ToolSword"
+   ]
+  }
+ }
 }

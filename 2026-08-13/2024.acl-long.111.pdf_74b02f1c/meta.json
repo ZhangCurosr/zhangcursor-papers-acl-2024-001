@@ -3,5 +3,29 @@
  "batch_id": "74b02f1c-e463-4ce3-9dda-db6cd97bd9f4",
  "token": "sk-n7iJ0Z1Ol...",
  "created_at": "2026-08-13 02:45:16",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ad36cba5-b817-430d-9447-748769d3398e.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ad36cba5-b817-430d-9447-748769d3398e.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:00:18",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "价值观评估",
+    "大语言模型",
+    "心理测量基准",
+    "价值对齐",
+    "价值观理解",
+    "LLM评测"
+   ],
+   "field": "大语言模型评估与价值观对齐",
+   "innovations": [
+    "首个综合心理测量价值观基准ValueBench，覆盖44个量表453个价值维度",
+    "基于真实人机交互的价值观取向评估管线，替代有局限的李克特自评",
+    "开放层次价值空间中的价值观理解评测任务体系（相关价值识别/抽取/生成）"
+   ],
+   "benchmarks": [
+    "ValueBench"
+   ]
+  }
+ }
 }

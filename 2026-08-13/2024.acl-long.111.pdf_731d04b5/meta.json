@@ -3,5 +3,32 @@
  "batch_id": "731d04b5-d77c-44fc-8dc8-95abb6493218",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 02:33:30",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ad36cba5-b817-430d-9447-748769d3398e.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ad36cba5-b817-430d-9447-748769d3398e.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:00:20",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "价值评估",
+    "大语言模型",
+    "心理测量基准",
+    "价值对齐",
+    "人机交互评估",
+    "LLM-as-Evaluator"
+   ],
+   "field": "大语言模型评估与价值对齐",
+   "innovations": [
+    "首个综合性心理测量价值基准（44问卷/453价值维度）",
+    "基于真实人机交互场景的价值倾向评估流水线",
+    "开放层级价值空间中的价值理解任务（识别/提取/生成）"
+   ],
+   "benchmarks": [
+    "ValueBench",
+    "PsychoBench",
+    "ValueEval",
+    "VUM"
+   ]
+  }
+ }
 }

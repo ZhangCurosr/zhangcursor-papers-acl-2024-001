@@ -3,5 +3,30 @@
  "batch_id": "4ded9015-a10f-4233-b01d-62dcb7ddf10f",
  "token": "sk-Ar06zcDAy...",
  "created_at": "2026-08-13 03:00:06",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/7e88677d-f8d3-4870-9122-b02e05df6547.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/7e88677d-f8d3-4870-9122-b02e05df6547.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:02:44",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "自动化证明",
+    "软件验证",
+    "大语言模型",
+    "seL4",
+    "Isabelle",
+    "形式化方法",
+    "定理证明"
+   ],
+   "field": "形式化验证与AI结合",
+   "innovations": [
+    "首个基于工业级seL4的项目级自动化证明基准Selene",
+    "提出lemma隔离技术实现轻量级验证环境",
+    "三种增强策略（相似检索/依赖提取/错误修复）缓解LLM证明挑战"
+   ],
+   "benchmarks": [
+    "Selene"
+   ]
+  }
+ }
 }

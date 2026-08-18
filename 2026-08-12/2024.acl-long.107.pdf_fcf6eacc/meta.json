@@ -3,5 +3,34 @@
  "batch_id": "fcf6eacc-8434-4a99-9ba0-baf547139427",
  "token": "sk-Ar06zcDAy...",
  "created_at": "2026-08-12 16:06:51",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/e135a6a0-a416-4122-861f-56726b87d6e4.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/e135a6a0-a416-4122-861f-56726b87d6e4.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 18:58:51",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "幻觉缓解",
+    "事实性对齐",
+    "自评估",
+    "DPO",
+    "置信度校准",
+    "大语言模型"
+   ],
+   "field": "大语言模型事实性与对齐",
+   "innovations": [
+    "利用LLM自评估能力生成事实性信号并通过DPO零标注对齐",
+    "SK-TUNING微调提升模型置信度估计与校准能力",
+    "原子声明分解+SELF-EVAL实现细粒度事实性评估"
+   ],
+   "benchmarks": [
+    "TruthfulQA",
+    "BioGEN",
+    "CommonSenseQA",
+    "OpenBookQA",
+    "MedQA",
+    "MMLU"
+   ]
+  }
+ }
 }

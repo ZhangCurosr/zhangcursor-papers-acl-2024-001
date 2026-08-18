@@ -3,5 +3,31 @@
  "batch_id": "c0d48079-ab79-4da0-8bc5-ad0338bef1ca",
  "token": "sk-7NOZt17oN...",
  "created_at": "2026-08-13 02:44:57",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/463cddcd-684e-4b63-9e28-d5021dadda57.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/463cddcd-684e-4b63-9e28-d5021dadda57.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:02:23",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "组合泛化",
+    "数据到文本生成",
+    "大语言模型",
+    "系统性",
+    "生产力",
+    "顺序不变性",
+    "规则可学习性"
+   ],
+   "field": "自然语言生成评估",
+   "innovations": [
+    "首次提出覆盖系统性、生产力、顺序不变性和规则可学习性四个维度的数据到文本组合泛化综合评估框架",
+    "基于现有数据集的无需人工标注的自动化评估数据集构造方法",
+    "系统性地将大语言模型纳入数据到文本生成组合泛化能力的多维度评估"
+   ],
+   "benchmarks": [
+    "WebNLG+",
+    "E2E"
+   ]
+  }
+ }
 }

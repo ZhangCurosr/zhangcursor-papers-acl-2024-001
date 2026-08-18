@@ -3,5 +3,32 @@
  "batch_id": "b35870d7-93c8-474e-8cc8-e5c2ad455063",
  "token": "sk-n7iJ0Z1Ol...",
  "created_at": "2026-08-13 02:33:24",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3c5d4e8e-44f4-4f03-a3b2-f32576672dcc.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3c5d4e8e-44f4-4f03-a3b2-f32576672dcc.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 18:59:31",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "代码生成",
+    "通用代码",
+    "多任务学习",
+    "指令微调",
+    "大语言模型",
+    "伪代码"
+   ],
+   "field": "代码大语言模型",
+   "innovations": [
+    "提出Universal Code作为编程语言无关的中间表示，桥接自然语言问题与可执行代码",
+    "设计多任务联合微调框架（QA/QP/PA/UoT），使模型学会先推理伪代码再翻译代码的两阶段生成范式",
+    "构建UNICODER-INSTRUCT约140K多语言指令数据集，显著提升开源代码LLM的多语言生成能力"
+   ],
+   "benchmarks": [
+    "HumanEval",
+    "MBPP",
+    "MultiPL-E",
+    "UNICODER-BENCH"
+   ]
+  }
+ }
 }

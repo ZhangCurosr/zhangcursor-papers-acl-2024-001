@@ -4,5 +4,32 @@
  "title": "A-Multidimensional-Framework-for-Evaluating-Lexical-Semantic",
  "token": "sk-sKVjU65N5...",
  "created_at": "2026-08-13 05:40:15",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/cf009948-a606-4e3d-9f83-304a283cc100.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/cf009948-a606-4e3d-9f83-304a283cc100.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:02:56",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "lexical semantic change",
+    "concept creep",
+    "sentiment analysis",
+    "sentence embeddings",
+    "computational social science",
+    "semantic breadth",
+    "intensifier index"
+   ],
+   "field": "词汇语义变化与计算社会科学",
+   "innovations": [
+    "将Bloomfield九类语义变化压缩为情感/广度/强度三维正交框架并同步量化",
+    "提出intensifier index新指标，通过依存解析检测前置强化修饰语频率变化",
+    "首次系统性地将concept creep理论与多维度计算方法结合验证心理健康概念的历史演变"
+   ],
+   "benchmarks": [
+    "CoHA (Corpus of Historical American English)",
+    "COCA (Corpus of Contemporary American English)",
+    "Psychology Abstract Corpus (Scimago-indexed journals)"
+   ]
+  }
+ }
 }

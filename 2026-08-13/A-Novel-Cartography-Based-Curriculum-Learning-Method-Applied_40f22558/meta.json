@@ -4,5 +4,30 @@
  "title": "A-Novel-Cartography-Based-Curriculum-Learning-Method-Applied",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 05:41:18",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2300416c-b5e0-4d41-ac04-099124164e3c.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2300416c-b5e0-4d41-ac04-099124164e3c.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:03:06",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Natural Language Inference",
+    "RoNLI",
+    "Curriculum Learning",
+    "Dataset Cartography",
+    "Low-resource Romanian",
+    "Distant Supervision"
+   ],
+   "field": "低资源语言自然语言推理",
+   "innovations": [
+    "首个罗马尼亚语NLI语料库RoNLI及远程监督构建流程",
+    "基于数据制图的难度评分函数s(c,v)与分层课程学习Cart-Stra-CL++"
+   ],
+   "benchmarks": [
+    "RoNLI test (3K)",
+    "SciNLI test",
+    "micro F1 / macro F1"
+   ]
+  }
+ }
 }

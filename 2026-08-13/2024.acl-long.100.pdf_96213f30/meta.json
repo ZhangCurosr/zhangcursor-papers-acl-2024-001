@@ -3,5 +3,31 @@
  "batch_id": "96213f30-e655-46e5-bb94-10d1a705e6ce",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 01:40:07",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3c5d4e8e-44f4-4f03-a3b2-f32576672dcc.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3c5d4e8e-44f4-4f03-a3b2-f32576672dcc.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 18:59:11",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "代码生成",
+    "大语言模型",
+    "通用伪代码",
+    "多任务学习",
+    "跨语言代码"
+   ],
+   "field": "代码大模型",
+   "innovations": [
+    "提出Universal Code作为语言无关的中间表示，桥接自然语言与多语言代码",
+    "设计UoT推理范式与四目标多任务联合训练框架",
+    "构建UNICODER-INSTRUCT数据集并验证多语言代码生成SOTA性能"
+   ],
+   "benchmarks": [
+    "HumanEval",
+    "MBPP",
+    "MultiPL-E",
+    "UNICODER-BENCH"
+   ]
+  }
+ }
 }

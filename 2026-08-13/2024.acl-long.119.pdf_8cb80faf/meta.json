@@ -3,5 +3,31 @@
  "batch_id": "8cb80faf-c4c1-4fe2-9076-a191b13775ab",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 02:33:37",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a5c9a216-e81c-407c-b566-b8699333ffc7.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a5c9a216-e81c-407c-b566-b8699333ffc7.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:01:33",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "工具学习",
+    "大语言模型安全",
+    "LLM对齐",
+    "工具调用安全",
+    "安全评测"
+   ],
+   "field": "大语言模型安全评估",
+   "innovations": [
+    "提出三阶段六场景的ToolSword工具学习安全评估框架",
+    "揭示工具学习破坏现有安全对齐机制的现象",
+    "发现模型规模增大不必然提升工具学习安全性"
+   ],
+   "benchmarks": [
+    "ToolSword Benchmark",
+    "MaliciousInstruct",
+    "advbench",
+    "shadow alignment"
+   ]
+  }
+ }
 }

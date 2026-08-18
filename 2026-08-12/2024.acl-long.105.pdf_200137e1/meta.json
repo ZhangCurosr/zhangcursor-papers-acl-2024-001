@@ -3,5 +3,33 @@
  "batch_id": "200137e1-b927-4607-bb1a-0bc751705a98",
  "token": "sk-Ar06zcDAy...",
  "created_at": "2026-08-12 16:06:50",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16a82400-5640-4ab0-8557-fe21a93b4560.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16a82400-5640-4ab0-8557-fe21a93b4560.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 18:58:53",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Evidence-Based QA",
+    "大语言模型",
+    "数据蒸馏",
+    "可归因性",
+    "分布外泛化",
+    "QLoRA微调",
+    "数据质量"
+   ],
+   "field": "证据驱动的问答与LLM忠实性",
+   "innovations": [
+    "提出带两级自动化质量过滤器的合成数据生成流水线，实现SYNSCIQA到SYNSCIQA++的质量阶梯",
+    "构建四个分布距离递进的测试集，系统评估微调专家模型的in-domain与OOD泛化性能",
+    "通过控制变量实验证明数据质量优于数据量，且in-domain性能可有效预测OOD性能"
+   ],
+   "benchmarks": [
+    "SYNSCIQA_test",
+    "GENSEARCH_test",
+    "CHATREPORT_test",
+    "CLIMATEQA_test"
+   ]
+  }
+ }
 }

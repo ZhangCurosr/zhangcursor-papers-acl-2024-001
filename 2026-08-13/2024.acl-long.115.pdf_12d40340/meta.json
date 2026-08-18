@@ -3,5 +3,31 @@
  "batch_id": "12d40340-551f-4719-8157-5ef64fe01ebe",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 02:33:32",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/acd450a2-00d3-4b72-8503-6d62adcb3778.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/acd450a2-00d3-4b72-8503-6d62adcb3778.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:01:00",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "open domain question answering",
+    "retrieval-augmented generation",
+    "knowledge graph generation",
+    "graph neural network",
+    "Fusion-in-Decoder"
+   ],
+   "field": "开放域问答",
+   "innovations": [
+    "从检索段落自动生成知识图谱三元组，解决现有KG不完整问题",
+    "利用GNN进行问题相关三元组筛选并拼接为额外输入增强FiD生成"
+   ],
+   "benchmarks": [
+    "Natural Questions",
+    "TriviaQA",
+    "EntityQuestions",
+    "2WikiMultiHopQA",
+    "MuSiQue"
+   ]
+  }
+ }
 }

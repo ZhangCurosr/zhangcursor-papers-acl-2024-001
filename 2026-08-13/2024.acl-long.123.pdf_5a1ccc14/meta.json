@@ -3,5 +3,30 @@
  "batch_id": "5a1ccc14-74de-41db-8ad4-28762ea6ae52",
  "token": "sk-n7iJ0Z1Ol...",
  "created_at": "2026-08-13 03:00:12",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f431a09b-2fcc-4f88-8389-20e0ea84d1e1.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f431a09b-2fcc-4f88-8389-20e0ea84d1e1.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:01:34",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "自动错误检测",
+    "人类标签变异",
+    "NLI数据集",
+    "两阶段标注",
+    "生态有效解释"
+   ],
+   "field": "数据质量与标注分析",
+   "innovations": [
+    "提出VARIERR数据集与两轮标注验证流程，系统分离标注错误与合理变异",
+    "基准测试AED方法与GPTs在连续信号场景下的误差检测能力",
+    "证明专家同伴判断优于大规模众包计数"
+   ],
+   "benchmarks": [
+    "VARIERR NLI",
+    "ChaosNLI",
+    "MNLI"
+   ]
+  }
+ }
 }

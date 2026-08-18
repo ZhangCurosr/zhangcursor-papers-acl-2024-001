@@ -3,5 +3,31 @@
  "batch_id": "6a06da5b-73d4-4a27-90cf-19878c3521bf",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 02:45:20",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f431a09b-2fcc-4f88-8389-20e0ea84d1e1.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f431a09b-2fcc-4f88-8389-20e0ea84d1e1.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:01:46",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "自然语言推理",
+    "标注错误检测",
+    "人类标注变异",
+    "自动错误检测",
+    "生态有效解释",
+    "两阶段标注"
+   ],
+   "field": "数据质量与标注分析",
+   "innovations": [
+    "提出两阶段标注方法论分离标注错误与合理人类标注变异",
+    "构建首个同时含合理变异与已检测错误的NLI数据集VARIERR",
+    "系统基准测试AED方法揭示传统方法显著落后于GPT-4和人类判断"
+   ],
+   "benchmarks": [
+    "VARIERR",
+    "MNLI",
+    "ChaosNLI"
+   ]
+  }
+ }
 }

@@ -3,5 +3,33 @@
  "batch_id": "ff6712e6-ca71-4bf5-af6e-e8de5b73c65d",
  "token": "sk-n7iJ0Z1Ol...",
  "created_at": "2026-08-12 16:07:16",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f431a09b-2fcc-4f88-8389-20e0ea84d1e1.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f431a09b-2fcc-4f88-8389-20e0ea84d1e1.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 18:59:11",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "NLI",
+    "annotation error",
+    "human label variation",
+    "automatic error detection",
+    "dataset quality",
+    "ecological validity",
+    "GPT",
+    "training dynamics"
+   ],
+   "field": "自然语言处理数据质量与标注评估",
+   "innovations": [
+    "提出两轮标注流程以分离标注错误与合理人类标签变异",
+    "发布首个同时包含错误与合理变异的多标签 NLI 数据集 VARIERR",
+    "揭示训练动态方法在高变异场景下显著劣于 GPT 与人类启发式"
+   ],
+   "benchmarks": [
+    "MNLI",
+    "ChaosNLI",
+    "VARIERR"
+   ]
+  }
+ }
 }

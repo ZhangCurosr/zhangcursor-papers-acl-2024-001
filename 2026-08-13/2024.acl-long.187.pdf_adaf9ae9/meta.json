@@ -3,5 +3,30 @@
  "batch_id": "adaf9ae9-8d0f-4c25-b2d2-0deb965b50ce",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 03:00:30",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/539f5572-5f14-4f5d-838f-393c6d5c12e0.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/539f5572-5f14-4f5d-838f-393c6d5c12e0.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:02:14",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Temporal Fact Extraction",
+    "Timeline-based Sentence Decomposition",
+    "In-Context Learning",
+    "Large Language Models",
+    "Knowledge Graph",
+    "Complex Sentence"
+   ],
+   "field": "信息抽取与时间事实抽取",
+   "innovations": [
+    "提出基于时间轴的句分解策略(TSD)，利用LLM in-context learning将复杂句子按时间轴拆解",
+    "设计TSDRE混合框架，将LLM分解能力与小型PLM微调结合，提升时间事实抽取性能",
+    "构建ComplexTRED数据集，包含19,148条复杂时间句子，填补复杂叙事场景评测空白"
+   ],
+   "benchmarks": [
+    "HyperRED-Temporal",
+    "ComplexTRED"
+   ]
+  }
+ }
 }

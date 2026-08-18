@@ -3,5 +3,31 @@
  "batch_id": "9d1fa471-5160-49f2-848e-be0a63921b2e",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 02:33:32",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f431a09b-2fcc-4f88-8389-20e0ea84d1e1.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f431a09b-2fcc-4f88-8389-20e0ea84d1e1.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:01:51",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "自动错误检测",
+    "人类标签变异性",
+    "数据质量",
+    "自然语言推理",
+    "两阶段标注",
+    "大语言模型"
+   ],
+   "field": "NLP数据质量与自动错误检测",
+   "innovations": [
+    "提出两阶段‘解释+有效性判断’标注方法论以分离错误与合理变异",
+    "创建首个同时包含已验证错误与HLV的NLI数据集VARIERR",
+    "在nuanced设置下基准测试AED方法，揭示训练动力学方法的局限及专家同伴判断的优势"
+   ],
+   "benchmarks": [
+    "VARIERR",
+    "MNLI",
+    "ChaosNLI"
+   ]
+  }
+ }
 }

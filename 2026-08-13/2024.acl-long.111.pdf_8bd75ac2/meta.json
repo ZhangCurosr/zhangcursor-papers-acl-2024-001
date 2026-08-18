@@ -3,5 +3,29 @@
  "batch_id": "8bd75ac2-ff6c-4ce0-bc79-f7e151cba197",
  "token": "sk-owp49a3rO...",
  "created_at": "2026-08-13 01:40:11",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ad36cba5-b817-430d-9447-748769d3398e.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ad36cba5-b817-430d-9447-748769d3398e.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:00:32",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "价值取向评估",
+    "价值理解",
+    "心理学测量基准",
+    "大语言模型",
+    "人机交互评估",
+    "价值观对齐"
+   ],
+   "field": "LLM价值观评估",
+   "innovations": [
+    "首个整合44个心理量表453个价值维度的综合心理学测量基准",
+    "基于真实人机交互场景的价值取向评估流程（改写为建议寻求问题+LLM评分）",
+    "在开放式分层价值空间中定义价值相关性并设计抽取/生成任务评估价值理解"
+   ],
+   "benchmarks": [
+    "ValueBench"
+   ]
+  }
+ }
 }

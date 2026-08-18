@@ -3,5 +3,31 @@
  "batch_id": "69e623d4-46dd-412f-a1b8-643af84ed67d",
  "token": "sk-owp49a3rO...",
  "created_at": "2026-08-13 01:40:11",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/685d4716-0eeb-430d-b00c-1bce515074ee.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/685d4716-0eeb-430d-b00c-1bce515074ee.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:00:35",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "稀疏微调",
+    "自然语言解释",
+    "少样本学习",
+    "参数高效微调",
+    "可解释AI"
+   ],
+   "field": "可解释自然语言处理",
+   "innovations": [
+    "提出首个面向NLE联合生成的稀疏微调策略SPARSEFIT，系统探索62种层/层对配置",
+    "发现仅微调6.84%参数（LayerNorm+Attention.Q）即可超越全量微调和现有PEFT方法",
+    "在T5/UNIFIEDQA/Llama 2三种架构上验证跨架构通用性"
+   ],
+   "benchmarks": [
+    "e-SNLI",
+    "ECQA",
+    "SBIC",
+    "ComVE"
+   ]
+  }
+ }
 }
