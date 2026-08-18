@@ -4,5 +4,38 @@
  "title": "An-Information-Theoretic-Approach-to-Analyze-NLP-Classificat",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 05:41:20",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/720cda1a-be1b-41df-bf59-83c2daad6e95.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/720cda1a-be1b-41df-bf59-83c2daad6e95.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:54:01",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "information-theoretic",
+    "mutual information",
+    "semantic-linguistic decomposition",
+    "multiple-choice reading comprehension",
+    "sentiment classification",
+    "readability",
+    "interpretability"
+   ],
+   "field": "NLP可解释性与信息论分析",
+   "innovations": [
+    "提出面向NLP分类的信息论元素分解框架，同时量化输入元素贡献与语义/语言成分贡献",
+    "基于LLM改写与蒙特卡洛估计给出可计算近似",
+    "揭示MCRC中上下文复杂度与问题影响力的正相关以及SC中语义主导但语言贡献可测的规律"
+   ],
+   "benchmarks": [
+    "RACE++",
+    "MCTest",
+    "CMCQRD",
+    "IMDb",
+    "Yelp",
+    "Amazon",
+    "SST-2",
+    "TweetEval",
+    "Hewlett"
+   ]
+  }
+ }
 }

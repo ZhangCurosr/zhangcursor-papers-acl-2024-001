@@ -4,5 +4,32 @@
  "title": "DM-BLI-Dynamic-Multiple-Subspaces-Alignment-for-Unsupervised",
  "token": "sk-dY4OBV5wM...",
  "created_at": "2026-08-13 05:40:40",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2a771277-0529-46b1-bfbf-cdba992fb5fc.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2a771277-0529-46b1-bfbf-cdba992fb5fc.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:56:26",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "双语词法诱导",
+    "跨语言词嵌入",
+    "子空间对齐",
+    "对比学习",
+    "低资源语言",
+    "无监督翻译"
+   ],
+   "field": "跨语言自然语言处理",
+   "innovations": [
+    "动态多子空间跨语言对齐框架，为每个子空间对定制专用映射",
+    "子空间间Wasserstein对比学习与子空间内词对对比学习联合优化",
+    "动态子空间分配机制避免初始聚类噪声与局部最优"
+   ],
+   "benchmarks": [
+    "MUSE",
+    "Precision@1",
+    "Precision@5",
+    "CSLS"
+   ]
+  }
+ }
 }

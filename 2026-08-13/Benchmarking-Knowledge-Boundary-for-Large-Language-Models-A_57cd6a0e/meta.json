@@ -4,5 +4,31 @@
  "title": "Benchmarking-Knowledge-Boundary-for-Large-Language-Models-A",
  "token": "sk-1jVZGxTQ1...",
  "created_at": "2026-08-13 05:40:49",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ec425aa2-3b3a-463c-99d3-91bca3b36cd3.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ec425aa2-3b3a-463c-99d3-91bca3b36cd3.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:54:43",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "知识边界",
+    "Prompt优化",
+    "LLM评估",
+    "语义约束",
+    "梯度下降"
+   ],
+   "field": "大语言模型评估",
+   "innovations": [
+    "提出知识边界概念区分三类知识",
+    "设计PGDC算法实现语义约束的Prompt优化"
+   ],
+   "benchmarks": [
+    "PARAREL",
+    "KAssess",
+    "CFACT",
+    "ALCUNA",
+    "MMLU"
+   ]
+  }
+ }
 }

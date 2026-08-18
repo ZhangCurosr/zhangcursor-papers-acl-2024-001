@@ -4,5 +4,32 @@
  "title": "An-Information-Bottleneck-Perspective-for-Effective-Noise-Fi",
  "token": "sk-JMLCbBCEj...",
  "created_at": "2026-08-13 05:40:12",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/5febecb7-685e-4868-8f15-61849b1ef5ec.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/5febecb7-685e-4868-8f15-61849b1ef5ec.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:53:48",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Information Bottleneck",
+    "Retrieval-Augmented Generation",
+    "Noise Filtering",
+    "Prompt Compression",
+    "DPO",
+    "Mutual Information",
+    "Open-Domain QA"
+   ],
+   "field": "检索增强生成与噪声过滤",
+   "innovations": [
+    "首次将信息瓶颈理论系统引入RAG噪声过滤，推导出条件互信息优化目标",
+    "提出统一的IB评估指标同时度量简洁性与正确性",
+    "将IB应用于SFT数据筛选与DPO强化学习奖励构建，实现两阶段渐进优化"
+   ],
+   "benchmarks": [
+    "Natural Questions (NQ)",
+    "TRIVIAQA",
+    "HOTPOTQA"
+   ]
+  }
+ }
 }

@@ -4,5 +4,31 @@
  "title": "Attribute-First-then-Generate-Locally-attributable-Grounded",
  "token": "sk-dD4E81LFV...",
  "created_at": "2026-08-13 05:41:11",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/adceb5a8-6699-4424-8c03-70d3b0de84ed.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/adceb5a8-6699-4424-8c03-70d3b0de84ed.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:54:30",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "归因文本生成",
+    "本地可归因",
+    "多文档摘要",
+    "长形式问答",
+    "幻觉缓解",
+    "文本规划"
+   ],
+   "field": "可归因文本生成",
+   "innovations": [
+    "首次提出本地可归因文本生成任务，实现句子级细粒度引用",
+    "Attribute First then Generate三步分解框架，使内容选择天然成为归因",
+    "揭示prefix对长文本连贯性的累积增益效应"
+   ],
+   "benchmarks": [
+    "Multi-News",
+    "DUC/TAC",
+    "LFQA (Liu et al. 2023)"
+   ]
+  }
+ }
 }

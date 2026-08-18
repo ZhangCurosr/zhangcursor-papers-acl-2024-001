@@ -4,5 +4,34 @@
  "title": "Can-LLMs-Learn-from-Previous-Mistakes-Investigating-LLMs-Err",
  "token": "sk-wGl2gwQjA...",
  "created_at": "2026-08-13 05:41:07",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/43338034-0e5a-4f2a-887b-972fca2254ab.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/43338034-0e5a-4f2a-887b-972fca2254ab.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:55:48",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Chain-of-Thought",
+    "错误学习",
+    "自我反思",
+    "指令微调",
+    "大语言模型推理",
+    "COTERRORSET"
+   ],
+   "field": "大语言模型推理能力增强",
+   "innovations": [
+    "提出Self-rethinking提示方法，通过历史错误示例引导LLM反思和纠错",
+    "提出Mistake tuning微调方法，在SFT中同时利用正确和错误推理数据",
+    "构建大规模COTERRORSET数据集，包含55万+问题的错误推理及成因分析"
+   ],
+   "benchmarks": [
+    "GSM8K",
+    "AQuA",
+    "MathQA",
+    "OpenbookQA",
+    "LogiQA",
+    "Critical Reasoning"
+   ]
+  }
+ }
 }

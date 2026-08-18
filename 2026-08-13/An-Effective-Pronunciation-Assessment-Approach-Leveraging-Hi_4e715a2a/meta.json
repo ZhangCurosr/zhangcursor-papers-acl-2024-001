@@ -4,5 +4,28 @@
  "title": "An-Effective-Pronunciation-Assessment-Approach-Leveraging-Hi",
  "token": "sk-aknYEUs8O...",
  "created_at": "2026-08-13 05:40:29",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/7f910c01-a7ec-440e-81df-4bcaa5e9dc05.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/7f910c01-a7ec-440e-81df-4bcaa5e9dc05.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:53:52",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "自动发音评估",
+    "层次化Transformer",
+    "多粒度评估",
+    "预训练策略",
+    "相关性正则化"
+   ],
+   "field": "多粒度语音评估",
+   "innovations": [
+    "提出层次化交互式Transformer架构HierTFR，显式建模音素-词汇-语句三级语言结构及相关性",
+    "设计相关性感知正则化（Correlation-aware Regularizer），约束预测与标注的相关系数矩阵一致",
+    "提出面向不同语言层级的定制化预训练策略（mask-predict + pairwise ranking）"
+   ],
+   "benchmarks": [
+    "speechocean762"
+   ]
+  }
+ }
 }

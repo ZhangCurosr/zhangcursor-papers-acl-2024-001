@@ -4,5 +4,35 @@
  "title": "Analysis-of-Multi-Source-Language-Training-in-Cross-Lingual",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 03:38:40",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/90d3b8cc-5c39-44ec-bb4b-cb3d14f79cad.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/90d3b8cc-5c39-44ec-bb4b-cb3d14f79cad.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:54:12",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "跨语言迁移",
+    "多源语言训练",
+    "零样本XLT",
+    "Lang2Vec",
+    "多语言语言模型",
+    "源语言选择"
+   ],
+   "field": "跨语言自然语言处理",
+   "innovations": [
+    "揭示MSLT通过增强语言无关特征促进跨语言语义对齐的内在机制",
+    "提出基于Lang2Vec语言多样性的源语言组合选择方法并系统验证",
+    "发现书写系统多样性是构建优质源语言集合的关键因素"
+   ],
+   "benchmarks": [
+    "XTREME",
+    "WikiAnn",
+    "XNLI",
+    "PAWS-X",
+    "XCOPA",
+    "XWinograd",
+    "XStoryCloze"
+   ]
+  }
+ }
 }

@@ -4,5 +4,10 @@
  "title": "Beyond-Memorization-The-Challenge-of-Random-Memory-Access-in",
  "token": "sk-dD4E81LFV...",
  "created_at": "2026-08-13 05:41:12",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/59b65894-8240-467c-bc2e-6cda7e6a5fa7.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/59b65894-8240-467c-bc2e-6cda7e6a5fa7.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:55:01",
+  "chunks": 1
+ }
 }

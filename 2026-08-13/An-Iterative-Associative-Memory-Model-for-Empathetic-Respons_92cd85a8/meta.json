@@ -4,5 +4,27 @@
  "title": "An-Iterative-Associative-Memory-Model-for-Empathetic-Respons",
  "token": "sk-wGl2gwQjA...",
  "created_at": "2026-08-13 05:41:04",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/d37b630d-e2f6-41bd-ae12-935f30862fbd.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/d37b630d-e2f6-41bd-ae12-935f30862fbd.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:53:57",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "共情对话生成",
+    "迭代关联记忆",
+    "二阶交互注意力",
+    "情境模型",
+    "显式/隐式信息融合"
+   ],
+   "field": "共情对话生成",
+   "innovations": [
+    "提出二阶交互注意力机制，一阶识别关键节点、二阶识别被关键节点关注的关联词",
+    "设计显式+隐式双通道迭代关联记忆框架，模拟人类逐句理解情感与认知过程"
+   ],
+   "benchmarks": [
+    "Empathetic-Dialogue"
+   ]
+  }
+ }
 }

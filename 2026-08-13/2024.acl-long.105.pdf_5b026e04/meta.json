@@ -3,5 +3,32 @@
  "batch_id": "5b026e04-7b1d-449c-9b20-5edfb0441ef0",
  "token": "sk-Ar06zcDAy...",
  "created_at": "2026-08-13 03:00:08",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16a82400-5640-4ab0-8557-fe21a93b4560.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16a82400-5640-4ab0-8557-fe21a93b4560.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:52:52",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Evidence-Based QA",
+    "LLM忠实性",
+    "数据质量过滤",
+    "合成数据",
+    "OOD泛化",
+    "RAG"
+   ],
+   "field": "可信赖大语言模型",
+   "innovations": [
+    "提出SYNSCIQA两级质量过滤流水线，证明质量>数量",
+    "构建四档分布内外测试集系统评估LLM忠实性",
+    "发现同分布测试性能与OOD性能高度相关（r≥0.91）可作为代理开发集"
+   ],
+   "benchmarks": [
+    "SYNSCIQA_test",
+    "GENSEARCH_test",
+    "CHATREPORT_test",
+    "CLIMATEQA_test"
+   ]
+  }
+ }
 }

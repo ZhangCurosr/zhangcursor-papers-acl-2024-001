@@ -4,5 +4,33 @@
  "title": "AIR-Bench-Benchmarking-Large-Audio-Language-Models-via-Gener",
  "token": "sk-dY4OBV5wM...",
  "created_at": "2026-08-13 05:40:52",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a7aa06f7-bad1-41ae-83be-947ac46af175.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a7aa06f7-bad1-41ae-83be-947ac46af175.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:53:40",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "大音频语言模型",
+    "生成式评测",
+    "音频理解",
+    "指令遵循",
+    "GPT-4评测",
+    "多模态基准"
+   ],
+   "field": "音频语言模型评测",
+   "innovations": [
+    "首个覆盖语音/声音/音乐/混合音频的生成式LALM评测基准",
+    "基于GPT-4的统一自动评估框架结合位置交换消除bias",
+    "响度控制与时间错位音频混合策略增强评测复杂度"
+   ],
+   "benchmarks": [
+    "AIR-Bench Foundation",
+    "AIR-Bench Chat",
+    "Dynamic-SUPERB",
+    "HEAR",
+    "SUPERB"
+   ]
+  }
+ }
 }

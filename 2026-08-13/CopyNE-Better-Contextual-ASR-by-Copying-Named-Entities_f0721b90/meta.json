@@ -4,5 +4,30 @@
  "title": "CopyNE-Better-Contextual-ASR-by-Copying-Named-Entities",
  "token": "sk-1jVZGxTQ1...",
  "created_at": "2026-08-13 05:40:56",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a99bf4ed-4a34-4272-a161-d40a21141724.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a99bf4ed-4a34-4272-a161-d40a21141724.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:56:32",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Contextual ASR",
+    "Named Entity",
+    "Copy Mechanism",
+    "Speech Recognition",
+    "Dictionary Augmentation"
+   ],
+   "field": "上下文自动语音识别",
+   "innovations": [
+    "首次将复制机制系统引入 ASR，一次性复制整个命名实体",
+    "设计统一概率搜索空间与置信度阈值过滤低置信度复制",
+    "在 CTC-Transformer 及 Whisper 基线上均实现显著实体转录增益"
+   ],
+   "benchmarks": [
+    "Aishell",
+    "ST-cmds",
+    "Eng"
+   ]
+  }
+ }
 }

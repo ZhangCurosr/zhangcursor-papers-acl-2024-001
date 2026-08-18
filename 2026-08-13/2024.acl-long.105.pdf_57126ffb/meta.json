@@ -3,5 +3,33 @@
  "batch_id": "57126ffb-492d-4e88-97d0-11f79d285bbf",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 01:40:10",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16a82400-5640-4ab0-8557-fe21a93b4560.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16a82400-5640-4ab0-8557-fe21a93b4560.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:52:52",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Evidence-Based QA",
+    "LLM Fine-tuning",
+    "Data Quality",
+    "Synthetic Data",
+    "Attributability",
+    "OOD Generalization",
+    "RAG"
+   ],
+   "field": "大语言模型可信生成",
+   "innovations": [
+    "提出两级质量过滤器（源质量+可归属性）从合成数据中提取高质量训练集",
+    "验证数据质量比数量对Evidence-Based QA微调效果更重要（p<0.001）",
+    "证明合成同分布测试集性能与OOD真实应用性能强相关（r>0.91）"
+   ],
+   "benchmarks": [
+    "SYNSCIQA_test",
+    "GENSEARCH_test",
+    "CHATREPORT_test",
+    "CLIMATEQA_test"
+   ]
+  }
+ }
 }

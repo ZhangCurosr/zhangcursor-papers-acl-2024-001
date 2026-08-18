@@ -4,5 +4,36 @@
  "title": "CANDLE-Iterative-Conceptualization-and-Instantiation-Distill",
  "token": "sk-1jVZGxTQ1...",
  "created_at": "2026-08-13 05:40:52",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/1b59309b-c4a4-44c6-8581-d7f734f5b4e8.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/1b59309b-c4a4-44c6-8581-d7f734f5b4e8.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:55:23",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "commonsense reasoning",
+    "knowledge distillation",
+    "conceptualization",
+    "instantiation",
+    "large language models",
+    "ATOMIC"
+   ],
+   "field": "常识推理与知识获取",
+   "innovations": [
+    "首次完成概念化-实例化完整链条的大模型蒸馏框架",
+    "提出双Critic过滤机制保障蒸馏知识质量",
+    "构建618万级ATOMIC扩展知识库并在多任务验证"
+   ],
+   "benchmarks": [
+    "AbstractATOMIC",
+    "ATOMIC²⁰",
+    "COMET",
+    "CSQA",
+    "aNLI",
+    "PIQA",
+    "SIQA",
+    "WinoGrande"
+   ]
+  }
+ }
 }

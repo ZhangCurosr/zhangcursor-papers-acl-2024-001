@@ -4,5 +4,32 @@
  "title": "DOCLENS-Multi-aspect-Fine-grained-Evaluation-for-Medical-Tex",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 05:41:21",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/59e57f4a-d4c2-433e-a38b-714c877e1a2d.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/59e57f4a-d4c2-433e-a38b-714c877e1a2d.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:56:43",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "medical text generation",
+    "automatic evaluation",
+    "fine-grained evaluation",
+    "claim recall",
+    "attribution evaluation",
+    "NLI",
+    "LLM as evaluator"
+   ],
+   "field": "医学自然语言处理",
+   "innovations": [
+    "提出完整性、简洁性、归属三维度细粒度医学文本评估框架DOCLENS",
+    "设计Claim Recall/Precision和Citation Recall/Precision四个细粒度度量指标",
+    "揭示开源与专有评估器在医学评估任务上的显著性能差距并分析原因"
+   ],
+   "benchmarks": [
+    "ACI-BENCH",
+    "MIMIC-III",
+    "MeQSum"
+   ]
+  }
+ }
 }

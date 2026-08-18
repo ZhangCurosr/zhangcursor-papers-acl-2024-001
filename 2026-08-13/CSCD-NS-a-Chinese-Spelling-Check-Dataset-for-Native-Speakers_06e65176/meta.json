@@ -4,5 +4,32 @@
  "title": "CSCD-NS-a-Chinese-Spelling-Check-Dataset-for-Native-Speakers",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 05:41:17",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/6313d484-2813-4987-a1cb-7397cfc732ad.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/6313d484-2813-4987-a1cb-7397cfc732ad.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:55:28",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "中文拼写检查",
+    "CSC",
+    "母语使用者",
+    "伪数据生成",
+    "输入法模拟",
+    "大语言模型评测",
+    "词级别错误"
+   ],
+   "field": "中文自然语言处理",
+   "innovations": [
+    "首个面向母语使用者的CSC数据集CSCD-NS（40,000样本）",
+    "基于输入法模拟的伪数据生成方法，错误分布更贴近真实场景",
+    "首次系统评测LLM在CSC任务上的表现，揭示生成式模型在等长+同音约束下的局限性"
+   ],
+   "benchmarks": [
+    "CSCD-NS",
+    "SIGHAN13/14/15",
+    "LCSTS-IME-2M"
+   ]
+  }
+ }
 }

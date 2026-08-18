@@ -4,5 +4,10 @@
  "title": "Can-Your-Model-Tell-a-Negation-from-an-Implicature-Unravelli",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 05:41:21",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/084b71b8-0f0b-47d4-9cd6-6f6fae4d090b.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/084b71b8-0f0b-47d4-9cd6-6f6fae4d090b.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:55:59",
+  "chunks": 1
+ }
 }

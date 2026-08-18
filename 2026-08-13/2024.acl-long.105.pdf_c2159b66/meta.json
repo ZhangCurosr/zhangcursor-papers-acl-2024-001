@@ -3,5 +3,33 @@
  "batch_id": "c2159b66-27bb-4c81-9a95-7f2fd80e659f",
  "token": "sk-n7iJ0Z1Ol...",
  "created_at": "2026-08-13 02:45:13",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16a82400-5640-4ab0-8557-fe21a93b4560.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16a82400-5640-4ab0-8557-fe21a93b4560.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:52:55",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Evidence-Based QA",
+    "LLM 微调",
+    "数据质量过滤",
+    "分布外泛化",
+    "来源引用",
+    "答案可归属性",
+    "合成数据"
+   ],
+   "field": "可信自然语言生成与检索增强",
+   "innovations": [
+    "提出合成数据两级质量过滤管道，证明质量优于数量",
+    "构建覆盖 In-Distribution 与三类 OOD 场景的评测集并验证代理有效性",
+    "通过双 NLI 聚合与严格引用约束提升证据型问答的可归属性评估可靠性"
+   ],
+   "benchmarks": [
+    "SYNSCIQA_test",
+    "GENSEARCH_test",
+    "CHATREPORT_test",
+    "CLIMATEQA_test"
+   ]
+  }
+ }
 }

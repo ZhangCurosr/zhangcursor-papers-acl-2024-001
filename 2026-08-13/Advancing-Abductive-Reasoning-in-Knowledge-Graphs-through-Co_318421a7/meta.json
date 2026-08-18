@@ -4,5 +4,29 @@
  "title": "Advancing-Abductive-Reasoning-in-Knowledge-Graphs-through-Co",
  "token": "sk-sKVjU65N5...",
  "created_at": "2026-08-13 05:40:10",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/cfbcee51-d88a-455b-a0ae-2bfb1fccf84d.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/cfbcee51-d88a-455b-a0ae-2bfb1fccf84d.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:53:27",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "溯因推理",
+    "知识图谱",
+    "逻辑假设生成",
+    "强化学习",
+    "Jaccard Index"
+   ],
+   "field": "知识图谱推理",
+   "innovations": [
+    "提出基于RL的RLF-KG方法，利用知识图谱反馈优化生成假设的解释质量",
+    "将复杂逻辑假设生成定义为图溯因推理任务，结合监督训练与强化学习两阶段优化"
+   ],
+   "benchmarks": [
+    "FB15k-237",
+    "WN18RR",
+    "DBpedia50"
+   ]
+  }
+ }
 }

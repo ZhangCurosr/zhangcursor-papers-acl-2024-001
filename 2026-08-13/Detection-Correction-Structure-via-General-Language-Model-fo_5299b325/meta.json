@@ -4,5 +4,31 @@
  "title": "Detection-Correction-Structure-via-General-Language-Model-fo",
  "token": "sk-aknYEUs8O...",
  "created_at": "2026-08-13 05:40:30",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/0048caa9-e784-480e-947b-1c074a64dc1d.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/0048caa9-e784-480e-947b-1c074a64dc1d.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:56:54",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Grammatical Error Correction",
+    "GLM",
+    "Detection-Correction",
+    "Multi-task Learning",
+    "Large Language Model"
+   ],
+   "field": "语法错误纠正",
+   "innovations": [
+    "提出基于GLM的整合检测-纠正结构DeCoGLM，在单一模型中实现端到端错误检测与局部纠正",
+    "设计多任务学习与注意力掩码机制使检测与纠正任务相互促进",
+    "探索小检测模型+大纠正模型的LLM应用策略，有效缓解过度纠正问题"
+   ],
+   "benchmarks": [
+    "CoNLL-14",
+    "BEA-19",
+    "MuCGEC",
+    "FCGEC"
+   ]
+  }
+ }
 }

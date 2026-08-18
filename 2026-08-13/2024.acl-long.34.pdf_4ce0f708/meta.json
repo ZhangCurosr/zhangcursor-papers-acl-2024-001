@@ -3,5 +3,31 @@
  "batch_id": "4ce0f708-69af-49ac-bfab-da9543cf3496",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 02:44:56",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/9d8e5e69-5636-4c40-93f1-8f3cc4cdc920.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/9d8e5e69-5636-4c40-93f1-8f3cc4cdc920.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:52:50",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "WAV2GLOSS",
+    "行间注释文本",
+    "低资源语言",
+    "多任务学习",
+    "语音识别",
+    "词缀标注"
+   ],
+   "field": "低资源语言文档化与多模态NLP",
+   "innovations": [
+    "提出WAV2GLOSS任务，从语音直接生成完整IGT四子任务标注",
+    "发布FIELDWORK首个多语言语音+IGT对齐数据集（37种语言）",
+    "系统比较端到端/级联/单任务/多任务/单语/多语多种训练范式"
+   ],
+   "benchmarks": [
+    "FIELDWORK",
+    "SIGMORPHON 2023 IGT Shared Task",
+    "ODIN"
+   ]
+  }
+ }
 }

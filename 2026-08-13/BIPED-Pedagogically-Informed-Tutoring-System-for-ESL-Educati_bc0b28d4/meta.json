@@ -4,5 +4,33 @@
  "title": "BIPED-Pedagogically-Informed-Tutoring-System-for-ESL-Educati",
  "token": "sk-dD4E81LFV...",
  "created_at": "2026-08-13 05:41:14",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/595cba41-44d2-4769-ad84-202d7d26f4a7.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/595cba41-44d2-4769-ad84-202d7d26f4a7.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:54:41",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "ESL教育",
+    "对话式智能辅导系统",
+    "指令微调",
+    "话语行为分析",
+    "双语教学",
+    "教育学 informed 数据"
+   ],
+   "field": "教育对话系统与计算语言学",
+   "innovations": [
+    "构建BIPED双语教育学辅导数据集，包含34类教师行为和9类学生行为的细粒度标注",
+    "提出两阶段可控生成框架（先预测教师行为再回复生成），首次系统应用多任务指令微调于CITS开发"
+   ],
+   "benchmarks": [
+    "BIPED",
+    "CIMA",
+    "TSCC",
+    "MATHDIAL",
+    "TalkMoves",
+    "NCTE"
+   ]
+  }
+ }
 }

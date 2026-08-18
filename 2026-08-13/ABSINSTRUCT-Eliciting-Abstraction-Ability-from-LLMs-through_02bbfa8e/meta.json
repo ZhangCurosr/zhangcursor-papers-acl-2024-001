@@ -4,5 +4,32 @@
  "title": "ABSINSTRUCT-Eliciting-Abstraction-Ability-from-LLMs-through",
  "token": "sk-OZiRtsQic...",
  "created_at": "2026-08-13 05:40:05",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ee29e3f5-be86-4076-a654-7f990cbb47da.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ee29e3f5-be86-4076-a654-7f990cbb47da.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:53:11",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "抽象能力",
+    "指令调优",
+    "大语言模型",
+    "可能性估计",
+    "解释生成",
+    "知识激发"
+   ],
+   "field": "大语言模型对齐与能力增强",
+   "innovations": [
+    "提出ABSINSTRUCT框架，通过解释调优系统性地激发LLM抽象能力",
+    "设计可能性估计器，基于模型自身知识筛选一致样本",
+    "构建多层过滤机制确保解释质量与数据多样性"
+   ],
+   "benchmarks": [
+    "ABSPYRAMID",
+    "AbstractATOMIC",
+    "Levy/Holt",
+    "SuperNI"
+   ]
+  }
+ }
 }

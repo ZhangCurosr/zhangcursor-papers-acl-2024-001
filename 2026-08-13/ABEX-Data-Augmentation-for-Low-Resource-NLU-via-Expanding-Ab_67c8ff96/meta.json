@@ -4,5 +4,34 @@
  "title": "ABEX-Data-Augmentation-for-Low-Resource-NLU-via-Expanding-Ab",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 03:38:38",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/304144cd-69f3-403a-a1cd-6d1a9a033691.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/304144cd-69f3-403a-a1cd-6d1a9a033691.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:53:09",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "数据增强",
+    "低资源NLU",
+    "AMR",
+    "生成式增强",
+    "BART",
+    "抽象表示"
+   ],
+   "field": "低资源自然语言理解",
+   "innovations": [
+    "提出Abstract-and-Expand范式，解耦抽象生成与内容扩展",
+    "设计基于AMR图编辑的训练无关可控抽象生成方法",
+    "引入图级mixup策略提升增强多样性"
+   ],
+   "benchmarks": [
+    "Huffpost",
+    "CoNLL-2003",
+    "SQuAD",
+    "MRPC",
+    "ATIS",
+    "MultiCoNER"
+   ]
+  }
+ }
 }

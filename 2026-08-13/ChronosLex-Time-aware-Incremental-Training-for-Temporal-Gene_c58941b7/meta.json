@@ -4,5 +4,32 @@
  "title": "ChronosLex-Time-aware-Incremental-Training-for-Temporal-Gene",
  "token": "sk-wGl2gwQjA...",
  "created_at": "2026-08-13 05:41:03",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/60168b31-0e13-4939-92af-976bd60b499a.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/60168b31-0e13-4939-92af-976bd60b499a.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:56:12",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "temporal generalization",
+    "legal text classification",
+    "continual learning",
+    "incremental fine-tuning",
+    "time-aware training",
+    "multi-label classification"
+   ],
+   "field": "法律自然语言处理与时序泛化",
+   "innovations": [
+    "提出 ChronosLex 增量微调框架按时间顺序训练法律多标签分类模型，显式建模输入词汇层面的时序漂移",
+    "设计并验证 Eval-Stream 流式评估协议替代 Eval-Fix，获得更稳健的时序泛化结论",
+    "首次系统评估持续学习与时间不变方法在法律多标签分类时序适应中的效果，发现 LoRA 在所有数据集上最优"
+   ],
+   "benchmarks": [
+    "UKLEX",
+    "EURLEX",
+    "ECHR",
+    "WildTime-inspired Eval-Stream protocol"
+   ]
+  }
+ }
 }

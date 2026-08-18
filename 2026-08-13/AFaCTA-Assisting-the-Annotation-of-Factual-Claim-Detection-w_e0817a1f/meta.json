@@ -4,5 +4,29 @@
  "title": "AFaCTA-Assisting-the-Annotation-of-Factual-Claim-Detection-w",
  "token": "sk-dY4OBV5wM...",
  "created_at": "2026-08-13 05:40:38",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ca12256d-635c-414a-9502-7c6a1f84eb56.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ca12256d-635c-414a-9502-7c6a1f84eb56.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:53:24",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "factual claim detection",
+    "automated annotation",
+    "large language models",
+    "self-consistency",
+    "fact-checking",
+    "verifiability"
+   ],
+   "field": "事实性声明检测与自动化标注",
+   "innovations": [
+    "提出基于verifiability的统一事实性声明定义，解耦check-worthiness",
+    "设计三路预定义推理路径一致性校准框架AFaCTA，证明预定义路径优于自采样CoT"
+   ],
+   "benchmarks": [
+    "PoliClaim",
+    "CheckThat!-2021"
+   ]
+  }
+ }
 }

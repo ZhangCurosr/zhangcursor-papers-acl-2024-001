@@ -4,5 +4,30 @@
  "title": "A-Non-autoregressive-Generation-Framework-for-End-to-End-Sim",
  "token": "sk-mBuyDYvkR...",
  "created_at": "2026-08-13 05:40:20",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/46223023-d8cc-42bb-b887-f81fd705f1ea.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/46223023-d8cc-42bb-b887-f81fd705f1ea.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:53:14",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "simultaneous speech translation",
+    "non-autoregressive generation",
+    "speech-to-speech translation",
+    "end-to-end translation",
+    "CTC decoding",
+    "acoustic unit"
+   ],
+   "field": "端到端同时语音翻译",
+   "innovations": [
+    "提出统一端到端非自回归框架 NAST-S2x，同时支持 Simul-S2T 和 Simul-S2S 任务",
+    "设计 chunk-to-chunk 非自回归解码器结合 CTC 动态长度调整实现流式翻译",
+    "引入两步 glancing 训练策略和多任务非单调 CTC 损失缓解多模态分布学习难题"
+   ],
+   "benchmarks": [
+    "MuST-C En-De/En-Es",
+    "CVSS-C Fr-En"
+   ]
+  }
+ }
 }

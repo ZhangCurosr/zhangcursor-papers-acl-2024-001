@@ -4,5 +4,32 @@
  "title": "Dissecting-Human-and-LLM-Preferences",
  "token": "sk-aknYEUs8O...",
  "created_at": "2026-08-13 05:40:33",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/8410cf9d-b8f4-4be2-b112-529c75dd0775.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/8410cf9d-b8f4-4be2-b112-529c75dd0775.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:57:14",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "LLM偏好",
+    "偏好解构",
+    "RLHF",
+    "LLM-as-a-judge",
+    "贝叶斯逻辑回归",
+    "对齐",
+    "评测基准"
+   ],
+   "field": "大语言模型对齐与评估",
+   "innovations": [
+    "提出偏好解构框架，将整体偏好定量分解为29个属性的贝叶斯回归权重",
+    "揭示人类与GPT-4-Turbo在错误敏感度、立场支持等方面的系统性偏好差异",
+    "发现模型规模是偏好的决定性因素且对齐微调不显著改变偏好倾向"
+   ],
+   "benchmarks": [
+    "MT-Bench",
+    "AlpacaEval 2.0",
+    "ChatBot Arena"
+   ]
+  }
+ }
 }

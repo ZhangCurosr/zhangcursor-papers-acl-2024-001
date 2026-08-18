@@ -4,5 +4,36 @@
  "title": "Active-Prompting-with-Chain-of-Thought-for-Large-Language-Mo",
  "token": "sk-sKVjU65N5...",
  "created_at": "2026-08-13 05:40:18",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/4edb3c87-8d28-4ce1-b4a1-42dcbf1d0562.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/4edb3c87-8d28-4ce1-b4a1-42dcbf1d0562.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:53:30",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "chain-of-thought",
+    "active learning",
+    "prompt selection",
+    "large language models",
+    "uncertainty estimation",
+    "self-consistency"
+   ],
+   "field": "大模型提示与推理",
+   "innovations": [
+    "提出不确定性驱动的主动示例选择策略，用于 Few-shot CoT 构建",
+    "设计并对比 Disagreement/Entropy/Variance/Self-confidence 四类不确定性度量",
+    "证明所选示例在不同 LLM 间可迁移且不确定性来源于任务"
+   ],
+   "benchmarks": [
+    "GSM8K",
+    "ASDiv",
+    "SVAMP",
+    "AQuA",
+    "SingleEq",
+    "CSQA",
+    "StrategyQA",
+    "Letter (4)"
+   ]
+  }
+ }
 }

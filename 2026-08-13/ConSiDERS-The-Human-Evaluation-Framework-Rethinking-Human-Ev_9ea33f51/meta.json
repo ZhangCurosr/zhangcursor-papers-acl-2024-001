@@ -4,5 +4,36 @@
  "title": "ConSiDERS-The-Human-Evaluation-Framework-Rethinking-Human-Ev",
  "token": "sk-JMLCbBCEj...",
  "created_at": "2026-08-13 05:40:01",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/c2a143fe-1fec-4ffb-a505-b35532005938.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/c2a143fe-1fec-4ffb-a505-b35532005938.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:56:25",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "human evaluation",
+    "LLM evaluation",
+    "cognitive bias",
+    "user experience",
+    "inter-rater agreement",
+    "likert scale",
+    "responsible AI",
+    "evaluation framework"
+   ],
+   "field": "自然语言生成评估方法",
+   "innovations": [
+    "提出ConSiDERS六支柱框架，系统性整合UX与认知心理学视角于LLM人评设计",
+    "首次系统论证处理流畅性通过晕轮效应扭曲事实性评分的风险并提供原子事实拆分缓解方案",
+    "揭示Krippendorff's-α对少数标签分歧的过度敏感问题并以toy example量化IRA指标选择的影响"
+   ],
+   "benchmarks": [
+    "GLUE",
+    "SuperGLUE",
+    "Big-Bench",
+    "HELM",
+    "XSum",
+    "IMDB"
+   ]
+  }
+ }
 }

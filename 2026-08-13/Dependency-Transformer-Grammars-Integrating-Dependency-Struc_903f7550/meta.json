@@ -4,5 +4,31 @@
  "title": "Dependency-Transformer-Grammars-Integrating-Dependency-Struc",
  "token": "sk-mBuyDYvkR...",
  "created_at": "2026-08-13 05:40:19",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/992c1981-f3c8-4c8f-9036-74219c264485.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/992c1981-f3c8-4c8f-9036-74219c264485.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-08-18 19:56:50",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "dependency parsing",
+    "syntactic language modeling",
+    "constrained attention",
+    "transformer grammar",
+    "inductive bias"
+   ],
+   "field": "句法语言模型",
+   "innovations": [
+    "通过约束注意力掩码模拟依存转换系统，首次将依存结构归纳偏置引入 Transformer 语言模型",
+    "设计基于栈深度的相对位置编码和组合式弧表示（w+arc）",
+    "系统比较 arc-standard/eager/swift 三种转换系统在语言建模中的表现"
+   ],
+   "benchmarks": [
+    "BLLIP-LG",
+    "BLiMP",
+    "SG",
+    "PTB"
+   ]
+  }
+ }
 }
