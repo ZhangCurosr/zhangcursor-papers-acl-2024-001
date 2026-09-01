@@ -4,5 +4,31 @@
  "title": "ToolSword-Unveiling-Safety-Issues-of-Large-Language-Models-i",
  "token": "sk-7NOZt17oN...",
  "created_at": "2026-08-13 03:39:03",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a5c9a216-e81c-407c-b566-b8699333ffc7.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a5c9a216-e81c-407c-b566-b8699333ffc7.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 21:44:09",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Tool Learning",
+    "LLM Safety",
+    "Tool Alignment",
+    "Attack Evaluation",
+    "Agent Security",
+    "Jailbreak Attack"
+   ],
+   "field": "大语言模型安全与对齐",
+   "innovations": [
+    "提出三阶段六场景工具学习安全评估框架 ToolSword",
+    "首次系统揭示工具学习对 LLM 安全对齐机制的破坏效应",
+    "构建 440 样本工具学习安全基准并评测 11 个主流 LLM"
+   ],
+   "benchmarks": [
+    "MaliciousInstruct",
+    "advbench",
+    "shadow alignment"
+   ]
+  }
+ }
 }

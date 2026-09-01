@@ -4,5 +4,29 @@
  "title": "Rethinking-Task-Oriented-Dialogue-Systems-From-Complex-Modul",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 03:50:03",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/73471f21-2f8a-41c8-ba95-de30763181ba.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/73471f21-2f8a-41c8-ba95-de30763181ba.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 21:43:29",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Task-Oriented Dialogue",
+    "Zero-shot",
+    "Autonomous Agent",
+    "Instruction-following LLM",
+    "Simulation-based Evaluation"
+   ],
+   "field": "任务导向对话系统",
+   "innovations": [
+    "提出首个完全零样本TOD自主代理AutoTOD，彻底弃用传统模块设计",
+    "设计三部件指令模式替代DST/Policy/NLG等所有功能模块",
+    "提出基于用户模拟器+对话评估器的仿真评估框架"
+   ],
+   "benchmarks": [
+    "MultiWOZ 2.0",
+    "SGD"
+   ]
+  }
+ }
 }

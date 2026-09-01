@@ -4,5 +4,32 @@
  "title": "When-Good-and-Reproducible-Results-are-a-Giant-with-Feet-of",
  "token": "sk-Ar06zcDAy...",
  "created_at": "2026-08-13 07:10:28",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/c5c79f67-4b18-4a9d-b17c-87648262d07e.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/c5c79f67-4b18-4a9d-b17c-87648262d07e.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 21:44:29",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "软件质量",
+    "代码正确性",
+    "可复现性",
+    "Conformer",
+    "语音识别",
+    "语音翻译",
+    "单元测试",
+    "pangoliNN"
+   ],
+   "field": "NLP/语音处理中的研究代码质量与正确性保障",
+   "innovations": [
+    "通过Conformer开源实现的系统性案例揭示‘好结果与可复现性不能保证代码正确性’",
+    "定位并修复三类padding相关bug（卷积、初始子采样、相对位置编码）",
+    "发布pangoliNN测试库与Code-quality Checklist以推动SQA实践进入研究流程"
+   ],
+   "benchmarks": [
+    "MuST-C v1.0 (ASR en-es, ST en-nl/de/fr/it/pt/ro/ru/es)",
+    "tst-COMMON"
+   ]
+  }
+ }
 }

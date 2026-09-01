@@ -4,5 +4,30 @@
  "title": "Timeline-based-Sentence-Decomposition-with-In-Context-Learni",
  "token": "sk-vBvZ06NsJ...",
  "created_at": "2026-08-13 14:54:42",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/539f5572-5f14-4f5d-838f-393c6d5c12e0.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/539f5572-5f14-4f5d-838f-393c6d5c12e0.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 21:43:50",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "temporal fact extraction",
+    "in-context learning",
+    "sentence decomposition",
+    "large language models",
+    "knowledge graph construction",
+    "complex sentences"
+   ],
+   "field": "时间信息抽取与大模型应用",
+   "innovations": [
+    "提出基于时间线的句子分解方法TSD，利用LLM的in-context learning实现无需训练语料的复杂句子分解",
+    "设计TSDRE框架，将LLM分解能力与小型PLM微调相结合，实现大模型理解力与小模型精确性的互补",
+    "构建ComplexTRED复杂时间事实提取数据集，填补复杂叙事场景的评测空白"
+   ],
+   "benchmarks": [
+    "HyperRED-Temporal",
+    "ComplexTRED"
+   ]
+  }
+ }
 }
