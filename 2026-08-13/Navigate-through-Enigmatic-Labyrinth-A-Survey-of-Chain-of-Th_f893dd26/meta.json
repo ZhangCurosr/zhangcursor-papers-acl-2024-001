@@ -4,5 +4,34 @@
  "title": "Navigate-through-Enigmatic-Labyrinth-A-Survey-of-Chain-of-Th",
  "token": "sk-sKVjU65N5...",
  "created_at": "2026-08-13 05:40:13",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/b1dbd023-f6e3-4cfc-8bff-64220b5517df.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/b1dbd023-f6e3-4cfc-8bff-64220b5517df.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:45:13",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Chain of Thought",
+    "reasoning",
+    "survey",
+    "large language models",
+    "prompting",
+    "XoT"
+   ],
+   "field": "大语言模型推理与提示工程",
+   "innovations": [
+    "首篇系统性XoT推理综述，建立三维度精细分类体系",
+    "首次整合工具使用、规划、蒸馏三大前沿方向的挑战与机遇",
+    "系统讨论CoT涌现机制、忠实推理、多模态推理等开放问题"
+   ],
+   "benchmarks": [
+    "GSM8K",
+    "MATH",
+    "CSQA",
+    "StrategyQA",
+    "BigBench",
+    "ScienceQA"
+   ]
+  }
+ }
 }

@@ -4,5 +4,30 @@
  "title": "OceanGPT-A-Large-Language-Model-for-Ocean-Science-Tasks",
  "token": "sk-dD4E81LFV...",
  "created_at": "2026-08-13 05:41:12",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16581af3-1042-4ff1-acfc-55570d6f15c8.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16581af3-1042-4ff1-acfc-55570d6f15c8.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:45:40",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "海洋科学",
+    "大语言模型",
+    "领域模型",
+    "指令微调",
+    "多智能体",
+    "OCEANBENCH",
+    "具身智能"
+   ],
+   "field": "领域大语言模型",
+   "innovations": [
+    "首个海洋科学领域大语言模型 OceanGPT，基于 LLaMA-2 在 67,633 篇海洋文献上预训练",
+    "提出 DOINSTRUCT 多智能体协作指令生成框架，自动构建超 150,000 条高质量领域指令",
+    "构建首个海洋科学评测基准 OCEANBENCH（15 类任务，约 10,805 样本），并探索 LLM 控制水下机器人的具身智能能力"
+   ],
+   "benchmarks": [
+    "OCEANBENCH"
+   ]
+  }
+ }
 }

@@ -4,5 +4,31 @@
  "title": "Evaluating-Dynamic-Topic-Models",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 05:41:17",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/914de7c5-14a0-4104-87d3-256506793a0f.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/914de7c5-14a0-4104-87d3-256506793a0f.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:42:04",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "动态主题模型",
+    "主题评估",
+    "时序文本分析",
+    "LLM主题模型",
+    "Topic Coherence",
+    "Evaluation Metrics"
+   ],
+   "field": "自然语言处理-主题建模与评估",
+   "innovations": [
+    "提出TTQ/DTQ填补DTM时间维度评估空白",
+    "将Word Intrusion和Topic Rating扩展至时序场景",
+    "系统对比统计/神经/LLM三类DTM的时间演化表现"
+   ],
+   "benchmarks": [
+    "NeurIPS论文数据集",
+    "NYT新闻数据集",
+    "UN General Debates数据集"
+   ]
+  }
+ }
 }

@@ -4,5 +4,29 @@
  "title": "FineSurE-Fine-grained-Summarization-Evaluation-using-LLMs",
  "token": "sk-nY8L7ieIq...",
  "created_at": "2026-08-13 05:39:52",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/8a95f304-9b99-4723-89ce-95d52ec698bc.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/8a95f304-9b99-4723-89ce-95d52ec698bc.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:42:09",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "摘要评估",
+    "大语言模型",
+    "细粒度评估",
+    "忠实度",
+    "关键事实对齐"
+   ],
+   "field": "自然语言生成评估",
+   "innovations": [
+    "提出 FineSurE 框架实现句子/关键事实级百分比评估",
+    "用完整性与简洁性替代模糊的连贯性/相关性维度",
+    "支持零样本关键事实抽取的细粒度评估"
+   ],
+   "benchmarks": [
+    "FRANK",
+    "REALSumm"
+   ]
+  }
+ }
 }

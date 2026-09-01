@@ -4,5 +4,31 @@
  "title": "Open-Set-Semi-Supervised-Text-Classification-via-Adversarial",
  "token": "sk-dY4OBV5wM...",
  "created_at": "2026-08-13 05:40:45",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/222327d1-9484-404c-8c42-538aa4ecbbf8.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/222327d1-9484-404c-8c42-538aa4ecbbf8.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:46:02",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "开放集半监督学习",
+    "异常检测",
+    "对抗学习",
+    "文本分类",
+    "测量分歧",
+    "OOD检测"
+   ],
+   "field": "开放集半监督学习",
+   "innovations": [
+    "从测量分歧视角统一形式化现有OSTC异常检测方法并揭示其0-bound局限",
+    "提出对抗分歧最大化框架协同优化交叉熵损失与检测置信度的分歧",
+    "设计基于跨测量一致性的异常例检测与测量校准机制保障优化方向"
+   ],
+   "benchmarks": [
+    "AGNews",
+    "Yahoo",
+    "DBPedia"
+   ]
+  }
+ }
 }

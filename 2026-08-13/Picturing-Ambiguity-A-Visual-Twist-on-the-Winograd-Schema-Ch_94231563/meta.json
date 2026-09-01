@@ -4,5 +4,30 @@
  "title": "Picturing-Ambiguity-A-Visual-Twist-on-the-Winograd-Schema-Ch",
  "token": "sk-Ar06zcDAy...",
  "created_at": "2026-08-13 04:49:56",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/d9d6aa76-4692-4553-9283-fb760e79bbad.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/d9d6aa76-4692-4553-9283-fb760e79bbad.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:46:28",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Winograd Schema",
+    "代词消歧",
+    "文本生成图像",
+    "多模态推理",
+    "DAAM",
+    "可解释性",
+    "常识推理"
+   ],
+   "field": "多模态常识推理与可解释性",
+   "innovations": [
+    "构建首个面向文生图模型的 WSC 式代词消歧数据集 WINOVIS，500 条样本",
+    "提出基于 DAAM 热力图与 IoU 阈值的可解释评估框架，分离代词消歧与视觉干扰",
+    "揭示 SD 2.0 精确率仅 56.7%、SDXL 几乎无法做出明确决策，证明文生图模型常识推理仍存在显著差距"
+   ],
+   "benchmarks": [
+    "WINOVIS"
+   ]
+  }
+ }
 }

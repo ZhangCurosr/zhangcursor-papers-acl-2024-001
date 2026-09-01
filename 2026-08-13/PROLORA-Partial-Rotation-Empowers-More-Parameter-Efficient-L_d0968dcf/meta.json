@@ -4,5 +4,33 @@
  "title": "PROLORA-Partial-Rotation-Empowers-More-Parameter-Efficient-L",
  "token": "sk-wGl2gwQjA...",
  "created_at": "2026-08-13 05:40:59",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/177e1ce2-2ef1-4462-8b4c-9f41386e4e5e.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/177e1ce2-2ef1-4462-8b4c-9f41386e4e5e.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:46:09",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "参数高效微调",
+    "LoRA",
+    "低秩自适应",
+    "参数共享",
+    "大语言模型",
+    "指令微调"
+   ],
+   "field": "参数高效微调（PEFT）",
+   "innovations": [
+    "层内参数共享机制（广播缩减+旋转增强+部分共享精修）",
+    "零开销旋转差异化提升表达力",
+    "修正Kaiming初始化保证共享chunk边界一致"
+   ],
+   "benchmarks": [
+    "MMLU",
+    "BBH",
+    "GSM",
+    "TyDi QA",
+    "HumanEval"
+   ]
+  }
+ }
 }

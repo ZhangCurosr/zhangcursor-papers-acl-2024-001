@@ -4,5 +4,31 @@
  "title": "Persuading-across-Diverse-Domains-A-Dataset-and-Persuasion-L",
  "token": "sk-OZiRtsQic...",
  "created_at": "2026-08-13 04:50:21",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/628f1758-6791-481f-b4c5-ff277fdebf5f.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/628f1758-6791-481f-b4c5-ff277fdebf5f.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:46:28",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "说服对话",
+    "多领域泛化",
+    "意图到策略推理",
+    "偏好优化",
+    "合成数据",
+    "DailyPersuasion",
+    "PersuGPT"
+   ],
+   "field": "多轮说服对话系统",
+   "innovations": [
+    "构建首个大规模多领域说服对话数据集 DailyPersuasion，含78,000会话35个领域",
+    "提出意图到策略推理ISR机制，在生成前显式推理用户意图并选择说服策略",
+    "设计基于多轮仿真的偏好优化方法，用用户模型模拟对话路径并通过DPO优化模型"
+   ],
+   "benchmarks": [
+    "DailyPersuasion",
+    "PersuasionForGood"
+   ]
+  }
+ }
 }

@@ -4,5 +4,32 @@
  "title": "Landmark-Embedding-A-Chunking-Free-Embedding-Method-For-Retr",
  "token": "sk-dD4E81LFV...",
  "created_at": "2026-08-13 05:41:10",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/6a7354b0-b3bd-47c6-a532-df800f7bb79f.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/6a7354b0-b3bd-47c6-a532-df800f7bb79f.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:43:05",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "检索增强生成",
+    "长上下文语言模型",
+    "嵌入模型",
+    "无分块检索",
+    "位置感知训练"
+   ],
+   "field": "检索增强长上下文语言建模",
+   "innovations": [
+    "提出无分块架构，在连贯上下文中直接生成句子级 Landmark Embedding",
+    "设计位置感知目标函数，通过指数衰减权重强化信息边界句的检索",
+    "设计三阶段多阶段学习算法，结合远端监督、弱监督与合成数据微调"
+   ],
+   "benchmarks": [
+    "LongBench",
+    "MS MARCO",
+    "Wikipedia",
+    "ArXiv",
+    "Needle in a Haystack"
+   ]
+  }
+ }
 }

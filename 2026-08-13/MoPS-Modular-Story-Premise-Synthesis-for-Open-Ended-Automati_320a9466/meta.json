@@ -4,5 +4,34 @@
  "title": "MoPS-Modular-Story-Premise-Synthesis-for-Open-Ended-Automati",
  "token": "sk-dY4OBV5wM...",
  "created_at": "2026-08-13 05:40:47",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/9aec9a63-f83a-419c-8e85-b65bde3b36bc.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/9aec9a63-f83a-419c-8e85-b65bde3b36bc.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:44:52",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "自动故事生成",
+    "故事前提",
+    "模块化合成",
+    "LLM",
+    "多样性评估",
+    "组合创意",
+    "嵌套字典"
+   ],
+   "field": "自动故事生成（ASG）",
+   "innovations": [
+    "将故事前提解构为主题/背景/人物/情节的有序依赖模块并通过嵌套字典进行组合合成",
+    "提出语义广度与密度双维度多样性指标配合三项质量指标的系统评测体系",
+    "构建 complete/moderate/curated 三粒度开源数据集并开源代码"
+   ],
+   "benchmarks": [
+    "WritingPrompts (WP)",
+    "Storium (STM)",
+    "DOC",
+    "RecurrentGPT",
+    "Dramatron"
+   ]
+  }
+ }
 }

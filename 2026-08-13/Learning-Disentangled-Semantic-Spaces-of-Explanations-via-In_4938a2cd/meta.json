@@ -4,5 +4,30 @@
  "title": "Learning-Disentangled-Semantic-Spaces-of-Explanations-via-In",
  "token": "sk-dY4OBV5wM...",
  "created_at": "2026-08-13 05:40:45",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2ef19a27-168a-4bd3-9bb5-dd9adbdc796f.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2ef19a27-168a-4bd3-9bb5-dd9adbdc796f.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:43:17",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "句子解耦",
+    "可逆神经网络",
+    "潜在空间",
+    "可控文本生成",
+    "论元结构",
+    "语义解耦"
+   ],
+   "field": "自然语言生成与可解释性",
+   "innovations": [
+    "首次将INN集成到Transformer语言AE中实现句子语义解耦",
+    "提出聚类监督训练策略增强角色-内容语义分离",
+    "几何数据增强辅助句子解耦表示学习"
+   ],
+   "benchmarks": [
+    "WorldTree",
+    "EntailmentBank"
+   ]
+  }
+ }
 }

@@ -4,5 +4,28 @@
  "title": "Learn-from-Failure-Fine-Tuning-LLMs-with-Trial-and-Error-Dat",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 03:49:36",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/d38b242b-356f-4529-8e4e-c15bd102bb0d.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/d38b242b-356f-4529-8e4e-c15bd102bb0d.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:43:13",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Automated Theorem Proving",
+    "Trial-and-Error Learning",
+    "Large Language Models",
+    "Intuitionistic Propositional Logic",
+    "Lean"
+   ],
+   "field": "形式化定理证明与LLM",
+   "innovations": [
+    "提出TRIALMASTER框架，在LLM微调中融入含回溯的完整试错证明树",
+    "构建PropL数据集，通过自然数-命题Bijection均匀采样并生成带试错信息的证明",
+    "证明试错训练可将OOD成功率从59.3%提升至88.7%，同时降低搜索成本"
+   ],
+   "benchmarks": [
+    "PropL (In-dist test: 1000 theorems, OOD test: 1000 theorems)"
+   ]
+  }
+ }
 }

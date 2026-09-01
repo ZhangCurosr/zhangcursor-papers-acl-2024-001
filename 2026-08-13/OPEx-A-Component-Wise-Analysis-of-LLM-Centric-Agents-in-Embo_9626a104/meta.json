@@ -4,5 +4,31 @@
  "title": "OPEx-A-Component-Wise-Analysis-of-LLM-Centric-Agents-in-Embo",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 05:41:21",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/98c68d68-3240-4ff3-aa25-01bede4b8147.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/98c68d68-3240-4ff3-aa25-01bede4b8147.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:45:54",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Embodied Instruction Following",
+    "Large Language Models",
+    "Multi-Agent System",
+    "Component-wise Analysis",
+    "In-context Learning",
+    "ALFRED",
+    "Semantic Mapping"
+   ],
+   "field": "具身智能与指令跟随",
+   "innovations": [
+    "提出OPEx三组件框架（Observer-Planner-Executor）并系统分解EIF任务",
+    "引入多智能体LLM通信策略与先验知识集成机制",
+    "通过消融实验量化感知、规划、执行等模块对性能的影响并识别瓶颈"
+   ],
+   "benchmarks": [
+    "ALFRED",
+    "ALFWorld"
+   ]
+  }
+ }
 }

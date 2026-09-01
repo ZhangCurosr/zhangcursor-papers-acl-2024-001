@@ -4,5 +4,34 @@
  "title": "Multimodal-Instruction-Tuning-with-Conditional-Mixture-of-Lo",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 05:41:21",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/42e57bbe-f995-4804-8b3c-a41bca835f74.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/42e57bbe-f995-4804-8b3c-a41bca835f74.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:45:05",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Multimodal Instruction Tuning",
+    "Parameter-Efficient Fine-Tuning",
+    "LoRA",
+    "Mixture of Experts",
+    "Task Interference",
+    "Conditional Factor Selection"
+   ],
+   "field": "多模态大模型高效微调",
+   "innovations": [
+    "将LoRA低秩因子作为可动态选择的专家池，实现实例级自适应适配矩阵构建",
+    "设计IFS+CFS双路由器条件化选择机制，增强A/B因子选择的协同一致性",
+    "实证揭示并量化参数高效多模态指令调优中的任务干扰现象"
+   ],
+   "benchmarks": [
+    "MME",
+    "Vision-Flan",
+    "Text-VQA",
+    "VSR",
+    "SNLI-VE",
+    "POPE"
+   ]
+  }
+ }
 }

@@ -4,5 +4,31 @@
  "title": "MINPROMPT-Graph-based-Minimal-Prompt-Data-Augmentation-for-F",
  "token": "sk-owp49a3rO...",
  "created_at": "2026-08-13 04:49:44",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/af3768da-5d59-4874-97c6-c93fec0e379a.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/af3768da-5d59-4874-97c6-c93fec0e379a.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:44:06",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "few-shot QA",
+    "data augmentation",
+    "graph algorithm",
+    "prompt tuning",
+    "question generation"
+   ],
+   "field": "少样本问答",
+   "innovations": [
+    "基于图的最小支配集算法进行关键句子选择以实现高效数据增强",
+    "无监督模板化问题生成策略结合实体类型先验"
+   ],
+   "benchmarks": [
+    "SQuAD",
+    "TriviaQA",
+    "Natural Questions",
+    "HotpotQA",
+    "BioASQ"
+   ]
+  }
+ }
 }

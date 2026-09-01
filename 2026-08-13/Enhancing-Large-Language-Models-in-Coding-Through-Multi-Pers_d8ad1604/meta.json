@@ -4,5 +4,33 @@
  "title": "Enhancing-Large-Language-Models-in-Coding-Through-Multi-Pers",
  "token": "sk-mBuyDYvkR...",
  "created_at": "2026-08-13 05:40:28",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/42847f02-8c91-4d2e-8572-2c7a07f8c0f2.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/42847f02-8c91-4d2e-8572-2c7a07f8c0f2.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:41:55",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "代码生成",
+    "大语言模型",
+    "自我一致性",
+    "多视角推理",
+    "后验增强",
+    "图排序",
+    "MPSC"
+   ],
+   "field": "代码生成与大语言模型推理增强",
+   "innovations": [
+    "提出三视角(Solution/Specification/Test case)多视角一致性框架并平等对待各视角输出",
+    "构建3部图编码互一致性，联合词法与语义自一致性通过图优化学习排序分数",
+    "揭示验证属性质量未必优于代码本身，一致性信号是提升核心来源"
+   ],
+   "benchmarks": [
+    "HumanEval",
+    "HumanEval+",
+    "MBPP",
+    "CodeContests"
+   ]
+  }
+ }
 }

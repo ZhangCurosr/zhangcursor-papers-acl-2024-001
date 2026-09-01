@@ -4,5 +4,34 @@
  "title": "Open-Ko-LLM-Leaderboard-Evaluating-Large-Language-Models-in",
  "token": "sk-dD4E81LFV...",
  "created_at": "2026-08-13 05:41:11",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/e2d87284-b749-4940-ba40-783d6b7bd1c8.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/e2d87284-b749-4940-ba40-783d6b7bd1c8.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:45:42",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "韩语LLM",
+    "大语言模型评测",
+    "基准构建",
+    "数据污染",
+    "私有测试集",
+    "Open Ko-LLM Leaderboard"
+   ],
+   "field": "多语言大模型评测",
+   "innovations": [
+    "构建首个对齐英语标准的韩语LLM私有测试集排行榜",
+    "新增Ko-CommonGen v2引入正交评估维度",
+    "提出基于任务饱和度的基准动态扩展量化标准"
+   ],
+   "benchmarks": [
+    "Ko-H5",
+    "Ko-ARC",
+    "Ko-HellaSwag",
+    "Ko-MMLU",
+    "Ko-TruthfulQA",
+    "Ko-CommonGen v2"
+   ]
+  }
+ }
 }

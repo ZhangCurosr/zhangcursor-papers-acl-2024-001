@@ -4,5 +4,31 @@
  "title": "Framing-in-the-Presence-of-Supporting-Data-A-Case-Study-in-U",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 05:41:19",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/dd107099-e150-494b-b822-2939f521e33c.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/dd107099-e150-494b-b822-2939f521e33c.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:42:53",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "media framing",
+    "computational social science",
+    "probabilistic soft logic",
+    "economic indicators",
+    "domain-adaptive pre-training",
+    "low-supervision NLP",
+    "editorial bias"
+   ],
+   "field": "计算框架分析与数字人文",
+   "innovations": [
+    "将新闻框架预测分解为文章级与数量级相互依赖的多任务结构，并在存在客观数值数据的场景下实现偏差量化",
+    "利用 DAPT 增强的 RoBERTA 分类器为 PSL 关系模型生成先验，在低监督条件下实现高精度指标级框架识别"
+   ],
+   "benchmarks": [
+    "Macro Indicator Detection F1=0.849",
+    "Economic Condition Framing F1=0.717",
+    "Quantity Polarity F1=0.813"
+   ]
+  }
+ }
 }

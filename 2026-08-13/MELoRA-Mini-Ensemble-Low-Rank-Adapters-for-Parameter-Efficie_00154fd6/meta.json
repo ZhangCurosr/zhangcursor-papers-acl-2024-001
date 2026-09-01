@@ -4,5 +4,30 @@
  "title": "MELoRA-Mini-Ensemble-Low-Rank-Adapters-for-Parameter-Efficie",
  "token": "sk-wGl2gwQjA...",
  "created_at": "2026-08-13 05:41:03",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/71172373-b856-4231-bb08-449f1fcab95a.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/71172373-b856-4231-bb08-449f1fcab95a.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:43:59",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "PEFT",
+    "LoRA",
+    "low-rank adaptation",
+    "parameter-efficient",
+    "instruction tuning",
+    "block-diagonal"
+   ],
+   "field": "参数高效微调方法",
+   "innovations": [
+    "提出并行堆叠的mini-LoRA块对角结构，理论保证等效秩可严格叠加",
+    "相同可训练参数量下实现更高有效秩并降低计算复杂度",
+    "在GLUE和INSTRUCTEVAL上用更少参数（最多36倍）超越LoRA及主流变体"
+   ],
+   "benchmarks": [
+    "GLUE",
+    "INSTRUCTEVAL"
+   ]
+  }
+ }
 }

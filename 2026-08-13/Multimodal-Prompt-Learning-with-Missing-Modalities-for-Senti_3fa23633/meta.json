@@ -4,5 +4,32 @@
  "title": "Multimodal-Prompt-Learning-with-Missing-Modalities-for-Senti",
  "token": "sk-aknYEUs8O...",
  "created_at": "2026-08-13 05:40:31",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/933d7196-007d-4b24-b06e-b5fd0fcc0b7f.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/933d7196-007d-4b24-b06e-b5fd0fcc0b7f.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:45:15",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "多模态情感分析",
+    "缺失模态",
+    "Prompt Learning",
+    "参数高效微调",
+    "多模态融合",
+    "情绪识别"
+   ],
+   "field": "多模态情感分析与情绪识别",
+   "innovations": [
+    "提出线性增长的三类互补 prompt（生成式/缺失信号/缺失类型）应对多模态缺失问题，参数量仅为 backbone 的 5%-10%",
+    "发现训练期 70% 模态丢弃率为最优正则化策略，显著提升模型鲁棒性",
+    "设计模态特定与模态共享 prompt 分离机制，分别捕获 intra-modality 和 inter-modality 特征"
+   ],
+   "benchmarks": [
+    "CMU-MOSI",
+    "CMU-MOSEI",
+    "IEMOCAP",
+    "CH-SIMS"
+   ]
+  }
+ }
 }

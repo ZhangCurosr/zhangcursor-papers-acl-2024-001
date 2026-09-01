@@ -4,5 +4,30 @@
  "title": "Mitigating-Catastrophic-Forgetting-in-Large-Language-Models",
  "token": "sk-sKVjU65N5...",
  "created_at": "2026-08-13 05:40:14",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16d5711f-ada3-430d-889b-5032794a0f4d.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16d5711f-ada3-430d-889b-5032794a0f4d.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:44:43",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "catastrophic forgetting",
+    "continual learning",
+    "large language models",
+    "synthetic rehearsal",
+    "in-context learning"
+   ],
+   "field": "大语言模型持续学习",
+   "innovations": [
+    "提出无需历史真实数据的自我合成回顾框架SSR",
+    "设计基础模型ICL生成+最新模型精炼的双阶段合成流程",
+    "揭示合成数据因低perplexity优于真实回放数据的现象"
+   ],
+   "benchmarks": [
+    "SuperNI",
+    "AlpacaEval 2.0",
+    "MMLU"
+   ]
+  }
+ }
 }

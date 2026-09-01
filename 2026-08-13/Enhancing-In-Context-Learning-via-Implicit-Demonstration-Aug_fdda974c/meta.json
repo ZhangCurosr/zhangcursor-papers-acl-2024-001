@@ -4,5 +4,38 @@
  "title": "Enhancing-In-Context-Learning-via-Implicit-Demonstration-Aug",
  "token": "sk-wGl2gwQjA...",
  "created_at": "2026-08-13 05:41:08",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2609c587-96e9-49cb-acc5-c3ee4b9388a1.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2609c587-96e9-49cb-acc5-c3ee4b9388a1.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:41:57",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "In-Context Learning",
+    "Implicit Augmentation",
+    "Logit Calibration",
+    "Deep Feature Distribution",
+    "Few-shot Learning",
+    "Large Language Models"
+   ],
+   "field": "上下文学习与大模型微调",
+   "innovations": [
+    "提出基于深特征分布的隐式演示增强方法 IDAICL",
+    "证明隐式增强等价于结合统计特性的 Logit 校准",
+    "通过均值和协方差矩阵实现无需增加序列长度的知识扩充"
+   ],
+   "benchmarks": [
+    "SST-2",
+    "SST-5",
+    "MR",
+    "CR",
+    "Amazon",
+    "Subj",
+    "TREC",
+    "DBPedia",
+    "AGNews",
+    "CB"
+   ]
+  }
+ }
 }

@@ -4,5 +4,34 @@
  "title": "MathGenie-Generating-Synthetic-Data-with-Question-Back-trans",
  "token": "sk-wGl2gwQjA...",
  "created_at": "2026-08-13 05:40:58",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/07c22571-cd7f-4996-8d83-0c78433e604d.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/07c22571-cd7f-4996-8d83-0c78433e604d.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:44:32",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "mathematical reasoning",
+    "synthetic data generation",
+    "back-translation",
+    "code-integrated solution",
+    "verification-based filtering",
+    "LLM finetuning",
+    "open-source model"
+   ],
+   "field": "数学推理与大模型合成数据",
+   "innovations": [
+    "迭代解增强与题目反向翻译流水线保障新题质量与多样性",
+    "代码集成验证理由自动过滤错误解提升合成数据可靠性",
+    "验证推理作为低开销推理增强策略替代多数投票"
+   ],
+   "benchmarks": [
+    "GSM8K",
+    "MATH",
+    "SVAMP",
+    "Simuleq",
+    "Mathematics"
+   ]
+  }
+ }
 }

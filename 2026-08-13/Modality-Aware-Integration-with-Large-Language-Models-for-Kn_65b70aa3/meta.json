@@ -4,5 +4,29 @@
  "title": "Modality-Aware-Integration-with-Large-Language-Models-for-Kn",
  "token": "sk-1jVZGxTQ1...",
  "created_at": "2026-08-13 05:40:50",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2baa6fdb-d5d7-4c91-9664-c0cdcc0ca0c3.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2baa6fdb-d5d7-4c91-9664-c0cdcc0ca0c3.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:44:54",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "知识型视觉问答",
+    "多模态融合",
+    "大语言模型",
+    "场景图",
+    "知识图谱",
+    "伪孪生网络"
+   ],
+   "field": "多模态知识推理",
+   "innovations": [
+    "双阶段 LLM 提示构建场景图与概念图耦合表示",
+    "伪孪生图介质融合实现可控跨模态交互"
+   ],
+   "benchmarks": [
+    "OK-VQA",
+    "FVQA"
+   ]
+  }
+ }
 }

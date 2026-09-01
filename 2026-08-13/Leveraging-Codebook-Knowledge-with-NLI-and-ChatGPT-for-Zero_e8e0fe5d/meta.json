@@ -4,5 +4,31 @@
  "title": "Leveraging-Codebook-Knowledge-with-NLI-and-ChatGPT-for-Zero",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 05:41:21",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3b9c9820-a340-4499-b1f0-c21b42f1b122.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3b9c9820-a340-4499-b1f0-c21b42f1b122.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:43:57",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "零样本关系分类",
+    "自然语言推理",
+    "政治事件编码",
+    "代码本知识",
+    "ChatGPT",
+    "树状查询框架",
+    "事件模式"
+   ],
+   "field": "低资源关系抽取",
+   "innovations": [
+    "将代码本知识转化为层级化NLI假设框架实现零样本政治事件关系分类",
+    "引入事件模式(P/F/CP/CF)作为细粒度分类的可计算语义维度",
+    "三层树状查询框架在假设空间控制与分类精度间取得最优平衡"
+   ],
+   "benchmarks": [
+    "PLV（自建，CAMEO/PLOVER细粒度标注）",
+    "A/W（ACE+WikiEvents跨域验证）"
+   ]
+  }
+ }
 }

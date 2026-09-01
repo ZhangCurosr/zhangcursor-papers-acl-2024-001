@@ -4,5 +4,30 @@
  "title": "GSM-PLUS-A-Comprehensive-Benchmark-for-Evaluating-the-Robust",
  "token": "sk-wGl2gwQjA...",
  "created_at": "2026-08-13 05:41:02",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/236f50a0-e9d0-4019-8955-4f8d181e43d6.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/236f50a0-e9d0-4019-8955-4f8d181e43d6.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:42:25",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "鲁棒性评估",
+    "数学推理",
+    "大语言模型",
+    "对抗基准",
+    "GSM8K",
+    "提示工程"
+   ],
+   "field": "大语言模型评估与鲁棒性",
+   "innovations": [
+    "基于Polya原则设计8种数学扰动的GSM-PLUS基准",
+    "提出PDR和ASP指标系统量化LLM数学推理鲁棒性",
+    "组合式提示CoMP通过迭代生成与验证提升鲁棒性"
+   ],
+   "benchmarks": [
+    "GSM-PLUS",
+    "GSM8K"
+   ]
+  }
+ }
 }

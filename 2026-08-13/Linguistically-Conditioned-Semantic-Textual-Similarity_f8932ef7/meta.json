@@ -4,5 +4,30 @@
  "title": "Linguistically-Conditioned-Semantic-Textual-Similarity",
  "token": "sk-JMLCbBCEj...",
  "created_at": "2026-08-13 05:40:33",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2969d40c-57c8-48a7-85da-e69e84c92c8b.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2969d40c-57c8-48a7-85da-e69e84c92c8b.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 11:43:39",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Conditional Semantic Textual Similarity",
+    "C-STS",
+    "Question Answering",
+    "Typed Feature Structure",
+    "Annotation Error Identification",
+    "SimCSE",
+    "Semantic Similarity"
+   ],
+   "field": "条件语义相似度",
+   "innovations": [
+    "基于QA答案的C-STS错误自动识别管道（F1>80%）",
+    "将C-STS解耦为答案生成与答案相似度学习两步训练方法",
+    "引入类型特征结构（TFS）为条件性提供语言学注解规范"
+   ],
+   "benchmarks": [
+    "C-STS validation set"
+   ]
+  }
+ }
 }
