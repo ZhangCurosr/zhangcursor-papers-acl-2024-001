@@ -4,5 +4,33 @@
  "title": "ANALOGYKB-Unlocking-Analogical-Reasoning-of-Language-Models",
  "token": "sk-sKVjU65N5...",
  "created_at": "2026-08-13 05:40:08",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3bed1cba-931c-434c-8568-df4dde2674b7.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3bed1cba-931c-434c-8568-df4dde2674b7.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:05:32",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "类比推理",
+    "知识图谱",
+    "大规模知识库",
+    "大语言模型",
+    "类比生成"
+   ],
+   "field": "类比推理与知识表示",
+   "innovations": [
+    "首个百万级类比知识库 ANALOGYKB，包含同关系与相似关系两类类比",
+    "LLM驱动的隐式相似关系发现框架，结合对称性与元关系概括双重规则过滤"
+   ],
+   "benchmarks": [
+    "E-KAR",
+    "BATS",
+    "UNIT 2",
+    "UNIT 4",
+    "Google",
+    "SAT",
+    "SCAN"
+   ]
+  }
+ }
 }

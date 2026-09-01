@@ -4,5 +4,31 @@
  "title": "IMBUE-Improving-Interpersonal-Effectiveness-through-Simulati",
  "token": "sk-nY8L7ieIq...",
  "created_at": "2026-08-13 05:39:51",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/dbcf979b-38fa-4d4a-9ff9-aeee04ae10a5.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/dbcf979b-38fa-4d4a-9ff9-aeee04ae10a5.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:10:40",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "DEAR MAN",
+    "interpersonal effectiveness",
+    "just-in-time feedback",
+    "DBT",
+    "language model simulation",
+    "skill evaluation",
+    "emotion regulation"
+   ],
+   "field": "人机交互与计算社会科学",
+   "innovations": [
+    "融合对比示例+kNN检索+推理+评分标准的四组件协同prompt策略，技能评分F1较GPT-4提升24.8%",
+    "首个同时训练沟通技能和情绪管理的LM交互系统，86人RCT验证技能掌握提升17.6%且可迁移至新情境"
+   ],
+   "benchmarks": [
+    "Expert-annotated DEAR MAN dataset (18 conversations, 163 utterances)",
+    "Macro F1 skill rating",
+    "Human similarity evaluation (83% vs experts)"
+   ]
+  }
+ }
 }

@@ -4,5 +4,36 @@
  "title": "Expedited-Training-of-Visual-Conditioned-Language-Generation",
  "token": "sk-owp49a3rO...",
  "created_at": "2026-08-13 04:50:00",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2bdeba36-1d59-466d-92d9-48b7fac72f26.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2bdeba36-1d59-466d-92d9-48b7fac72f26.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:07:28",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "视觉-语言模型",
+    "Token Merging",
+    "单阶段训练",
+    "视频理解",
+    "BLIP-2",
+    "高效预训练"
+   ],
+   "field": "多模态表示学习",
+   "innovations": [
+    "提出TomeFormer替代Q-former实现单阶段单损失训练",
+    "将Token Merging从推理加速引入训练中的语义压缩",
+    "设计时序软Token上下文化模块实现图像模型到视频的无缝迁移"
+   ],
+   "benchmarks": [
+    "VQAv2",
+    "GQA",
+    "OK-VQA",
+    "MSCOCO Captioning",
+    "NoCaps",
+    "Flickr30K",
+    "MSR-VTT",
+    "MSVD"
+   ]
+  }
+ }
 }

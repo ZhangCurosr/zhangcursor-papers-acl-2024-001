@@ -4,5 +4,34 @@
  "title": "Democratizing-LLMs-for-Low-Resource-Languages-by-Leveraging",
  "token": "sk-dD4E81LFV...",
  "created_at": "2026-08-13 05:41:15",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ffe5dbe5-9382-44e6-bc8f-4031770d6359.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ffe5dbe5-9382-44e6-bc8f-4031770d6359.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:06:05",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "低资源语言",
+    "语言多样性提示",
+    "不监督翻译",
+    "多语言 LLM",
+    "in-context learning",
+    "英语中转"
+   ],
+   "field": "多语言自然语言处理",
+   "innovations": [
+    "提出 LDP 方法，利用多种高资源语言合成示例激活 LLM 在低资源语言上的生成能力",
+    "设计 X→En/En→X/X→Y 三种翻译变体，无需监督数据即可达到或超越监督少样本效果",
+    "揭示英语语言标签对低资源语言的负面影响并提出 Native-tag/无标签替代方案"
+   ],
+   "benchmarks": [
+    "ROOTS corpus",
+    "FLoRes-200",
+    "XLSum",
+    "XQuAD",
+    "TydiQA",
+    "Sea-Bench"
+   ]
+  }
+ }
 }

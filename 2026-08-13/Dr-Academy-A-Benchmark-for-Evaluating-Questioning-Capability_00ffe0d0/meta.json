@@ -4,5 +4,29 @@
  "title": "Dr-Academy-A-Benchmark-for-Evaluating-Questioning-Capability",
  "token": "sk-wGl2gwQjA...",
  "created_at": "2026-08-13 05:41:05",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/755c232a-708a-4d55-869f-854d217a6aa3.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/755c232a-708a-4d55-869f-854d217a6aa3.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:05:47",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "教育评估",
+    "问题生成",
+    "大语言模型",
+    "基准测试",
+    "布鲁姆分类法",
+    "LLM-as-a-Judge"
+   ],
+   "field": "教育NLP / LLM教育应用",
+   "innovations": [
+    "提出首个基于教育分类法评估LLM教师提问能力的基准Dr.Academy",
+    "建立一致性/相关性/覆盖度/代表性四指标教育问题自动评估体系",
+    "揭示GPT-4与Claude2在通用/单学科与跨学科领域的能力分化格局"
+   ],
+   "benchmarks": [
+    "Dr.Academy"
+   ]
+  }
+ }
 }

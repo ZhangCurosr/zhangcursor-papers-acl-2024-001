@@ -4,5 +4,31 @@
  "title": "Improving-Event-Definition-Following-For-Zero-Shot-Event-Det",
  "token": "sk-wGl2gwQjA...",
  "created_at": "2026-08-13 05:41:14",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2e64d1af-eee1-455b-b25e-47a13c051d3b.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2e64d1af-eee1-455b-b25e-47a13c051d3b.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:11:17",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "zero-shot event detection",
+    "event definition following",
+    "DivED dataset",
+    "event ontology",
+    "hard-negative samples",
+    "instruction tuning"
+   ],
+   "field": "低资源信息抽取",
+   "innovations": [
+    "提出DivED数据集，强调事件类型和定义多样性提升零样本事件检测性能",
+    "系统分析数据成分影响，发现200事件类型和10条定义为最优配置",
+    "结合事件本体论与难负样本，微调的LLaMA-2-7B超越GPT-3.5"
+   ],
+   "benchmarks": [
+    "ACE",
+    "M2E2",
+    "MEE"
+   ]
+  }
+ }
 }

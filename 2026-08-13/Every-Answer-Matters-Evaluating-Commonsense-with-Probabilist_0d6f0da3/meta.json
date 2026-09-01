@@ -4,5 +4,31 @@
  "title": "Every-Answer-Matters-Evaluating-Commonsense-with-Probabilist",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 05:41:20",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/82daad57-a1e4-4baf-b168-3aafd8e17424.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/82daad57-a1e4-4baf-b168-3aafd8e17424.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:07:23",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "commonsense evaluation",
+    "probabilistic metrics",
+    "open-ended generation",
+    "KL divergence",
+    "CFC task",
+    "PROBEVAL",
+    "large language models"
+   ],
+   "field": "常识推理与大语言模型评估",
+   "innovations": [
+    "提出CFC生成式常识任务，以AMR隐式槽位补全替代MCQA",
+    "设计PROBEVAL概率评估器，用KL散度衡量模型与人类答案分布的对齐度",
+    "构建经统计保证的多元答案数据集，揭示LLM与人类常识能力的显著差距"
+   ],
+   "benchmarks": [
+    "CFC",
+    "ProtoQA"
+   ]
+  }
+ }
 }

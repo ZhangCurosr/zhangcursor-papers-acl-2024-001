@@ -4,5 +4,33 @@
  "title": "InstructProtein-Aligning-Human-and-Protein-Language-via-Know",
  "token": "sk-JMLCbBCEj...",
  "created_at": "2026-08-13 05:40:39",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a861bb5a-0f37-459a-be1e-e6d82a042103.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a861bb5a-0f37-459a-be1e-e6d82a042103.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:13:23",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "蛋白质语言模型",
+    "指令调优",
+    "知识图谱",
+    "蛋白质序列设计",
+    "多模态大模型",
+    "知识因果建模"
+   ],
+   "field": "科学大模型",
+   "innovations": [
+    "提出首个蛋白质-人类语言双向生成的大模型InstructProtein",
+    "基于知识图谱和因果建模自动生成高质量蛋白质指令数据集",
+    "提出去偏采样策略解决蛋白质功能注释的标注不平衡问题"
+   ],
+   "benchmarks": [
+    "GO-BP/MF/CC",
+    "DeepLoc亚细胞定位",
+    "Metal Ion Binding Prediction",
+    "SCOPe结构分类",
+    "Instruction-Protein Pairing"
+   ]
+  }
+ }
 }

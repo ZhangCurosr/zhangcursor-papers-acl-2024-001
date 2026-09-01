@@ -4,5 +4,30 @@
  "title": "Inference-to-the-Best-Explanation-in-Large-Language-Models",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 05:41:18",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3fb1b1b7-ea43-4ff7-827e-b0a9e11733a9.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3fb1b1b7-ea43-4ff7-827e-b0a9e11733a9.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:11:35",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Inference to the Best Explanation",
+    "LLM explanation evaluation",
+    "neuro-symbolic reasoning",
+    "causal QA",
+    "explainable AI",
+    "automatic explanation verification"
+   ],
+   "field": "可解释大语言模型",
+   "innovations": [
+    "首个将哲学IBE理论转化为可自动计算特征(一致性/简约性/连贯性/不确定性)的LLM解释评估框架",
+    "IBE-Eval在CQA任务上最高达77%准确率，超越GPT-3.5-as-a-Judge 17pp并与人类判断显著相关",
+    "揭示语言不确定性是解释质量最强预测因子，证明LLM能自洽地为错误答案生成一致解释"
+   ],
+   "benchmarks": [
+    "COPA",
+    "E-CARE"
+   ]
+  }
+ }
 }

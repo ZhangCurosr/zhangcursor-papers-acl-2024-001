@@ -4,5 +4,10 @@
  "title": "Evaluating-Intention-Detection-Capability-of-Large-Language",
  "token": "sk-aknYEUs8O...",
  "created_at": "2026-08-13 05:40:42",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/c1a8c660-a536-4767-9f5a-5260b136e012.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/c1a8c660-a536-4767-9f5a-5260b136e012.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:07:22",
+  "chunks": 1
+ }
 }

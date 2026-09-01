@@ -4,5 +4,32 @@
  "title": "FOFO-A-Benchmark-to-Evaluate-LLMs-Format-Following-Capabilit",
  "token": "sk-zybFjYcVd...",
  "created_at": "2026-08-13 05:39:49",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/1fc40195-185e-4268-898b-7ee76e172b06.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/1fc40195-185e-4268-898b-7ee76e172b06.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:08:57",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "format-following",
+    "LLM evaluation",
+    "benchmark",
+    "instruction-following",
+    "AI agent",
+    "format compliance"
+   ],
+   "field": "大语言模型评估与基准测试",
+   "innovations": [
+    "首个将指令遵循解耦为内容遵循与格式遵循的独立评估基准",
+    "AI-人类协作的三阶段复杂领域格式数据集构建方法",
+    "揭示格式遵循能力与内容生成质量相互独立及开源-闭源模型差距"
+   ],
+   "benchmarks": [
+    "FOFO",
+    "AlpacaEval",
+    "MT-Bench",
+    "IfEval"
+   ]
+  }
+ }
 }

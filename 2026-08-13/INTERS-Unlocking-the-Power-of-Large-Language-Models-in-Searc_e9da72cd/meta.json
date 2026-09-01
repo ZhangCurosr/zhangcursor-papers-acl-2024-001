@@ -4,5 +4,37 @@
  "title": "INTERS-Unlocking-the-Power-of-Large-Language-Models-in-Searc",
  "token": "sk-wGl2gwQjA...",
  "created_at": "2026-08-13 05:41:16",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/67aba7db-63b4-4d34-9e42-a326c32d646c.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/67aba7db-63b4-4d34-9e42-a326c32d646c.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:16:22",
+  "chunks": 4,
+  "meta": {
+   "keywords": [
+    "查询理解",
+    "大语言模型微调",
+    "信息检索",
+    "多任务学习",
+    "INTERS",
+    "LLaMA-2"
+   ],
+   "field": "搜索引擎中的大语言模型应用",
+   "innovations": [
+    "提出INTERS统一数据集，整合查询理解、文档理解与查询-文档关系理解三大模块",
+    "通过消融实验揭示Document Understanding对Conversational QA和Reading Comprehension的关键作用",
+    "验证50%数据即可接近全量微调效果，提供低资源场景下的训练效率参考"
+   ],
+   "benchmarks": [
+    "FEVER",
+    "MS-MARCO",
+    "SQuAD",
+    "HotpotQA",
+    "CoQA",
+    "QuAC",
+    "CNN/DM",
+    "TREC-COVID",
+    "NFCorpus"
+   ]
+  }
+ }
 }

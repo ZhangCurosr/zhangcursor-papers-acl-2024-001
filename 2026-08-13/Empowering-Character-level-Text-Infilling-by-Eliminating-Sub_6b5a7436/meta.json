@@ -4,5 +4,31 @@
  "title": "Empowering-Character-level-Text-Infilling-by-Eliminating-Sub",
  "token": "sk-dD4E81LFV...",
  "created_at": "2026-08-13 05:41:09",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/640006f4-9411-4ee2-b6e5-e38e66f51ff7.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/640006f4-9411-4ee2-b6e5-e38e66f51ff7.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:06:08",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Fill-in-the-Middle",
+    "code completion",
+    "sub-token",
+    "character-level infilling",
+    "decoder-only model",
+    "pre-training"
+   ],
+   "field": "代码语言模型预训练",
+   "innovations": [
+    "提出FIM-SE方法，通过L-Prefix/F-Suffix约束消除推理阶段的子token预测",
+    "将字符级随机跨度填充转化为多行级填充，统一不同粒度任务的训练范式"
+   ],
+   "benchmarks": [
+    "Humaneval random-span",
+    "Humaneval single-line",
+    "Humaneval multi-line",
+    "MBPP"
+   ]
+  }
+ }
 }

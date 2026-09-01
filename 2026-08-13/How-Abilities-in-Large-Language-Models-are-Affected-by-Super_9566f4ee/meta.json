@@ -4,5 +4,33 @@
  "title": "How-Abilities-in-Large-Language-Models-are-Affected-by-Super",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 05:41:17",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/4788cafc-496b-431a-941c-45a2ce63fdc3.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/4788cafc-496b-431a-941c-45a2ce63fdc3.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:09:56",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Supervised Fine-Tuning",
+    "Multi-ability Scaling",
+    "Catastrophic Forgetting",
+    "Data Composition",
+    "DMT Strategy",
+    "LLaMA"
+   ],
+   "field": "大语言模型微调与多能力协同",
+   "innovations": [
+    "揭示数学/代码/通用能力在SFT阶段的差异化缩放模式与低资源增益/高资源冲突现象",
+    "提出双阶段混合微调DMT策略，以微量专项数据在通用训练阶段防止灾难性遗忘",
+    "实证证明数据量比数据比例更关键，且分布重叠是导致能力冲突的根本原因"
+   ],
+   "benchmarks": [
+    "GSM8K",
+    "HumanEval",
+    "MT-Bench",
+    "MATH",
+    "MBPP"
+   ]
+  }
+ }
 }

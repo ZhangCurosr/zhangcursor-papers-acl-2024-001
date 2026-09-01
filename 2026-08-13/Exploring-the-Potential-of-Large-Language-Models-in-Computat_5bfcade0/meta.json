@@ -4,5 +4,35 @@
  "title": "Exploring-the-Potential-of-Large-Language-Models-in-Computat",
  "token": "sk-1jVZGxTQ1...",
  "created_at": "2026-08-13 05:40:52",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3ba7f903-2d33-4fbd-a4fe-e96e974ec7fa.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3ba7f903-2d33-4fbd-a4fe-e96e974ec7fa.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:09:25",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "计算论证",
+    "大语言模型",
+    "论点挖掘",
+    "论点生成",
+    "零样本评估",
+    "反诘生成",
+    "Benchmark"
+   ],
+   "field": "计算论证与大模型评估",
+   "innovations": [
+    "首次系统评估LLM在计算论证14个数据集上的零/少样本性能",
+    "提出端到端counter speech生成新基准及三种生成范式",
+    "揭示ROUGE与BERTScore在论证生成评估中的系统性偏差"
+   ],
+   "benchmarks": [
+    "IAM Claims/Evidence/Stance",
+    "IBM Claims/Evidence/Stance/Type",
+    "FEVER",
+    "CounterArguGen",
+    "ConcluGen",
+    "DebateSum"
+   ]
+  }
+ }
 }

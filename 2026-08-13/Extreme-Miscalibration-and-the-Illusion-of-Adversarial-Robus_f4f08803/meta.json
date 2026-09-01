@@ -4,5 +4,35 @@
  "title": "Extreme-Miscalibration-and-the-Illusion-of-Adversarial-Robus",
  "token": "sk-1jVZGxTQ1...",
  "created_at": "2026-08-13 05:40:54",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ffa99b97-7678-4a00-9808-9130f7e2bd68.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ffa99b97-7678-4a00-9808-9130f7e2bd68.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:08:23",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "adversarial robustness",
+    "model calibration",
+    "temperature scaling",
+    "illusion of robustness",
+    "gradient obfuscation",
+    "adversarial training",
+    "NLP security"
+   ],
+   "field": "自然语言处理安全与鲁棒性",
+   "innovations": [
+    "首次系统揭示NLP对抗训练中的鲁棒性幻觉现象及其成因",
+    "提出测试时温度校准方法戳破对抗鲁棒性幻觉",
+    "证明训练时高温度可提升对未见攻击的真实对抗鲁棒性"
+   ],
+   "benchmarks": [
+    "Rotten Tomatoes",
+    "Twitter Emotions",
+    "AGNews",
+    "CoLA",
+    "QNLI",
+    "MRPC"
+   ]
+  }
+ }
 }

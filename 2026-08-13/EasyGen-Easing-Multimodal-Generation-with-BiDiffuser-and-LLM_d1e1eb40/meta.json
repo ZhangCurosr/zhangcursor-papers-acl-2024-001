@@ -4,5 +4,36 @@
  "title": "EasyGen-Easing-Multimodal-Generation-with-BiDiffuser-and-LLM",
  "token": "sk-sKVjU65N5...",
  "created_at": "2026-08-13 05:40:11",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/b87b52c0-78f8-43a3-9633-8043ef30e80d.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/b87b52c0-78f8-43a3-9633-8043ef30e80d.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:05:54",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "多模态生成",
+    "扩散模型",
+    "大型语言模型",
+    "图像到文本",
+    "文本到图像",
+    "BiDiffuser",
+    "SUR适配器"
+   ],
+   "field": "多模态大模型",
+   "innovations": [
+    "提出BiDiffuser双向条件扩散模型，解决UniDiffuser任务冲突问题",
+    "设计SUR增强适配器将LLM语义知识注入扩散模型提升图像生成质量",
+    "提出Pre-Align/Mid-Align双轨对齐机制实现高效的端到端多模态生成"
+   ],
+   "benchmarks": [
+    "MS-COCO",
+    "NoCaps",
+    "OK-VQA",
+    "GQA",
+    "PhotoChat",
+    "VQAv2",
+    "MBBench"
+   ]
+  }
+ }
 }

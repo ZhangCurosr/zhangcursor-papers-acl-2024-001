@@ -4,5 +4,29 @@
  "title": "Collaboration-or-Corporate-Capture-Quantifying-NLP-s-Relianc",
  "token": "sk-dD4E81LFV...",
  "created_at": "2026-08-13 05:41:13",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/9ae6a9d6-1bf3-4835-8e96-b39ecdbea874.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/9ae6a9d6-1bf3-4835-8e96-b39ecdbea874.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:05:17",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "工业界依赖",
+    "NLP 调研",
+    "企业捕获",
+    "引用分析",
+    "SOTA 评估"
+   ],
+   "field": "NLP 研究生态与 bibliometrics",
+   "innovations": [
+    "系统性量化 EMNLP 2022 对工业界 artifacts 的依赖远超发表比例",
+    "揭示学术界与工业界在相对 SOTA 提升幅度上的显著差距",
+    "提出 NLP 会议透明化与算力公平的具体出版政策建议"
+   ],
+   "benchmarks": [
+    "EMNLP 2022",
+    "ACL Anthology 统计基线"
+   ]
+  }
+ }
 }

@@ -4,5 +4,27 @@
  "title": "IBSEN-Director-Actor-Agent-Collaboration-for-Controllable-an",
  "token": "sk-mBuyDYvkR...",
  "created_at": "2026-08-13 05:40:23",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/bc323c76-8515-4f03-95de-6f73959e081c.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/bc323c76-8515-4f03-95de-6f73959e081c.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:10:16",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "多智能体系统",
+    "可控文本生成",
+    "角色扮演",
+    "戏剧剧本生成",
+    "大语言模型应用"
+   ],
+   "field": "多智能体协作与交互生成",
+   "innovations": [
+    "提出导演-演员代理协作框架实现可控戏剧生成",
+    "支持人类玩家动态介入的剧情自适应机制"
+   ],
+   "benchmarks": [
+    "自定义改编戏剧场景"
+   ]
+  }
+ }
 }

@@ -4,5 +4,29 @@
  "title": "GrowOVER-How-Can-LLMs-Adapt-to-Growing-Real-World-Knowledge",
  "token": "sk-dD4E81LFV...",
  "created_at": "2026-08-13 05:41:11",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/0b14be59-2e47-4fe8-9897-419a1f786c7e.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/0b14be59-2e47-4fe8-9897-419a1f786c7e.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:09:44",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Retrieval-Augmented Generation",
+    "Dynamic Benchmark",
+    "Continual Knowledge",
+    "Language Model Adaptation",
+    "Open-Domain Dialogue"
+   ],
+   "field": "检索增强生成与动态知识评估",
+   "innovations": [
+    "提出含证据文本与三态标签的月度动态基准GrowOVER，支持自动化维护",
+    "设计免训练的RiLM框架，通过确定性分类器与加权自适应重检索实现知识自适应",
+    "在无参数更新条件下性能匹敌或超越每月持续预训练的RaLM-CP"
+   ],
+   "benchmarks": [
+    "GrowOVER-QA",
+    "GrowOVER-Dialogue"
+   ]
+  }
+ }
 }

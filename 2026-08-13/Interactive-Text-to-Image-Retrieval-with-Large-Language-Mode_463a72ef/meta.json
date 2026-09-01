@@ -4,5 +4,30 @@
  "title": "Interactive-Text-to-Image-Retrieval-with-Large-Language-Mode",
  "token": "sk-nY8L7ieIq...",
  "created_at": "2026-08-13 05:39:50",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/fa5d11ca-193a-4d7a-a1ff-708865250d53.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/fa5d11ca-193a-4d7a-a1ff-708865250d53.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:12:09",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "交互式图像检索",
+    "Vision-Language模型",
+    "大语言模型",
+    "即插即用方法",
+    "多轮对话检索"
+   ],
+   "field": "多模态交互检索",
+   "innovations": [
+    "利用LLM将对话上下文重构为caption风格以实现零样本黑盒兼容",
+    "将检索候选图像信息注入LLM提问器并基于KL散度筛选非冗余问题",
+    "提出BRI指标统一评估用户满意度、效率和排名提升显著性"
+   ],
+   "benchmarks": [
+    "VisDial",
+    "COCO",
+    "Flickr30k"
+   ]
+  }
+ }
 }

@@ -4,5 +4,31 @@
  "title": "AUTOACT-Automatic-Agent-Learning-from-Scratch-for-QA-via-Sel",
  "token": "sk-wGl2gwQjA...",
  "created_at": "2026-08-13 05:41:04",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a7f5c0bf-3270-4fec-b258-d5e17a7812ce.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a7f5c0bf-3270-4fec-b258-d5e17a7812ce.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:05:17",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Agent Learning",
+    "Self-Planning",
+    "Multi-Agent",
+    "Parameter-Efficient Fine-tuning",
+    "Question Answering",
+    "Division-of-Labor",
+    "Open-source LLM"
+   ],
+   "field": "多智能体系统与LLM微调",
+   "innovations": [
+    "从 scratch 自合成轨迹并自动化生成规划数据，摆脱对闭源模型与人工标注的依赖",
+    "基于分工策略将 META-AGENT 细分为 Plan/Tool/Reflect 三个专项子智能体并独立 LoRA 微调",
+    "群体协同推理架构，通过解耦任务分解、参数生成与结果校验显著提升复杂 QA 性能"
+   ],
+   "benchmarks": [
+    "HotpotQA",
+    "ScienceQA"
+   ]
+  }
+ }
 }

@@ -4,5 +4,31 @@
  "title": "Does-DETECTGPT-Fully-Utilize-Perturbation-Bridging-Selective",
  "token": "sk-dY4OBV5wM...",
  "created_at": "2026-08-13 05:40:34",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/365a2340-9242-43c4-b208-649b2aaacdab.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/365a2340-9242-43c4-b208-649b2aaacdab.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:05:37",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "机器生成文本检测",
+    "对比学习",
+    "选择性扰动",
+    "few-shot学习",
+    "DetectGPT"
+   ],
+   "field": "机器学习生成文本检测",
+   "innovations": [
+    "基于YAKE的token级选择性扰动策略，保护关键token减少噪声",
+    "用多对对比学习桥接度量方法与微调方法，摆脱阈值依赖",
+    "Token级加权特征重构，复用扰动阶段的重要性权重到对比学习中"
+   ],
+   "benchmarks": [
+    "Grover",
+    "GPT-2",
+    "GPT-3.5",
+    "HC3"
+   ]
+  }
+ }
 }

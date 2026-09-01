@@ -4,5 +4,34 @@
  "title": "IMO-Greedy-Layer-Wise-Sparse-Representation-Learning-for-Out",
  "token": "sk-1jVZGxTQ1...",
  "created_at": "2026-08-13 05:40:55",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f6164fca-445d-4423-a0b5-b6b5d906f111.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f6164fca-445d-4423-a0b5-b6b5d906f111.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:10:58",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "域泛化",
+    "分布外泛化",
+    "稀疏表示",
+    "不变特征",
+    "文本分类",
+    "预训练语言模型",
+    "因果表示学习"
+   ],
+   "field": "自然语言处理-域泛化",
+   "innovations": [
+    "提出自上而下贪心逐层稀疏掩码学习方法IMO，有效筛选领域不变特征",
+    "建立稀疏正则损失与因果特征选择之间的理论联系",
+    "在单源域泛化设定下，小参数模型（BART）超越CHATGPT等大模型"
+   ],
+   "benchmarks": [
+    "IMDB→Amazon/Yelp/TweetEval",
+    "Amazon→IMDB/Yelp/TweetEval",
+    "Yelp→IMDB/Amazon/TweetEval",
+    "AG News Title↔Description",
+    "SocialDial Synthetic→Human"
+   ]
+  }
+ }
 }

@@ -4,5 +4,32 @@
  "title": "Hyper-CL-Conditioning-Sentence-Representations-with-Hypernet",
  "token": "sk-zybFjYcVd...",
  "created_at": "2026-08-13 05:39:50",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/600f2b16-bd5c-4fd1-9365-5091beeb2718.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/600f2b16-bd5c-4fd1-9365-5091beeb2718.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 07:10:12",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "句子表征",
+    "条件化语义相似度",
+    "对比学习",
+    "超网络",
+    "知识图谱补全",
+    "tri-encoder",
+    "条件嵌入"
+   ],
+   "field": "句子表征与条件化语义学习",
+   "innovations": [
+    "用超网络动态生成条件投影矩阵，将句子嵌入映射到条件子空间，在保持tri-encoder缓存效率的同时增强条件交互表达能力",
+    "在条件子空间中联合高温度InfoNCE对比损失与细粒度MSE损失进行训练，提升条件化相似度判别力",
+    "提出低秩超网络分解与投影矩阵缓存机制，平衡参数量、表达力与推理效率"
+   ],
+   "benchmarks": [
+    "C-STS",
+    "WN18RR",
+    "FB15k-237"
+   ]
+  }
+ }
 }
