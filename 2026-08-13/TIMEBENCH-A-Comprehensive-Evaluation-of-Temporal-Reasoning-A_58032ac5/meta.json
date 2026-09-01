@@ -4,5 +4,35 @@
  "title": "TIMEBENCH-A-Comprehensive-Evaluation-of-Temporal-Reasoning-A",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 03:49:58",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ed6d13e0-9bbd-404d-9c54-5e330b168c5f.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ed6d13e0-9bbd-404d-9c54-5e330b168c5f.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:54:17",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "时间推理",
+    "大语言模型",
+    "基准测试",
+    "Chain-of-Thought",
+    "时序常识",
+    "事件时间关系"
+   ],
+   "field": "时间推理与大语言模型评估",
+   "innovations": [
+    "提出TIMEBENCH分层基准：从符号→常识→事件三层级全面评估LLM时间推理能力，涵盖10个任务16个子任务",
+    "发现CoT提示对时间推理并非普遍有效，零样本CoT导致平均7.4%下降，少样本在知识敏感任务下降15.2%",
+    "首次揭示SFT/RLHF对齐过程会显著损害开源模型的时间推理能力（最高下降22%）"
+   ],
+   "benchmarks": [
+    "TIMEBENCH",
+    "TimeX NLI",
+    "MCTACO",
+    "TimeQA",
+    "TempReason",
+    "MenatQA",
+    "TRACIE"
+   ]
+  }
+ }
 }

@@ -4,5 +4,32 @@
  "title": "VARIERR-NLI-Separating-Annotation-Error-from-Human-Label-Var",
  "token": "sk-7NOZt17oN...",
  "created_at": "2026-08-13 03:39:04",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f431a09b-2fcc-4f88-8389-20e0ea84d1e1.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f431a09b-2fcc-4f88-8389-20e0ea84d1e1.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:56:30",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "annotation error",
+    "human label variation",
+    "NLI",
+    "automatic error detection",
+    "data quality",
+    "LLM",
+    "ecologically valid explanation"
+   ],
+   "field": "数据质量与标注误差检测",
+   "innovations": [
+    "提出双轮标注方法分离NLI中的标注错误与合理人类标签变异",
+    "构建首个同时包含合理变异与已验证错误的多标注者NLI数据集VARIERR",
+    "证明GPT-4在区分错误与变异上优于传统AED方法但仍不及人类专家"
+   ],
+   "benchmarks": [
+    "VARIERR",
+    "ChaosNLI",
+    "MNLI"
+   ]
+  }
+ }
 }

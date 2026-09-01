@@ -4,5 +4,31 @@
  "title": "MEFT-Memory-Efficient-Fine-Tuning-through-Sparse-Adapter",
  "token": "sk-1jVZGxTQ1...",
  "created_at": "2026-08-13 05:40:52",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/adb95b35-471a-4917-8618-143092046fb2.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/adb95b35-471a-4917-8618-143092046fb2.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:53:41",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "参数高效微调",
+    "稀疏激活",
+    "CPU-GPU协同训练",
+    "Mixture of Experts",
+    "知识密集型任务"
+   ],
+   "field": "大语言模型高效微调",
+   "innovations": [
+    "利用FFN激活稀疏性将大规模Adapter参数存于CPU并动态加载至GPU",
+    "Key-Experts机制通过路由降低CPU检索复杂度至O(dM√r)",
+    "在24GB单卡上以10%参数实现接近Full Fine-tuning的知识密集型任务性能"
+   ],
+   "benchmarks": [
+    "Natural Questions",
+    "SQuAD",
+    "ToolBench",
+    "GSM8K"
+   ]
+  }
+ }
 }

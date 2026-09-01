@@ -4,5 +4,33 @@
  "title": "UNICODER-Scaling-Code-Large-Language-Model-via-Universal-Cod",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 03:38:59",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3c5d4e8e-44f4-4f03-a3b2-f32576672dcc.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3c5d4e8e-44f4-4f03-a3b2-f32576672dcc.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:55:42",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "代码生成",
+    "通用代码",
+    "伪代码",
+    "链式推理",
+    "多语言代码理解",
+    "指令微调",
+    "中间表示"
+   ],
+   "field": "代码大语言模型",
+   "innovations": [
+    "提出通用代码(UniCode)作为PL-agnostic的中间表示，桥接自然语言与多语言代码",
+    "构建四目标联合微调框架(QA/QP/PA/UoT)以充分利用通用代码中间表示",
+    "设计UNICODER-INSTRUCT(约140K样本)与UNICODER-BENCH评测基准"
+   ],
+   "benchmarks": [
+    "HumanEval",
+    "MBPP",
+    "MultiPL-E",
+    "UNICODER-BENCH"
+   ]
+  }
+ }
 }

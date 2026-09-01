@@ -4,5 +4,32 @@
  "title": "The-BELEBELE-Benchmark-a-Parallel-Reading-Comprehension-Data",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 03:49:35",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/bac05de0-fb66-4a10-8405-3ea1414fe540.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/bac05de0-fb66-4a10-8405-3ea1414fe540.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:54:45",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "多语言阅读理解",
+    "Machine Reading Comprehension",
+    "跨语言评估",
+    "LLM多语言能力",
+    "BELEBELE",
+    "low-resource NLP"
+   ],
+   "field": "多语言自然语言理解",
+   "innovations": [
+    "首个覆盖122种语言变体的并行多项选择题阅读理解数据集",
+    "提出基于词法重叠统计检验与捷径模型过滤的MCQ质量保证流程"
+   ],
+   "benchmarks": [
+    "BELEBELE",
+    "FLORES-200",
+    "XNLI",
+    "MLQA",
+    "XQUAD"
+   ]
+  }
+ }
 }

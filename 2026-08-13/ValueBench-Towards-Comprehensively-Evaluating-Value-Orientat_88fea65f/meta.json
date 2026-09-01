@@ -4,5 +4,29 @@
  "title": "ValueBench-Towards-Comprehensively-Evaluating-Value-Orientat",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 03:38:59",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ad36cba5-b817-430d-9447-748769d3398e.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ad36cba5-b817-430d-9447-748769d3398e.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:56:39",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "大语言模型",
+    "价值取向评估",
+    "心理测量学基准",
+    "价值理解",
+    "人机交互评估",
+    "LLM对齐"
+   ],
+   "field": "大语言模型评估与对齐",
+   "innovations": [
+    "首个综合心理测量学价值基准，覆盖44个量表453个价值维度",
+    "基于真实人机交互改写流程评估LLM价值取向，规避Likert自评缺陷",
+    "开放层级价值空间中评估LLM价值理解能力（识别关系/提取/生成）"
+   ],
+   "benchmarks": [
+    "ValueBench"
+   ]
+  }
+ }
 }

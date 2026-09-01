@@ -4,5 +4,32 @@
  "title": "TTM-RE-Memory-Augmented-Document-Level-Relation-Extraction",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 07:10:27",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a55c995a-4b7d-4064-81e3-10337b8f5a3b.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/a55c995a-4b7d-4064-81e3-10337b8f5a3b.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:54:26",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "document-level relation extraction",
+    "memory-augmented model",
+    "Token Turing Machine",
+    "positive-unlabeled learning",
+    "distant supervision",
+    "noise-robust training",
+    "ReDocRED",
+    "long-tail relation"
+   ],
+   "field": "文档级关系抽取与弱监督学习",
+   "innovations": [
+    "首个将Token Turing Machine记忆模块应用于文档级关系抽取的架构",
+    "记忆模块与SSR-PU噪声鲁棒损失联合优化以充分利用远距离监督数据",
+    "在极端低标注(19%)+远距离监督场景下超越SOTA 12个F1点"
+   ],
+   "benchmarks": [
+    "ReDocRED",
+    "ChemDisGene"
+   ]
+  }
+ }
 }

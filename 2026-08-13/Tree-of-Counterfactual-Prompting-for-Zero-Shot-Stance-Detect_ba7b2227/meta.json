@@ -4,5 +4,31 @@
  "title": "Tree-of-Counterfactual-Prompting-for-Zero-Shot-Stance-Detect",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 03:49:36",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/bc8d1416-b1ed-46d5-9f94-ecb21433825e.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/bc8d1416-b1ed-46d5-9f94-ecb21433825e.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:55:17",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "stance detection",
+    "zero-shot",
+    "counterfactual reasoning",
+    "prompting",
+    "multimodal",
+    "large language model"
+   ],
+   "field": "零样本立场检测与多模态推理",
+   "innovations": [
+    "首次提出无需任何标注示例的 TR-ZSSD 任务与 ToC 提示框架",
+    "通过显式枚举并接受/拒绝/无立场三种反事实假设的解释与对比验证实现可解释立场推断",
+    "将立场检测从分类范式重新定义为基于反事实推理的可解释生成任务"
+   ],
+   "benchmarks": [
+    "SemEval-2016 Task 6 A",
+    "COVAXFRAMES",
+    "MMVAX-STANCE"
+   ]
+  }
+ }
 }

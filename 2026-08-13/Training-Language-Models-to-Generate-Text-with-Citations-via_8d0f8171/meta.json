@@ -4,5 +4,33 @@
  "title": "Training-Language-Models-to-Generate-Text-with-Citations-via",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 03:50:04",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/773b1fdf-cebc-49b9-b68b-f184925f0e2b.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/773b1fdf-cebc-49b9-b68b-f184925f0e2b.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:55:06",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "可归属生成",
+    "细粒度奖励",
+    "拒绝采样",
+    "强化学习",
+    "引用生成",
+    "大语言模型"
+   ],
+   "field": "可信自然语言生成",
+   "innovations": [
+    "首次提出三项细粒度奖励（正确性、引用召回、引用精确）联合训练框架",
+    "将句子级束搜索与细粒度奖励结合用于拒绝采样",
+    "证明小模型经细粒度奖励训练后可超越ChatGPT"
+   ],
+   "benchmarks": [
+    "ALCE",
+    "ASQA",
+    "QAMPARI",
+    "ELI5",
+    "EXPERTQA"
+   ]
+  }
+ }
 }

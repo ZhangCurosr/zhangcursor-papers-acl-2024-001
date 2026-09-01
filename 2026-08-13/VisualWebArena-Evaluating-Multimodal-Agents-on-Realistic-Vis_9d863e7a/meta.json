@@ -4,5 +4,32 @@
  "title": "VisualWebArena-Evaluating-Multimodal-Agents-on-Realistic-Vis",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 03:49:37",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/43415100-1fd9-4e5e-8c2b-ad6b4a456206.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/43415100-1fd9-4e5e-8c2b-ad6b4a456206.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:56:51",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "多模态Agent",
+    "网页交互",
+    "视觉 grounding",
+    "VisualWebArena",
+    "Set-of-Marks",
+    "大语言模型",
+    "视觉语言模型"
+   ],
+   "field": "多模态智能体与网页交互",
+   "innovations": [
+    "提出 VisualWebArena benchmark，包含 910 个真实视觉化网页任务",
+    "引入 SoM (Set-of-Marks) 视觉表示方法，简化 VLM Agent 的动作空间",
+    "建立执行级视觉评估体系，包括 eval_vqa 和 eval_fuzzy_image_match 等新型奖励函数"
+   ],
+   "benchmarks": [
+    "VisualWebArena",
+    "WebArena",
+    "WebShop"
+   ]
+  }
+ }
 }

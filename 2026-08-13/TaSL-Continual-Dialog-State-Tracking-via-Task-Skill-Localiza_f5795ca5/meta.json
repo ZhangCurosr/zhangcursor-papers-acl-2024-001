@@ -4,5 +4,31 @@
  "title": "TaSL-Continual-Dialog-State-Tracking-via-Task-Skill-Localiza",
  "token": "sk-owp49a3rO...",
  "created_at": "2026-08-13 03:49:48",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/6a0fd4a5-fdc7-41a5-857c-99f16d8730c2.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/6a0fd4a5-fdc7-41a5-857c-99f16d8730c2.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:54:37",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Continual Learning",
+    "Dialogue State Tracking",
+    "Knowledge Transfer",
+    "Skill Localization",
+    "Model Averaging",
+    "Catastrophic Forgetting",
+    "Parameter-space CL"
+   ],
+   "field": "持续对话状态追踪",
+   "innovations": [
+    "首次提出参数空间分组重要性感知技能定位方法区分任务特定/共享参数",
+    "细粒度技能整合策略实现无记忆回放的双向知识迁移",
+    "重要性评分引入敏感性平滑与不确定性量化提升估计精度"
+   ],
+   "benchmarks": [
+    "SGD (15 domains)",
+    "MultiWoz 2.1 (cross-dataset)"
+   ]
+  }
+ }
 }

@@ -4,5 +4,37 @@
  "title": "Unsupervised-Information-Refinement-Training-of-Large-Langua",
  "token": "sk-7NOZt17oN...",
  "created_at": "2026-08-13 07:10:25",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/6e372a63-2001-4d69-91c8-a8953b69d5de.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/6e372a63-2001-4d69-91c8-a8953b69d5de.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:56:06",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Retrieval-Augmented Generation",
+    "Information Refinement",
+    "Unsupervised Learning",
+    "Large Language Models",
+    "Zero-shot Generalization"
+   ],
+   "field": "检索增强生成",
+   "innovations": [
+    "提出LLM作为Information Refiner的新视角，定义正信息增益概念",
+    "设计三种无监督训练任务覆盖完整/残缺/无关检索文本场景",
+    "仅用Wikipedia无监督训练即可提升跨任务RAG性能并避免灾难性遗忘"
+   ],
+   "benchmarks": [
+    "Natural Questions",
+    "WebQuestions",
+    "T-REx",
+    "Zero Shot RE",
+    "HotpotQA",
+    "Musique",
+    "ELI5",
+    "Wizard of Wikipedia",
+    "WikiText-103",
+    "CodeXGLUE"
+   ]
+  }
+ }
 }

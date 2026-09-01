@@ -4,5 +4,31 @@
  "title": "Reflect-RL-Two-Player-Online-RL-Fine-Tuning-for-LMs",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 03:49:37",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/904eca33-b56c-41fc-b3d5-f316e2e31ffa.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/904eca33-b56c-41fc-b3d5-f316e2e31ffa.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:54:18",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "online RL fine-tuning",
+    "language models",
+    "reflection",
+    "multi-step decision making",
+    "curriculum learning",
+    "action enumeration"
+   ],
+   "field": "大语言模型强化学习微调",
+   "innovations": [
+    "两玩家在线RL微调框架Reflect-RL，冻结reflection模型辅助策略模型避免梯度干扰",
+    "负样本生成增强reflection模型纠错能力",
+    "Single-prompt action enumeration降低大动作空间计算复杂度"
+   ],
+   "benchmarks": [
+    "AutoExplore",
+    "DangerousTaxi",
+    "ALFWorld"
+   ]
+  }
+ }
 }

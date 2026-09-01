@@ -4,5 +4,33 @@
  "title": "MAGE-Machine-generated-Text-Detection-in-the-Wild",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 05:41:16",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/b3eb1213-6444-4981-8e7e-4c24148e8fc6.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/b3eb1213-6444-4981-8e7e-4c24148e8fc6.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:53:33",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "机器生成文本检测",
+    "分布外泛化",
+    "大语言模型",
+    "perplexity",
+    "改写攻击",
+    "多领域检测"
+   ],
+   "field": "机器生成文本检测",
+   "innovations": [
+    "构建首个涵盖多领域(7)/多模型(27)/多难度的系统性机器生成文本检测测试床MAGE",
+    "揭示perplexity作为跨领域通用判别特征的双刃剑效应",
+    "证明仅需0.1%域内数据调整决策边界即可实现86.54%的分布外检测平均召回率"
+   ],
+   "benchmarks": [
+    "MAGE Testbed 1-8",
+    "Unseen Models",
+    "Unseen Domains",
+    "Unseen Domains & Unseen Model",
+    "Paraphrasing Attack"
+   ]
+  }
+ }
 }

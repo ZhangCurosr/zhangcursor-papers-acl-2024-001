@@ -4,5 +4,31 @@
  "title": "Virtual-Compiler-Is-All-You-Need-For-Assembly-Code-Search",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 03:50:06",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/800db7d4-f591-4384-8edd-09ba87fc4717.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/800db7d4-f591-4384-8edd-09ba87fc4717.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:56:57",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Assembly Code Search",
+    "Virtual Compiler",
+    "LLM",
+    "Binary Analysis",
+    "Code Generation",
+    "Contrastive Learning",
+    "Datasets"
+   ],
+   "field": "二进制代码分析与搜索",
+   "innovations": [
+    "提出虚拟编译器(ViC)范式，用LLM模拟通用编译器生成汇编数据",
+    "利用ViC将多语言源码搜索数据集转化为汇编搜索数据集，解决数据稀缺问题",
+    "设计解耦的双编码器架构，显著提升汇编代码搜索性能(Recall@1提升26%)"
+   ],
+   "benchmarks": [
+    "257 queries on real-world binaries (Mac/Windows/Linux)",
+    "Recall@1, Recall@20, MAP"
+   ]
+  }
+ }
 }

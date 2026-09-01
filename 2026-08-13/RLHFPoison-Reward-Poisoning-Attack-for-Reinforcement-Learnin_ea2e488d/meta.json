@@ -4,5 +4,31 @@
  "title": "RLHFPoison-Reward-Poisoning-Attack-for-Reinforcement-Learnin",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 03:49:58",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/51262c69-efd4-4607-8cf2-844ff8dc8ac9.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/51262c69-efd4-4607-8cf2-844ff8dc8ac9.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:53:53",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "RLHF",
+    "Poisoning Attack",
+    "Reward Model",
+    "Backdoor Attack",
+    "LLM Safety",
+    "Data Poisoning"
+   ],
+   "field": "大语言模型安全与对齐",
+   "innovations": [
+    "提出RankPoison三步筛选方法实现高效隐蔽的RLHF偏好数据中毒攻击",
+    "使用自然触发词'How'实现后门攻击同时保持安全对齐性能",
+    "揭示奖励模型精度与RL阶段安全性之间的不一致性"
+   ],
+   "benchmarks": [
+    "PKU-SafeRLHF-Dataset",
+    "Stanford Alpaca Dataset",
+    "hh-rlhf"
+   ]
+  }
+ }
 }

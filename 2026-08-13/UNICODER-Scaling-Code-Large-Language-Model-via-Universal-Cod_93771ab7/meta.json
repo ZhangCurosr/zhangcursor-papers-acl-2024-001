@@ -4,5 +4,34 @@
  "title": "UNICODER-Scaling-Code-Large-Language-Model-via-Universal-Cod",
  "token": "sk-dQ65jxzP4...",
  "created_at": "2026-08-13 14:54:53",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3c5d4e8e-44f4-4f03-a3b2-f32576672dcc.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3c5d4e8e-44f4-4f03-a3b2-f32576672dcc.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:55:33",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "code generation",
+    "universal code",
+    "chain-of-thought",
+    "multilingual code",
+    "instruction tuning",
+    "Large Language Model",
+    "HumanEval",
+    "MultiPL-E"
+   ],
+   "field": "代码大模型与程序合成",
+   "innovations": [
+    "提出语言无关的通用代码（UniCode）作为代码生成的中间表示",
+    "构建 UNICODER-INSTRUCT 多语言指令数据集并开源",
+    "设计多任务 SFT 与 Universal-code-of-Thought（UoT）训练范式"
+   ],
+   "benchmarks": [
+    "HumanEval",
+    "MBPP",
+    "MultiPL-E",
+    "UNICODER-BENCH"
+   ]
+  }
+ }
 }

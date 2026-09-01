@@ -4,5 +4,34 @@
  "title": "Unlocking-Data-free-Low-bit-Quantization-with-Matrix-Decompo",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 03:49:50",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ecfe6535-f1dc-4e33-a4ef-3c5e0a0bd106.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ecfe6535-f1dc-4e33-a4ef-3c5e0a0bd106.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:56:15",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "KV Cache Compression",
+    "Data-free Quantization",
+    "Tensor Decomposition",
+    "MPO",
+    "LLM Inference",
+    "Low-bit Quantization"
+   ],
+   "field": "大语言模型高效推理",
+   "innovations": [
+    "基于MPO张量分解将KV Cache量化困难从大矩阵迁移至小局部张量",
+    "大张量低比特+小张量高精度混合精度量化策略",
+    "针对DecoQuant设计反量化与GeMM融合的高效推理Kernel"
+   ],
+   "benchmarks": [
+    "LAMBADA",
+    "AG News",
+    "Subj",
+    "MR",
+    "Boolq",
+    "RTE"
+   ]
+  }
+ }
 }

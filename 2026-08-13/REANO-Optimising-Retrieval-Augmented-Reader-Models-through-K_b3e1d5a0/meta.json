@@ -4,5 +4,33 @@
  "title": "REANO-Optimising-Retrieval-Augmented-Reader-Models-through-K",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 03:39:02",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/acd450a2-00d3-4b72-8503-6d62adcb3778.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/acd450a2-00d3-4b72-8503-6d62adcb3778.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:53:43",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "open domain question answering",
+    "retrieval-augmented generation",
+    "knowledge graph",
+    "graph neural network",
+    "Fusion-in-Decoder",
+    "relation extraction"
+   ],
+   "field": "开放域问答与知识增强生成",
+   "innovations": [
+    "从检索passages动态生成知识图谱替代不完整的外部KG",
+    "query-aware GNN筛选top-K相关三元组并拼接为附加passage",
+    "答案-实体对齐弱监督训练GNN三元组选择模块"
+   ],
+   "benchmarks": [
+    "Natural Questions",
+    "TriviaQA",
+    "EntityQuestions",
+    "2WikiMultiHopQA",
+    "MuSiQue"
+   ]
+  }
+ }
 }

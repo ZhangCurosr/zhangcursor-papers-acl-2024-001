@@ -4,5 +4,30 @@
  "title": "Through-the-Lens-of-Split-Vote-Exploring-Disagreement-Diffic",
  "token": "sk-7NOZt17oN...",
  "created_at": "2026-08-13 07:10:26",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3ccc9d06-32bc-4b2e-91a5-b60046932b71.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/3ccc9d06-32bc-4b2e-91a5-b60046932b71.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:54:53",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "法律NLP",
+    "模型校准",
+    "人类标签变异",
+    "案例结果分类",
+    "分裂投票",
+    "不确定性评估"
+   ],
+   "field": "法律人工智能与可信NLP",
+   "innovations": [
+    "构建首个包含自然法官分裂投票分布的ECtHR案例分类数据集SV-ECHR",
+    "在法律NLP中首次系统区分并评估模型的置信度校准与人类校准",
+    "构建包含SV特化子类的分歧来源分类学并量化其影响"
+   ],
+   "benchmarks": [
+    "SV-ECHR (基于LexGLUE ECtHR A|B)",
+    "ECtHR Case Outcome Classification"
+   ]
+  }
+ }
 }

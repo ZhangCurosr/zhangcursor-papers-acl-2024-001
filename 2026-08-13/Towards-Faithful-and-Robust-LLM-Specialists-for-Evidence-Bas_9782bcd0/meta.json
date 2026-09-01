@@ -4,5 +4,33 @@
  "title": "Towards-Faithful-and-Robust-LLM-Specialists-for-Evidence-Bas",
  "token": "sk-qKu2Cn1y4...",
  "created_at": "2026-08-13 14:54:40",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16a82400-5640-4ab0-8557-fe21a93b4560.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/16a82400-5640-4ab0-8557-fe21a93b4560.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:55:13",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Evidence-Based QA",
+    "LLM微调",
+    "合成数据生成",
+    "数据质量",
+    "可归属性评估",
+    "RAG",
+    "OOD泛化"
+   ],
+   "field": "检索增强生成与忠实性",
+   "innovations": [
+    "提出带自动质量过滤的合成数据生成流水线SYNSCIQA++用于证据支撑问答微调",
+    "构建四个递进式域内/域外评测基准系统化评估微调专家的泛化能力",
+    "通过严格控制变量实验证实数据质量远重于数据量且合成验证集可有效代理OOD性能"
+   ],
+   "benchmarks": [
+    "SYNSCIQA_test",
+    "GENSEARCH_test",
+    "CHATREPORT_test",
+    "CLIMATEQA_test"
+   ]
+  }
+ }
 }

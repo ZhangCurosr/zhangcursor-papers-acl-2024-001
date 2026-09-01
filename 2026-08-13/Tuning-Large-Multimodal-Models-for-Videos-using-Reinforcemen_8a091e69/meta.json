@@ -4,5 +4,36 @@
  "title": "Tuning-Large-Multimodal-Models-for-Videos-using-Reinforcemen",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 03:49:38",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/d56aa0b5-442e-458d-a695-909de1de0a5b.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/d56aa0b5-442e-458d-a695-909de1de0a5b.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:55:43",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "多模态对齐",
+    "强化学习",
+    "视频理解",
+    "RLAIF",
+    "Reward Modeling",
+    "多模态大模型"
+   ],
+   "field": "多模态大模型对齐与微调",
+   "innovations": [
+    "首次将 RLAIF 引入视频多模态模型对齐训练",
+    "提出情境感知奖励建模，利用视频叙述上下文增强 AI 偏好判断质量",
+    "两段式课程 SFT 训练策略，按答案长度划分难易阶段优化指令跟随能力"
+   ],
+   "benchmarks": [
+    "MSVD-QA",
+    "MSRVTT-QA",
+    "ActivityNet-QA",
+    "MSVD T2V Retrieval",
+    "MSRVTT T2V Retrieval",
+    "UCF101",
+    "HMDB51",
+    "Video-Based Generative Benchmark"
+   ]
+  }
+ }
 }

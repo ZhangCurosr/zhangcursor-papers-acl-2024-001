@@ -4,5 +4,28 @@
  "title": "RORA-Robust-Free-Text-Rationale-Evaluation",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 03:49:41",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ad2e5090-4b53-4403-838e-c6aa2771e582.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/ad2e5090-4b53-4403-838e-c6aa2771e582.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:53:49",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Rationale Evaluation",
+    "Explainable NLP",
+    "Label Leakage",
+    "Invariant Risk Minimization",
+    "Counterfactual Data Augmentation"
+   ],
+   "field": "可解释人工智能",
+   "innovations": [
+    "提出RORA框架，通过对抗编辑与IRM训练评估模型，以抵御标签泄漏干扰",
+    "利用小模型集成梯度归因精准识别解释中的泄漏token"
+   ],
+   "benchmarks": [
+    "StrategyQA",
+    "CommonsenseQA"
+   ]
+  }
+ }
 }

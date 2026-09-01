@@ -4,5 +4,30 @@
  "title": "Unsupervised-Multimodal-Clustering-for-Semantics-Discovery-i",
  "token": "sk-7NOZt17oN...",
  "created_at": "2026-08-13 07:10:25",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2322f5a1-3f8f-49df-b92b-57a33d495b2b.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/2322f5a1-3f8f-49df-b92b-57a33d495b2b.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:56:19",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "无监督聚类",
+    "多模态学习",
+    "语义发现",
+    "对比学习",
+    "意图识别"
+   ],
+   "field": "多模态自然语言处理",
+   "innovations": [
+    "密度驱动的高质量样本动态选择策略",
+    "多模态对比预训练与非语言模态遮蔽增强",
+    "高/低质量样本顺序表示学习两阶段框架"
+   ],
+   "benchmarks": [
+    "MIntRec",
+    "MELD-DA",
+    "IEMOCAP-DA"
+   ]
+  }
+ }
 }

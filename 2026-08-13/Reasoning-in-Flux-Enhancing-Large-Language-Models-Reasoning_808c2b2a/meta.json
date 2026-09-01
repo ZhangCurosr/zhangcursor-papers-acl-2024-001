@@ -4,5 +4,32 @@
  "title": "Reasoning-in-Flux-Enhancing-Large-Language-Models-Reasoning",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 03:49:52",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/9061d938-6af1-42ee-8d55-dcb8c2582a24.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/9061d938-6af1-42ee-8d55-dcb8c2582a24.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:54:03",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Chain-of-Thought",
+    "Uncertainty-aware",
+    "Example Selection",
+    "Test-time Intervention",
+    "Large Language Models"
+   ],
+   "field": "大语言模型推理增强",
+   "innovations": [
+    "提出UAG框架，利用token级不确定性突增实时检测并纠偏多步推理错误",
+    "设计基于贝叶斯视角的'相关性-新颖性'双目标示例动态选择准则",
+    "引入K-means聚类加速在线示例检索，实现低开销即插即用推理增强"
+   ],
+   "benchmarks": [
+    "GSM8K",
+    "StrategyQA",
+    "BoolQ",
+    "MultiArith",
+    "BigBench子集"
+   ]
+  }
+ }
 }

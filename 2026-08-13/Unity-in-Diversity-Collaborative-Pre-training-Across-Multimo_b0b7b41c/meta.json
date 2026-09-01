@@ -4,5 +4,33 @@
  "title": "Unity-in-Diversity-Collaborative-Pre-training-Across-Multimo",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 03:50:11",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/4c536f44-814c-458d-890a-402defbcd607.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/4c536f44-814c-458d-890a-402defbcd607.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:56:03",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Medical Pre-training",
+    "Cross-Source Learning",
+    "Multimodal Representation",
+    "Contrastive Learning",
+    "Electronic Health Records",
+    "Medical Imaging"
+   ],
+   "field": "医疗多模态表示学习",
+   "innovations": [
+    "提出MEDCSP框架实现跨EHR与影像源的多模态协同预训练",
+    "设计基于时间窗口的跨源同患者对比学习损失",
+    "利用诊断历史软标签构建跨源相似队列对比学习损失"
+   ],
+   "benchmarks": [
+    "MIMIC-IV",
+    "MIMIC-CXR",
+    "COVID-19 Chest X-ray",
+    "Open-I",
+    "CheXpert"
+   ]
+  }
+ }
 }

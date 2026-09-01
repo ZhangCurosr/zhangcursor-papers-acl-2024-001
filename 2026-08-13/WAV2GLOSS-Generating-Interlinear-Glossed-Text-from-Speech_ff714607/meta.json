@@ -4,5 +4,35 @@
  "title": "WAV2GLOSS-Generating-Interlinear-Glossed-Text-from-Speech",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 03:38:35",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/9d8e5e69-5636-4c40-93f1-8f3cc4cdc920.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/9d8e5e69-5636-4c40-93f1-8f3cc4cdc920.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 19:57:13",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "WAV2GLOSS",
+    "Interlinear Glossed Text",
+    "低资源语音",
+    "多语言ASR",
+    "形态标注",
+    "语言文档化",
+    "FIELDWORK数据集"
+   ],
+   "field": "低资源语音语言处理",
+   "innovations": [
+    "首次提出WAV2GLOSS任务：从语音直接生成IGT四类标注",
+    "发布FIELDWORK数据集：首个37语言语音+IGT多语言数据集",
+    "系统评估端到端/级联/单任务/多任务范式的基准对比"
+   ],
+   "benchmarks": [
+    "FIELDWORK",
+    "CER",
+    "chrF++",
+    "BLEU",
+    "BLEURT",
+    "BERTScore"
+   ]
+  }
+ }
 }
