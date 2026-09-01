@@ -4,5 +4,33 @@
  "title": "SPARSEFIT-Few-shot-Prompting-with-Sparse-Fine-tuning-for-Joi",
  "token": "sk-331OfnzjD...",
  "created_at": "2026-08-13 14:54:41",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/685d4716-0eeb-430d-b00c-1bce515074ee.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/685d4716-0eeb-430d-b00c-1bce515074ee.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:50:31",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "few-shot learning",
+    "parameter-efficient fine-tuning",
+    "natural language explanations",
+    "sparse fine-tuning",
+    "explainable NLP",
+    "T5"
+   ],
+   "field": "可解释自然语言处理",
+   "innovations": [
+    "提出 SPARSEFIT 稀疏微调策略，仅微调 6.8% 参数即可在 few-shot 设置下联合生成预测与 NLE",
+    "系统探索 Transformer 各层及层对的微调组合，发现 LayerNorm+Attention.Q 为最优配置",
+    "证明稀疏微调在 T5 和 Llama 2 上均优于 LoRA/AdaLoRA/(IA)³ 等主流 PEFT 方法"
+   ],
+   "benchmarks": [
+    "e-SNLI",
+    "ECQA",
+    "ComVE",
+    "SBIC",
+    "FEB benchmark"
+   ]
+  }
+ }
 }

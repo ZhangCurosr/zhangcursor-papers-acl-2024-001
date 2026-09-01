@@ -4,5 +4,30 @@
  "title": "Retrieval-Augmented-Multilingual-Knowledge-Editing",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 07:10:26",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/eadfec3c-ebce-456d-8baa-ff47d45b1325.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/eadfec3c-ebce-456d-8baa-ff47d45b1325.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:50:16",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "知识编辑",
+    "多语言",
+    "检索增强",
+    "上下文学习",
+    "跨语言",
+    "大语言模型"
+   ],
+   "field": "多语言自然语言处理与知识编辑",
+   "innovations": [
+    "提出ReMaKE框架，首次实现检索增强型多语言知识编辑，支持编辑语言与查询语言不同",
+    "构建12语言MzsRE多语言知识编辑数据集，覆盖印欧语系和亚洲语言",
+    "设计基于XLM-R的二分类多语言检索器，有效缓解跨语言上下文干扰"
+   ],
+   "benchmarks": [
+    "MzsRE",
+    "zsRE"
+   ]
+  }
+ }
 }

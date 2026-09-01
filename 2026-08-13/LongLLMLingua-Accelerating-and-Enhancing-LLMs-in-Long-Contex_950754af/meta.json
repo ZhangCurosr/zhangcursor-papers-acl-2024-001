@@ -4,5 +4,32 @@
  "title": "LongLLMLingua-Accelerating-and-Enhancing-LLMs-in-Long-Contex",
  "token": "sk-aknYEUs8O...",
  "created_at": "2026-08-13 05:40:25",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/fd8a0968-71af-4fdd-a521-26217f400f85.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/fd8a0968-71af-4fdd-a521-26217f400f85.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:48:48",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "prompt compression",
+    "long context",
+    "LLM acceleration",
+    "question-aware compression",
+    "contrastive perplexity"
+   ],
+   "field": "长上下文大语言模型效率优化",
+   "innovations": [
+    "问题感知的粗到细压缩：通过条件困惑度 $r_k$ 与对比困惑度 $s_i$ 分别实现文档级与 token 级关键信息保留",
+    "动态压缩比分配：根据文档重要性线性调度压缩预算，实现自适应信息保留",
+    "子序列恢复：后处理还原被截断实体，提升生成完整性"
+   ],
+   "benchmarks": [
+    "NaturalQuestions",
+    "LongBench",
+    "ZeroSCROLLS",
+    "MuSiQue",
+    "LooGLE"
+   ]
+  }
+ }
 }

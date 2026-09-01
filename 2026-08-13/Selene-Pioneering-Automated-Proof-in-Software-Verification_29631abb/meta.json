@@ -4,5 +4,29 @@
  "title": "Selene-Pioneering-Automated-Proof-in-Software-Verification",
  "token": "sk-45Ifw5Iq3...",
  "created_at": "2026-08-13 03:38:55",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/7e88677d-f8d3-4870-9122-b02e05df6547.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/7e88677d-f8d3-4870-9122-b02e05df6547.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:50:46",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "软件验证",
+    "自动化证明",
+    "大型语言模型",
+    "seL4",
+    "形式化方法",
+    "定理证明"
+   ],
+   "field": "软件形式化验证与大模型",
+   "innovations": [
+    "提出首个基于工业级OS微内核seL4的项目级自动化证明基准Selene",
+    "设计引理隔离技术实现大型形式化系统的轻量级快速评估",
+    "系统评估GPT-4在软件证明中的能力并提出三种有效增强策略"
+   ],
+   "benchmarks": [
+    "Selene"
+   ]
+  }
+ }
 }

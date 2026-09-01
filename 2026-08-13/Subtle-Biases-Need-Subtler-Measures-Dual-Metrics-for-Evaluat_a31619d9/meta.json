@@ -4,5 +4,32 @@
  "title": "Subtle-Biases-Need-Subtler-Measures-Dual-Metrics-for-Evaluat",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 07:10:27",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/11b40357-1afc-45e5-9817-d35a74f63b42.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/11b40357-1afc-45e5-9817-d35a74f63b42.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:51:53",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "large language models",
+    "bias evaluation",
+    "representative bias",
+    "affinity bias",
+    "creative generation",
+    "fairness metrics"
+   ],
+   "field": "LLM公平性与偏见评估",
+   "innovations": [
+    "提出RBS与ABS双指标分别量化生成偏移与评估偏好偏见",
+    "设计CoGS基准套件覆盖12类创意任务的系统性偏见评测",
+    "揭示各LLM独特的bias fingerprint人机偏见模式对比"
+   ],
+   "benchmarks": [
+    "CoGS (Creativity-Oriented Generation Suite)",
+    "GPT-4",
+    "LLaMA-2",
+    "Mixtral"
+   ]
+  }
+ }
 }

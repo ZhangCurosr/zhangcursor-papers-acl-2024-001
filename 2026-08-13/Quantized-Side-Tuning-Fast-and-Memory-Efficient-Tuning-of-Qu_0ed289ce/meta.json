@@ -4,5 +4,32 @@
  "title": "Quantized-Side-Tuning-Fast-and-Memory-Efficient-Tuning-of-Qu",
  "token": "sk-n7iJ0Z1Ol...",
  "created_at": "2026-08-13 03:49:35",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/30dee283-1bdb-435e-b209-d3613444113f.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/30dee283-1bdb-435e-b209-d3613444113f.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:50:12",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "高效微调",
+    "大语言模型",
+    "模型量化",
+    "侧网络",
+    "内存优化",
+    "参数高效学习",
+    "4-bit量化"
+   ],
+   "field": "大语言模型高效微调",
+   "innovations": [
+    "首次将4-bit权重量化与side network结合，同时优化weights/activations/optimizer三类内存来源",
+    "提出低秩自适应下采样模块(LoRA/Adapter/Pooling)，将下采样可训练参数占比从56%降至0-7.8%",
+    "设计可学习门控融合机制(α初始化=1)，解决LST在长文本生成中的重复问题并支持分类与生成任务"
+   ],
+   "benchmarks": [
+    "GLUE",
+    "MMLU",
+    "MT-Bench"
+   ]
+  }
+ }
 }

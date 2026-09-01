@@ -4,5 +4,29 @@
  "title": "Selene-Pioneering-Automated-Proof-in-Software-Verification",
  "token": "sk-DXHHyylpH...",
  "created_at": "2026-08-13 14:54:53",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/7e88677d-f8d3-4870-9122-b02e05df6547.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/7e88677d-f8d3-4870-9122-b02e05df6547.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:51:11",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "automated theorem proving",
+    "software verification",
+    "large language models",
+    "formal verification",
+    "seL4",
+    "Isabelle"
+   ],
+   "field": "形式化验证与大语言模型",
+   "innovations": [
+    "提出首个基于真实工业级seL4微内核的项目级自动化证明基准Selene",
+    "设计Lemma Isolation技术实现轻量级增量验证环境",
+    "系统评估GPT-3.5/4在程序化与声明式风格证明上的能力并提出三类增强策略"
+   ],
+   "benchmarks": [
+    "Selene"
+   ]
+  }
+ }
 }

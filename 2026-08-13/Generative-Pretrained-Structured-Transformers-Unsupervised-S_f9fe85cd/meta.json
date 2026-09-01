@@ -4,5 +4,34 @@
  "title": "Generative-Pretrained-Structured-Transformers-Unsupervised-S",
  "token": "sk-1jVZGxTQ1...",
  "created_at": "2026-08-13 05:40:57",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/128e1c04-5afa-474e-8b1e-496c357a78d8.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/128e1c04-5afa-474e-8b1e-496c357a78d8.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:47:51",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "句法语言模型",
+    "无监督预训练",
+    "结构化Transformer",
+    "语法诱导",
+    "Inside-Outside算法",
+    "表示替代物"
+   ],
+   "field": "结构化语言建模",
+   "innovations": [
+    "提出双组件无监督SLM架构，无需金标准树即可在十亿级token上预训练",
+    "引入表示替代物机制打破数据依赖，实现组分解模型与生成模型的并行联合训练",
+    "首次证明无监督SLM可在多种NLU/NG任务上超越同等规模GPT-2"
+   ],
+   "benchmarks": [
+    "GLUE",
+    "XSum",
+    "CNN/DailyMail",
+    "Gigaword",
+    "PTB语法诱导",
+    "句法泛化测试套件"
+   ]
+  }
+ }
 }

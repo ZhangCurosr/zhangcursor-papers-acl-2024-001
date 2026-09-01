@@ -4,5 +4,33 @@
  "title": "SPARSEFIT-Few-shot-Prompting-with-Sparse-Fine-tuning-for-Joi",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 03:39:00",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/685d4716-0eeb-430d-b00c-1bce515074ee.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/685d4716-0eeb-430d-b00c-1bce515074ee.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:50:40",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "sparse fine-tuning",
+    "few-shot learning",
+    "natural language explanation",
+    "parameter-efficient fine-tuning",
+    "PEFT",
+    "explainable NLP"
+   ],
+   "field": "可解释自然语言处理",
+   "innovations": [
+    "首次系统性探索稀疏微调在联合生成预测与自然语言解释任务中的应用",
+    "提出 SPARSEFIT 最优配置仅微调 6.84% 参数即达到与全参数微调相当性能",
+    "发现不同稀疏组件组合具有显著协同增益并验证于多模型架构"
+   ],
+   "benchmarks": [
+    "e-SNLI",
+    "ECQA",
+    "SBIC",
+    "ComVE",
+    "FEB benchmark"
+   ]
+  }
+ }
 }

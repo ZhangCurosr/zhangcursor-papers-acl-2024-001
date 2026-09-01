@@ -4,5 +4,29 @@
  "title": "Probing-the-Multi-turn-Planning-Capabilities-of-LLMs-via-20",
  "token": "sk-nY8L7ieIq...",
  "created_at": "2026-08-13 04:50:12",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/7ffdde6c-a2fa-4b1b-82a8-a13fa6a9e5f6.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/7ffdde6c-a2fa-4b1b-82a8-a13fa6a9e5f6.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:49:34",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "多轮对话规划",
+    "实体推断",
+    "行为克隆",
+    "强化学习",
+    "20 Questions游戏",
+    "LLM评测"
+   ],
+   "field": "多轮对话与Agent规划能力评估",
+   "innovations": [
+    "提出EDA基准与20 Questions游戏作为多轮主动提问与战略规划的代理评测任务",
+    "验证行为克隆可从强模型蒸馏规划策略至开源小模型，RLGP通过游戏过程强化学习进一步提升性能"
+   ],
+   "benchmarks": [
+    "Things",
+    "Celebrities"
+   ]
+  }
+ }
 }

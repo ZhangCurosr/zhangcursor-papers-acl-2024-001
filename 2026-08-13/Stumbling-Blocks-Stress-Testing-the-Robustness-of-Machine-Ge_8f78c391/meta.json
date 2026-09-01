@@ -4,5 +4,32 @@
  "title": "Stumbling-Blocks-Stress-Testing-the-Robustness-of-Machine-Ge",
  "token": "sk-9BdnpHblK...",
  "created_at": "2026-08-13 03:50:09",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/12db1e19-f404-4b7f-b5b1-6ec6fe26e434.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/12db1e19-f404-4b7f-b5b1-6ec6fe26e434.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:52:00",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "machine-generated text detection",
+    "robustness evaluation",
+    "adversarial attack",
+    "watermarking",
+    "GLTR",
+    "DetectGPT",
+    "attack budget"
+   ],
+   "field": "机器生成文本检测鲁棒性",
+   "innovations": [
+    "首次系统性评估8种MGT检测器在12种真实攻击下的鲁棒性并构建排行榜",
+    "提出攻击预算(Budget)统一量化扰动强度以实现跨攻击公平比较",
+    "揭示检测器漏洞模式并提出DetectGPT低概率token过滤的即插即用补丁"
+   ],
+   "benchmarks": [
+    "News-domain HWT/MGT paired dataset (8k/1k/1k)",
+    "ROC AUC relative to unattacked performance",
+    "TPR@FPR=5%"
+   ]
+  }
+ }
 }

@@ -4,5 +4,31 @@
  "title": "Rewriting-the-Code-A-Simple-Method-for-Large-Language-Model",
  "token": "sk-owp49a3rO...",
  "created_at": "2026-08-13 03:49:45",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/02d7dcba-f39a-4049-8add-d5f5be6c7da5.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/02d7dcba-f39a-4049-8add-d5f5be6c7da5.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:50:13",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "代码搜索",
+    "Generation-Augmented Retrieval",
+    "大语言模型",
+    "代码风格归一化",
+    "稀疏检索",
+    "密集检索"
+   ],
+   "field": "代码搜索与大语言模型",
+   "innovations": [
+    "提出 ReCo 方法，通过重写代码库中原始代码的风格来弥合 LLM 生成示例代码与真实代码之间的风格偏差",
+    "首次提出 Code Style Similarity (CSSim) 指标，从变量命名、API 调用和代码结构三维度量化代码风格相似度"
+   ],
+   "benchmarks": [
+    "CoNaLa",
+    "MBPP",
+    "APPS",
+    "MBJP"
+   ]
+  }
+ }
 }

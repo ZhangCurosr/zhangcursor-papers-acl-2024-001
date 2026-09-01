@@ -4,5 +4,32 @@
  "title": "SCIMON-Scientific-Inspiration-Machines-Optimized-for-Novelty",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 07:10:26",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/58993bf3-c728-4762-98e1-f81dabf8e88d.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/58993bf3-c728-4762-98e1-f81dabf8e88d.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:50:28",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Scientific Idea Generation",
+    "Literature-Based Discovery",
+    "Novelty Optimization",
+    "Retrieval-Augmented Generation",
+    "Scientific NLP",
+    "Knowledge Graph",
+    "Contrastive Learning"
+   ],
+   "field": "科学发现与自然语言生成",
+   "innovations": [
+    "提出SCIMON框架：三源灵感检索（语义/KG/引用）+ 迭代新颖性优化生成科学方向",
+    "引入in-context contrastive loss以抑制背景文本复制并增强生成新颖性",
+    "构建首个面向NLP与生医领域的grounded科学idea生成评测基准及gold测试集"
+   ],
+   "benchmarks": [
+    "ACL Anthology Gold Test (194 instances)",
+    "PubMed Biomedical Test Set",
+    "Human Evaluation: Study I/II/III"
+   ]
+  }
+ }
 }

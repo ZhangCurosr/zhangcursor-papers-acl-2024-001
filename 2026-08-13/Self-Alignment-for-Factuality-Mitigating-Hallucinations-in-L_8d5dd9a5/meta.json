@@ -4,5 +4,34 @@
  "title": "Self-Alignment-for-Factuality-Mitigating-Hallucinations-in-L",
  "token": "sk-Jd4ujJMnj...",
  "created_at": "2026-08-13 14:54:40",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/e135a6a0-a416-4122-861f-56726b87d6e4.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/e135a6a0-a416-4122-861f-56726b87d6e4.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:51:07",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "大语言模型",
+    "幻觉缓解",
+    "自我评估",
+    "事实性对齐",
+    "DPO",
+    "置信度校准"
+   ],
+   "field": "大语言模型事实性与可信度",
+   "innovations": [
+    "提出基于自我评估的事实性对齐框架Self-Alignment for Factuality",
+    "设计SK-TUNING增强LLM置信度估计与校准能力",
+    "利用模型内部知识生成偏好对无需人工标注"
+   ],
+   "benchmarks": [
+    "TruthfulQA",
+    "BioGEN",
+    "CommonSenseQA",
+    "OpenBookQA",
+    "MedQA",
+    "MMLU"
+   ]
+  }
+ }
 }

@@ -4,5 +4,34 @@
  "title": "Prompt-Expansion-for-Adaptive-Text-to-Image-Generation",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 03:50:11",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/b4c8a6e0-67df-4c68-9718-c6b435d60001.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/b4c8a6e0-67df-4c68-9718-c6b435d60001.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:49:38",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "text-to-image generation",
+    "prompt expansion",
+    "diversity",
+    "aesthetic optimization",
+    "prompt engineering",
+    "language-model guided generation"
+   ],
+   "field": "文本到图像生成",
+   "innovations": [
+    "提出 Prompt Expansion 框架将用户查询扩展为多样化 prompt 以提升图像美学与多样性",
+    "构建 600k 反向配对 {query:prompt} 数据集并引入 Re-fine-tuning 对齐下游 T2I 模型",
+    "设计 Prefix Dropout 课程学习实现 query 类型隐式推断的多风格可控生成"
+   ],
+   "benchmarks": [
+    "PartiPrompts",
+    "Webli-Align",
+    "Imagen",
+    "Stable Diffusion v1.4",
+    "MUSIQ-AVA",
+    "COCA"
+   ]
+  }
+ }
 }

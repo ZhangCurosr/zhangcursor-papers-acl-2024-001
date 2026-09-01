@@ -4,5 +4,31 @@
  "title": "Probing-Language-Models-for-Pre-training-Data-Detection",
  "token": "sk-nY8L7ieIq...",
  "created_at": "2026-08-13 04:50:08",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/1b1c06df-e859-4c89-a75f-45329f2c0674.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/1b1c06df-e859-4c89-a75f-45329f2c0674.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:49:09",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Membership Inference Attack",
+    "Probing",
+    "Pre-training Data Detection",
+    "Large Language Models",
+    "Data Contamination",
+    "White-box Attack",
+    "ArxivMIA"
+   ],
+   "field": "LLM安全与隐私",
+   "innovations": [
+    "首次利用内部激活探测技术检测LLM预训练数据",
+    "提出具有低重复率和长文本特征的ArxivMIA学术基准"
+   ],
+   "benchmarks": [
+    "WikiMIA",
+    "ArxivMIA",
+    "Contam-1.4b Contamination Detection Challenge"
+   ]
+  }
+ }
 }

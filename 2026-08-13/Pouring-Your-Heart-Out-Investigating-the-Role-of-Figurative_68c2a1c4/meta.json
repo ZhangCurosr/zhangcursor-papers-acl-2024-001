@@ -4,5 +4,35 @@
  "title": "Pouring-Your-Heart-Out-Investigating-the-Role-of-Figurative",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 07:10:27",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/94342437-27b7-488e-9c93-5e60a74279dd.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/94342437-27b7-488e-9c93-5e60a74279dd.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:49:13",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "共情检测",
+    "比喻语言",
+    "隐喻",
+    "习语",
+    "预训练语言模型",
+    "领域特定数据集",
+    "LiNC",
+    "在线社区"
+   ],
+   "field": "计算社会学与情感计算",
+   "innovations": [
+    "发布领域特定的痤疮共情数据集AcnEmpathize并系统分析比喻语言分布",
+    "证明习语/隐喻/夸张特征可显著提升共情检测性能（F1提升达0.488~0.942）",
+    "首次将比喻语言特征融入基于特征和PLM的共情检测模型进行对比实验"
+   ],
+   "benchmarks": [
+    "AcnEmpathize",
+    "SVM_LIWC",
+    "RoBERTa-large-mnli",
+    "RoBERTa-twitter-sentiment",
+    "T5 zero-shot"
+   ]
+  }
+ }
 }

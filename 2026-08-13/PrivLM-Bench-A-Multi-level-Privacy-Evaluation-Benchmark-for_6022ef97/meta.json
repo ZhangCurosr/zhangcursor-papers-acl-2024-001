@@ -4,5 +4,31 @@
  "title": "PrivLM-Bench-A-Multi-level-Privacy-Evaluation-Benchmark-for",
  "token": "sk-7NOZt17oN...",
  "created_at": "2026-08-13 04:49:41",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/8cb01bc3-9663-4c55-857d-321dbb32575b.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/8cb01bc3-9663-4c55-857d-321dbb32575b.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:49:07",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "差分隐私",
+    "语言模型",
+    "隐私评估",
+    "成员推断攻击",
+    "数据提取攻击",
+    "嵌入反转攻击",
+    "参数高效微调"
+   ],
+   "field": "大语言模型安全与隐私",
+   "innovations": [
+    "首次将推理数据隐私纳入PPLM统一评估框架，揭示DP微调无法保护推理阶段数据隐私",
+    "提出PrivLM-Bench基准，跨模型架构和调优方法整合DEA/MIA/EIA三类攻击进行公平实证评估",
+    "发现现有隐私攻击的实证效能远低于防御机制预设的最坏情况威胁水平"
+   ],
+   "benchmarks": [
+    "PrivLM-Bench",
+    "GLUE (MNLI/SST2/QNLI)"
+   ]
+  }
+ }
 }

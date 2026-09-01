@@ -4,5 +4,34 @@
  "title": "Long-Context-Language-Modeling-with-Parallel-Context-Encodin",
  "token": "sk-1jVZGxTQ1...",
  "created_at": "2026-08-13 05:40:53",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/67c819ca-0805-4afc-9a05-95491f58113e.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/67c819ca-0805-4afc-9a05-95491f58113e.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:48:24",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Long-Context LLM",
+    "CEPE",
+    "Cross-Attention",
+    "Efficient Fine-tuning",
+    "Retrieval-Augmented Generation",
+    "Knowledge Distillation"
+   ],
+   "field": "长上下文语言建模",
+   "innovations": [
+    "提出CEPE框架，通过小型Encoder与Cross-Attention以极低代价将Decoder-only LLM上下文扩展至128K",
+    "设计CEPED变体，利用无标签数据和蒸馏损失扩展指令微调模型的上下文能力",
+    "证明仅用8K训练数据即可外推至128K并实现10倍吞吐与1/6显存占用的高效长文本建模"
+   ],
+   "benchmarks": [
+    "PG19",
+    "Proof-Pile",
+    "CodeParrot",
+    "ZeroSCROLLS",
+    "Natural Questions",
+    "TriviaQA"
+   ]
+  }
+ }
 }

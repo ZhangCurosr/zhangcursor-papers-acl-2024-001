@@ -4,5 +4,32 @@
  "title": "Self-Contrast-Better-Reflection-Through-Inconsistent-Solving",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 03:50:14",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f2001d6a-cee5-4345-a9e0-aeb1cb70c345.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/f2001d6a-cee5-4345-a9e0-aeb1cb70c345.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:51:28",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "Self-Reflection",
+    "Self-Correction",
+    "Chain-of-Thought",
+    "Multi-Perspective Reasoning",
+    "Prompting Strategy",
+    "Large Language Models",
+    "Self-Consistency"
+   ],
+   "field": "大语言模型推理与反思能力",
+   "innovations": [
+    "提出Self-Contrast方法，将LLM自我反思从直接评估转换为多视角对比+检查清单生成",
+    "揭示LLM内在反思瓶颈源于自我评估反馈的过度自信(46.7%)和高度不一致(45.7%)",
+    "自策展提示(Self-Curated Prompt)机制：LLM根据问题自适应生成多样化解题视角，无需人工预设Agent角色"
+   ],
+   "benchmarks": [
+    "GSM8K",
+    "SVAMP",
+    "CommonMT"
+   ]
+  }
+ }
 }

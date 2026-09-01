@@ -4,5 +4,31 @@
  "title": "SPOR-A-Comprehensive-and-Practical-Evaluation-Method-for-Com",
  "token": "sk-aQHhxC28I...",
  "created_at": "2026-08-13 14:54:52",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/463cddcd-684e-4b63-9e28-d5021dadda57.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/463cddcd-684e-4b63-9e28-d5021dadda57.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-01 15:50:47",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "组合泛化",
+    "Data-to-Text 生成",
+    "系统性",
+    "生产力",
+    "顺序不变性",
+    "规则可学性",
+    "大语言模型"
+   ],
+   "field": "自然语言生成评估",
+   "innovations": [
+    "提出涵盖四个维度的组合泛化综合评估框架 SPOR",
+    "设计基于重分配的自动化数据集构建方法，无需人工标注",
+    "系统评测包括 LLMs 在内的多种模型，揭示其在 Data-to-Text 任务上的组合泛化缺陷"
+   ],
+   "benchmarks": [
+    "WebNLG",
+    "E2E"
+   ]
+  }
+ }
 }
