@@ -4,5 +4,29 @@
  "title": "WaterBench-Towards-Holistic-Evaluation-of-Watermarks-for-Lar",
  "token": "sk-Ar06zcDAy...",
  "created_at": "2026-08-13 03:49:51",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/8349b7e2-f00f-4369-83f5-9c7ecd728706.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/8349b7e2-f00f-4369-83f5-9c7ecd728706.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-02 00:12:50",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "LLM水印",
+    "基准评测",
+    "生成质量评估",
+    "指令遵循",
+    "水印强度",
+    "GPT4-Judge"
+   ],
+   "field": "大语言模型安全与可信",
+   "innovations": [
+    "提出统一水印强度的基准测试流程实现公平比较",
+    "构建覆盖5类9子任务的多维度水印评测基准",
+    "引入GPT4-Judge自动量化指令遵循能力的水印衰减"
+   ],
+   "benchmarks": [
+    "WaterBench"
+   ]
+  }
+ }
 }

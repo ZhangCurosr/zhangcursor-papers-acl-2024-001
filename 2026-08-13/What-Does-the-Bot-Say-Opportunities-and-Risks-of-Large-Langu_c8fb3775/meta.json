@@ -4,5 +4,29 @@
  "title": "What-Does-the-Bot-Say-Opportunities-and-Risks-of-Large-Langu",
  "token": "sk-Ir4JqYCnj...",
  "created_at": "2026-08-13 03:50:12",
- "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/4d4e29b9-9121-4dc6-90bf-57f1c45d6e5f.zip"
+ "result_url": "https://cdn-mineru.openxlab.org.cn/pdf/2026-08-13/4d4e29b9-9121-4dc6-90bf-57f1c45d6e5f.zip",
+ "summarized": {
+  "model": "agnes-2.5-flash",
+  "at": "2026-09-02 00:12:56",
+  "chunks": 1,
+  "meta": {
+   "keywords": [
+    "social bot detection",
+    "large language models",
+    "adversarial machine learning",
+    "mixture of experts",
+    "instruction tuning"
+   ],
+   "field": "社交媒体机器人检测",
+   "innovations": [
+    "提出异构专家混合框架，将LLM按模态分工检测元数据、文本和网络结构",
+    "系统研究LLM引导的文本改写和图结构篡改策略，揭示LLM在机器人检测中的双刃剑效应",
+    "证明仅需1,000条标注数据的指令微调即可超越现有SOTA检测器，显著提升低资源场景下的检测性能"
+   ],
+   "benchmarks": [
+    "TwiBot-20",
+    "TwiBot-22"
+   ]
+  }
+ }
 }
